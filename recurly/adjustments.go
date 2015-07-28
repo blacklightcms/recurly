@@ -28,18 +28,20 @@ type (
 		TaxInCents             int           `xml:"tax_in_cents,omitempty"`
 		TotalInCents           int           `xml:"total_in_cents,omitempty"`
 		Currency               string        `xml:"currency"`
-		Taxable                bool          `xml:"taxable,omitempty"`
+		Taxable                NullBool      `xml:"taxable,omitempty"`
 		TaxCode                string        `xml:"tax_code,omitempty"`
+		TaxType                string        `xml:"tax_type,omitempty"`
 		TaxRegion              string        `xml:"tax_region,omitempty"`
 		TaxRate                float64       `xml:"tax_rate,omitempty"`
 		TaxExempt              NullBool      `xml:"tax_exempt,omitempty"`
-		TaxDetails             *[]taxDetails `xml:"tax_details,omitempty"`
+		TaxDetails             *[]TaxDetails `xml:"tax_details>tax_detail,omitempty"`
 		StartDate              NullTime      `xml:"start_date,omitempty"`
 		EndDate                NullTime      `xml:"end_date,omitempty"`
 		CreatedAt              NullTime      `xml:"created_at,omitempty"`
 	}
 
-	taxDetails struct {
+	// TaxDetails holds tax information and is embedded in an Adjustment.
+	TaxDetails struct {
 		XMLName    xml.Name `xml:"tax_detail"`
 		Name       string   `xml:"name,omitempty"`
 		Type       string   `xml:"type,omitempty"`
@@ -89,7 +91,7 @@ func (service adjustmentService) Get(uuid string) (*Response, Adjustment, error)
 // https://docs.recurly.com/api/adjustments#create-adjustment
 func (service adjustmentService) Create(accountCode string, a Adjustment) (*Response, Adjustment, error) {
 	action := fmt.Sprintf("accounts/%s/adjustments", accountCode)
-	req, err := service.client.newRequest("GET", action, nil, a)
+	req, err := service.client.newRequest("POST", action, nil, a)
 	if err != nil {
 		return nil, Adjustment{}, err
 	}

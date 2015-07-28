@@ -20,37 +20,21 @@ type (
 		// client is the HTTP Client used to communicate with the API.
 		client *http.Client
 
-		// Subdomain is your account's sub domain used for authentication.
+		// subdomain is your account's sub domain used for authentication.
 		subDomain string
 
-		// APIKey is your account's API key used for authentication.
+		// apiKey is your account's API key used for authentication.
 		apiKey string
 
 		// BaseURL is the base url for api requests.
 		BaseURL string
 
-		// Accounts handles all interaction with the accounts portion
-		// of the recurly API.
-		Accounts accountService
-
-		// Adjustments handles all interaction with the adjustments portion of
-		// the recurly API.
-		Adjustments adjustmentService
-
-		// Billing handles all interaction with the billing info portion of
-		// the recurly API.
-		Billing billingService
-
-		// Plans handles all interaction with the plans portion of the
-		// recurly API.
-		Plans planService
-
-		// AddOns handles all interaction with the add ons portion of the
-		// recurly API. All add ons are linked to a plan.
-		AddOns addOnService
-
-		// Subscriptions handles all interaction with the subscriptions portion
-		// of the recurly API.
+		// Services used for talking with different parts of the Recurly API
+		Accounts      accountService
+		Adjustments   adjustmentService
+		Billing       billingService
+		Plans         planService
+		AddOns        addOnService
 		Subscriptions subscriptionService
 	}
 
@@ -130,6 +114,11 @@ func (c Client) do(req *http.Request, v interface{}) (*Response, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
+
+	// @todo pagination support.
+	// How do you make cursor calls for additional pages?
+	// log.Println(res.Header.Get("x-records"))
+	// log.Println(res.Header.Get("link"))
 
 	response := &Response{Response: resp}
 	if response.IsError() {

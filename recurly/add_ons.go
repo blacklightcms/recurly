@@ -3,7 +3,6 @@ package recurly
 import (
 	"encoding/xml"
 	"fmt"
-	"time"
 )
 
 type (
@@ -21,7 +20,7 @@ type (
 		TaxCode                     string      `xml:"tax_code,omitempty"`
 		UnitAmountInCents           *UnitAmount `xml:"unit_amount_in_cents,omitempty"`
 		AccountingCode              string      `xml:"accounting_code,omitempty"`
-		CreatedAt                   *time.Time  `xml:"created_at,omitempty"`
+		CreatedAt                   NullTime    `xml:"created_at,omitempty"`
 	}
 )
 
@@ -76,8 +75,8 @@ func (aos addOnService) Create(planCode string, a AddOn) (*Response, AddOn, erro
 // Update will update the pricing information or description for an add-on.
 // Subscriptions who have already subscribed to the add-on will not receive the new pricing.
 // https://docs.recurly.com/api/plans/add-ons#update-addon
-func (aos addOnService) Update(planCode string, a AddOn) (*Response, AddOn, error) {
-	action := fmt.Sprintf("plans/%s/add_ons", planCode)
+func (aos addOnService) Update(planCode string, code string, a AddOn) (*Response, AddOn, error) {
+	action := fmt.Sprintf("plans/%s/add_ons/%s", planCode, code)
 	req, err := aos.client.newRequest("PUT", action, nil, a)
 	if err != nil {
 		return nil, AddOn{}, err

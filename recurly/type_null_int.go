@@ -22,7 +22,7 @@ func NewInt(i int) NullInt {
 func (n *NullInt) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v int
 	err := d.DecodeElement(&v, &start)
-	if err != nil {
+	if err == nil {
 		*n = NullInt{Int: v, Valid: true}
 	}
 

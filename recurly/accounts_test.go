@@ -217,11 +217,11 @@ func TestCreateAccount(t *testing.T) {
 
 	r, _, err := client.Accounts.Create(Account{})
 	if err != nil {
-		t.Errorf("TestGetAccount Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestCreateAccount Error: Error occured making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
-		t.Fatal("TestGetAccount Error: Expected create account to return OK")
+		t.Fatal("TestCreateAccount Error: Expected create account to return OK")
 	}
 }
 
