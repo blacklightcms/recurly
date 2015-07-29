@@ -16,8 +16,78 @@ import (
 // fields are handled properly -- including types like booleans and integers which
 // have zero values that we want to send.
 func TestCouponsEncoding(t *testing.T) {
+	redeem, _ := time.Parse(datetimeFormat, "2014-01-01T07:00:00Z")
 	suite := []map[string]interface{}{
 		map[string]interface{}{"struct": Coupon{}, "xml": "<coupon><coupon_code></coupon_code><name></name><discount_type></discount_type></coupon>"},
+		map[string]interface{}{"struct": Coupon{
+			Code:         "special",
+			Name:         "Special 10% off",
+			DiscountType: "percent",
+		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type></coupon>"},
+		map[string]interface{}{"struct": Coupon{
+			Code:              "special",
+			Name:              "Special 10% off",
+			HostedDescription: "Save 10%",
+			DiscountType:      "percent",
+		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><hosted_description>Save 10%</hosted_description><discount_type>percent</discount_type></coupon>"},
+		map[string]interface{}{"struct": Coupon{
+			Code:               "special",
+			Name:               "Special 10% off",
+			InvoiceDescription: "Coupon: Special 10% off",
+			DiscountType:       "percent",
+		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><invoice_description>Coupon: Special 10% off</invoice_description><discount_type>percent</discount_type></coupon>"},
+		map[string]interface{}{"struct": Coupon{
+			Code:         "special",
+			Name:         "Special 10% off",
+			DiscountType: "percent",
+			RedeemByDate: NewTime(redeem),
+		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><redeem_by_date>2014-01-01T07:00:00Z</redeem_by_date></coupon>"},
+		map[string]interface{}{"struct": Coupon{
+			Code:         "special",
+			Name:         "Special 10% off",
+			DiscountType: "percent",
+			SingleUse:    NewBool(true),
+		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><single_use>true</single_use></coupon>"},
+		map[string]interface{}{"struct": Coupon{
+			Code:             "special",
+			Name:             "Special 10% off",
+			DiscountType:     "percent",
+			AppliesForMonths: NewInt(3),
+		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><applies_for_months>3</applies_for_months></coupon>"},
+		map[string]interface{}{"struct": Coupon{
+			Code:           "special",
+			Name:           "Special 10% off",
+			DiscountType:   "percent",
+			MaxRedemptions: NewInt(20),
+		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><max_redemptions>20</max_redemptions></coupon>"},
+		map[string]interface{}{"struct": Coupon{
+			Code:              "special",
+			Name:              "Special 10% off",
+			DiscountType:      "percent",
+			AppliesToAllPlans: NewBool(false),
+		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><applies_to_all_plans>false</applies_to_all_plans></coupon>"},
+		map[string]interface{}{"struct": Coupon{
+			Code:            "special",
+			Name:            "Special 10% off",
+			DiscountType:    "percent",
+			DiscountPercent: 10,
+		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><discount_percent>10</discount_percent></coupon>"},
+		map[string]interface{}{"struct": Coupon{
+			Code:            "special",
+			Name:            "Special $10 off",
+			DiscountType:    "dollars",
+			DiscountPercent: 1000,
+		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special $10 off</name><discount_type>dollars</discount_type><discount_percent>1000</discount_percent></coupon>"},
+		map[string]interface{}{"struct": Coupon{
+			Code:              "special",
+			Name:              "Special 10% off",
+			DiscountType:      "percent",
+			AppliesToAllPlans: NewBool(false),
+			PlanCodes: &[]CouponPlanCode{
+				CouponPlanCode{Code: "gold"},
+				CouponPlanCode{Code: "silver"},
+			},
+		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><applies_to_all_plans>false</applies_to_all_plans><plan_codes><plan_code>gold</plan_code><plan_code>silver</plan_code></plan_codes></coupon>"},
 	}
 
 	for _, s := range suite {
