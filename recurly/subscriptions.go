@@ -7,7 +7,9 @@ import (
 )
 
 type (
-	subscriptionService struct {
+	// SubscriptionsService handles communication with the subscription related methods
+	// of the recurly API.
+	SubscriptionsService struct {
 		client *Client
 	}
 
@@ -141,8 +143,8 @@ func (s Subscription) MakeUpdate() UpdateSubscription {
 
 // List returns a list of all the subscriptions.
 // https://docs.recurly.com/api/subscriptions#list-subscriptions
-func (ss subscriptionService) List(params Params) (*Response, []Subscription, error) {
-	req, err := ss.client.newRequest("GET", "subscriptions", params, nil)
+func (service SubscriptionsService) List(params Params) (*Response, []Subscription, error) {
+	req, err := service.client.newRequest("GET", "subscriptions", params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -151,16 +153,16 @@ func (ss subscriptionService) List(params Params) (*Response, []Subscription, er
 		XMLName       xml.Name       `xml:"subscriptions"`
 		Subscriptions []Subscription `xml:"subscription"`
 	}
-	res, err := ss.client.do(req, &s)
+	res, err := service.client.do(req, &s)
 
 	return res, s.Subscriptions, err
 }
 
-// ListAccount returns a list of subscriptions for an account.
+// ListForAccount returns a list of subscriptions for an account.
 // https://docs.recurly.com/api/subscriptions#list-account-subscriptions
-func (ss subscriptionService) ListForAccount(accountCode string, params Params) (*Response, []Subscription, error) {
+func (service SubscriptionsService) ListForAccount(accountCode string, params Params) (*Response, []Subscription, error) {
 	action := fmt.Sprintf("accounts/%s/subscriptions", accountCode)
-	req, err := ss.client.newRequest("GET", action, params, nil)
+	req, err := service.client.newRequest("GET", action, params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -169,50 +171,50 @@ func (ss subscriptionService) ListForAccount(accountCode string, params Params) 
 		XMLName       xml.Name       `xml:"subscriptions"`
 		Subscriptions []Subscription `xml:"subscription"`
 	}
-	res, err := ss.client.do(req, &s)
+	res, err := service.client.do(req, &s)
 
 	return res, s.Subscriptions, err
 }
 
 // Get returns a subscription by uuid
 // https://docs.recurly.com/api/subscriptions#lookup-subscription
-func (ss subscriptionService) Get(uuid string) (*Response, Subscription, error) {
+func (service SubscriptionsService) Get(uuid string) (*Response, Subscription, error) {
 	action := fmt.Sprintf("subscriptions/%s", uuid)
-	req, err := ss.client.newRequest("GET", action, nil, nil)
+	req, err := service.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, Subscription{}, err
 	}
 
 	var s Subscription
-	res, err := ss.client.do(req, &s)
+	res, err := service.client.do(req, &s)
 
 	return res, s, err
 }
 
 // Create creates a new subscription.
 // https://docs.recurly.com/api/subscriptions#create-subscription
-func (ss subscriptionService) Create(s NewSubscription) (*Response, Subscription, error) {
-	req, err := ss.client.newRequest("POST", "subscriptions", nil, s)
+func (service SubscriptionsService) Create(s NewSubscription) (*Response, Subscription, error) {
+	req, err := service.client.newRequest("POST", "subscriptions", nil, s)
 	if err != nil {
 		return nil, Subscription{}, err
 	}
 
 	var dest Subscription
-	res, err := ss.client.do(req, &dest)
+	res, err := service.client.do(req, &dest)
 
 	return res, dest, err
 }
 
 // Preview returns a preview for a new subscription applied to an account.
 // https://docs.recurly.com/api/subscriptions#preview-sub
-func (ss subscriptionService) Preview(s NewSubscription) (*Response, Subscription, error) {
-	req, err := ss.client.newRequest("POST", "subscriptions/preview", nil, s)
+func (service SubscriptionsService) Preview(s NewSubscription) (*Response, Subscription, error) {
+	req, err := service.client.newRequest("POST", "subscriptions/preview", nil, s)
 	if err != nil {
 		return nil, Subscription{}, err
 	}
 
 	var dest Subscription
-	res, err := ss.client.do(req, &dest)
+	res, err := service.client.do(req, &dest)
 
 	return res, dest, err
 }
@@ -223,15 +225,15 @@ func (ss subscriptionService) Preview(s NewSubscription) (*Response, Subscriptio
 // identically. If updating SubscriptionAddOns, you should provide the entire replacement
 // value. See recurly documentation for more info.
 // https://docs.recurly.com/api/subscriptions#update-subscription
-func (ss subscriptionService) Update(uuid string, s UpdateSubscription) (*Response, Subscription, error) {
+func (service SubscriptionsService) Update(uuid string, s UpdateSubscription) (*Response, Subscription, error) {
 	action := fmt.Sprintf("subscriptions/%s", uuid)
-	req, err := ss.client.newRequest("PUT", action, nil, s)
+	req, err := service.client.newRequest("PUT", action, nil, s)
 	if err != nil {
 		return nil, Subscription{}, err
 	}
 
 	var dest Subscription
-	res, err := ss.client.do(req, &dest)
+	res, err := service.client.do(req, &dest)
 
 	return res, dest, err
 }
@@ -239,15 +241,15 @@ func (ss subscriptionService) Update(uuid string, s UpdateSubscription) (*Respon
 // UpdateNotes updates a subscription's invoice notes before the next renewal.
 // Updating notes will not trigger the renewal.
 // https://docs.recurly.com/api/subscriptions#update-subscription-notes
-func (ss subscriptionService) UpdateNotes(uuid string, n SubscriptionNotes) (*Response, Subscription, error) {
+func (service SubscriptionsService) UpdateNotes(uuid string, n SubscriptionNotes) (*Response, Subscription, error) {
 	action := fmt.Sprintf("subscriptions/%s/notes", uuid)
-	req, err := ss.client.newRequest("PUT", action, nil, n)
+	req, err := service.client.newRequest("PUT", action, nil, n)
 	if err != nil {
 		return nil, Subscription{}, err
 	}
 
 	var dest Subscription
-	res, err := ss.client.do(req, &dest)
+	res, err := service.client.do(req, &dest)
 
 	return res, dest, err
 }
@@ -255,15 +257,15 @@ func (ss subscriptionService) UpdateNotes(uuid string, n SubscriptionNotes) (*Re
 // PreviewChange returns a preview for a subscription change applied to an
 // account without committing a subscription change or posting an invoice.
 // https://docs.recurly.com/api/subscriptions#sub-change-preview
-func (ss subscriptionService) PreviewChange(uuid string, s UpdateSubscription) (*Response, Subscription, error) {
+func (service SubscriptionsService) PreviewChange(uuid string, s UpdateSubscription) (*Response, Subscription, error) {
 	action := fmt.Sprintf("subscriptions/%s/preview", uuid)
-	req, err := ss.client.newRequest("POST", action, nil, s)
+	req, err := service.client.newRequest("POST", action, nil, s)
 	if err != nil {
 		return nil, Subscription{}, err
 	}
 
 	var dest Subscription
-	res, err := ss.client.do(req, &dest)
+	res, err := service.client.do(req, &dest)
 
 	return res, dest, err
 }
@@ -271,75 +273,75 @@ func (ss subscriptionService) PreviewChange(uuid string, s UpdateSubscription) (
 // Cancel cancels a subscription so it remains active and then expires at the
 // end of the current bill cycle.
 // https://docs.recurly.com/api/subscriptions#cancel-subscription
-func (ss subscriptionService) Cancel(uuid string) (*Response, error) {
+func (service SubscriptionsService) Cancel(uuid string) (*Response, error) {
 	action := fmt.Sprintf("subscriptions/%s/cancel", uuid)
-	req, err := ss.client.newRequest("PUT", action, nil, nil)
+	req, err := service.client.newRequest("PUT", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return ss.client.do(req, nil)
+	return service.client.do(req, nil)
 }
 
 // Reactivate will reactivate a canceled subscription so it renews at the end
 // of the current bill cycle.
 // https://docs.recurly.com/api/subscriptions#reactivate-subscription
-func (ss subscriptionService) Reactivate(uuid string) (*Response, error) {
+func (service SubscriptionsService) Reactivate(uuid string) (*Response, error) {
 	action := fmt.Sprintf("subscriptions/%s/reactivate", uuid)
-	req, err := ss.client.newRequest("PUT", action, nil, nil)
+	req, err := service.client.newRequest("PUT", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return ss.client.do(req, nil)
+	return service.client.do(req, nil)
 }
 
 // TerminateWithPartialRefund will terminate the active subscription
 // immediately with a full refund.
 // https://docs.recurly.com/api/subscriptions#terminate-subscription
-func (ss subscriptionService) TerminateWithPartialRefund(uuid string) (*Response, error) {
+func (service SubscriptionsService) TerminateWithPartialRefund(uuid string) (*Response, error) {
 	action := fmt.Sprintf("subscriptions/%s/terminate", uuid)
-	req, err := ss.client.newRequest("PUT", action, Params{"refund_type": "partial"}, nil)
+	req, err := service.client.newRequest("PUT", action, Params{"refund_type": "partial"}, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return ss.client.do(req, nil)
+	return service.client.do(req, nil)
 }
 
 // TerminateWithFullRefund will terminate the active subscription
 // immediately with a full refund.
 // https://docs.recurly.com/api/subscriptions#terminate-subscription
-func (ss subscriptionService) TerminateWithFullRefund(uuid string) (*Response, error) {
+func (service SubscriptionsService) TerminateWithFullRefund(uuid string) (*Response, error) {
 	action := fmt.Sprintf("subscriptions/%s/terminate", uuid)
-	req, err := ss.client.newRequest("PUT", action, Params{"refund_type": "full"}, nil)
+	req, err := service.client.newRequest("PUT", action, Params{"refund_type": "full"}, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return ss.client.do(req, nil)
+	return service.client.do(req, nil)
 }
 
 // TerminateWithoutRefund will terminate the active subscription
 // immediately with no refund.
 // https://docs.recurly.com/api/subscriptions#terminate-subscription
-func (ss subscriptionService) TerminateWithoutRefund(uuid string) (*Response, error) {
+func (service SubscriptionsService) TerminateWithoutRefund(uuid string) (*Response, error) {
 	action := fmt.Sprintf("subscriptions/%s/terminate", uuid)
-	req, err := ss.client.newRequest("PUT", action, Params{"refund_type": "none"}, nil)
+	req, err := service.client.newRequest("PUT", action, Params{"refund_type": "none"}, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return ss.client.do(req, nil)
+	return service.client.do(req, nil)
 }
 
 // Postpone will pause an an active subscription until the specified date.
 // The subscription will not be prorated. For a subscription in a trial period,
 // modifying the renewal date will modify when the trial expires.
 // https://docs.recurly.com/api/subscriptions#postpone-subscription
-func (ss subscriptionService) Postpone(uuid string, dt time.Time, bulk bool) (*Response, error) {
+func (service SubscriptionsService) Postpone(uuid string, dt time.Time, bulk bool) (*Response, error) {
 	action := fmt.Sprintf("subscriptions/%s/postpone", uuid)
-	req, err := ss.client.newRequest("PUT", action, Params{
+	req, err := service.client.newRequest("PUT", action, Params{
 		"bulk":              bulk,
 		"next_renewal_date": dt.Format(time.RFC3339),
 	}, nil)
@@ -347,7 +349,7 @@ func (ss subscriptionService) Postpone(uuid string, dt time.Time, bulk bool) (*R
 		return nil, err
 	}
 
-	return ss.client.do(req, nil)
+	return service.client.do(req, nil)
 }
 
 // Note: Create/Update Subscription with AddOns and Create/Update manual invoice

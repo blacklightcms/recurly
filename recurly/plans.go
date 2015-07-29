@@ -6,7 +6,9 @@ import (
 )
 
 type (
-	planService struct {
+	// PlansService handles communication with the plans related methods
+	// of the recurly API.
+	PlansService struct {
 		client *Client
 	}
 
@@ -40,8 +42,8 @@ type (
 
 // List will retrieve all your active subscription plans.
 // https://docs.recurly.com/api/plans#list-plans
-func (ps planService) List(params Params) (*Response, []Plan, error) {
-	req, err := ps.client.newRequest("GET", "plans", params, nil)
+func (service PlansService) List(params Params) (*Response, []Plan, error) {
+	req, err := service.client.newRequest("GET", "plans", params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -50,36 +52,36 @@ func (ps planService) List(params Params) (*Response, []Plan, error) {
 		XMLName xml.Name `xml:"plans"`
 		Plans   []Plan   `xml:"plan"`
 	}
-	res, err := ps.client.do(req, &p)
+	res, err := service.client.do(req, &p)
 
 	return res, p.Plans, err
 }
 
 // Get will lookup a specific plan by code.
 // https://docs.recurly.com/api/plans#lookup-plan
-func (ps planService) Get(code string) (*Response, Plan, error) {
+func (service PlansService) Get(code string) (*Response, Plan, error) {
 	action := fmt.Sprintf("plans/%s", code)
-	req, err := ps.client.newRequest("GET", action, nil, nil)
+	req, err := service.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, Plan{}, err
 	}
 
 	var p Plan
-	res, err := ps.client.do(req, &p)
+	res, err := service.client.do(req, &p)
 
 	return res, p, err
 }
 
 // Create will create a new subscription plan.
 // https://docs.recurly.com/api/plans#create-plan
-func (ps planService) Create(p Plan) (*Response, Plan, error) {
-	req, err := ps.client.newRequest("POST", "plans", nil, p)
+func (service PlansService) Create(p Plan) (*Response, Plan, error) {
+	req, err := service.client.newRequest("POST", "plans", nil, p)
 	if err != nil {
 		return nil, Plan{}, err
 	}
 
 	var dest Plan
-	res, err := ps.client.do(req, &dest)
+	res, err := service.client.do(req, &dest)
 
 	return res, dest, err
 }
@@ -87,27 +89,27 @@ func (ps planService) Create(p Plan) (*Response, Plan, error) {
 // Update will update the pricing or details for a plan. Existing subscriptions
 // will remain at the previous renewal amounts.
 // https://docs.recurly.com/api/plans#update-plan
-func (ps planService) Update(code string, p Plan) (*Response, Plan, error) {
+func (service PlansService) Update(code string, p Plan) (*Response, Plan, error) {
 	action := fmt.Sprintf("plans/%s", code)
-	req, err := ps.client.newRequest("PUT", action, nil, p)
+	req, err := service.client.newRequest("PUT", action, nil, p)
 	if err != nil {
 		return nil, Plan{}, err
 	}
 
 	var dest Plan
-	res, err := ps.client.do(req, &dest)
+	res, err := service.client.do(req, &dest)
 
 	return res, dest, err
 }
 
 // Delete will make a plan inactive. New accounts cannot be created on the plan.
 // https://docs.recurly.com/api/plans#delete-plan
-func (ps planService) Delete(code string) (*Response, error) {
+func (service PlansService) Delete(code string) (*Response, error) {
 	action := fmt.Sprintf("plans/%s", code)
-	req, err := ps.client.newRequest("DELETE", action, nil, nil)
+	req, err := service.client.newRequest("DELETE", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return ps.client.do(req, nil)
+	return service.client.do(req, nil)
 }

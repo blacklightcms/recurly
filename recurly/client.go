@@ -30,17 +30,16 @@ type (
 		BaseURL string
 
 		// Services used for talking with different parts of the Recurly API
-		Accounts      accountService
-		Adjustments   adjustmentService
-		Billing       billingService
-		Plans         planService
-		AddOns        addOnService
-		Subscriptions subscriptionService
-		Coupons       couponService
+		Accounts      AccountsService
+		Adjustments   AdjustmentsService
+		Billing       BillingService
+		Plans         PlansService
+		AddOns        AddOnsService
+		Subscriptions SubscriptionsService
+		Coupons       CouponsService
 	}
 
 	// Params are used to send parameters with the request.
-	// @todo make private
 	Params map[string]interface{}
 )
 
@@ -57,13 +56,13 @@ func NewClient(subDomain string, apiKey string, httpClient *http.Client) *Client
 		BaseURL:   fmt.Sprintf(defaultBaseURL, subDomain),
 	}
 
-	c.Accounts = accountService{client: c}
-	c.Adjustments = adjustmentService{client: c}
-	c.Billing = billingService{client: c}
-	c.Plans = planService{client: c}
-	c.AddOns = addOnService{client: c}
-	c.Subscriptions = subscriptionService{client: c}
-	c.Coupons = couponService{client: c}
+	c.Accounts = AccountsService{client: c}
+	c.Adjustments = AdjustmentsService{client: c}
+	c.Billing = BillingService{client: c}
+	c.Plans = PlansService{client: c}
+	c.AddOns = AddOnsService{client: c}
+	c.Subscriptions = SubscriptionsService{client: c}
+	c.Coupons = CouponsService{client: c}
 
 	return c
 }

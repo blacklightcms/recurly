@@ -6,7 +6,9 @@ import (
 )
 
 type (
-	addOnService struct {
+	// AddOnsService handles communication with the add ons related methods
+	// of the recurly API.
+	AddOnsService struct {
 		client *Client
 	}
 
@@ -26,9 +28,9 @@ type (
 
 // List returns a list of add ons for a plan.
 // https://docs.recurly.com/api/plans/add-ons#list-addons
-func (aos addOnService) List(planCode string, params Params) (*Response, []AddOn, error) {
+func (service AddOnsService) List(planCode string, params Params) (*Response, []AddOn, error) {
 	action := fmt.Sprintf("plans/%s/add_ons", planCode)
-	req, err := aos.client.newRequest("GET", action, params, nil)
+	req, err := service.client.newRequest("GET", action, params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -37,37 +39,37 @@ func (aos addOnService) List(planCode string, params Params) (*Response, []AddOn
 		XMLName xml.Name `xml:"add_ons"`
 		AddOns  []AddOn  `xml:"add_on"`
 	}
-	res, err := aos.client.do(req, &p)
+	res, err := service.client.do(req, &p)
 
 	return res, p.AddOns, err
 }
 
 // Get returns information about an add on.
 // https://docs.recurly.com/api/plans/add-ons#lookup-addon
-func (aos addOnService) Get(planCode string, code string) (*Response, AddOn, error) {
+func (service AddOnsService) Get(planCode string, code string) (*Response, AddOn, error) {
 	action := fmt.Sprintf("plans/%s/add_ons/%s", planCode, code)
-	req, err := aos.client.newRequest("GET", action, nil, nil)
+	req, err := service.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, AddOn{}, err
 	}
 
 	var a AddOn
-	res, err := aos.client.do(req, &a)
+	res, err := service.client.do(req, &a)
 
 	return res, a, err
 }
 
 // Create adds an add on to a plan.
 // https://docs.recurly.com/api/plans/add-ons#create-addon
-func (aos addOnService) Create(planCode string, a AddOn) (*Response, AddOn, error) {
+func (service AddOnsService) Create(planCode string, a AddOn) (*Response, AddOn, error) {
 	action := fmt.Sprintf("plans/%s/add_ons", planCode)
-	req, err := aos.client.newRequest("POST", action, nil, a)
+	req, err := service.client.newRequest("POST", action, nil, a)
 	if err != nil {
 		return nil, AddOn{}, err
 	}
 
 	var dest AddOn
-	res, err := aos.client.do(req, &dest)
+	res, err := service.client.do(req, &dest)
 
 	return res, dest, err
 }
@@ -75,27 +77,27 @@ func (aos addOnService) Create(planCode string, a AddOn) (*Response, AddOn, erro
 // Update will update the pricing information or description for an add-on.
 // Subscriptions who have already subscribed to the add-on will not receive the new pricing.
 // https://docs.recurly.com/api/plans/add-ons#update-addon
-func (aos addOnService) Update(planCode string, code string, a AddOn) (*Response, AddOn, error) {
+func (service AddOnsService) Update(planCode string, code string, a AddOn) (*Response, AddOn, error) {
 	action := fmt.Sprintf("plans/%s/add_ons/%s", planCode, code)
-	req, err := aos.client.newRequest("PUT", action, nil, a)
+	req, err := service.client.newRequest("PUT", action, nil, a)
 	if err != nil {
 		return nil, AddOn{}, err
 	}
 
 	var dest AddOn
-	res, err := aos.client.do(req, &dest)
+	res, err := service.client.do(req, &dest)
 
 	return res, dest, err
 }
 
 // Delete will remove an add on from a plan.
 // https://docs.recurly.com/api/plans/add-ons#delete-addon
-func (aos addOnService) Delete(planCode string, code string) (*Response, error) {
+func (service AddOnsService) Delete(planCode string, code string) (*Response, error) {
 	action := fmt.Sprintf("plans/%s/add_ons/%s", planCode, code)
-	req, err := aos.client.newRequest("DELETE", action, nil, nil)
+	req, err := service.client.newRequest("DELETE", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return aos.client.do(req, nil)
+	return service.client.do(req, nil)
 }

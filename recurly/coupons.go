@@ -6,7 +6,9 @@ import (
 )
 
 type (
-	couponService struct {
+	// CouponsService handles communication with the coupons related methods
+	// of the recurly API.
+	CouponsService struct {
 		client *Client
 	}
 
@@ -39,7 +41,7 @@ type (
 
 // List returns a list of all the coupons
 // https://dev.recurly.com/docs/list-active-coupons
-func (service couponService) List(params Params) (*Response, []Coupon, error) {
+func (service CouponsService) List(params Params) (*Response, []Coupon, error) {
 	req, err := service.client.newRequest("GET", "coupons", params, nil)
 	if err != nil {
 		return nil, nil, err
@@ -56,7 +58,7 @@ func (service couponService) List(params Params) (*Response, []Coupon, error) {
 
 // Get returns information about an active coupon.
 // https://dev.recurly.com/docs/lookup-a-coupon
-func (service couponService) Get(code string) (*Response, Coupon, error) {
+func (service CouponsService) Get(code string) (*Response, Coupon, error) {
 	action := fmt.Sprintf("coupons/%s", code)
 	req, err := service.client.newRequest("GET", action, nil, nil)
 	if err != nil {
@@ -71,7 +73,7 @@ func (service couponService) Get(code string) (*Response, Coupon, error) {
 
 // Create a new coupon. Coupons cannot be updated after being created.
 // https://dev.recurly.com/docs/create-coupon
-func (service couponService) Create(c Coupon) (*Response, Coupon, error) {
+func (service CouponsService) Create(c Coupon) (*Response, Coupon, error) {
 	req, err := service.client.newRequest("POST", "coupons", nil, c)
 	if err != nil {
 		return nil, Coupon{}, err
@@ -83,9 +85,9 @@ func (service couponService) Create(c Coupon) (*Response, Coupon, error) {
 	return res, dest, err
 }
 
-// Deactivate the coupon so it can no longer be redeemed.
+// Delete deactivates the coupon so it can no longer be redeemed.
 // https://docs.recurly.com/api/plans/add-ons#delete-addon
-func (service couponService) Delete(code string) (*Response, error) {
+func (service CouponsService) Delete(code string) (*Response, error) {
 	action := fmt.Sprintf("coupons/%s", code)
 	req, err := service.client.newRequest("DELETE", action, nil, nil)
 	if err != nil {
