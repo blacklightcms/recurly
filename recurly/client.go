@@ -36,6 +36,7 @@ type (
 		Plans         planService
 		AddOns        addOnService
 		Subscriptions subscriptionService
+		Coupons       couponService
 	}
 
 	// Params are used to send parameters with the request.
@@ -62,6 +63,7 @@ func NewClient(subDomain string, apiKey string, httpClient *http.Client) *Client
 	c.Plans = planService{client: c}
 	c.AddOns = addOnService{client: c}
 	c.Subscriptions = subscriptionService{client: c}
+	c.Coupons = couponService{client: c}
 
 	return c
 }
