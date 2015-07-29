@@ -1,17 +1,18 @@
-# Recurly API Client for Go
+# Go Recurly
+Recurly is a Go (golang) API Client for the [Recurly](https://recurly.com/) API.
 
-## Description
-An implementation of the recurly API in golang.
-
-References
- * https://dev.recurly.com/docs/
+## References
+ * [API Reference](http://godoc.org/github.com/blacklightcms/go-recurly/recurly)
+ * [Recurly API Documentation](https://dev.recurly.com/docs/)
+ * [recurly.js Documentation](https://docs.recurly.com/js/)
+ * Documentation and examples for the library are coming soon. In the meantime,
+ checkout the unit tests for thorough examples and usage.
 
 ## Installation
+Install using the "go get" command:
 ```
 go get github.com/blacklightcms/go-recurly/recurly
 ```
-
-## Usage
 
 ### Example
 
@@ -51,15 +52,19 @@ if resp.IsServerError() {
 }
 ```
 
-## Notes
-The API is still being finalized and may change over the coming weeks.
+## Roadmap
+The API is still being finalized and may change over the coming weeks. Here is
+what's coming before things stabilize:
  * Support for paginating beyond the first page with cursors needs to be completed
- * Documentation and more usage examples will be coming as well
+ * Coupons and invoices. All other portions of the API are complete.
+ * Documentation and more usage examples.
  * There is currently no support for updating billing info with a credit card or
- bank account directly. Using recurly.js token is the only supported method currently.
- This is currently a low priority.
+ bank account directly. Using [recurly.js](https://docs.recurly.com/js/) token is the only supported method currently.
+ Because the the token method using [recurly.js](https://docs.recurly.com/js/) is the recommended method, this
+ is currently a low priority. The placeholder functions are already in place so
+ this will not affect API stability of the library.
 
 Once that notice is removed things will be stable. Contributions are welcome.
 
 ## License
-Licensed under the MIT.
+go-recurly is available under the [MIT License](http://opensource.org/licenses/MIT).
