@@ -3,6 +3,9 @@ package recurly
 import (
 	"bytes"
 	"encoding/xml"
+	"fmt"
+	"net/http"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -12,7 +15,7 @@ import (
 // fields are handled properly -- including types like booleans and integers which
 // have zero values that we want to send.
 func TestSubscriptionsEncoding(t *testing.T) {
-	ts, _ := time.Parse("2006-01-02T15:04:05Z07:00", "2015-06-03T13:42:23.764061Z")
+	ts, _ := time.Parse(datetimeFormat, "2015-06-03T13:42:23.764061Z")
 	suite := []map[string]interface{}{
 		// Plan code, account, and currency are required fields. They should always be present.
 		map[string]interface{}{"struct": NewSubscription{}, "xml": "<subscription><plan_code></plan_code><account></account><currency></currency></subscription>"},
@@ -216,5 +219,548 @@ func TestSubscriptionsEncoding(t *testing.T) {
 		if s["xml"] != given.String() {
 			t.Errorf("TestSubscriptionsEncoding Error (%d): Expected %s, given %s", i, s["xml"], given.String())
 		}
+	}
+}
+
+func TestListSubscriptions(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/subscriptions", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			t.Errorf("TestListSubscriptions Error: Expected %s request, given %s", "GET", r.Method)
+		}
+		rw.WriteHeader(200)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
+		<subscriptions type="array">
+			<subscription href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96">
+				<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
+				<invoice href="https://your-subdomain.recurly.com/v2/invoices/1108"/>
+				<plan href="https://your-subdomain.recurly.com/v2/plans/gold">
+				  <plan_code>gold</plan_code>
+				  <name>Gold plan</name>
+				</plan>
+				<uuid>44f83d7cba354d5b84812419f923ea96</uuid>
+				<state>active</state>
+				<unit_amount_in_cents type="integer">800</unit_amount_in_cents>
+				<currency>EUR</currency>
+				<quantity type="integer">1</quantity>
+				<activated_at type="datetime">2011-05-27T07:00:00Z</activated_at>
+				<canceled_at nil="nil"></canceled_at>
+				<expires_at nil="nil"></expires_at>
+				<current_period_started_at type="datetime">2011-06-27T07:00:00Z</current_period_started_at>
+				<current_period_ends_at type="datetime">2010-07-27T07:00:00Z</current_period_ends_at>
+				<trial_started_at nil="nil"></trial_started_at>
+				<trial_ends_at nil="nil"></trial_ends_at>
+				<tax_in_cents type="integer">72</tax_in_cents>
+				<tax_type>usst</tax_type>
+				<tax_region>CA</tax_region>
+				<tax_rate type="float">0.0875</tax_rate>
+				<po_number nil="nil"></po_number>
+				<net_terms type="integer">0</net_terms>
+				<subscription_add_ons type="array">
+				</subscription_add_ons>
+				<a name="cancel" href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/cancel" method="put"/>
+				<a name="terminate" href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/terminate" method="put"/>
+				<a name="postpone" href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/postpone" method="put"/>
+			</subscription>
+		</subscriptions>`)
+	})
+
+	r, subscriptions, err := client.Subscriptions.List(Params{"per_page": 1})
+	if err != nil {
+		t.Errorf("TestListSubscriptions Error: Error occured making API call. Err: %s", err)
+	}
+
+	if r.IsError() {
+		t.Fatal("TestListSubscriptions Error: Expected list subcriptions to return OK")
+	}
+
+	if len(subscriptions) != 1 {
+		t.Fatalf("TestListSubscriptions Error: Expected 1 subscription returned, given %d", len(subscriptions))
+	}
+
+	if r.Request.URL.Query().Get("per_page") != "1" {
+		t.Errorf("TestListSubscriptions Error: Expected per_page parameter of 1, given %s", r.Request.URL.Query().Get("per_page"))
+	}
+
+	activated, _ := time.Parse(datetimeFormat, "2011-05-27T07:00:00Z")
+	cpStartedAt, _ := time.Parse(datetimeFormat, "2011-06-27T07:00:00Z")
+	cpEndsAt, _ := time.Parse(datetimeFormat, "2010-07-27T07:00:00Z")
+	for _, given := range subscriptions {
+		expected := Subscription{
+			XMLName: xml.Name{Local: "subscription"},
+			Plan: nestedPlan{
+				Code: "gold",
+				Name: "Gold plan",
+			},
+			Account: href{
+				HREF: "https://your-subdomain.recurly.com/v2/accounts/1",
+				Code: "1",
+			},
+			Invoice: href{
+				HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
+				Code: "1108",
+			},
+			UUID:                   "44f83d7cba354d5b84812419f923ea96",
+			State:                  "active",
+			UnitAmountInCents:      800,
+			Currency:               "EUR",
+			Quantity:               1,
+			ActivatedAt:            NewTime(activated),
+			CurrentPeriodStartedAt: NewTime(cpStartedAt),
+			CurrentPeriodEndsAt:    NewTime(cpEndsAt),
+			TaxInCents:             72,
+			TaxType:                "usst",
+			TaxRegion:              "CA",
+			TaxRate:                0.0875,
+			NetTerms:               NewInt(0),
+		}
+
+		if !reflect.DeepEqual(expected, given) {
+			t.Errorf("TestListSubscriptions Error: expected subscription to equal %#v, given %#v", expected, given)
+		}
+	}
+}
+
+func TestListAccountSubscriptions(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/accounts/1/subscriptions", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			t.Errorf("TestListAccountSubscriptions Error: Expected %s request, given %s", "GET", r.Method)
+		}
+		rw.WriteHeader(200)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
+		<subscriptions type="array">
+			<subscription href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96">
+				<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
+				<invoice href="https://your-subdomain.recurly.com/v2/invoices/1108"/>
+				<plan href="https://your-subdomain.recurly.com/v2/plans/gold">
+				  <plan_code>gold</plan_code>
+				  <name>Gold plan</name>
+				</plan>
+				<uuid>44f83d7cba354d5b84812419f923ea96</uuid>
+				<state>active</state>
+				<unit_amount_in_cents type="integer">800</unit_amount_in_cents>
+				<currency>EUR</currency>
+				<quantity type="integer">1</quantity>
+				<activated_at type="datetime">2011-05-27T07:00:00Z</activated_at>
+				<canceled_at nil="nil"></canceled_at>
+				<expires_at nil="nil"></expires_at>
+				<current_period_started_at type="datetime">2011-06-27T07:00:00Z</current_period_started_at>
+				<current_period_ends_at type="datetime">2010-07-27T07:00:00Z</current_period_ends_at>
+				<trial_started_at nil="nil"></trial_started_at>
+				<trial_ends_at nil="nil"></trial_ends_at>
+				<tax_in_cents type="integer">72</tax_in_cents>
+				<tax_type>usst</tax_type>
+				<tax_region>CA</tax_region>
+				<tax_rate type="float">0.0875</tax_rate>
+				<po_number nil="nil"></po_number>
+				<net_terms type="integer">0</net_terms>
+				<subscription_add_ons type="array">
+				</subscription_add_ons>
+				<a name="cancel" href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/cancel" method="put"/>
+				<a name="terminate" href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/terminate" method="put"/>
+				<a name="postpone" href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/postpone" method="put"/>
+			</subscription>
+		</subscriptions>`)
+	})
+
+	r, subscriptions, err := client.Subscriptions.ListForAccount("1", Params{"per_page": 1})
+	if err != nil {
+		t.Errorf("TestListAccountSubscriptions Error: Error occured making API call. Err: %s", err)
+	}
+
+	if r.IsError() {
+		t.Fatal("TestListAccountSubscriptions Error: Expected list subcriptions to return OK")
+	}
+
+	if len(subscriptions) != 1 {
+		t.Fatalf("TestListAccountSubscriptions Error: Expected 1 subscription returned, given %d", len(subscriptions))
+	}
+
+	if r.Request.URL.Query().Get("per_page") != "1" {
+		t.Errorf("TestListAccountSubscriptions Error: Expected per_page parameter of 1, given %s", r.Request.URL.Query().Get("per_page"))
+	}
+
+	activated, _ := time.Parse(datetimeFormat, "2011-05-27T07:00:00Z")
+	cpStartedAt, _ := time.Parse(datetimeFormat, "2011-06-27T07:00:00Z")
+	cpEndsAt, _ := time.Parse(datetimeFormat, "2010-07-27T07:00:00Z")
+	for _, given := range subscriptions {
+		expected := Subscription{
+			XMLName: xml.Name{Local: "subscription"},
+			Plan: nestedPlan{
+				Code: "gold",
+				Name: "Gold plan",
+			},
+			Account: href{
+				HREF: "https://your-subdomain.recurly.com/v2/accounts/1",
+				Code: "1",
+			},
+			Invoice: href{
+				HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
+				Code: "1108",
+			},
+			UUID:                   "44f83d7cba354d5b84812419f923ea96",
+			State:                  "active",
+			UnitAmountInCents:      800,
+			Currency:               "EUR",
+			Quantity:               1,
+			ActivatedAt:            NewTime(activated),
+			CurrentPeriodStartedAt: NewTime(cpStartedAt),
+			CurrentPeriodEndsAt:    NewTime(cpEndsAt),
+			TaxInCents:             72,
+			TaxType:                "usst",
+			TaxRegion:              "CA",
+			TaxRate:                0.0875,
+			NetTerms:               NewInt(0),
+		}
+
+		if !reflect.DeepEqual(expected, given) {
+			t.Errorf("TestListAccountSubscriptions Error: expected subscription to equal %#v, given %#v", expected, given)
+		}
+	}
+}
+
+func TestGetSubscriptions(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			t.Errorf("TestGetSubscriptions Error: Expected %s request, given %s", "GET", r.Method)
+		}
+		rw.WriteHeader(200)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
+		<subscription href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96">
+			<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
+			<invoice href="https://your-subdomain.recurly.com/v2/invoices/1108"/>
+			<plan href="https://your-subdomain.recurly.com/v2/plans/gold">
+			  <plan_code>gold</plan_code>
+			  <name>Gold plan</name>
+			</plan>
+			<uuid>44f83d7cba354d5b84812419f923ea96</uuid>
+			<state>active</state>
+			<unit_amount_in_cents type="integer">800</unit_amount_in_cents>
+			<currency>EUR</currency>
+			<quantity type="integer">1</quantity>
+			<activated_at type="datetime">2011-05-27T07:00:00Z</activated_at>
+			<canceled_at nil="nil"></canceled_at>
+			<expires_at nil="nil"></expires_at>
+			<current_period_started_at type="datetime">2011-06-27T07:00:00Z</current_period_started_at>
+			<current_period_ends_at type="datetime">2010-07-27T07:00:00Z</current_period_ends_at>
+			<trial_started_at nil="nil"></trial_started_at>
+			<trial_ends_at nil="nil"></trial_ends_at>
+			<tax_in_cents type="integer">72</tax_in_cents>
+			<tax_type>usst</tax_type>
+			<tax_region>CA</tax_region>
+			<tax_rate type="float">0.0875</tax_rate>
+			<po_number nil="nil"></po_number>
+			<net_terms type="integer">0</net_terms>
+			<subscription_add_ons type="array">
+			</subscription_add_ons>
+			<a name="cancel" href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/cancel" method="put"/>
+			<a name="terminate" href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/terminate" method="put"/>
+			<a name="postpone" href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/postpone" method="put"/>
+		</subscription>`)
+	})
+
+	r, subscription, err := client.Subscriptions.Get("44f83d7cba354d5b84812419f923ea96")
+	if err != nil {
+		t.Errorf("TestGetSubscriptions Error: Error occured making API call. Err: %s", err)
+	}
+
+	if r.IsError() {
+		t.Fatal("TestGetSubscriptions Error: Expected list subcriptions to return OK")
+	}
+
+	activated, _ := time.Parse(datetimeFormat, "2011-05-27T07:00:00Z")
+	cpStartedAt, _ := time.Parse(datetimeFormat, "2011-06-27T07:00:00Z")
+	cpEndsAt, _ := time.Parse(datetimeFormat, "2010-07-27T07:00:00Z")
+	expected := Subscription{
+		XMLName: xml.Name{Local: "subscription"},
+		Plan: nestedPlan{
+			Code: "gold",
+			Name: "Gold plan",
+		},
+		Account: href{
+			HREF: "https://your-subdomain.recurly.com/v2/accounts/1",
+			Code: "1",
+		},
+		Invoice: href{
+			HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
+			Code: "1108",
+		},
+		UUID:                   "44f83d7cba354d5b84812419f923ea96",
+		State:                  "active",
+		UnitAmountInCents:      800,
+		Currency:               "EUR",
+		Quantity:               1,
+		ActivatedAt:            NewTime(activated),
+		CurrentPeriodStartedAt: NewTime(cpStartedAt),
+		CurrentPeriodEndsAt:    NewTime(cpEndsAt),
+		TaxInCents:             72,
+		TaxType:                "usst",
+		TaxRegion:              "CA",
+		TaxRate:                0.0875,
+		NetTerms:               NewInt(0),
+	}
+
+	if !reflect.DeepEqual(expected, subscription) {
+		t.Errorf("TestGetSubscriptions Error: expected subscription to equal %#v, given %#v", expected, subscription)
+	}
+}
+
+func TestCreateSubscription(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/subscriptions", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			t.Errorf("TestCreateSubscription Error: Expected %s request, given %s", "POST", r.Method)
+		}
+		rw.WriteHeader(201)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
+	})
+
+	r, _, err := client.Subscriptions.Create(NewSubscription{})
+	if err != nil {
+		t.Errorf("TestCreateSubscription Error: Error occured making API call. Err: %s", err)
+	}
+
+	if r.IsError() {
+		t.Fatal("TestCreateSubscription Error: Expected create subscription to return OK")
+	}
+}
+
+func TestPreviewSubscription(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/subscriptions/preview", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			t.Errorf("TestPreviewSubscription Error: Expected %s request, given %s", "POST", r.Method)
+		}
+		rw.WriteHeader(201)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
+	})
+
+	r, _, err := client.Subscriptions.Preview(NewSubscription{})
+	if err != nil {
+		t.Errorf("TestPreviewSubscription Error: Error occured making API call. Err: %s", err)
+	}
+
+	if r.IsError() {
+		t.Fatal("TestPreviewSubscription Error: Expected preview subscription to return OK")
+	}
+}
+
+func TestUpdateSubscription(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			t.Errorf("TestUpdateSubscription Error: Expected %s request, given %s", "PUT", r.Method)
+		}
+		rw.WriteHeader(201)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
+	})
+
+	r, _, err := client.Subscriptions.Update("44f83d7cba354d5b84812419f923ea96", UpdateSubscription{})
+	if err != nil {
+		t.Errorf("TestUpdateSubscription Error: Error occured making API call. Err: %s", err)
+	}
+
+	if r.IsError() {
+		t.Fatal("TestUpdateSubscription Error: Expected update subscription to return OK")
+	}
+}
+
+func TestUpdateSubscriptionNotes(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/notes", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			t.Errorf("TestUpdateSubscriptionNotes Error: Expected %s request, given %s", "PUT", r.Method)
+		}
+		rw.WriteHeader(201)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
+	})
+
+	r, _, err := client.Subscriptions.UpdateNotes("44f83d7cba354d5b84812419f923ea96", SubscriptionNotes{})
+	if err != nil {
+		t.Errorf("TestUpdateSubscriptionNotes Error: Error occured making API call. Err: %s", err)
+	}
+
+	if r.IsError() {
+		t.Fatal("TestUpdateSubscriptionNotes Error: Expected update subscription notes to return OK")
+	}
+}
+
+func TestPreviewSubscriptionChange(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/preview", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			t.Errorf("TestPreviewSubscriptionChange Error: Expected %s request, given %s", "POST", r.Method)
+		}
+		rw.WriteHeader(201)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
+	})
+
+	r, _, err := client.Subscriptions.PreviewChange("44f83d7cba354d5b84812419f923ea96", UpdateSubscription{})
+	if err != nil {
+		t.Errorf("TestPreviewSubscriptionChange Error: Error occured making API call. Err: %s", err)
+	}
+
+	if r.IsError() {
+		t.Fatal("TestPreviewSubscriptionChange Error: Expected preview subscription change to return OK")
+	}
+}
+
+func TestCancelSubscription(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/cancel", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			t.Errorf("TestCancelSubscription Error: Expected %s request, given %s", "PUT", r.Method)
+		}
+		rw.WriteHeader(204)
+	})
+
+	r, err := client.Subscriptions.Cancel("44f83d7cba354d5b84812419f923ea96")
+	if err != nil {
+		t.Errorf("TestCancelSubscription Error: Error occured making API call. Err: %s", err)
+	}
+
+	if r.IsError() {
+		t.Fatal("TestCancelSubscription Error: Expected cancel subscription change to return OK")
+	}
+}
+
+func TestReactivateSubscription(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/reactivate", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			t.Errorf("TestReactivateSubscription Error: Expected %s request, given %s", "PUT", r.Method)
+		}
+		rw.WriteHeader(204)
+	})
+
+	r, err := client.Subscriptions.Reactivate("44f83d7cba354d5b84812419f923ea96")
+	if err != nil {
+		t.Errorf("TestReactivateSubscription Error: Error occured making API call. Err: %s", err)
+	}
+
+	if r.IsError() {
+		t.Fatal("TestReactivateSubscription Error: Expected reactivate subscription change to return OK")
+	}
+}
+
+func TestTerminateSubscriptionWithPartialRefund(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/terminate", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			t.Errorf("TestTerminateSubscriptionWithPartialRefund Error: Expected %s request, given %s", "PUT", r.Method)
+		}
+		if r.URL.Query().Get("refund_type") != "partial" {
+			t.Errorf("TestTerminateSubscriptionWithPartialRefund Error: Expected refund_type of partial, given %s", r.URL.Query().Get("refund_type"))
+		}
+		rw.WriteHeader(204)
+	})
+
+	r, err := client.Subscriptions.TerminateWithPartialRefund("44f83d7cba354d5b84812419f923ea96")
+	if err != nil {
+		t.Errorf("TestTerminateSubscriptionWithPartialRefund Error: Error occured making API call. Err: %s", err)
+	}
+
+	if r.IsError() {
+		t.Fatal("TestTerminateSubscriptionWithPartialRefund Error: Expected terminate subscription with partial refund to return OK")
+	}
+}
+
+func TestTerminateSubscriptionWithFullRefund(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/terminate", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			t.Errorf("TestTerminateSubscriptionWithFullRefund Error: Expected %s request, given %s", "PUT", r.Method)
+		}
+		if r.URL.Query().Get("refund_type") != "full" {
+			t.Errorf("TestTerminateSubscriptionWithFullRefund Error: Expected refund_type of full, given %s", r.URL.Query().Get("refund_type"))
+		}
+		rw.WriteHeader(204)
+	})
+
+	r, err := client.Subscriptions.TerminateWithFullRefund("44f83d7cba354d5b84812419f923ea96")
+	if err != nil {
+		t.Errorf("TestTerminateSubscriptionWithFullRefund Error: Error occured making API call. Err: %s", err)
+	}
+
+	if r.IsError() {
+		t.Fatal("TestTerminateSubscriptionWithFullRefund Error: Expected terminate subscription with full refund to return OK")
+	}
+}
+
+func TestTerminateSubscriptionWithoutRefund(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/terminate", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			t.Errorf("TestTerminateSubscriptionWithoutRefund Error: Expected %s request, given %s", "PUT", r.Method)
+		}
+		if r.URL.Query().Get("refund_type") != "none" {
+			t.Errorf("TestTerminateSubscriptionWithoutRefund Error: Expected refund_type of none, given %s", r.URL.Query().Get("refund_type"))
+		}
+		rw.WriteHeader(204)
+	})
+
+	r, err := client.Subscriptions.TerminateWithoutRefund("44f83d7cba354d5b84812419f923ea96")
+	if err != nil {
+		t.Errorf("TestTerminateSubscriptionWithoutRefund Error: Error occured making API call. Err: %s", err)
+	}
+
+	if r.IsError() {
+		t.Fatal("TestTerminateSubscriptionWithoutRefund Error: Expected terminate subscription without refund to return OK")
+	}
+}
+
+func TestPostponeSubscription(t *testing.T) {
+	setup()
+	defer teardown()
+
+	ts, _ := time.Parse(datetimeFormat, "2015-08-27T07:00:00Z")
+	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/postpone", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			t.Errorf("TestPostponeSubscription Error: Expected %s request, given %s", "PUT", r.Method)
+		}
+		if r.URL.Query().Get("next_renewal_date") != "2015-08-27T07:00:00Z" {
+			t.Errorf("TestPostponeSubscription Error: Expected qs param of next_renewal date equal to 2015-08-27T07:00:00Z, given %s", r.URL.Query().Get("next_renewal_date"))
+		}
+		if r.URL.Query().Get("bulk") != "false" {
+			t.Errorf("TestPostponeSubscription Error: Expected qs param of bulk equal to false, given %s", r.URL.Query().Get("bulk"))
+		}
+		rw.WriteHeader(204)
+	})
+
+	r, err := client.Subscriptions.Postpone("44f83d7cba354d5b84812419f923ea96", ts, false)
+	if err != nil {
+		t.Errorf("TestPostponeSubscription Error: Error occured making API call. Err: %s", err)
+	}
+
+	if r.IsError() {
+		t.Fatal("TestPostponeSubscription Error: Expected postpone subscription change to return OK")
 	}
 }

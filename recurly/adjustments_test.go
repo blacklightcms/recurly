@@ -94,7 +94,7 @@ func TestAdjustmentsList(t *testing.T) {
 		t.Errorf("TestAdjustmentsList Error: Expected per_page parameter of 1, given %s", r.Request.URL.Query().Get("per_page"))
 	}
 
-	ts, _ := time.Parse("2006-01-02T15:04:05Z07:00", "2011-08-31T03:30:00Z")
+	ts, _ := time.Parse(datetimeFormat, "2011-08-31T03:30:00Z")
 	for _, given := range adjustments {
 		expected := Adjustment{
 			XMLName: xml.Name{Local: "adjustment"},
@@ -201,7 +201,7 @@ func TestGetAdjustment(t *testing.T) {
 		t.Fatal("TestGetAdjustment Error: Expected get adjustment to return OK")
 	}
 
-	ts, _ := time.Parse("2006-01-02T15:04:05Z07:00", "2015-02-04T23:13:07Z")
+	ts, _ := time.Parse(datetimeFormat, "2015-02-04T23:13:07Z")
 	expected := Adjustment{
 		XMLName: xml.Name{Local: "adjustment"},
 		Account: href{

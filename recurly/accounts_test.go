@@ -101,7 +101,7 @@ func TestAccountList(t *testing.T) {
 		t.Fatalf("TestAccountList Error: Expected 1 account returned, given %d", len(accounts))
 	}
 
-	ts, _ := time.Parse("2006-01-02T15:04:05Z07:00", "2011-10-25T12:00:00Z")
+	ts, _ := time.Parse(datetimeFormat, "2011-10-25T12:00:00Z")
 	for _, given := range accounts {
 		expected := Account{
 			XMLName:   xml.Name{Local: "account"},
@@ -178,7 +178,7 @@ func TestGetAccount(t *testing.T) {
 		t.Fatal("TestGetAccount Error: Expected get accounts to return OK")
 	}
 
-	ts, _ := time.Parse("2006-01-02T15:04:05Z07:00", "2011-10-25T12:00:00Z")
+	ts, _ := time.Parse(datetimeFormat, "2011-10-25T12:00:00Z")
 	expected := Account{
 		XMLName:   xml.Name{Local: "account"},
 		Code:      "1",
@@ -326,8 +326,8 @@ func TestAccountListNotes(t *testing.T) {
 		t.Fatalf("TestAccountListNotes Error: Expected 2 notes returned, given %d", len(notes))
 	}
 
-	ts1, _ := time.Parse("2006-01-02T15:04:05Z07:00", "2013-05-14T18:52:50Z")
-	ts2, _ := time.Parse("2006-01-02T15:04:05Z07:00", "2013-05-14T18:53:04Z")
+	ts1, _ := time.Parse(datetimeFormat, "2013-05-14T18:52:50Z")
+	ts2, _ := time.Parse(datetimeFormat, "2013-05-14T18:53:04Z")
 	expected := []Note{
 		Note{
 			XMLName:   xml.Name{Local: "note"},

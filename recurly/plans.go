@@ -3,7 +3,6 @@ package recurly
 import (
 	"encoding/xml"
 	"fmt"
-	"time"
 )
 
 type (
@@ -13,36 +12,29 @@ type (
 
 	// Plan represents an individual plan on your site.
 	Plan struct {
-		XMLName                  xml.Name    `xml:"plan"`
-		Code                     string      `xml:"plan_code,omitempty"`
-		Name                     string      `xml:"name"`
-		Description              string      `xml:"description,omitempty"`
-		SuccessURL               string      `xml:"success_url,omitempty"`
-		CancelURL                string      `xml:"cancel_url,omitempty"`
-		DisplayDonationAmounts   NullBool    `xml:"display_donation_amounts,omitempty"`
-		DisplayQuantity          NullBool    `xml:"display_quantity,omitempty"`
-		DisplayPhoneNumber       NullBool    `xml:"display_phone_number,omitempty"`
-		BypassHostedConfirmation NullBool    `xml:"bypass_hosted_confirmation,omitempty"`
-		UnitName                 string      `xml:"unit_name,omitempty"`
-		PaymentPageTOSLink       string      `xml:"payment_page_tos_link,omitempty"`
-		IntervalUnit             string      `xml:"plan_interval_unit,omitempty"`
-		IntervalLength           int         `xml:"plan_interval_length,omitempty"`
-		TrialIntervalUnit        string      `xml:"trial_interval_unit,omitempty"`
-		TrialIntervalLength      int         `xml:"trial_interval_length,omitempty"`
-		TotalBillingCycles       int         `xml:"total_billing_cycles,omitempty"`
-		AccountingCode           string      `xml:"accounting_code,omitempty"`
-		CreatedAt                *time.Time  `xml:"created_at,omitempty"`
-		TaxExempt                NullBool    `xml:"tax_exempt,omitempty"`
-		TaxCode                  string      `xml:"tax_code,omitempty"`
-		UnitAmountInCents        UnitAmount  `xml:"unit_amount_in_cents"`
-		SetupFeeInCents          *UnitAmount `xml:"setup_fee_in_cents,omitempty"`
-	}
-
-	// UnitAmount is used in plans where unit amounts are represented in cents
-	// in both EUR and USD.
-	UnitAmount struct {
-		USD int `xml:"USD,omitempty"`
-		EUR int `xml:"EUR,omitempty"`
+		XMLName                  xml.Name   `xml:"plan"`
+		Code                     string     `xml:"plan_code,omitempty"`
+		Name                     string     `xml:"name"`
+		Description              string     `xml:"description,omitempty"`
+		SuccessURL               string     `xml:"success_url,omitempty"`
+		CancelURL                string     `xml:"cancel_url,omitempty"`
+		DisplayDonationAmounts   NullBool   `xml:"display_donation_amounts,omitempty"`
+		DisplayQuantity          NullBool   `xml:"display_quantity,omitempty"`
+		DisplayPhoneNumber       NullBool   `xml:"display_phone_number,omitempty"`
+		BypassHostedConfirmation NullBool   `xml:"bypass_hosted_confirmation,omitempty"`
+		UnitName                 string     `xml:"unit_name,omitempty"`
+		PaymentPageTOSLink       string     `xml:"payment_page_tos_link,omitempty"`
+		IntervalUnit             string     `xml:"plan_interval_unit,omitempty"`
+		IntervalLength           int        `xml:"plan_interval_length,omitempty"`
+		TrialIntervalUnit        string     `xml:"trial_interval_unit,omitempty"`
+		TrialIntervalLength      int        `xml:"trial_interval_length,omitempty"`
+		TotalBillingCycles       NullInt    `xml:"total_billing_cycles,omitempty"`
+		AccountingCode           string     `xml:"accounting_code,omitempty"`
+		CreatedAt                NullTime   `xml:"created_at,omitempty"`
+		TaxExempt                NullBool   `xml:"tax_exempt,omitempty"`
+		TaxCode                  string     `xml:"tax_code,omitempty"`
+		UnitAmountInCents        UnitAmount `xml:"unit_amount_in_cents"`
+		SetupFeeInCents          UnitAmount `xml:"setup_fee_in_cents,omitempty"`
 	}
 )
 
@@ -95,8 +87,9 @@ func (ps planService) Create(p Plan) (*Response, Plan, error) {
 // Update will update the pricing or details for a plan. Existing subscriptions
 // will remain at the previous renewal amounts.
 // https://docs.recurly.com/api/plans#update-plan
-func (ps planService) Update(p Plan) (*Response, Plan, error) {
-	req, err := ps.client.newRequest("PUT", "plans", nil, p)
+func (ps planService) Update(code string, p Plan) (*Response, Plan, error) {
+	action := fmt.Sprintf("plans/%s", code)
+	req, err := ps.client.newRequest("PUT", action, nil, p)
 	if err != nil {
 		return nil, Plan{}, err
 	}

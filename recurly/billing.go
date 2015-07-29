@@ -57,6 +57,19 @@ type (
 	}
 )
 
+// Type returns the billing info type. Currently options: card, bank, ""
+func (b Billing) Type() string {
+	if b.FirstSix > 0 && b.LastFour > 0 && b.Month > 0 && b.Year > 0 {
+		return "card"
+	}
+
+	if b.NameOnAccount != "" && b.RoutingNumber > 0 && b.AccountNumber > 0 {
+		return "bank"
+	}
+
+	return ""
+}
+
 // Get returns only the account's current billing information.
 // https://docs.recurly.com/api/billing-info#lookup-billing-info
 func (bs billingService) Get(accountCode string) (*Response, Billing, error) {

@@ -24,7 +24,7 @@ func TestAddOnsEncoding(t *testing.T) {
 		map[string]interface{}{"struct": AddOn{DisplayQuantityOnHostedPage: NewBool(true)}, "xml": "<add_on><display_quantity_on_hosted_page>true</display_quantity_on_hosted_page></add_on>"},
 		map[string]interface{}{"struct": AddOn{DisplayQuantityOnHostedPage: NewBool(false)}, "xml": "<add_on><display_quantity_on_hosted_page>false</display_quantity_on_hosted_page></add_on>"},
 		map[string]interface{}{"struct": AddOn{TaxCode: "digital"}, "xml": "<add_on><tax_code>digital</tax_code></add_on>"},
-		map[string]interface{}{"struct": AddOn{UnitAmountInCents: &UnitAmount{USD: 200}}, "xml": "<add_on><unit_amount_in_cents><USD>200</USD></unit_amount_in_cents></add_on>"},
+		map[string]interface{}{"struct": AddOn{UnitAmountInCents: UnitAmount{USD: 200}}, "xml": "<add_on><unit_amount_in_cents><USD>200</USD></unit_amount_in_cents></add_on>"},
 		map[string]interface{}{"struct": AddOn{AccountingCode: "abc123"}, "xml": "<add_on><accounting_code>abc123</accounting_code></add_on>"},
 	}
 
@@ -85,7 +85,7 @@ func TestAddOnsList(t *testing.T) {
 		t.Errorf("TestAddOnsList Error: Expected per_page parameter of 1, given %s", r.Request.URL.Query().Get("per_page"))
 	}
 
-	ts, _ := time.Parse("2006-01-02T15:04:05Z07:00", "2011-06-28T12:34:56Z")
+	ts, _ := time.Parse(datetimeFormat, "2011-06-28T12:34:56Z")
 	for _, given := range addOns {
 		expected := AddOn{
 			XMLName:                     xml.Name{Local: "add_on"},
@@ -94,7 +94,7 @@ func TestAddOnsList(t *testing.T) {
 			DefaultQuantity:             NewInt(1),
 			DisplayQuantityOnHostedPage: NewBool(false),
 			TaxCode:                     "digital",
-			UnitAmountInCents:           &UnitAmount{USD: 200},
+			UnitAmountInCents:           UnitAmount{USD: 200},
 			AccountingCode:              "abc123",
 			CreatedAt:                   NewTime(ts),
 		}
@@ -139,7 +139,7 @@ func TestGetAddOn(t *testing.T) {
 		t.Fatal("TestGetAddOn Error: Expected get add_on to return OK")
 	}
 
-	ts, _ := time.Parse("2006-01-02T15:04:05Z07:00", "2011-06-28T12:34:56Z")
+	ts, _ := time.Parse(datetimeFormat, "2011-06-28T12:34:56Z")
 	expected := AddOn{
 		XMLName:                     xml.Name{Local: "add_on"},
 		Code:                        "ipaddresses",
@@ -147,7 +147,7 @@ func TestGetAddOn(t *testing.T) {
 		DefaultQuantity:             NewInt(1),
 		DisplayQuantityOnHostedPage: NewBool(false),
 		TaxCode:                     "digital",
-		UnitAmountInCents:           &UnitAmount{USD: 200},
+		UnitAmountInCents:           UnitAmount{USD: 200},
 		AccountingCode:              "abc123",
 		CreatedAt:                   NewTime(ts),
 	}

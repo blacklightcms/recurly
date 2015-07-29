@@ -5,6 +5,10 @@ import (
 	"time"
 )
 
+const (
+	datetimeFormat = "2006-01-02T15:04:05Z07:00"
+)
+
 type (
 	// NullTime is used for properly handling time.Time types that could be null.
 	NullTime struct {
@@ -15,6 +19,7 @@ type (
 
 // NewTime generates a new NullTime.
 func NewTime(t time.Time) NullTime {
+	t = t.UTC()
 	return NullTime{Time: &t}
 }
 
@@ -23,12 +28,12 @@ func (t *NullTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v string
 	err := d.DecodeElement(&v, &start)
 	if err == nil && v != "" {
-		parsed, err := time.Parse("2006-01-02T15:04:05Z07:00", v)
+		parsed, err := time.Parse(datetimeFormat, v)
 		if err != nil {
 			return err
 		}
 
-		*t = NullTime{Time: &parsed}
+		*t = NewTime(parsed)
 	}
 
 	return nil
@@ -38,16 +43,17 @@ func (t *NullTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 // marshaled. All times are sent in UTC.
 func (t NullTime) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	if t.Time != nil {
-		t.Time.UTC()
-		e.EncodeElement(t.Time.Format("2006-01-02T15:04:05Z07:00"), start)
+		e.EncodeElement(t.String(), start)
 	}
 
 	return nil
 }
 
+// String returns a string representation of the time in UTC using the
+// datetimeFormat constant as the format.
 func (t NullTime) String() string {
 	if t.Time != nil {
-		return t.Time.String()
+		return t.Time.UTC().Format(datetimeFormat)
 	}
 
 	return ""

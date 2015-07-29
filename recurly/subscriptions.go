@@ -13,11 +13,8 @@ type (
 
 	// Subscription represents an individual subscription.
 	Subscription struct {
-		XMLName xml.Name `xml:"subscription"`
-		Plan    struct {
-			Code string `xml:"plan_code,omitempty"`
-			Name string `xml:"name,omitempty"`
-		} `xml:"plan,omitempty"`
+		XMLName                xml.Name             `xml:"subscription"`
+		Plan                   nestedPlan           `xml:"plan,omitempty"`
 		Account                href                 `xml:"account"`
 		Invoice                href                 `xml:"invoice"`
 		UUID                   string               `xml:"uuid,omitempty"`
@@ -39,6 +36,11 @@ type (
 		PONumber               string               `xml:"po_number,omitempty"`
 		NetTerms               NullInt              `xml:"net_terms,omitempty"`
 		SubscriptionAddOns     *[]SubscriptionAddOn `xml:"subscriptions_add_ons,omitempty"`
+	}
+
+	nestedPlan struct {
+		Code string `xml:"plan_code,omitempty"`
+		Name string `xml:"name,omitempty"`
 	}
 
 	// SubscriptionAddOn are add ons to subscriptions.
@@ -297,7 +299,7 @@ func (ss subscriptionService) Reactivate(uuid string) (*Response, error) {
 // https://docs.recurly.com/api/subscriptions#terminate-subscription
 func (ss subscriptionService) TerminateWithPartialRefund(uuid string) (*Response, error) {
 	action := fmt.Sprintf("subscriptions/%s/terminate", uuid)
-	req, err := ss.client.newRequest("PUT", action, Params{"refund": "partial"}, nil)
+	req, err := ss.client.newRequest("PUT", action, Params{"refund_type": "partial"}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -310,7 +312,7 @@ func (ss subscriptionService) TerminateWithPartialRefund(uuid string) (*Response
 // https://docs.recurly.com/api/subscriptions#terminate-subscription
 func (ss subscriptionService) TerminateWithFullRefund(uuid string) (*Response, error) {
 	action := fmt.Sprintf("subscriptions/%s/terminate", uuid)
-	req, err := ss.client.newRequest("PUT", action, Params{"refund": "full"}, nil)
+	req, err := ss.client.newRequest("PUT", action, Params{"refund_type": "full"}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -323,7 +325,7 @@ func (ss subscriptionService) TerminateWithFullRefund(uuid string) (*Response, e
 // https://docs.recurly.com/api/subscriptions#terminate-subscription
 func (ss subscriptionService) TerminateWithoutRefund(uuid string) (*Response, error) {
 	action := fmt.Sprintf("subscriptions/%s/terminate", uuid)
-	req, err := ss.client.newRequest("PUT", action, Params{"refund": "none"}, nil)
+	req, err := ss.client.newRequest("PUT", action, Params{"refund_type": "none"}, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -335,10 +337,10 @@ func (ss subscriptionService) TerminateWithoutRefund(uuid string) (*Response, er
 // The subscription will not be prorated. For a subscription in a trial period,
 // modifying the renewal date will modify when the trial expires.
 // https://docs.recurly.com/api/subscriptions#postpone-subscription
-func (ss subscriptionService) Postpone(uuid string, dt time.Time) (*Response, error) {
+func (ss subscriptionService) Postpone(uuid string, dt time.Time, bulk bool) (*Response, error) {
 	action := fmt.Sprintf("subscriptions/%s/postpone", uuid)
 	req, err := ss.client.newRequest("PUT", action, Params{
-		"bulk":              false,
+		"bulk":              bulk,
 		"next_renewal_date": dt.Format(time.RFC3339),
 	}, nil)
 	if err != nil {
@@ -347,3 +349,11 @@ func (ss subscriptionService) Postpone(uuid string, dt time.Time) (*Response, er
 
 	return ss.client.do(req, nil)
 }
+
+// Note: Create/Update Subscription with AddOns and Create/Update manual invoice
+// are the same endpoint as Create. You just need to include additional parameters
+// for each method. See the documentation here:
+// https://dev.recurly.com/docs/subscription-add-ons
+// https://dev.recurly.com/docs/update-subscription-with-add-ons
+// https://dev.recurly.com/docs/subscriptions-for-manual-invoicing
+// https://dev.recurly.com/docs/update-subscription-manual-invoice

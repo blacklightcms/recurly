@@ -54,8 +54,10 @@ if resp.IsServerError() {
 ## Notes
 The API is still being finalized and may change over the coming weeks.
  * Support for paginating beyond the first page with cursors needs to be completed
- * Unit tests are nearly complete and will be coming over the coming days.
  * Documentation and more usage examples will be coming as well
+ * There is currently no support for updating billing info with a credit card or
+ bank account directly. Using recurly.js token is the only supported method currently.
+ This is currently a low priority.
 
 Once that notice is removed things will be stable. Contributions are welcome.
 
