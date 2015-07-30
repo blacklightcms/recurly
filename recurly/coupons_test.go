@@ -138,7 +138,7 @@ func TestCouponsList(t *testing.T) {
 
 	r, coupons, err := client.Coupons.List(Params{"per_page": 1})
 	if err != nil {
-		t.Errorf("TestCouponsList Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestCouponsList Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -213,7 +213,7 @@ func TestGetCoupon(t *testing.T) {
 
 	r, a, err := client.Coupons.Get("special")
 	if err != nil {
-		t.Errorf("TestGetCoupon Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestGetCoupon Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -259,7 +259,7 @@ func TestCreateCoupon(t *testing.T) {
 
 	r, _, err := client.Coupons.Create(Coupon{})
 	if err != nil {
-		t.Errorf("TestCreateCoupon Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestCreateCoupon Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -280,7 +280,7 @@ func TestDeleteCoupon(t *testing.T) {
 
 	r, err := client.Coupons.Delete("special")
 	if err != nil {
-		t.Errorf("TestDeleteCoupon Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestDeleteCoupon Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {

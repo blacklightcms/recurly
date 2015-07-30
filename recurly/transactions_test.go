@@ -100,7 +100,7 @@ func TestTransactionsList(t *testing.T) {
 
 	r, transactions, err := client.Transactions.List(Params{"per_page": 1})
 	if err != nil {
-		t.Errorf("TestTransactionsList Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestTransactionsList Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -247,7 +247,7 @@ func TestTransactionsListForAccount(t *testing.T) {
 
 	r, transactions, err := client.Transactions.ListForAccount("1", Params{"per_page": 1})
 	if err != nil {
-		t.Errorf("TestTransactionsListForAccount Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestTransactionsListForAccount Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -392,7 +392,7 @@ func TestGetTransaction(t *testing.T) {
 
 	r, a, err := client.Transactions.Get("a13acd8fe4294916b79aec87b7ea441f")
 	if err != nil {
-		t.Errorf("TestGetTransaction Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestGetTransaction Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -476,7 +476,7 @@ func TestCreateTransaction(t *testing.T) {
 
 	r, _, err := client.Transactions.Create(Transaction{})
 	if err != nil {
-		t.Errorf("TestCreateTransaction Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestCreateTransaction Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {

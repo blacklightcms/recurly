@@ -97,7 +97,7 @@ func TestListPlans(t *testing.T) {
 
 	r, plans, err := client.Plans.List(Params{"per_page": 1})
 	if err != nil {
-		t.Errorf("TestListPlans Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestListPlans Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -189,7 +189,7 @@ func TestGetPlan(t *testing.T) {
 
 	r, plan, err := client.Plans.Get("gold")
 	if err != nil {
-		t.Errorf("TestGetPlan Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestGetPlan Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -240,7 +240,7 @@ func TestCreatePlan(t *testing.T) {
 
 	r, _, err := client.Plans.Create(Plan{})
 	if err != nil {
-		t.Errorf("TestCreatePlan Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestCreatePlan Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -262,7 +262,7 @@ func TestUpdatePlan(t *testing.T) {
 
 	r, _, err := client.Plans.Update("silver", Plan{})
 	if err != nil {
-		t.Errorf("TestUpdatePlan Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestUpdatePlan Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -283,7 +283,7 @@ func TestDeletePlan(t *testing.T) {
 
 	r, err := client.Plans.Delete("platinum")
 	if err != nil {
-		t.Errorf("TestDeletePlan Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestDeletePlan Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {

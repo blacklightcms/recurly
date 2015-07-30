@@ -70,7 +70,7 @@ func TestAddOnsList(t *testing.T) {
 
 	r, addOns, err := client.AddOns.List("gold", Params{"per_page": 1})
 	if err != nil {
-		t.Errorf("TestAddOnsList Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestAddOnsList Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -132,7 +132,7 @@ func TestGetAddOn(t *testing.T) {
 
 	r, a, err := client.AddOns.Get("gold", "ipaddresses")
 	if err != nil {
-		t.Errorf("TestGetAddOn Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestGetAddOn Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -171,7 +171,7 @@ func TestCreateAddOn(t *testing.T) {
 
 	r, _, err := client.AddOns.Create("gold", AddOn{})
 	if err != nil {
-		t.Errorf("TestCreateAddOn Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestCreateAddOn Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -193,7 +193,7 @@ func TestUpdateAddOn(t *testing.T) {
 
 	r, _, err := client.AddOns.Update("gold", "ipaddresses", AddOn{})
 	if err != nil {
-		t.Errorf("TestUpdateAddOn Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestUpdateAddOn Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -214,7 +214,7 @@ func TestDeleteAddOn(t *testing.T) {
 
 	r, err := client.AddOns.Delete("gold", "ipaddresses")
 	if err != nil {
-		t.Errorf("TestDeleteAddOn Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestDeleteAddOn Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {

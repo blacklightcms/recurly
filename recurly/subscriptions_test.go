@@ -269,7 +269,7 @@ func TestListSubscriptions(t *testing.T) {
 
 	r, subscriptions, err := client.Subscriptions.List(Params{"per_page": 1})
 	if err != nil {
-		t.Errorf("TestListSubscriptions Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestListSubscriptions Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -370,7 +370,7 @@ func TestListAccountSubscriptions(t *testing.T) {
 
 	r, subscriptions, err := client.Subscriptions.ListForAccount("1", Params{"per_page": 1})
 	if err != nil {
-		t.Errorf("TestListAccountSubscriptions Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestListAccountSubscriptions Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -469,7 +469,7 @@ func TestGetSubscriptions(t *testing.T) {
 
 	r, subscription, err := client.Subscriptions.Get("44f83d7cba354d5b84812419f923ea96")
 	if err != nil {
-		t.Errorf("TestGetSubscriptions Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestGetSubscriptions Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -527,7 +527,7 @@ func TestCreateSubscription(t *testing.T) {
 
 	r, _, err := client.Subscriptions.Create(NewSubscription{})
 	if err != nil {
-		t.Errorf("TestCreateSubscription Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestCreateSubscription Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -549,7 +549,7 @@ func TestPreviewSubscription(t *testing.T) {
 
 	r, _, err := client.Subscriptions.Preview(NewSubscription{})
 	if err != nil {
-		t.Errorf("TestPreviewSubscription Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestPreviewSubscription Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -565,13 +565,13 @@ func TestUpdateSubscription(t *testing.T) {
 		if r.Method != "PUT" {
 			t.Errorf("TestUpdateSubscription Error: Expected %s request, given %s", "PUT", r.Method)
 		}
-		rw.WriteHeader(201)
+		rw.WriteHeader(200)
 		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
 	})
 
 	r, _, err := client.Subscriptions.Update("44f83d7cba354d5b84812419f923ea96", UpdateSubscription{})
 	if err != nil {
-		t.Errorf("TestUpdateSubscription Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestUpdateSubscription Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -587,13 +587,13 @@ func TestUpdateSubscriptionNotes(t *testing.T) {
 		if r.Method != "PUT" {
 			t.Errorf("TestUpdateSubscriptionNotes Error: Expected %s request, given %s", "PUT", r.Method)
 		}
-		rw.WriteHeader(201)
+		rw.WriteHeader(200)
 		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
 	})
 
 	r, _, err := client.Subscriptions.UpdateNotes("44f83d7cba354d5b84812419f923ea96", SubscriptionNotes{})
 	if err != nil {
-		t.Errorf("TestUpdateSubscriptionNotes Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestUpdateSubscriptionNotes Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -615,7 +615,7 @@ func TestPreviewSubscriptionChange(t *testing.T) {
 
 	r, _, err := client.Subscriptions.PreviewChange("44f83d7cba354d5b84812419f923ea96", UpdateSubscription{})
 	if err != nil {
-		t.Errorf("TestPreviewSubscriptionChange Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestPreviewSubscriptionChange Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -637,7 +637,7 @@ func TestCancelSubscription(t *testing.T) {
 
 	r, _, err := client.Subscriptions.Cancel("44f83d7cba354d5b84812419f923ea96")
 	if err != nil {
-		t.Errorf("TestCancelSubscription Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestCancelSubscription Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -659,7 +659,7 @@ func TestReactivateSubscription(t *testing.T) {
 
 	r, _, err := client.Subscriptions.Reactivate("44f83d7cba354d5b84812419f923ea96")
 	if err != nil {
-		t.Errorf("TestReactivateSubscription Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestReactivateSubscription Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -684,7 +684,7 @@ func TestTerminateSubscriptionWithPartialRefund(t *testing.T) {
 
 	r, _, err := client.Subscriptions.TerminateWithPartialRefund("44f83d7cba354d5b84812419f923ea96")
 	if err != nil {
-		t.Errorf("TestTerminateSubscriptionWithPartialRefund Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestTerminateSubscriptionWithPartialRefund Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -709,7 +709,7 @@ func TestTerminateSubscriptionWithFullRefund(t *testing.T) {
 
 	r, _, err := client.Subscriptions.TerminateWithFullRefund("44f83d7cba354d5b84812419f923ea96")
 	if err != nil {
-		t.Errorf("TestTerminateSubscriptionWithFullRefund Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestTerminateSubscriptionWithFullRefund Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -734,7 +734,7 @@ func TestTerminateSubscriptionWithoutRefund(t *testing.T) {
 
 	r, _, err := client.Subscriptions.TerminateWithoutRefund("44f83d7cba354d5b84812419f923ea96")
 	if err != nil {
-		t.Errorf("TestTerminateSubscriptionWithoutRefund Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestTerminateSubscriptionWithoutRefund Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -763,7 +763,7 @@ func TestPostponeSubscription(t *testing.T) {
 
 	r, _, err := client.Subscriptions.Postpone("44f83d7cba354d5b84812419f923ea96", ts, false)
 	if err != nil {
-		t.Errorf("TestPostponeSubscription Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestPostponeSubscription Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {

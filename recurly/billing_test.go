@@ -99,7 +99,7 @@ func TestBillingGet(t *testing.T) {
 
 	r, b, err := client.Billing.Get("1")
 	if err != nil {
-		t.Errorf("TestBillingGet Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestBillingGet Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -173,7 +173,7 @@ func TestBillingCreateWithToken(t *testing.T) {
 
 	r, b, err := client.Billing.CreateWithToken("1", token)
 	if err != nil {
-		t.Errorf("TestBillingCreateWithToken Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestBillingCreateWithToken Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -234,7 +234,7 @@ func TestBillingUpdateWithToken(t *testing.T) {
 
 	r, _, err := client.Billing.UpdateWithToken("abceasf", token)
 	if err != nil {
-		t.Errorf("TestBillingUpdateWithToken Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestBillingUpdateWithToken Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -263,7 +263,7 @@ func TestClearBilling(t *testing.T) {
 
 	r, err := client.Billing.Clear("account@example.com")
 	if err != nil {
-		t.Errorf("TestClearBilling Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestClearBilling Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {

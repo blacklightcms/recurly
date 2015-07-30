@@ -90,7 +90,7 @@ func TestAccountList(t *testing.T) {
 
 	r, accounts, err := client.Accounts.List(nil)
 	if err != nil {
-		t.Errorf("TestAccountList Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestAccountList Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -171,7 +171,7 @@ func TestGetAccount(t *testing.T) {
 
 	r, a, err := client.Accounts.Get("1")
 	if err != nil {
-		t.Errorf("TestGetAccount Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestGetAccount Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -217,7 +217,7 @@ func TestCreateAccount(t *testing.T) {
 
 	r, _, err := client.Accounts.Create(Account{})
 	if err != nil {
-		t.Errorf("TestCreateAccount Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestCreateAccount Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -239,7 +239,7 @@ func TestUpdateAccount(t *testing.T) {
 
 	r, _, err := client.Accounts.Update("245", Account{})
 	if err != nil {
-		t.Errorf("TestUpdateAccount Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestUpdateAccount Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -260,7 +260,7 @@ func TestCloseAccount(t *testing.T) {
 
 	r, err := client.Accounts.Close("5322")
 	if err != nil {
-		t.Errorf("TestCloseAccount Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestCloseAccount Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -281,7 +281,7 @@ func TestReopenAccount(t *testing.T) {
 
 	r, err := client.Accounts.Reopen("5322")
 	if err != nil {
-		t.Errorf("TestReopenAccount Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestReopenAccount Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -315,7 +315,7 @@ func TestAccountListNotes(t *testing.T) {
 
 	r, notes, err := client.Accounts.ListNotes("abcd@example.com")
 	if err != nil {
-		t.Errorf("TestAccountListNotes Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestAccountListNotes Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {

@@ -79,7 +79,7 @@ func TestAdjustmentsList(t *testing.T) {
 
 	r, adjustments, err := client.Adjustments.List("100", Params{"per_page": 1})
 	if err != nil {
-		t.Errorf("TestAdjustmentsList Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestAdjustmentsList Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -194,7 +194,7 @@ func TestGetAdjustment(t *testing.T) {
 
 	r, adjustment, err := client.Adjustments.Get("626db120a84102b1809909071c701c60")
 	if err != nil {
-		t.Errorf("TestGetAdjustment Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestGetAdjustment Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -280,7 +280,7 @@ func TestCreateAdjustment(t *testing.T) {
 
 	r, _, err := client.Adjustments.Create("1", Adjustment{})
 	if err != nil {
-		t.Errorf("TestCreateAdjustment Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestCreateAdjustment Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
@@ -301,7 +301,7 @@ func TestDeleteAdjustment(t *testing.T) {
 
 	r, err := client.Adjustments.Delete("945a4cb9afd64300b97b138407a51aef")
 	if err != nil {
-		t.Errorf("TestDeleteAdjustment Error: Error occured making API call. Err: %s", err)
+		t.Errorf("TestDeleteAdjustment Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
