@@ -1,7 +1,7 @@
 # Go Recurly
 Recurly is a Go (golang) API Client for the [Recurly](https://recurly.com/) API.
 
- [![Build Status](https://travis-ci.org/blacklightcms/go-recurly.svg?branch=master)](https://travis-ci.org/blacklightcms/go-recurly) [![Coverage Status](https://coveralls.io/repos/blacklightcms/go-recurly/badge.svg?branch=master&service=github)](https://coveralls.io/github/blacklightcms/go-recurly?branch=master) [![GoDoc](https://godoc.org/github.com/blacklightcms/go-recurly/recurly?status.svg)](https://godoc.org/github.com/blacklightcms/go-recurly/recurly)  
+ [![Build Status](https://travis-ci.org/blacklightcms/go-recurly.svg?branch=master)](https://travis-ci.org/blacklightcms/go-recurly)  [![GoDoc](https://godoc.org/github.com/blacklightcms/go-recurly/recurly?status.svg)](https://godoc.org/github.com/blacklightcms/go-recurly/recurly)  
 
 ## References
  * [API Reference](http://godoc.org/github.com/blacklightcms/go-recurly/recurly)
