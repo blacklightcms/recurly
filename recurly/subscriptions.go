@@ -273,83 +273,101 @@ func (service SubscriptionsService) PreviewChange(uuid string, s UpdateSubscript
 // Cancel cancels a subscription so it remains active and then expires at the
 // end of the current bill cycle.
 // https://docs.recurly.com/api/subscriptions#cancel-subscription
-func (service SubscriptionsService) Cancel(uuid string) (*Response, error) {
+func (service SubscriptionsService) Cancel(uuid string) (*Response, Subscription, error) {
 	action := fmt.Sprintf("subscriptions/%s/cancel", uuid)
 	req, err := service.client.newRequest("PUT", action, nil, nil)
 	if err != nil {
-		return nil, err
+		return nil, Subscription{}, err
 	}
 
-	return service.client.do(req, nil)
+	var dest Subscription
+	res, err := service.client.do(req, &dest)
+
+	return res, dest, err
 }
 
 // Reactivate will reactivate a canceled subscription so it renews at the end
 // of the current bill cycle.
 // https://docs.recurly.com/api/subscriptions#reactivate-subscription
-func (service SubscriptionsService) Reactivate(uuid string) (*Response, error) {
+func (service SubscriptionsService) Reactivate(uuid string) (*Response, Subscription, error) {
 	action := fmt.Sprintf("subscriptions/%s/reactivate", uuid)
 	req, err := service.client.newRequest("PUT", action, nil, nil)
 	if err != nil {
-		return nil, err
+		return nil, Subscription{}, err
 	}
 
-	return service.client.do(req, nil)
+	var dest Subscription
+	res, err := service.client.do(req, &dest)
+
+	return res, dest, err
 }
 
 // TerminateWithPartialRefund will terminate the active subscription
 // immediately with a full refund.
 // https://docs.recurly.com/api/subscriptions#terminate-subscription
-func (service SubscriptionsService) TerminateWithPartialRefund(uuid string) (*Response, error) {
+func (service SubscriptionsService) TerminateWithPartialRefund(uuid string) (*Response, Subscription, error) {
 	action := fmt.Sprintf("subscriptions/%s/terminate", uuid)
 	req, err := service.client.newRequest("PUT", action, Params{"refund_type": "partial"}, nil)
 	if err != nil {
-		return nil, err
+		return nil, Subscription{}, err
 	}
 
-	return service.client.do(req, nil)
+	var dest Subscription
+	res, err := service.client.do(req, &dest)
+
+	return res, dest, err
 }
 
 // TerminateWithFullRefund will terminate the active subscription
 // immediately with a full refund.
 // https://docs.recurly.com/api/subscriptions#terminate-subscription
-func (service SubscriptionsService) TerminateWithFullRefund(uuid string) (*Response, error) {
+func (service SubscriptionsService) TerminateWithFullRefund(uuid string) (*Response, Subscription, error) {
 	action := fmt.Sprintf("subscriptions/%s/terminate", uuid)
 	req, err := service.client.newRequest("PUT", action, Params{"refund_type": "full"}, nil)
 	if err != nil {
-		return nil, err
+		return nil, Subscription{}, err
 	}
 
-	return service.client.do(req, nil)
+	var dest Subscription
+	res, err := service.client.do(req, &dest)
+
+	return res, dest, err
 }
 
 // TerminateWithoutRefund will terminate the active subscription
 // immediately with no refund.
 // https://docs.recurly.com/api/subscriptions#terminate-subscription
-func (service SubscriptionsService) TerminateWithoutRefund(uuid string) (*Response, error) {
+func (service SubscriptionsService) TerminateWithoutRefund(uuid string) (*Response, Subscription, error) {
 	action := fmt.Sprintf("subscriptions/%s/terminate", uuid)
 	req, err := service.client.newRequest("PUT", action, Params{"refund_type": "none"}, nil)
 	if err != nil {
-		return nil, err
+		return nil, Subscription{}, err
 	}
 
-	return service.client.do(req, nil)
+	var dest Subscription
+	res, err := service.client.do(req, &dest)
+
+	return res, dest, err
 }
 
 // Postpone will pause an an active subscription until the specified date.
 // The subscription will not be prorated. For a subscription in a trial period,
 // modifying the renewal date will modify when the trial expires.
 // https://docs.recurly.com/api/subscriptions#postpone-subscription
-func (service SubscriptionsService) Postpone(uuid string, dt time.Time, bulk bool) (*Response, error) {
+func (service SubscriptionsService) Postpone(uuid string, dt time.Time, bulk bool) (*Response, Subscription, error) {
 	action := fmt.Sprintf("subscriptions/%s/postpone", uuid)
 	req, err := service.client.newRequest("PUT", action, Params{
 		"bulk":              bulk,
 		"next_renewal_date": dt.Format(time.RFC3339),
 	}, nil)
 	if err != nil {
-		return nil, err
+		return nil, Subscription{}, err
 	}
 
-	return service.client.do(req, nil)
+	var dest Subscription
+	res, err := service.client.do(req, &dest)
+
+	return res, dest, err
 }
 
 // Note: Create/Update Subscription with AddOns and Create/Update manual invoice

@@ -631,10 +631,11 @@ func TestCancelSubscription(t *testing.T) {
 		if r.Method != "PUT" {
 			t.Errorf("TestCancelSubscription Error: Expected %s request, given %s", "PUT", r.Method)
 		}
-		rw.WriteHeader(204)
+		rw.WriteHeader(200)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
 	})
 
-	r, err := client.Subscriptions.Cancel("44f83d7cba354d5b84812419f923ea96")
+	r, _, err := client.Subscriptions.Cancel("44f83d7cba354d5b84812419f923ea96")
 	if err != nil {
 		t.Errorf("TestCancelSubscription Error: Error occured making API call. Err: %s", err)
 	}
@@ -652,10 +653,11 @@ func TestReactivateSubscription(t *testing.T) {
 		if r.Method != "PUT" {
 			t.Errorf("TestReactivateSubscription Error: Expected %s request, given %s", "PUT", r.Method)
 		}
-		rw.WriteHeader(204)
+		rw.WriteHeader(200)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
 	})
 
-	r, err := client.Subscriptions.Reactivate("44f83d7cba354d5b84812419f923ea96")
+	r, _, err := client.Subscriptions.Reactivate("44f83d7cba354d5b84812419f923ea96")
 	if err != nil {
 		t.Errorf("TestReactivateSubscription Error: Error occured making API call. Err: %s", err)
 	}
@@ -676,10 +678,11 @@ func TestTerminateSubscriptionWithPartialRefund(t *testing.T) {
 		if r.URL.Query().Get("refund_type") != "partial" {
 			t.Errorf("TestTerminateSubscriptionWithPartialRefund Error: Expected refund_type of partial, given %s", r.URL.Query().Get("refund_type"))
 		}
-		rw.WriteHeader(204)
+		rw.WriteHeader(200)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
 	})
 
-	r, err := client.Subscriptions.TerminateWithPartialRefund("44f83d7cba354d5b84812419f923ea96")
+	r, _, err := client.Subscriptions.TerminateWithPartialRefund("44f83d7cba354d5b84812419f923ea96")
 	if err != nil {
 		t.Errorf("TestTerminateSubscriptionWithPartialRefund Error: Error occured making API call. Err: %s", err)
 	}
@@ -700,10 +703,11 @@ func TestTerminateSubscriptionWithFullRefund(t *testing.T) {
 		if r.URL.Query().Get("refund_type") != "full" {
 			t.Errorf("TestTerminateSubscriptionWithFullRefund Error: Expected refund_type of full, given %s", r.URL.Query().Get("refund_type"))
 		}
-		rw.WriteHeader(204)
+		rw.WriteHeader(200)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
 	})
 
-	r, err := client.Subscriptions.TerminateWithFullRefund("44f83d7cba354d5b84812419f923ea96")
+	r, _, err := client.Subscriptions.TerminateWithFullRefund("44f83d7cba354d5b84812419f923ea96")
 	if err != nil {
 		t.Errorf("TestTerminateSubscriptionWithFullRefund Error: Error occured making API call. Err: %s", err)
 	}
@@ -724,10 +728,11 @@ func TestTerminateSubscriptionWithoutRefund(t *testing.T) {
 		if r.URL.Query().Get("refund_type") != "none" {
 			t.Errorf("TestTerminateSubscriptionWithoutRefund Error: Expected refund_type of none, given %s", r.URL.Query().Get("refund_type"))
 		}
-		rw.WriteHeader(204)
+		rw.WriteHeader(200)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
 	})
 
-	r, err := client.Subscriptions.TerminateWithoutRefund("44f83d7cba354d5b84812419f923ea96")
+	r, _, err := client.Subscriptions.TerminateWithoutRefund("44f83d7cba354d5b84812419f923ea96")
 	if err != nil {
 		t.Errorf("TestTerminateSubscriptionWithoutRefund Error: Error occured making API call. Err: %s", err)
 	}
@@ -752,10 +757,11 @@ func TestPostponeSubscription(t *testing.T) {
 		if r.URL.Query().Get("bulk") != "false" {
 			t.Errorf("TestPostponeSubscription Error: Expected qs param of bulk equal to false, given %s", r.URL.Query().Get("bulk"))
 		}
-		rw.WriteHeader(204)
+		rw.WriteHeader(200)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
 	})
 
-	r, err := client.Subscriptions.Postpone("44f83d7cba354d5b84812419f923ea96", ts, false)
+	r, _, err := client.Subscriptions.Postpone("44f83d7cba354d5b84812419f923ea96", ts, false)
 	if err != nil {
 		t.Errorf("TestPostponeSubscription Error: Error occured making API call. Err: %s", err)
 	}
