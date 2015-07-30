@@ -119,7 +119,7 @@ func TestAccountList(t *testing.T) {
 				Country: "US",
 			},
 			HostedLoginToken: "a92468579e9c4231a6c0031c4716c01d",
-			CreatedAt:        &ts,
+			CreatedAt:        NewTime(ts),
 		}
 
 		if !reflect.DeepEqual(expected, given) {
@@ -195,7 +195,7 @@ func TestGetAccount(t *testing.T) {
 			Country: "US",
 		},
 		HostedLoginToken: "a92468579e9c4231a6c0031c4716c01d",
-		CreatedAt:        &ts,
+		CreatedAt:        NewTime(ts),
 	}
 
 	if !reflect.DeepEqual(expected, a) {

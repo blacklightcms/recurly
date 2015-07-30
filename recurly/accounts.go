@@ -15,21 +15,21 @@ type (
 
 	// Account represents an individual account on your site
 	Account struct {
-		XMLName          xml.Name   `xml:"account"`
-		Code             string     `xml:"account_code,omitempty"`
-		State            string     `xml:"state,omitempty"`
-		Username         string     `xml:"username,omitempty"`
-		Email            string     `xml:"email,omitempty"`
-		FirstName        string     `xml:"first_name,omitempty"`
-		LastName         string     `xml:"last_name,omitempty"`
-		CompanyName      string     `xml:"company_name,omitempty"`
-		VATNumber        string     `xml:"vat_number,omitempty"`
-		TaxExempt        NullBool   `xml:"tax_exempt,omitempty"`
-		BillingInfo      *Billing   `xml:"billing_info,omitempty"`
-		Address          *Address   `xml:"address,omitempty"`
-		AcceptLanguage   string     `xml:"accept_language,omitempty"`
-		HostedLoginToken string     `xml:"hosted_login_token,omitempty"`
-		CreatedAt        *time.Time `xml:"created_at,omitempty"`
+		XMLName          xml.Name `xml:"account"`
+		Code             string   `xml:"account_code,omitempty"`
+		State            string   `xml:"state,omitempty"`
+		Username         string   `xml:"username,omitempty"`
+		Email            string   `xml:"email,omitempty"`
+		FirstName        string   `xml:"first_name,omitempty"`
+		LastName         string   `xml:"last_name,omitempty"`
+		CompanyName      string   `xml:"company_name,omitempty"`
+		VATNumber        string   `xml:"vat_number,omitempty"`
+		TaxExempt        NullBool `xml:"tax_exempt,omitempty"`
+		BillingInfo      *Billing `xml:"billing_info,omitempty"`
+		Address          *Address `xml:"address,omitempty"`
+		AcceptLanguage   string   `xml:"accept_language,omitempty"`
+		HostedLoginToken string   `xml:"hosted_login_token,omitempty"`
+		CreatedAt        NullTime `xml:"created_at,omitempty"`
 	}
 
 	// Address is used for embedded addresses within other structs.
