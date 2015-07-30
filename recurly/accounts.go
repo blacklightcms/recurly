@@ -51,6 +51,14 @@ type (
 	}
 )
 
+const (
+	// AccountStateActive is the status for active accounts.
+	AccountStateActive = "active"
+
+	// AccountStateClosed is the status for closed accounts.
+	AccountStateClosed = "closed"
+)
+
 // List returns a list of the accounts on your site.
 // https://docs.recurly.com/api/accounts#list-accounts
 func (service AccountsService) List(params Params) (*Response, []Account, error) {

@@ -47,6 +47,17 @@ type (
 	}
 )
 
+const (
+	// TransactionStatusSuccess is the status for a successful transaction.
+	TransactionStatusSuccess = "success"
+
+	// TransactionStatusFailed is the status for a failed transaction.
+	TransactionStatusFailed = "failed"
+
+	// TransactionStatusVoid is the status for a voided transaction.
+	TransactionStatusVoid = "void"
+)
+
 // List returns a list of transactions
 // https://dev.recurly.com/docs/list-transactions
 func (service TransactionsService) List(params Params) (*Response, []Transaction, error) {
