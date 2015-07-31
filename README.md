@@ -57,7 +57,7 @@ if resp.IsServerError() {
 ## Roadmap
 The API is still being finalized and may change over the coming weeks. Here is
 what's coming before things stabilize:
- * Support for paginating beyond the first page with cursors needs to be completed
+ * ~~Support for paginating beyond the first page with cursors needs to be completed~~
  * ~~Coupons, coupon redemptions, invoices, and transactions. All other
  portions of the API are complete.~~
  * ~~Documentation~~ and more usage examples.

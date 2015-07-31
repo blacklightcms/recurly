@@ -3,6 +3,8 @@ package recurly
 import (
 	"encoding/xml"
 	"net/http"
+	"regexp"
+	"strings"
 )
 
 type (
@@ -41,6 +43,11 @@ type (
 	}
 )
 
+var (
+	// rxPaginationLink is a regex to parse prev/next links from the Link header
+	rxPaginationLink = regexp.MustCompile(`<[^>]+\?cursor=(-?[0-9]+)>;`)
+)
+
 // IsOK returns true if the request was successful.
 func (r Response) IsOK() bool {
 	return r.Response.StatusCode >= 200 && r.Response.StatusCode <= 299
@@ -60,4 +67,44 @@ func (r Response) IsClientError() bool {
 // indicating you may want to retry the request later.
 func (r Response) IsServerError() bool {
 	return r.Response.StatusCode >= 500 && r.Response.StatusCode <= 599
+}
+
+// Prev returns the cursor for the previous page of paginated results. If no
+// previous page exists, an empty string is returned.
+func (r Response) Prev() string {
+	if !r.IsOK() || r.Header.Get("Link") == "" {
+		return ""
+	}
+
+	links := strings.Split(r.Header.Get("Link"), ",")
+	for _, l := range links {
+		if strings.HasSuffix(l, `rel="prev"`) {
+			re := rxPaginationLink.FindStringSubmatch(l)
+			if len(re) == 2 {
+				return re[1]
+			}
+		}
+	}
+
+	return ""
+}
+
+// Next returns the cursor for the next page of paginated results. If no
+// next page exists, an empty string is returned.
+func (r Response) Next() string {
+	if !r.IsOK() || r.Header.Get("Link") == "" {
+		return ""
+	}
+
+	links := strings.Split(r.Header.Get("Link"), ",")
+	for _, l := range links {
+		if strings.HasSuffix(l, `rel="next"`) {
+			re := rxPaginationLink.FindStringSubmatch(l)
+			if len(re) == 2 {
+				return re[1]
+			}
+		}
+	}
+
+	return ""
 }

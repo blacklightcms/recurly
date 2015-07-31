@@ -47,6 +47,7 @@ func TestAdjustmentsList(t *testing.T) {
 		if r.Method != "GET" {
 			t.Errorf("TestAdjustmentsList Error: Expected %s request, given %s", "GET", r.Method)
 		}
+		rw.Header().Set("Link", `<https://your-subdomain.recurly.com/v2/accounts/100/adjustments?cursor=1304958672>; rel="next"`)
 		rw.WriteHeader(200)
 		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
 			<adjustments type="array">
@@ -92,6 +93,10 @@ func TestAdjustmentsList(t *testing.T) {
 
 	if r.Request.URL.Query().Get("per_page") != "1" {
 		t.Errorf("TestAdjustmentsList Error: Expected per_page parameter of 1, given %s", r.Request.URL.Query().Get("per_page"))
+	}
+
+	if r.Next() != "1304958672" {
+		t.Errorf("TestAdjustmentsList Error: Expected next cursor to equal %s, given %s", "1304958672", r.Next())
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2011-08-31T03:30:00Z")

@@ -53,6 +53,7 @@ func TestAccountList(t *testing.T) {
 		if r.Method != "GET" {
 			t.Errorf("TestAccountList Error: Expected %s request, given %s", "GET", r.Method)
 		}
+		rw.Header().Set("Link", `<https://your-subdomain.recurly.com/v2/accounts?cursor=1304958672>; rel="next"`)
 		rw.WriteHeader(200)
 		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
 		<accounts>
@@ -101,6 +102,14 @@ func TestAccountList(t *testing.T) {
 		t.Fatalf("TestAccountList Error: Expected 1 account returned, given %d", len(accounts))
 	}
 
+	if r.Prev() != "" {
+		t.Errorf("TestAccountListPagination Error: Expected prev cursor to be empty, given %s", r.Prev())
+	}
+
+	if r.Next() != "1304958672" {
+		t.Errorf("TestAccountListPagination Error: Expected next cursor to equal %s, given %s", "1318388868", r.Next())
+	}
+
 	ts, _ := time.Parse(datetimeFormat, "2011-10-25T12:00:00Z")
 	for _, given := range accounts {
 		expected := Account{
@@ -125,6 +134,39 @@ func TestAccountList(t *testing.T) {
 		if !reflect.DeepEqual(expected, given) {
 			t.Errorf("TestAccountList Error: expected account to equal %#v, given %#v", expected, given)
 		}
+	}
+}
+
+func TestAccountListPagination(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/accounts", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			t.Errorf("TestAccountList Error: Expected %s request, given %s", "GET", r.Method)
+		}
+		rw.Header().Set("Link", `<https://your-subdomain.recurly.com/v2/transactions>; rel="start",
+  <https://your-subdomain.recurly.com/v2/transactions?cursor=-1318344434>; rel="prev",
+  <https://your-subdomain.recurly.com/v2/transactions?cursor=1318388868>; rel="next"`)
+		rw.WriteHeader(200)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><accounts></accounts>`)
+	})
+
+	r, _, err := client.Accounts.List(Params{"cursor": "12345"})
+	if err != nil {
+		t.Errorf("TestAccountListPagination Error: Error occurred making API call. Err: %s", err)
+	}
+
+	if r.IsError() {
+		t.Fatal("TestAccountListPagination Error: Expected list accounts to return OK")
+	}
+
+	if r.Prev() != "-1318344434" {
+		t.Errorf("TestAccountListPagination Error: Expected prev cursor to equal %s, given %s", "-1318344434", r.Prev())
+	}
+
+	if r.Next() != "1318388868" {
+		t.Errorf("TestAccountListPagination Error: Expected next cursor to equal %s, given %s", "1318388868", r.Next())
 	}
 }
 
