@@ -36,7 +36,7 @@ type (
 		TaxRate             float64  `xml:"tax_rate,omitempty"`
 		NetTerms            NullInt  `xml:"net_terms,omitempty"`
 		CollectionMethod    string   `xml:"collection_method,omitempty"`
-		// Redemption ? UID is diffferent from others
+		// Redemption ? UUID is diffferent from others @todo
 		LineItems    []Adjustment  `xml:"line_items>adjustment,omitempty"`
 		Transactions []Transaction `xml:"transactions>transaction,omitempty"`
 	}

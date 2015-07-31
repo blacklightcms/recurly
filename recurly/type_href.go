@@ -8,6 +8,7 @@ import (
 type (
 	// href takes href links and extracts out the code/ID into a struct
 	href struct {
+		nullMarshal
 		HREF string
 		Code string
 	}
@@ -32,10 +33,5 @@ func (h *href) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		Code: str,
 	}
 
-	return nil
-}
-
-// MarshalXML ensures that href is read only.
-func (h href) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return nil
 }

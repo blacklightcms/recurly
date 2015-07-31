@@ -542,13 +542,17 @@ func TestGetInvoice(t *testing.T) {
 				Voidable:      NewBool(true),
 				Refundable:    NewBool(true),
 				IPAddress:     net.ParseIP("127.0.0.1"),
-				CVVResult: &TransactionResult{
-					Code:    "M",
-					Message: "Match",
+				CVVResult: CVVResult{
+					transactionResult{
+						Code:    "M",
+						Message: "Match",
+					},
 				},
-				AVSResult: &TransactionResult{
-					Code:    "D",
-					Message: "Street address and postal code match.",
+				AVSResult: AVSResult{
+					transactionResult{
+						Code:    "D",
+						Message: "Street address and postal code match.",
+					},
 				},
 				CreatedAt: newTimeFromString("2015-06-10T15:25:06Z"),
 				Account: Account{

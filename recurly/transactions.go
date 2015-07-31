@@ -15,29 +15,29 @@ type (
 
 	// Transaction ...
 	Transaction struct {
-		XMLName         xml.Name           `xml:"transaction"`
-		Invoice         href               `xml:"invoice,omitempty"`
-		Subscription    href               `xml:"subscription,omitempty"`
-		UUID            string             `xml:"uuid,omitempty"`
-		Action          string             `xml:"action,omitempty"`
-		AmountInCents   int                `xml:"amount_in_cents"`
-		TaxInCents      int                `xml:"tax_in_cents,omitempty"`
-		Currency        string             `xml:"currency"`
-		Status          string             `xml:"status,omitempty"`
-		PaymentMethod   string             `xml:"payment_method,omitempty"`
-		Reference       string             `xml:"reference,omitempty"`
-		Source          string             `xml:"source,omitempty"`
-		Recurring       NullBool           `xml:"recurring,omitempty"`
-		Test            bool               `xml:"test,omitempty"`
-		Voidable        NullBool           `xml:"voidable,omitempty"`
-		Refundable      NullBool           `xml:"refundable,omitempty"`
-		IPAddress       net.IP             `xml:"ip_address,omitempty"`
-		CVVResult       *TransactionResult `xml:"cvv_result,omitempty"`
-		AVSResult       *TransactionResult `xml:"avs_result,omitempty"`
-		AVSResultStreet string             `xml:"avs_result_street,omitempty"`
-		AVSResultPostal string             `xml:"avs_result_postal,omitempty"`
-		CreatedAt       NullTime           `xml:"created_at,omitempty"`
-		Account         Account            `xml:"details>account"`
+		XMLName         xml.Name  `xml:"transaction"`
+		Invoice         href      `xml:"invoice,omitempty"`
+		Subscription    href      `xml:"subscription,omitempty"`
+		UUID            string    `xml:"uuid,omitempty"`
+		Action          string    `xml:"action,omitempty"`
+		AmountInCents   int       `xml:"amount_in_cents"`
+		TaxInCents      int       `xml:"tax_in_cents,omitempty"`
+		Currency        string    `xml:"currency"`
+		Status          string    `xml:"status,omitempty"`
+		PaymentMethod   string    `xml:"payment_method,omitempty"`
+		Reference       string    `xml:"reference,omitempty"`
+		Source          string    `xml:"source,omitempty"`
+		Recurring       NullBool  `xml:"recurring,omitempty"`
+		Test            bool      `xml:"test,omitempty"`
+		Voidable        NullBool  `xml:"voidable,omitempty"`
+		Refundable      NullBool  `xml:"refundable,omitempty"`
+		IPAddress       net.IP    `xml:"ip_address,omitempty"`
+		CVVResult       CVVResult `xml:"cvv_result"`
+		AVSResult       AVSResult `xml:"avs_result"`
+		AVSResultStreet string    `xml:"avs_result_street,omitempty"`
+		AVSResultPostal string    `xml:"avs_result_postal,omitempty"`
+		CreatedAt       NullTime  `xml:"created_at,omitempty"`
+		Account         Account   `xml:"details>account"`
 	}
 
 	// CreateTransaction is used to create new transactions.
@@ -63,12 +63,50 @@ type (
 		Account       Account  `xml:"account"`
 	}
 
-	// TransactionResult holds transaction results for CVV and AVS fields.
-	TransactionResult struct {
+	transactionResult struct {
+		nullMarshal
 		Code    string `xml:"code,attr"`
 		Message string `xml:",innerxml"`
 	}
+
+	// CVVResult holds transaction results for CVV fields.
+	// https://www.chasepaymentech.com/card_verification_codes.html
+	CVVResult struct {
+		transactionResult
+	}
+
+	// AVSResult holds transaction results for address verification.
+	// http://developer.authorize.net/tools/errorgenerationguide/
+	AVSResult struct {
+		transactionResult
+	}
 )
+
+// IsMatch returns true if the CVV code is a match.
+func (c CVVResult) IsMatch() bool {
+	return c.Code == "M" || c.Code == "Y"
+}
+
+// IsNoMatch returns true if the CVV code did not match.
+func (c CVVResult) IsNoMatch() bool {
+	return c.Code == "N"
+}
+
+// NotProcessed returns true if the CVV code was not processed.
+func (c CVVResult) NotProcessed() bool {
+	return c.Code == "P"
+}
+
+// ShouldHaveBeenPresent returns true if the CVV code should have been present
+// on the card but was not indicated.
+func (c CVVResult) ShouldHaveBeenPresent() bool {
+	return c.Code == "S"
+}
+
+// UnableToProcess returns true when the issuer was unable to process the CVV.
+func (c CVVResult) UnableToProcess() bool {
+	return c.Code == "U"
+}
 
 const (
 	// TransactionStatusSuccess is the status for a successful transaction.

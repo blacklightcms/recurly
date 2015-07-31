@@ -141,13 +141,17 @@ func TestTransactionsList(t *testing.T) {
 			Voidable:      NewBool(true),
 			Refundable:    NewBool(true),
 			IPAddress:     net.ParseIP("127.0.0.1"),
-			CVVResult: &TransactionResult{
-				Code:    "M",
-				Message: "Match",
+			CVVResult: CVVResult{
+				transactionResult{
+					Code:    "M",
+					Message: "Match",
+				},
 			},
-			AVSResult: &TransactionResult{
-				Code:    "D",
-				Message: "Street address and postal code match.",
+			AVSResult: AVSResult{
+				transactionResult{
+					Code:    "D",
+					Message: "Street address and postal code match.",
+				},
 			},
 			CreatedAt: NewTime(ts),
 			Account: Account{
@@ -288,13 +292,17 @@ func TestTransactionsListAccount(t *testing.T) {
 			Voidable:      NewBool(true),
 			Refundable:    NewBool(true),
 			IPAddress:     net.ParseIP("127.0.0.1"),
-			CVVResult: &TransactionResult{
-				Code:    "M",
-				Message: "Match",
+			CVVResult: CVVResult{
+				transactionResult{
+					Code:    "M",
+					Message: "Match",
+				},
 			},
-			AVSResult: &TransactionResult{
-				Code:    "D",
-				Message: "Street address and postal code match.",
+			AVSResult: AVSResult{
+				transactionResult{
+					Code:    "D",
+					Message: "Street address and postal code match.",
+				},
 			},
 			CreatedAt: NewTime(ts),
 			Account: Account{
@@ -424,13 +432,17 @@ func TestGetTransaction(t *testing.T) {
 		Voidable:      NewBool(true),
 		Refundable:    NewBool(true),
 		IPAddress:     net.ParseIP("127.0.0.1"),
-		CVVResult: &TransactionResult{
-			Code:    "M",
-			Message: "Match",
+		CVVResult: CVVResult{
+			transactionResult{
+				Code:    "M",
+				Message: "Match",
+			},
 		},
-		AVSResult: &TransactionResult{
-			Code:    "D",
-			Message: "Street address and postal code match.",
+		AVSResult: AVSResult{
+			transactionResult{
+				Code:    "D",
+				Message: "Street address and postal code match.",
+			},
 		},
 		CreatedAt: NewTime(ts),
 		Account: Account{
@@ -607,5 +619,52 @@ func TestCreateTransactionFraudCard(t *testing.T) {
 
 	if !reflect.DeepEqual(expected, r.TransactionError) {
 		t.Errorf("TestCreateTransactionFraudCard Error: Expected transaction error of %+v, given %+v", expected, r.TransactionError)
+	}
+}
+
+func TestCVVIsFunctions(t *testing.T) {
+	c := CVVResult{transactionResult{Code: "M"}}
+	if !c.IsMatch() {
+		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to be match", "M")
+	}
+
+	if c.IsNoMatch() || c.NotProcessed() || c.ShouldHaveBeenPresent() || c.UnableToProcess() {
+		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to ONLY be match", "M")
+	}
+
+	c = CVVResult{transactionResult{Code: "N"}}
+	if !c.IsNoMatch() {
+		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to not be a match", "N")
+	}
+
+	if c.IsMatch() || c.NotProcessed() || c.ShouldHaveBeenPresent() || c.UnableToProcess() {
+		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to ONLY be match", "N")
+	}
+
+	c = CVVResult{transactionResult{Code: "P"}}
+	if !c.NotProcessed() {
+		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to not be a match", "P")
+	}
+
+	if c.IsMatch() || c.IsNoMatch() || c.ShouldHaveBeenPresent() || c.UnableToProcess() {
+		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to ONLY be match", "P")
+	}
+
+	c = CVVResult{transactionResult{Code: "S"}}
+	if !c.ShouldHaveBeenPresent() {
+		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to not be a match", "S")
+	}
+
+	if c.IsMatch() || c.IsNoMatch() || c.NotProcessed() || c.UnableToProcess() {
+		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to ONLY be match", "S")
+	}
+
+	c = CVVResult{transactionResult{Code: "U"}}
+	if !c.UnableToProcess() {
+		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to not be a match", "U")
+	}
+
+	if c.IsMatch() || c.IsNoMatch() || c.NotProcessed() || c.ShouldHaveBeenPresent() {
+		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to ONLY be match", "U")
 	}
 }
