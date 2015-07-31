@@ -12,6 +12,12 @@ type (
 
 		// Errors holds an array of validation errors if any occurred.
 		Errors []Error
+
+		// TransactionError holds transaction errors from your payment gateway.
+		// This will only be populdated when creating a new subscription,
+		// updating billing information, and processing a one-time transaction.
+		// https://recurly.readme.io/v2.0/page/transaction-errors
+		TransactionError TransactionError
 	}
 
 	// Error is an individual validation error
@@ -20,6 +26,18 @@ type (
 		Message string   `xml:",innerxml"`
 		Field   string   `xml:"field,attr"`
 		Symbol  string   `xml:"symbol,attr"`
+	}
+
+	// TransactionError is an error encounted from your payment gateway that
+	// recurly has standardized.
+	// https://recurly.readme.io/v2.0/page/transaction-errors
+	TransactionError struct {
+		XMLName          xml.Name `xml:"transaction_error"`
+		ErrorCode        string   `xml:"error_code,omitempty"`
+		ErrorCategory    string   `xml:"error_category,omitempty"`
+		MerchantMessage  string   `xml:"merchant_message,omitempty"`
+		CustomerMessage  string   `xml:"customer_message,omitempty"`
+		GatewayErrorCode string   `xml:"gateway_error_code,omitempty"`
 	}
 )
 

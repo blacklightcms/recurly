@@ -242,6 +242,34 @@ func TestBillingUpdateWithToken(t *testing.T) {
 	}
 }
 
+func TestBillingUpdateWithInvalidToken(t *testing.T) {
+	setup()
+	defer teardown()
+
+	token := "tok-UgLus845alBogoKRsiGw92vzos"
+	mux.HandleFunc("/v2/accounts/abceasf/billing_info", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			t.Errorf("TestBillingUpdateWithInvalidToken Error: Expected %s request, given %s", "PUT", r.Method)
+		}
+
+		rw.WriteHeader(404)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><error><symbol>token_invalid</symbol><description>Token is either invalid or expired</description></error>`)
+	})
+
+	r, _, err := client.Billing.UpdateWithToken("abceasf", token)
+	if err != nil {
+		t.Errorf("TestBillingUpdateWithInvalidToken Error: Error occurred making API call. Err: %s", err)
+	}
+
+	if r.IsOK() {
+		t.Fatal("TestBillingUpdateWithInvalidToken Error: Expected updating billing info with invalid token to return error")
+	}
+
+	if len(r.Errors) == 0 || r.Errors[0].Symbol != "token_invalid" {
+		t.Errorf("TestBillingUpdateWithInvalidToken Error: Error response not parsed properly")
+	}
+}
+
 func TestBillingUpdateWithCC(t *testing.T) {
 	t.Skip("TestBillingUpdatedWithCC Notice: Skipping test")
 }

@@ -33,6 +33,7 @@ type (
 		FirstSix int    `xml:"first_six,omitempty"`
 		LastFour int    `xml:"last_four,omitempty"`
 		CardType string `xml:"card_type,omitempty"`
+		Number   int    `xml:"number,omitempty"`
 		Month    int    `xml:"month,omitempty"`
 		Year     int    `xml:"year,omitempty"`
 		// VerificationValue is only used for create/update only. A Verification

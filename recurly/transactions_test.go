@@ -470,16 +470,142 @@ func TestCreateTransaction(t *testing.T) {
 		if r.Method != "POST" {
 			t.Errorf("TestCreateTransaction Error: Expected %s request, given %s", "POST", r.Method)
 		}
-		rw.WriteHeader(201)
+		expected := `<transaction><amount_in_cents>100</amount_in_cents><currency>USD</currency><account><account_code>25</account_code></account></transaction>`
+		given := new(bytes.Buffer)
+		given.ReadFrom(r.Body)
+		if expected != given.String() {
+			t.Errorf("TestCreateTransaction Error: Expected request body of %s, given %s", expected, given.String())
+		}
+
+		rw.WriteHeader(200)
 		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><transaction></transaction>`)
 	})
 
-	r, _, err := client.Transactions.Create(Transaction{})
+	r, _, err := client.Transactions.Create(CreateTransaction{
+		AmountInCents: 100,
+		Currency:      "USD",
+		Account: Account{
+			Code: "25",
+		},
+	})
 	if err != nil {
 		t.Errorf("TestCreateTransaction Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
 		t.Fatal("TestCreateTransaction Error: Expected create transaction to return OK")
+	}
+}
+
+func TestCreateTransactionFraudCard(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/transactions", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			t.Errorf("TestCreateTransactionFraudCard Error: Expected %s request, given %s", "POST", r.Method)
+		}
+
+		rw.WriteHeader(422)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
+			<errors>
+			  <transaction_error>
+			    <error_code>fraud_gateway</error_code>
+			    <error_category>fraud</error_category>
+			    <merchant_message>The payment gateway declined the transaction due to fraud filters enabled in your gateway.</merchant_message>
+			    <customer_message>The transaction was declined. Please use a different card, contact your bank, or contact support.</customer_message>
+			    <gateway_error_code nil="nil"></gateway_error_code>
+			  </transaction_error>
+			  <error field="transaction.account.base" symbol="fraud_gateway">The transaction was declined. Please use a different card, contact your bank, or contact support.</error>
+			  <transaction href="https://your-subdomain.recurly.com/v2/transactions/3054a79e4c3ab4699f95be455f8653bb" type="credit_card">
+			    <account href="https://your-subdomain.recurly.com/v2/accounts/Seantwo@recurly.com"/>
+			    <uuid>3054a79e4c3ab4699f95be455f8653bb</uuid>
+			    <action>purchase</action>
+			    <amount_in_cents type="integer">100</amount_in_cents>
+			    <tax_in_cents type="integer">0</tax_in_cents>
+			    <currency>USD</currency>
+			    <status>declined</status>
+			    <payment_method>credit_card</payment_method>
+			    <reference>6223543</reference>
+			    <source>transaction</source>
+			    <recurring type="boolean">false</recurring>
+			    <test type="boolean">true</test>
+			    <voidable type="boolean">false</voidable>
+			    <refundable type="boolean">false</refundable>
+			    <ip_address>184.23.184.210</ip_address>
+			    <transaction_error>
+			      <error_code>fraud_gateway</error_code>
+			      <error_category>fraud</error_category>
+			      <merchant_message>The payment gateway declined the transaction due to fraud filters enabled in your gateway.</merchant_message>
+			      <customer_message>The transaction was declined. Please use a different card, contact your bank, or contact support.</customer_message>
+			      <gateway_error_code nil="nil"></gateway_error_code>
+			    </transaction_error>
+			    <cvv_result code="" nil="nil"></cvv_result>
+			    <avs_result code="" nil="nil"></avs_result>
+			    <avs_result_street nil="nil"></avs_result_street>
+			    <avs_result_postal nil="nil"></avs_result_postal>
+			    <created_at type="datetime">2015-07-31T20:45:01Z</created_at>
+			    <details>
+			      <account>
+			        <account_code>1</account_code>
+			        <first_name>Verena</first_name>
+			        <last_name>Example</last_name>
+			        <company></company>
+			        <email></email>
+			        <billing_info type="credit_card">
+			          <first_name>Verena</first_name>
+			          <last_name>Example</last_name>
+			          <address1>123 Main St.</address1>
+			          <address2></address2>
+			          <city>San Francisco</city>
+			          <state>CA</state>
+			          <zip>94133</zip>
+			          <country>US</country>
+			          <phone nil="nil"></phone>
+			          <vat_number nil="nil"></vat_number>
+			          <card_type>Visa</card_type>
+			          <year type="integer">2020</year>
+			          <month type="integer">10</month>
+			          <first_six>400000</first_six>
+			          <last_four>0085</last_four>
+			        </billing_info>
+			      </account>
+			    </details>
+			  </transaction>
+			</errors>`)
+	})
+
+	r, _, err := client.Transactions.Create(CreateTransaction{
+		AmountInCents: 100,
+		Currency:      "USD",
+		Account: Account{
+			Code: "25",
+			BillingInfo: &Billing{
+				FirstName: "Verena",
+				LastName:  "Example",
+				Number:    4000000000000085,
+				Month:     10,
+				Year:      2020,
+			},
+		},
+	})
+	if err != nil {
+		t.Errorf("TestCreateTransactionFraudCard Error: Error occurred making API call. Err: %s", err)
+	}
+
+	if r.IsOK() {
+		t.Fatal("TestCreateTransactionFraudCard Error: Expected create fraudulent transaction to return error")
+	}
+
+	expected := TransactionError{
+		XMLName:         xml.Name{Local: "transaction_error"},
+		ErrorCode:       "fraud_gateway",
+		ErrorCategory:   "fraud",
+		MerchantMessage: "The payment gateway declined the transaction due to fraud filters enabled in your gateway.",
+		CustomerMessage: "The transaction was declined. Please use a different card, contact your bank, or contact support.",
+	}
+
+	if !reflect.DeepEqual(expected, r.TransactionError) {
+		t.Errorf("TestCreateTransactionFraudCard Error: Expected transaction error of %+v, given %+v", expected, r.TransactionError)
 	}
 }
