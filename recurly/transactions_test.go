@@ -180,13 +180,13 @@ func TestTransactionsList(t *testing.T) {
 	}
 }
 
-func TestTransactionsListForAccount(t *testing.T) {
+func TestTransactionsListAccount(t *testing.T) {
 	setup()
 	defer teardown()
 
 	mux.HandleFunc("/v2/accounts/1/transactions", func(rw http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
-			t.Errorf("TestTransactionsListForAccount Error: Expected %s request, given %s", "GET", r.Method)
+			t.Errorf("TestTransactionsListAccount Error: Expected %s request, given %s", "GET", r.Method)
 		}
 		rw.WriteHeader(200)
 		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
@@ -245,21 +245,21 @@ func TestTransactionsListForAccount(t *testing.T) {
         </transactions>`)
 	})
 
-	r, transactions, err := client.Transactions.ListForAccount("1", Params{"per_page": 1})
+	r, transactions, err := client.Transactions.ListAccount("1", Params{"per_page": 1})
 	if err != nil {
-		t.Errorf("TestTransactionsListForAccount Error: Error occurred making API call. Err: %s", err)
+		t.Errorf("TestTransactionsListAccount Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
-		t.Fatal("TestTransactionsListForAccount Error: Expected list for account transactions to return OK")
+		t.Fatal("TestTransactionsListAccount Error: Expected list for account transactions to return OK")
 	}
 
 	if len(transactions) != 1 {
-		t.Fatalf("TestTransactionsListForAccount Error: Expected 1 transaction returned, given %d", len(transactions))
+		t.Fatalf("TestTransactionsListAccount Error: Expected 1 transaction returned, given %d", len(transactions))
 	}
 
 	if r.Request.URL.Query().Get("per_page") != "1" {
-		t.Errorf("TestTransactionsListForAccount Error: Expected per_page parameter of 1, given %s", r.Request.URL.Query().Get("per_page"))
+		t.Errorf("TestTransactionsListAccount Error: Expected per_page parameter of 1, given %s", r.Request.URL.Query().Get("per_page"))
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2015-06-10T15:25:06Z")
@@ -322,7 +322,7 @@ func TestTransactionsListForAccount(t *testing.T) {
 		}
 
 		if !reflect.DeepEqual(expected, given) {
-			t.Errorf("TestTransactionsListForAccount Error: expected transaction to equal %#v, given %#v", expected, given)
+			t.Errorf("TestTransactionsListAccount Error: expected transaction to equal %#v, given %#v", expected, given)
 		}
 	}
 }

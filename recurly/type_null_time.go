@@ -23,6 +23,14 @@ func NewTime(t time.Time) NullTime {
 	return NullTime{Time: &t}
 }
 
+// newTimeFromString generates a new NullTime based on a
+// time string in the datetimeFormat format.
+// This is primarily used in unit testing.
+func newTimeFromString(str string) NullTime {
+	t, _ := time.Parse(datetimeFormat, str)
+	return NullTime{Time: &t}
+}
+
 // UnmarshalXML unmarshals an int properly, as well as marshaling an empty string to nil.
 func (t *NullTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v string

@@ -197,7 +197,7 @@ func TestSubscriptionsEncoding(t *testing.T) {
 			},
 		}}, "xml": "<subscription><subscription_add_ons><subscription_add_on><add_on_code>extra_users</add_on_code><unit_amount_in_cents>1000</unit_amount_in_cents><quantity>2</quantity></subscription_add_on></subscription_add_ons></subscription>"},
 		map[string]interface{}{"struct": Subscription{
-			SubscriptionAddOns: &[]SubscriptionAddOn{
+			SubscriptionAddOns: []SubscriptionAddOn{
 				SubscriptionAddOn{
 					Code:              "extra_users",
 					UnitAmountInCents: 1000,
@@ -368,7 +368,7 @@ func TestListAccountSubscriptions(t *testing.T) {
 		</subscriptions>`)
 	})
 
-	r, subscriptions, err := client.Subscriptions.ListForAccount("1", Params{"per_page": 1})
+	r, subscriptions, err := client.Subscriptions.ListAccount("1", Params{"per_page": 1})
 	if err != nil {
 		t.Errorf("TestListAccountSubscriptions Error: Error occurred making API call. Err: %s", err)
 	}

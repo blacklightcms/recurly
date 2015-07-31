@@ -35,6 +35,7 @@ type (
 		Billing       BillingService
 		Coupons       CouponsService
 		Redemptions   RedemptionsService
+		Invoices      InvoicesService
 		Plans         PlansService
 		AddOns        AddOnsService
 		Subscriptions SubscriptionsService
@@ -63,6 +64,7 @@ func NewClient(subDomain string, apiKey string, httpClient *http.Client) *Client
 	c.Billing = BillingService{client: c}
 	c.Coupons = CouponsService{client: c}
 	c.Redemptions = RedemptionsService{client: c}
+	c.Invoices = InvoicesService{client: c}
 	c.Plans = PlansService{client: c}
 	c.AddOns = AddOnsService{client: c}
 	c.Subscriptions = SubscriptionsService{client: c}

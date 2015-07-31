@@ -75,9 +75,9 @@ func (service TransactionsService) List(params Params) (*Response, []Transaction
 	return res, p.Transactions, err
 }
 
-// ListForAccount returns a list of transactions for an account
+// ListAccount returns a list of transactions for an account
 // https://dev.recurly.com/docs/list-accounts-transactions
-func (service TransactionsService) ListForAccount(accountCode string, params Params) (*Response, []Transaction, error) {
+func (service TransactionsService) ListAccount(accountCode string, params Params) (*Response, []Transaction, error) {
 	action := fmt.Sprintf("accounts/%s/transactions", accountCode)
 	req, err := service.client.newRequest("GET", action, params, nil)
 	if err != nil {

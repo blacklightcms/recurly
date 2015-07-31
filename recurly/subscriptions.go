@@ -15,29 +15,29 @@ type (
 
 	// Subscription represents an individual subscription.
 	Subscription struct {
-		XMLName                xml.Name             `xml:"subscription"`
-		Plan                   nestedPlan           `xml:"plan,omitempty"`
-		Account                href                 `xml:"account"`
-		Invoice                href                 `xml:"invoice"`
-		UUID                   string               `xml:"uuid,omitempty"`
-		State                  string               `xml:"state,omitempty"`
-		UnitAmountInCents      int                  `xml:"unit_amount_in_cents,omitempty"`
-		Currency               string               `xml:"currency,omitempty"`
-		Quantity               int                  `xml:"quantity,omitempty"`
-		ActivatedAt            NullTime             `xml:"activated_at,omitempty"`
-		CanceledAt             NullTime             `xml:"canceled_at,omitempty"`
-		ExpiresAt              NullTime             `xml:"expires_at,omitempty"`
-		CurrentPeriodStartedAt NullTime             `xml:"current_period_started_at,omitempty"`
-		CurrentPeriodEndsAt    NullTime             `xml:"current_period_ends_at,omitempty"`
-		TrialStartedAt         NullTime             `xml:"trial_started_at,omitempty"`
-		TrialEndsAt            NullTime             `xml:"trial_ends_at,omitempty"`
-		TaxInCents             int                  `xml:"tax_in_cents,omitempty"`
-		TaxType                string               `xml:"tax_type,omitempty"`
-		TaxRegion              string               `xml:"tax_region,omitempty"`
-		TaxRate                float64              `xml:"tax_rate,omitempty"`
-		PONumber               string               `xml:"po_number,omitempty"`
-		NetTerms               NullInt              `xml:"net_terms,omitempty"`
-		SubscriptionAddOns     *[]SubscriptionAddOn `xml:"subscriptions_add_ons,omitempty"`
+		XMLName                xml.Name            `xml:"subscription"`
+		Plan                   nestedPlan          `xml:"plan,omitempty"`
+		Account                href                `xml:"account"`
+		Invoice                href                `xml:"invoice"`
+		UUID                   string              `xml:"uuid,omitempty"`
+		State                  string              `xml:"state,omitempty"`
+		UnitAmountInCents      int                 `xml:"unit_amount_in_cents,omitempty"`
+		Currency               string              `xml:"currency,omitempty"`
+		Quantity               int                 `xml:"quantity,omitempty"`
+		ActivatedAt            NullTime            `xml:"activated_at,omitempty"`
+		CanceledAt             NullTime            `xml:"canceled_at,omitempty"`
+		ExpiresAt              NullTime            `xml:"expires_at,omitempty"`
+		CurrentPeriodStartedAt NullTime            `xml:"current_period_started_at,omitempty"`
+		CurrentPeriodEndsAt    NullTime            `xml:"current_period_ends_at,omitempty"`
+		TrialStartedAt         NullTime            `xml:"trial_started_at,omitempty"`
+		TrialEndsAt            NullTime            `xml:"trial_ends_at,omitempty"`
+		TaxInCents             int                 `xml:"tax_in_cents,omitempty"`
+		TaxType                string              `xml:"tax_type,omitempty"`
+		TaxRegion              string              `xml:"tax_region,omitempty"`
+		TaxRate                float64             `xml:"tax_rate,omitempty"`
+		PONumber               string              `xml:"po_number,omitempty"`
+		NetTerms               NullInt             `xml:"net_terms,omitempty"`
+		SubscriptionAddOns     []SubscriptionAddOn `xml:"subscriptions_add_ons,omitempty"`
 	}
 
 	nestedPlan struct {
@@ -137,7 +137,7 @@ func (s Subscription) MakeUpdate() UpdateSubscription {
 		// NetTerms need to be copied over because on update they default to 0.
 		// This ensures the NetTerms don't get overridden.
 		NetTerms:           s.NetTerms,
-		SubscriptionAddOns: s.SubscriptionAddOns,
+		SubscriptionAddOns: &s.SubscriptionAddOns,
 	}
 }
 
@@ -158,9 +158,9 @@ func (service SubscriptionsService) List(params Params) (*Response, []Subscripti
 	return res, s.Subscriptions, err
 }
 
-// ListForAccount returns a list of subscriptions for an account.
+// ListAccount returns a list of subscriptions for an account.
 // https://docs.recurly.com/api/subscriptions#list-account-subscriptions
-func (service SubscriptionsService) ListForAccount(accountCode string, params Params) (*Response, []Subscription, error) {
+func (service SubscriptionsService) ListAccount(accountCode string, params Params) (*Response, []Subscription, error) {
 	action := fmt.Sprintf("accounts/%s/subscriptions", accountCode)
 	req, err := service.client.newRequest("GET", action, params, nil)
 	if err != nil {
