@@ -205,11 +205,86 @@ func TestBillingCreateWithToken(t *testing.T) {
 }
 
 func TestBillingCreateWithCC(t *testing.T) {
-	t.Skip("TestBillingCreatedWithCC Notice: Skipping test")
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/accounts/1/billing_info", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			t.Errorf("TestBillingCreateWithCC Error: Expected %s request, given %s", "POST", r.Method)
+		}
+		given := new(bytes.Buffer)
+		given.ReadFrom(r.Body)
+		expected := "<billing_info><first_name>Verena</first_name><last_name>Example</last_name><address1>123 Main St.</address1><city>San Francisco</city><state>CA</state><zip>94105</zip><country>US</country><number>4111111111111111</number><month>10</month><year>2020</year></billing_info>"
+		if expected != given.String() {
+			t.Errorf("TestBillingCreateWithCC Error: Expected request body of %s, given %s", expected, given.String())
+		}
+
+		rw.WriteHeader(200)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><billing_info></billing_info>`)
+	})
+
+	r, _, err := client.Billing.Create("1", Billing{
+		FirstName: "Verena",
+		LastName:  "Example",
+		Address:   "123 Main St.",
+		City:      "San Francisco",
+		State:     "CA",
+		Zip:       "94105",
+		Country:   "US",
+		Number:    4111111111111111,
+		Month:     10,
+		Year:      2020,
+	})
+
+	if err != nil {
+		t.Errorf("TestBillingCreateWithCC Error: Error occurred making API call. Err: %s", err)
+	}
+
+	if r.IsError() {
+		t.Fatal("TestBillingCreateWithCC Error: Expected creating billing info to return OK")
+	}
 }
 
 func TestBillingCreateWithBankAccount(t *testing.T) {
-	t.Skip("TestBillingCreatedWithCC Notice: Skipping test")
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/accounts/134/billing_info", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			t.Errorf("TestBillingCreateWithBankAccount Error: Expected %s request, given %s", "POST", r.Method)
+		}
+		given := new(bytes.Buffer)
+		given.ReadFrom(r.Body)
+		expected := "<billing_info><first_name>Verena</first_name><last_name>Example</last_name><address1>123 Main St.</address1><city>San Francisco</city><state>CA</state><zip>94105</zip><country>US</country><name_on_account>Acme, Inc</name_on_account><routing_number>123456780</routing_number><account_number>111111111</account_number><account_type>checking</account_type></billing_info>"
+		if expected != given.String() {
+			t.Errorf("TestBillingCreateWithBankAccount Error: Expected request body of %s, given %s", expected, given.String())
+		}
+
+		rw.WriteHeader(200)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><billing_info></billing_info>`)
+	})
+
+	r, _, err := client.Billing.Create("134", Billing{
+		FirstName:     "Verena",
+		LastName:      "Example",
+		Address:       "123 Main St.",
+		City:          "San Francisco",
+		State:         "CA",
+		Zip:           "94105",
+		Country:       "US",
+		NameOnAccount: "Acme, Inc",
+		RoutingNumber: 123456780,
+		AccountNumber: 111111111,
+		AccountType:   "checking",
+	})
+
+	if err != nil {
+		t.Errorf("TestBillingCreateWithBankAccount Error: Error occurred making API call. Err: %s", err)
+	}
+
+	if r.IsError() {
+		t.Fatal("TestBillingCreateWithBankAccount Error: Expected creating billing info to return OK")
+	}
 }
 
 func TestBillingUpdateWithToken(t *testing.T) {
@@ -271,11 +346,104 @@ func TestBillingUpdateWithInvalidToken(t *testing.T) {
 }
 
 func TestBillingUpdateWithCC(t *testing.T) {
-	t.Skip("TestBillingUpdatedWithCC Notice: Skipping test")
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/accounts/1/billing_info", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			t.Errorf("TestBillingUpdateWithCC Error: Expected %s request, given %s", "PUT", r.Method)
+		}
+		given := new(bytes.Buffer)
+		given.ReadFrom(r.Body)
+		expected := "<billing_info><first_name>Verena</first_name><last_name>Example</last_name><address1>123 Main St.</address1><city>San Francisco</city><state>CA</state><zip>94105</zip><country>US</country><number>4111111111111111</number><month>10</month><year>2020</year></billing_info>"
+		if expected != given.String() {
+			t.Errorf("TestBillingUpdateWithCC Error: Expected request body of %s, given %s", expected, given.String())
+		}
+
+		rw.WriteHeader(200)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><billing_info></billing_info>`)
+	})
+
+	r, _, err := client.Billing.Update("1", Billing{
+		FirstName: "Verena",
+		LastName:  "Example",
+		Address:   "123 Main St.",
+		City:      "San Francisco",
+		State:     "CA",
+		Zip:       "94105",
+		Country:   "US",
+		Number:    4111111111111111,
+		Month:     10,
+		Year:      2020,
+
+		// Add additional fields that should be removed
+		Token:             "abc",
+		IPAddressCountry:  "US",
+		FirstSix:          411111,
+		LastFour:          1111,
+		CardType:          "visa",
+		PaypalAgreementID: "ppl",
+		AmazonAgreementID: "asdfb",
+	})
+
+	if err != nil {
+		t.Errorf("TestBillingUpdateWithCC Error: Error occurred making API call. Err: %s", err)
+	}
+
+	if r.IsError() {
+		t.Fatal("TestBillingUpdateWithCC Error: Expected creating billing info to return OK")
+	}
 }
 
 func TestBillingUpdateWithBankAccount(t *testing.T) {
-	t.Skip("TestBillingUpdatedWithCC Notice: Skipping test")
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/accounts/134/billing_info", func(rw http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			t.Errorf("TestBillingUpdateWithBankAccount Error: Expected %s request, given %s", "PUT", r.Method)
+		}
+		given := new(bytes.Buffer)
+		given.ReadFrom(r.Body)
+		expected := "<billing_info><first_name>Verena</first_name><last_name>Example</last_name><address1>123 Main St.</address1><city>San Francisco</city><state>CA</state><zip>94105</zip><country>US</country><name_on_account>Acme, Inc</name_on_account><routing_number>123456780</routing_number><account_number>111111111</account_number><account_type>checking</account_type></billing_info>"
+		if expected != given.String() {
+			t.Errorf("TestBillingUpdateWithBankAccount Error: Expected request body of %s, given %s", expected, given.String())
+		}
+
+		rw.WriteHeader(200)
+		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><billing_info></billing_info>`)
+	})
+
+	r, _, err := client.Billing.Update("134", Billing{
+		FirstName:     "Verena",
+		LastName:      "Example",
+		Address:       "123 Main St.",
+		City:          "San Francisco",
+		State:         "CA",
+		Zip:           "94105",
+		Country:       "US",
+		NameOnAccount: "Acme, Inc",
+		RoutingNumber: 123456780,
+		AccountNumber: 111111111,
+		AccountType:   "checking",
+
+		// Add additional fields that should be removed
+		Token:             "abc",
+		IPAddressCountry:  "US",
+		FirstSix:          111111,
+		LastFour:          1111,
+		CardType:          "visa",
+		PaypalAgreementID: "ppl",
+		AmazonAgreementID: "asdfb",
+	})
+
+	if err != nil {
+		t.Errorf("TestBillingUpdateWithBankAccount Error: Error occurred making API call. Err: %s", err)
+	}
+
+	if r.IsError() {
+		t.Fatal("TestBillingUpdateWithBankAccount Error: Expected creating billing info to return OK")
+	}
 }
 
 func TestClearBilling(t *testing.T) {

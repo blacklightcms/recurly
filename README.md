@@ -61,11 +61,11 @@ what's coming before things stabilize:
  * ~~Coupons, coupon redemptions, invoices, and transactions. All other
  portions of the API are complete.~~
  * ~~Documentation~~ and more usage examples.
- * There is currently no support for updating billing info with a credit card or
+ * ~~There is currently no support for updating billing info with a credit card or
  bank account directly. Using [recurly.js](https://docs.recurly.com/js/) token is the only supported method currently.
  Because the the token method using [recurly.js](https://docs.recurly.com/js/) is the recommended method, this
  is currently a low priority. The placeholder functions are already in place so
- this will not affect API stability of the library.
+ this will not affect API stability of the library.~~
  * [Webhook](https://dev.recurly.com/page/webhooks) support. This will come last after API stability.
 
 Once that notice is removed things will be stable. Contributions are welcome.
