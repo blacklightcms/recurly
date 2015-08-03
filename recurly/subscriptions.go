@@ -54,7 +54,7 @@ type (
 		Quantity          int      `xml:"quantity,omitempty"`
 	}
 
-	// NewSubscription is used to create new subscriptions
+	// NewSubscription is used to create new subscriptions.
 	NewSubscription struct {
 		XMLName                 xml.Name             `xml:"subscription"`
 		PlanCode                string               `xml:"plan_code"`

@@ -474,26 +474,26 @@ func TestGetTransaction(t *testing.T) {
 	}
 }
 
-func TestCreateTransaction(t *testing.T) {
+func TestNewTransaction(t *testing.T) {
 	setup()
 	defer teardown()
 
 	mux.HandleFunc("/v2/transactions", func(rw http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
-			t.Errorf("TestCreateTransaction Error: Expected %s request, given %s", "POST", r.Method)
+			t.Errorf("TestNewTransaction Error: Expected %s request, given %s", "POST", r.Method)
 		}
 		expected := `<transaction><amount_in_cents>100</amount_in_cents><currency>USD</currency><account><account_code>25</account_code></account></transaction>`
 		given := new(bytes.Buffer)
 		given.ReadFrom(r.Body)
 		if expected != given.String() {
-			t.Errorf("TestCreateTransaction Error: Expected request body of %s, given %s", expected, given.String())
+			t.Errorf("TestNewTransaction Error: Expected request body of %s, given %s", expected, given.String())
 		}
 
 		rw.WriteHeader(200)
 		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><transaction></transaction>`)
 	})
 
-	r, _, err := client.Transactions.Create(CreateTransaction{
+	r, _, err := client.Transactions.Create(NewTransaction{
 		AmountInCents: 100,
 		Currency:      "USD",
 		Account: Account{
@@ -501,21 +501,21 @@ func TestCreateTransaction(t *testing.T) {
 		},
 	})
 	if err != nil {
-		t.Errorf("TestCreateTransaction Error: Error occurred making API call. Err: %s", err)
+		t.Errorf("TestNewTransaction Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsError() {
-		t.Fatal("TestCreateTransaction Error: Expected create transaction to return OK")
+		t.Fatal("TestNewTransaction Error: Expected create transaction to return OK")
 	}
 }
 
-func TestCreateTransactionFraudCard(t *testing.T) {
+func TestNewTransactionFraudCard(t *testing.T) {
 	setup()
 	defer teardown()
 
 	mux.HandleFunc("/v2/transactions", func(rw http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
-			t.Errorf("TestCreateTransactionFraudCard Error: Expected %s request, given %s", "POST", r.Method)
+			t.Errorf("TestNewTransactionFraudCard Error: Expected %s request, given %s", "POST", r.Method)
 		}
 
 		rw.WriteHeader(422)
@@ -587,7 +587,7 @@ func TestCreateTransactionFraudCard(t *testing.T) {
 			</errors>`)
 	})
 
-	r, _, err := client.Transactions.Create(CreateTransaction{
+	r, _, err := client.Transactions.Create(NewTransaction{
 		AmountInCents: 100,
 		Currency:      "USD",
 		Account: Account{
@@ -602,11 +602,11 @@ func TestCreateTransactionFraudCard(t *testing.T) {
 		},
 	})
 	if err != nil {
-		t.Errorf("TestCreateTransactionFraudCard Error: Error occurred making API call. Err: %s", err)
+		t.Errorf("TestNewTransactionFraudCard Error: Error occurred making API call. Err: %s", err)
 	}
 
 	if r.IsOK() {
-		t.Fatal("TestCreateTransactionFraudCard Error: Expected create fraudulent transaction to return error")
+		t.Fatal("TestNewTransactionFraudCard Error: Expected create fraudulent transaction to return error")
 	}
 
 	expected := TransactionError{
@@ -618,7 +618,7 @@ func TestCreateTransactionFraudCard(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(expected, r.TransactionError) {
-		t.Errorf("TestCreateTransactionFraudCard Error: Expected transaction error of %+v, given %+v", expected, r.TransactionError)
+		t.Errorf("TestNewTransactionFraudCard Error: Expected transaction error of %+v, given %+v", expected, r.TransactionError)
 	}
 }
 

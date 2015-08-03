@@ -40,12 +40,12 @@ type (
 		Account         Account   `xml:"details>account"`
 	}
 
-	// CreateTransaction is used to create new transactions.
+	// NewTransaction is used to create new transactions.
 	// It removes read-only fields from Transaction and also ensures
 	// the account fields gets encoded as <account>..</account> and not
 	// as <details><account></account></details> -- the read format
 	// returned from Recurly.
-	CreateTransaction struct {
+	NewTransaction struct {
 		XMLName       xml.Name `xml:"transaction"`
 		Action        string   `xml:"action,omitempty"`
 		AmountInCents int      `xml:"amount_in_cents"`
@@ -178,8 +178,8 @@ func (service TransactionsService) Get(uuid string) (*Response, Transaction, err
 // attributes must be supplied. When charging an existing account only the
 // account_code must be supplied.
 // https://dev.recurly.com/docs/create-transaction
-func (service TransactionsService) Create(ct CreateTransaction) (*Response, Transaction, error) {
-	req, err := service.client.newRequest("POST", "transactions", nil, ct)
+func (service TransactionsService) Create(nt NewTransaction) (*Response, Transaction, error) {
+	req, err := service.client.newRequest("POST", "transactions", nil, nt)
 	if err != nil {
 		return nil, Transaction{}, err
 	}
