@@ -286,6 +286,25 @@ expected := Subscription{
 You can then use s.Account.Code to retrieve account info, or s.Invoice.Code to
 retrieve invoice info.
 
+## Transaction errors
+In addition to the Errors property in the recurly.Response, response also
+contains a TransactionError field for Transaction Errors.
+
+Be sure to check resp.TransactionError for any API calls that may return a transaction
+error for additional info. The TransactionError struct is defined like this:
+```go
+TransactionError struct {
+	XMLName          xml.Name `xml:"transaction_error"`
+	ErrorCode        string   `xml:"error_code,omitempty"`
+	ErrorCategory    string   `xml:"error_category,omitempty"`
+	MerchantMessage  string   `xml:"merchant_message,omitempty"`
+	CustomerMessage  string   `xml:"customer_message,omitempty"`
+	GatewayErrorCode string   `xml:"gateway_error_code,omitempty"`
+}
+```
+
+[Link to transaction error documentation](https://recurly.readme.io/v2.0/page/transaction-errors).
+
 ## Roadmap
 The API should now be mostly stable. I'm going to leave this notice here for a bit
 in case any one in the community has comments or suggestions for improvements.
