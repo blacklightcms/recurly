@@ -28,8 +28,16 @@ func TestAccountEncoding(t *testing.T) {
 		map[string]interface{}{"struct": Account{TaxExempt: NewBool(true)}, "xml": "<account><tax_exempt>true</tax_exempt></account>"},
 		map[string]interface{}{"struct": Account{TaxExempt: NewBool(false)}, "xml": "<account><tax_exempt>false</tax_exempt></account>"},
 		map[string]interface{}{"struct": Account{AcceptLanguage: "en_US"}, "xml": "<account><accept_language>en_US</accept_language></account>"},
-		map[string]interface{}{"struct": Account{FirstName: "Larry", Address: &Address{Address: "123 Main St.", City: "San Francisco", State: "CA", Zip: "94105", Country: "US"}}, "xml": "<account><first_name>Larry</first_name><address><address1>123 Main St.</address1><city>San Francisco</city><state>CA</state><zip>94105</zip><country>US</country></address></account>"},
+		map[string]interface{}{"struct": Account{FirstName: "Larry", Address: Address{Address: "123 Main St.", City: "San Francisco", State: "CA", Zip: "94105", Country: "US"}}, "xml": "<account><first_name>Larry</first_name><address><address1>123 Main St.</address1><city>San Francisco</city><state>CA</state><zip>94105</zip><country>US</country></address></account>"},
 		map[string]interface{}{"struct": Account{Code: "test@example.com", BillingInfo: &Billing{Token: "507c7f79bcf86cd7994f6c0e"}}, "xml": "<account><account_code>test@example.com</account_code><billing_info><token_id>507c7f79bcf86cd7994f6c0e</token_id></billing_info></account>"},
+		map[string]interface{}{"struct": Address{}, "xml": ""},
+		map[string]interface{}{"struct": Address{Address: "123 Main St."}, "xml": "<address><address1>123 Main St.</address1></address>"},
+		map[string]interface{}{"struct": Address{Address2: "Unit A"}, "xml": "<address><address2>Unit A</address2></address>"},
+		map[string]interface{}{"struct": Address{City: "San Francisco"}, "xml": "<address><city>San Francisco</city></address>"},
+		map[string]interface{}{"struct": Address{State: "CA"}, "xml": "<address><state>CA</state></address>"},
+		map[string]interface{}{"struct": Address{Zip: "94105"}, "xml": "<address><zip>94105</zip></address>"},
+		map[string]interface{}{"struct": Address{Country: "US"}, "xml": "<address><country>US</country></address>"},
+		map[string]interface{}{"struct": Address{Phone: "555-555-5555"}, "xml": "<address><phone>555-555-5555</phone></address>"},
 	}
 
 	for _, s := range suite {
@@ -120,7 +128,7 @@ func TestAccountList(t *testing.T) {
 			FirstName: "Verena",
 			LastName:  "Example",
 			TaxExempt: NewBool(false),
-			Address: &Address{
+			Address: Address{
 				Address: "123 Main St.",
 				City:    "San Francisco",
 				State:   "CA",
@@ -229,7 +237,7 @@ func TestGetAccount(t *testing.T) {
 		FirstName: "Verena",
 		LastName:  "Example",
 		TaxExempt: NewBool(false),
-		Address: &Address{
+		Address: Address{
 			Address: "123 Main St.",
 			City:    "San Francisco",
 			State:   "CA",

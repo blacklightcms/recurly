@@ -233,29 +233,29 @@ func TestGetAdjustment(t *testing.T) {
 		TaxRegion:              "CA",
 		TaxRate:                0.0875,
 		TaxExempt:              NewBool(false),
-		TaxDetails: &[]TaxDetails{
-			TaxDetails{
+		TaxDetails: []TaxDetail{
+			TaxDetail{
 				XMLName:    xml.Name{Local: "tax_detail"},
 				Name:       "california",
 				Type:       "state",
 				TaxRate:    0.065,
 				TaxInCents: 130,
 			},
-			TaxDetails{
+			TaxDetail{
 				XMLName:    xml.Name{Local: "tax_detail"},
 				Name:       "san mateo county",
 				Type:       "county",
 				TaxRate:    0.01,
 				TaxInCents: 20,
 			},
-			TaxDetails{
+			TaxDetail{
 				XMLName:    xml.Name{Local: "tax_detail"},
 				Name:       "sf municipal tax",
 				Type:       "city",
 				TaxRate:    0.0,
 				TaxInCents: 0,
 			},
-			TaxDetails{
+			TaxDetail{
 				XMLName:    xml.Name{Local: "tax_detail"},
 				Type:       "special",
 				TaxRate:    0.0125,

@@ -39,7 +39,7 @@ type (
 	}
 )
 
-// List returns a list of all the coupons
+// List returns a list of all the coupons on your site.
 // https://dev.recurly.com/docs/list-active-coupons
 func (service CouponsService) List(params Params) (*Response, []Coupon, error) {
 	req, err := service.client.newRequest("GET", "coupons", params, nil)
