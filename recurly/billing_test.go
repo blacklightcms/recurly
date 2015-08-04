@@ -18,8 +18,18 @@ func TestBillingEncoding(t *testing.T) {
 	suite := []map[string]interface{}{
 		map[string]interface{}{"struct": Billing{}, "xml": "<billing_info></billing_info>"},
 		map[string]interface{}{"struct": Billing{Token: "507c7f79bcf86cd7994f6c0e"}, "xml": "<billing_info><token_id>507c7f79bcf86cd7994f6c0e</token_id></billing_info>"},
-
-		// @todo test bank account and credit card fields when support for those updates is added.
+		map[string]interface{}{"struct": Billing{FirstName: "Verena", LastName: "Example"}, "xml": "<billing_info><first_name>Verena</first_name><last_name>Example</last_name></billing_info>"},
+		map[string]interface{}{"struct": Billing{Address: "123 Main St."}, "xml": "<billing_info><address1>123 Main St.</address1></billing_info>"},
+		map[string]interface{}{"struct": Billing{Address2: "Unit A"}, "xml": "<billing_info><address2>Unit A</address2></billing_info>"},
+		map[string]interface{}{"struct": Billing{City: "San Francisco"}, "xml": "<billing_info><city>San Francisco</city></billing_info>"},
+		map[string]interface{}{"struct": Billing{State: "CA"}, "xml": "<billing_info><state>CA</state></billing_info>"},
+		map[string]interface{}{"struct": Billing{Zip: "94105"}, "xml": "<billing_info><zip>94105</zip></billing_info>"},
+		map[string]interface{}{"struct": Billing{Country: "US"}, "xml": "<billing_info><country>US</country></billing_info>"},
+		map[string]interface{}{"struct": Billing{Phone: "555-555-5555"}, "xml": "<billing_info><phone>555-555-5555</phone></billing_info>"},
+		map[string]interface{}{"struct": Billing{VATNumber: "abc"}, "xml": "<billing_info><vat_number>abc</vat_number></billing_info>"},
+		map[string]interface{}{"struct": Billing{IPAddress: net.ParseIP("127.0.0.1")}, "xml": "<billing_info><ip_address>127.0.0.1</ip_address></billing_info>"},
+		map[string]interface{}{"struct": Billing{Number: 4111111111111111, Month: 5, Year: 2020, VerificationValue: 111}, "xml": "<billing_info><number>4111111111111111</number><month>5</month><year>2020</year><verification_value>111</verification_value></billing_info>"},
+		map[string]interface{}{"struct": Billing{RoutingNumber: "065400137", AccountNumber: "0123456789", AccountType: "checking"}, "xml": "<billing_info><routing_number>065400137</routing_number><account_number>0123456789</account_number><account_type>checking</account_type></billing_info>"},
 	}
 
 	for _, s := range suite {
@@ -45,8 +55,8 @@ func TestBillingType(t *testing.T) {
 
 	b2 := Billing{
 		NameOnAccount: "Acme, Inc",
-		RoutingNumber: 123456780,
-		AccountNumber: 111111111,
+		RoutingNumber: "123456780",
+		AccountNumber: "111111111",
 	}
 
 	b3 := Billing{}
@@ -273,8 +283,8 @@ func TestBillingCreateWithBankAccount(t *testing.T) {
 		Zip:           "94105",
 		Country:       "US",
 		NameOnAccount: "Acme, Inc",
-		RoutingNumber: 123456780,
-		AccountNumber: 111111111,
+		RoutingNumber: "123456780",
+		AccountNumber: "111111111",
 		AccountType:   "checking",
 	})
 
@@ -423,8 +433,8 @@ func TestBillingUpdateWithBankAccount(t *testing.T) {
 		Zip:           "94105",
 		Country:       "US",
 		NameOnAccount: "Acme, Inc",
-		RoutingNumber: 123456780,
-		AccountNumber: 111111111,
+		RoutingNumber: "123456780",
+		AccountNumber: "111111111",
 		AccountType:   "checking",
 
 		// Add additional fields that should be removed

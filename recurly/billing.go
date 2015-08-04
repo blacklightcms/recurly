@@ -18,6 +18,7 @@ type (
 		XMLName          xml.Name `xml:"billing_info"`
 		FirstName        string   `xml:"first_name,omitempty"`
 		LastName         string   `xml:"last_name,omitempty"`
+		Company          string   `xml:"company,omitempty"`
 		Address          string   `xml:"address1,omitempty"`
 		Address2         string   `xml:"address2,omitempty"`
 		City             string   `xml:"city,omitempty"`
@@ -47,9 +48,11 @@ type (
 		AmazonAgreementID string `xml:"amazon_billing_agreement_id,omitempty"`
 
 		// Bank Account
+		// Note: routing numbers and account numbers may start with zeros, so need
+		// to treat them as strings
 		NameOnAccount string `xml:"name_on_account,omitempty"`
-		RoutingNumber int    `xml:"routing_number,omitempty"`
-		AccountNumber int    `xml:"account_number,omitempty"`
+		RoutingNumber string `xml:"routing_number,omitempty"`
+		AccountNumber string `xml:"account_number,omitempty"`
 		AccountType   string `xml:"account_type,omitempty"`
 
 		// Token is used for create/update only. A token will never be returned
@@ -64,7 +67,7 @@ func (b Billing) Type() string {
 		return "card"
 	}
 
-	if b.NameOnAccount != "" && b.RoutingNumber > 0 && b.AccountNumber > 0 {
+	if b.NameOnAccount != "" && b.RoutingNumber != "" && b.AccountNumber != "" {
 		return "bank"
 	}
 
