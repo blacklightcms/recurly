@@ -28,9 +28,8 @@ client, err := recurly.NewClient("subdomain", "apiKey", nil)
 resp, accounts, err := client.Accounts.List({"per_page": 20})
 ```
 
-The recurly.Response class provides some convenience methods:
+recurly.Response embeds http.Response and provides some convenience methods:
 ```go
-
 if resp.IsOK() {
     fmt.Println("Response was a 200-299 status code")
 }
@@ -50,6 +49,11 @@ if resp.IsClientError() {
 
 if resp.IsServerError() {
     fmt.Println("Try again later. Response was a 500-599 status code")
+}
+
+// Get status code from http.response
+if resp.StatusCode == 422 {
+    // ...
 }
 ```
 
@@ -97,6 +101,8 @@ if resp.IsOK() {
 ```
 
 ### Get Accounts (pagination example)
+All paginated methods (usually named List or List*) support a ```per_page``` and ```cursor``` parameter. Example usage:
+
 ```go
 resp, accounts, err := client.Accounts.List(recurly.Params{"per_page": 10})
 
@@ -131,6 +137,7 @@ resp, accounts, err := client.Accounts.Get(recurly.Params{
     "per_page": 10,
     "cursor": prev,
 })
+```
 
 ### Close account
 ```go
@@ -152,6 +159,39 @@ resp, b, err := client.Billing.CreateWithToken("1", token)
 ```go
 // 1 is the account code
 resp, b, err := client.Billing.UpdateWithToken("1", token)
+```
+
+### Create Billing with Credit Card
+```go
+resp, b, err := client.Billing.Create("1", Billing{
+    FirstName: "Verena",
+    LastName:  "Example",
+    Address:   "123 Main St.",
+    City:      "San Francisco",
+    State:     "CA",
+    Zip:       "94105",
+    Country:   "US",
+    Number:    4111111111111111,
+    Month:     10,
+    Year:      2020,
+})
+```
+
+### Create Billing With Bank account
+```go
+resp, b, err := client.Billing.Create("134", Billing{
+    FirstName:     "Verena",
+    LastName:      "Example",
+    Address:       "123 Main St.",
+    City:          "San Francisco",
+    State:         "CA",
+    Zip:           "94105",
+    Country:       "US",
+    NameOnAccount: "Acme, Inc",
+    RoutingNumber: "123456780",
+    AccountNumber: "111111111",
+    AccountType:   "checking",
+})
 ```
 
 ### Creating Transactions and Subscriptions
@@ -192,7 +232,7 @@ resp, s, err := client.Subscriptions.Create(recurly.NewSubscription{
 This package has a few null types that ensure that zero values will marshal
 or unmarshal properly.
 
-For example, booleans have a zero value of ```false``` in go. If you need to
+For example, booleans have a zero value of ```false``` in Go. If you need to
 explicitly send a false value, go will see that as a zero value and the omitempty
 option will ensure it doesn't get sent.
 
