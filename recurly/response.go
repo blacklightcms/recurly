@@ -45,7 +45,7 @@ type (
 
 var (
 	// rxPaginationLink is a regex to parse prev/next links from the Link header
-	rxPaginationLink = regexp.MustCompile(`<[^>]+\?cursor=(-?[0-9]+)>;`)
+	rxPaginationLink = regexp.MustCompile(`<[^>]+\?cursor=(-?[0-9]+)`)
 )
 
 // IsOK returns true if the request was successful.
