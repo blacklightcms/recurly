@@ -19,6 +19,7 @@ type (
 		Account             href     `xml:"account,omitempty"`
 		Address             Address  `xml:"address,omitempty"`
 		Subscription        href     `xml:"subscription,omitempty"`
+		OriginalInvoice     href     `xml:"original_invoice,omitempty"`
 		UUID                string   `xml:"uuid,omitempty"`
 		State               string   `xml:"state,omitempty"`
 		InvoiceNumberPrefix string   `xml:"invoice_number_prefix,omitempty"`
