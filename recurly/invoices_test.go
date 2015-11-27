@@ -34,6 +34,7 @@ func TestInvoicesList(t *testing.T) {
         			<phone></phone>
         		</address>
         		<subscription href="https://your-subdomain.recurly.com/v2/subscriptions/17caaca1716f33572edc8146e0aaefde"/>
+        		<original_invoice href="https://your-subdomain.recurly.com/v2/invoices/938571" />
         		<uuid>421f7b7d414e4c6792938e7c49d552e9</uuid>
         		<state>open</state>
         		<invoice_number_prefix></invoice_number_prefix>
@@ -118,6 +119,10 @@ func TestInvoicesList(t *testing.T) {
 			Subscription: href{
 				HREF: "https://your-subdomain.recurly.com/v2/subscriptions/17caaca1716f33572edc8146e0aaefde",
 				Code: "17caaca1716f33572edc8146e0aaefde",
+			},
+			OriginalInvoice: href{
+				HREF: "https://your-subdomain.recurly.com/v2/invoices/938571",
+				Code: "938571",
 			},
 			UUID:             "421f7b7d414e4c6792938e7c49d552e9",
 			State:            InvoiceStateOpen,

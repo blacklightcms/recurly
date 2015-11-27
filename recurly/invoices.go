@@ -19,6 +19,7 @@ type (
 		Account             href     `xml:"account,omitempty"`
 		Address             Address  `xml:"address,omitempty"`
 		Subscription        href     `xml:"subscription,omitempty"`
+		OriginalInvoice     href     `xml:"original_invoice,omitempty"`
 		UUID                string   `xml:"uuid,omitempty"`
 		State               string   `xml:"state,omitempty"`
 		InvoiceNumberPrefix string   `xml:"invoice_number_prefix,omitempty"`
@@ -36,7 +37,6 @@ type (
 		TaxRate             float64  `xml:"tax_rate,omitempty"`
 		NetTerms            NullInt  `xml:"net_terms,omitempty"`
 		CollectionMethod    string   `xml:"collection_method,omitempty"`
-		OriginalInvoice     href     `xml:"original_invoice,omitempty"`
 		// Redemption ? UUID is diffferent from others @todo
 		LineItems    []Adjustment  `xml:"line_items>adjustment,omitempty"`
 		Transactions []Transaction `xml:"transactions>transaction,omitempty"`
