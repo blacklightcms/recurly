@@ -105,9 +105,17 @@ func TestPaginationLinks(t *testing.T) {
 		rw.WriteHeader(http.StatusOK)
 	})
 
+	mux.HandleFunc("/caseC", func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Set("Link", "<https://api.recurly.com/v2/accounts?cursor=1234567890&per_page=20>; rel=\"start\", <https://api.recurly.com/v2/accounts?cursor=1234566890&per_page=20>; rel=\"next\"")
+		rw.WriteHeader(http.StatusOK)
+	})
+
+
+
 	suite := []map[string]string{
 		map[string]string{"endpoint": "/caseA", "next": "1827545887837797260", "prev": ""},
 		map[string]string{"endpoint": "/caseB", "next": "1824642383070236054", "prev": "-1325183252208393488"},
+		map[string]string{"endpoint": "/caseC", "next": "1234566890", "prev": ""},
 	}
 
 	for i, s := range suite {
