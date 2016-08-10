@@ -37,7 +37,7 @@ type (
 		TaxRate                float64             `xml:"tax_rate,omitempty"`
 		PONumber               string              `xml:"po_number,omitempty"`
 		NetTerms               NullInt             `xml:"net_terms,omitempty"`
-		SubscriptionAddOns     []SubscriptionAddOn `xml:"subscriptions_add_ons,omitempty"`
+		SubscriptionAddOns     []SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
 	}
 
 	nestedPlan struct {
