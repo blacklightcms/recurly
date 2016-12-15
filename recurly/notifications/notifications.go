@@ -2,6 +2,7 @@ package notifications
 
 import (
 	"encoding/xml"
+	"fmt"
 	"io"
 	"io/ioutil"
 
@@ -22,14 +23,16 @@ type notificationName struct {
 type (
 	// SuccessfulPaymentNotification is sent when a payment is successful.
 	SuccessfulPaymentNotification struct {
-		Account     recurly.Account
-		Transaction recurly.Transaction
+		Account       recurly.Account
+		Transaction   recurly.Transaction
+		InvoiceNumber int `xml:"-"`
 	}
 
 	// FailedPaymentNotification is sent when a payment fails.
 	FailedPaymentNotification struct {
-		Account     recurly.Account
-		Transaction recurly.Transaction
+		Account       recurly.Account
+		Transaction   recurly.Transaction
+		InvoiceNumber int `xml:"-"`
 	}
 
 	// PastDueInvoiceNotification is sent when an invoice is past due.
@@ -39,10 +42,46 @@ type (
 	}
 )
 
-// TODO respond to webhook with a 200 code within 5 minutes or Recurly will resend it.
-// TODO Caller can route the notification with a switch statement on XMLName. Then caller
-// will make an API call to Lookup Invoice (for which it only needs the invoice number) to
-// verify that the invoice is either paid or still unpaid, then it can progress forward.
+// transactionHolder allows the uuid and invoice number fields to be set.
+// The UUID field is labeled id in notifications and the invoice number
+// is not included on the existing transaction struct.
+type transactionHolder interface {
+	setTransactionFields(id string, in int)
+}
+
+// setTransactionFields sets fields on the transaction struct.
+func (n *SuccessfulPaymentNotification) setTransactionFields(id string, in int) {
+	n.Transaction.UUID = id
+	n.InvoiceNumber = in
+}
+
+func (n *FailedPaymentNotification) setTransactionFields(id string, in int) {
+	n.Transaction.UUID = id
+	n.InvoiceNumber = in
+}
+
+// transaction allows the transaction id and invoice number to be unmarshalled
+// so they can be set on the notification struct.
+type transaction struct {
+	ID            string `xml:"transaction>id"`
+	InvoiceNumber int    `xml:"transaction>invoice_number,omitempty"`
+}
+
+// ErrUnknownNotification is used when the incoming webhook does not match a
+// predefined notification type. It implements the error interface.
+type ErrUnknownNotification struct {
+	name string
+}
+
+// Error implements the error interface.
+func (e ErrUnknownNotification) Error() string {
+	return fmt.Sprintf("unknown notification: %s", e.name)
+}
+
+// Name returns the name of the unknown notification.
+func (e ErrUnknownNotification) Name() string {
+	return e.name
+}
 
 // Parse parses an incoming webhook and returns the notification.
 func Parse(r io.Reader) (interface{}, error) {
@@ -68,10 +107,25 @@ func Parse(r io.Reader) (interface{}, error) {
 		dst = &FailedPaymentNotification{}
 	case PastDueInvoice:
 		dst = &PastDueInvoiceNotification{}
+	default:
+		var unknown ErrUnknownNotification
+		if err := xml.Unmarshal(notification, &unknown); err != nil {
+			return nil, err
+		}
+		unknown.name = n.XMLName.Local
+		return nil, unknown
 	}
 
 	if err := xml.Unmarshal(notification, dst); err != nil {
 		return nil, err
+	}
+
+	if th, ok := dst.(transactionHolder); ok {
+		var t transaction
+		if err := xml.Unmarshal(notification, &t); err != nil {
+			return nil, err
+		}
+		th.setTransactionFields(t.ID, t.InvoiceNumber)
 	}
 
 	return dst, nil
