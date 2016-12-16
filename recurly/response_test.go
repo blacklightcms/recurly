@@ -74,7 +74,7 @@ func TestResponseConvenienceMethods(t *testing.T) {
 			t.Errorf("TestResponse Error (%d): Expected ok to be %v for %s, given %v", i, expected, s["endpoint"], r.IsOK())
 		}
 
-		expected, _ = strconv.ParseBool(s["error"])
+	 	expected, _ = strconv.ParseBool(s["error"])
 		if expected != r.IsError() {
 			t.Errorf("TestResponse Error (%d): Expected error to be %v for %s, given %v", i, expected, s["endpoint"], r.IsError())
 		}
@@ -87,6 +87,58 @@ func TestResponseConvenienceMethods(t *testing.T) {
 		expected, _ = strconv.ParseBool(s["serverError"])
 		if expected != r.IsServerError() {
 			t.Errorf("TestResponse Error (%d): Expected serverError to be %v for %s, given %v", i, expected, s["endpoint"], r.IsServerError())
+		}
+	}
+}
+
+func TestPaginationLinks(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/caseA", func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Set("Link", "<https://your-subdomain.recurly.com/v2/invoices?cursor=1827545887837797260>; rel=\"next\"")
+		rw.WriteHeader(http.StatusOK)
+	})
+
+	mux.HandleFunc("/caseB", func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Set("Link", "<https://your-subdomain.recurly.com/v2/invoices?state=past_due>; rel=\"start\", <https://your-subdomain.recurly.com/v2/invoices?cursor=-1325183252208393488&state=past_due>; rel=\"prev\", <https://your-subdomain.recurly.com/v2/invoices?cursor=1824642383070236054&state=past_due>; rel=\"next\"")
+		rw.WriteHeader(http.StatusOK)
+	})
+
+	mux.HandleFunc("/caseC", func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Set("Link", "<https://api.recurly.com/v2/accounts?cursor=1234567890&per_page=20>; rel=\"start\", <https://api.recurly.com/v2/accounts?cursor=1234566890&per_page=20>; rel=\"next\"")
+		rw.WriteHeader(http.StatusOK)
+	})
+
+
+
+	suite := []map[string]string{
+		map[string]string{"endpoint": "/caseA", "next": "1827545887837797260", "prev": ""},
+		map[string]string{"endpoint": "/caseB", "next": "1824642383070236054", "prev": "-1325183252208393488"},
+		map[string]string{"endpoint": "/caseC", "next": "1234566890", "prev": ""},
+	}
+
+	for i, s := range suite {
+		req, err := http.NewRequest("GET", client.BaseURL+s["endpoint"], nil)
+
+		if err != nil {
+			t.Fatalf("TestPaginationLinks Error (%d): Error creating request for %s. err: %s", i, s["endpoint"], err)
+		}
+
+		resp, err := client.client.Do(req)
+
+		if err != nil {
+			t.Fatalf("TestPaginationLinks Error (%d): Error making request for %s. err: %s", i, s["endpoint"], err)
+		}
+
+		r := &Response{Response: resp}
+
+		if r.Next() != s["next"] {
+			t.Errorf("TestPaginationLinks Error (%d): Expected next cursor to be %v, got %s, given %v", i, s["next"], r.Next(), s["endpoint"])
+		}
+
+		if r.Prev() != s["prev"] {
+			t.Errorf("TestPaginationLinks Error (%d): Expected prev cursor to be %v, for %s, given %v", i, s["prev"], r.Prev(), s["endpoint"])
 		}
 	}
 }
