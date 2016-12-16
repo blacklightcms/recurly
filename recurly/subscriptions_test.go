@@ -259,6 +259,11 @@ func TestListSubscriptions(t *testing.T) {
 				<po_number nil="nil"></po_number>
 				<net_terms type="integer">0</net_terms>
 				<subscription_add_ons type="array">
+				<subscription_add_on>
+				<add_on_code>my_add_on</add_on_code>
+				<unit_amount_in_cents type="integer">1</unit_amount_in_cents>
+				<quantity type="integer">1</quantity>
+				</subscription_add_on>
 				</subscription_add_ons>
 				<a name="cancel" href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/cancel" method="put"/>
 				<a name="terminate" href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/terminate" method="put"/>
@@ -315,6 +320,14 @@ func TestListSubscriptions(t *testing.T) {
 			TaxRegion:              "CA",
 			TaxRate:                0.0875,
 			NetTerms:               NewInt(0),
+			SubscriptionAddOns: []SubscriptionAddOn{
+				SubscriptionAddOn{
+					XMLName:           xml.Name{Local: "subscription_add_on"},
+					Code:              "my_add_on",
+					Quantity:          1,
+					UnitAmountInCents: 1,
+				},
+			},
 		}
 
 		if !reflect.DeepEqual(expected, given) {
