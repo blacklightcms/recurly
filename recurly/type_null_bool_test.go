@@ -21,7 +21,7 @@ func TestNullBool(t *testing.T) {
 	}
 
 	if !given1.Is(true) {
-		t.Errorf("TestNullBool Error (1): Expected Is() to return %t, given %#t", true, given1.Is(true))
+		t.Errorf("TestNullBool Error (1): Expected Is() to return %v, given %v", true, given1.Is(true))
 	}
 
 	if !reflect.DeepEqual(expected2, given2) {

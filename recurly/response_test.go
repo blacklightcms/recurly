@@ -90,3 +90,49 @@ func TestResponseConvenienceMethods(t *testing.T) {
 		}
 	}
 }
+
+func TestPaginationLinks(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/case0", func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Set("Link", "<https://your-subdomain.recurly.com/v2/invoices?cursor=1827545887837797260>; rel=\"next\"")
+		rw.WriteHeader(http.StatusOK)
+	})
+
+	mux.HandleFunc("/case1", func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Set("Link", "<https://your-subdomain.recurly.com/v2/invoices?state=past_due>; rel=\"start\", <https://your-subdomain.recurly.com/v2/invoices?cursor=-1325183252208393488&state=past_due>; rel=\"prev\", <https://your-subdomain.recurly.com/v2/invoices?cursor=1824642383070236054&state=past_due>; rel=\"next\"")
+		rw.WriteHeader(http.StatusOK)
+	})
+
+	mux.HandleFunc("/case2", func(rw http.ResponseWriter, r *http.Request) {
+		rw.Header().Set("Link", "<https://api.recurly.com/v2/accounts?cursor=1234567890&per_page=20>; rel=\"start\", <https://api.recurly.com/v2/accounts?cursor=1234566890&per_page=20>; rel=\"next\"")
+		rw.WriteHeader(http.StatusOK)
+	})
+
+	suite := []map[string]string{
+		{"endpoint": "/case0", "next": "1827545887837797260", "prev": ""},
+		{"endpoint": "/case1", "next": "1824642383070236054", "prev": "-1325183252208393488"},
+		{"endpoint": "/case2", "next": "1234566890", "prev": ""},
+	}
+
+	for i, s := range suite {
+		req, err := http.NewRequest("GET", client.BaseURL+s["endpoint"], nil)
+		if err != nil {
+			t.Fatalf("TestPaginationLinks Error (%d): Error creating request for %s. err: %s", i, s["endpoint"], err)
+		}
+
+		resp, err := client.client.Do(req)
+		if err != nil {
+			t.Fatalf("TestPaginationLinks Error (%d): Error making request for %s. err: %s", i, s["endpoint"], err)
+		}
+
+		r := &Response{Response: resp}
+
+		if r.Next() != s["next"] {
+			t.Errorf("TestPaginationLinks Error (%d): Expected next cursor to be %v, got %s, given %v", i, s["next"], r.Next(), s["endpoint"])
+		} else if r.Prev() != s["prev"] {
+			t.Errorf("TestPaginationLinks Error (%d): Expected prev cursor to be %v, for %s, given %v", i, s["prev"], r.Prev(), s["endpoint"])
+		}
+	}
+}

@@ -3,6 +3,7 @@ package recurly
 import (
 	"encoding/xml"
 	"net/http"
+	"net/url"
 	"regexp"
 	"strings"
 )
@@ -45,7 +46,7 @@ type (
 
 var (
 	// rxPaginationLink is a regex to parse prev/next links from the Link header
-	rxPaginationLink = regexp.MustCompile(`<[^>]+\?cursor=(-?[0-9]+)>;`)
+	rxPaginationLink = regexp.MustCompile(`<([^>]+)>;`)
 )
 
 // IsOK returns true if the request was successful.
@@ -77,11 +78,15 @@ func (r Response) Prev() string {
 	}
 
 	links := strings.Split(r.Header.Get("Link"), ",")
-	for _, l := range links {
-		if strings.HasSuffix(l, `rel="prev"`) {
-			re := rxPaginationLink.FindStringSubmatch(l)
-			if len(re) == 2 {
-				return re[1]
+	for _, link := range links {
+		if strings.HasSuffix(link, `rel="prev"`) {
+			match := rxPaginationLink.FindStringSubmatch(link)
+			if len(match) == 2 {
+				u, err := url.Parse(match[1])
+				if err != nil {
+					return ""
+				}
+				return u.Query().Get("cursor")
 			}
 		}
 	}
@@ -97,11 +102,15 @@ func (r Response) Next() string {
 	}
 
 	links := strings.Split(r.Header.Get("Link"), ",")
-	for _, l := range links {
-		if strings.HasSuffix(l, `rel="next"`) {
-			re := rxPaginationLink.FindStringSubmatch(l)
-			if len(re) == 2 {
-				return re[1]
+	for _, link := range links {
+		if strings.HasSuffix(link, `rel="next"`) {
+			match := rxPaginationLink.FindStringSubmatch(link)
+			if len(match) == 2 {
+				u, err := url.Parse(match[1])
+				if err != nil {
+					return ""
+				}
+				return u.Query().Get("cursor")
 			}
 		}
 	}
