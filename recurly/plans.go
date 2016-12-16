@@ -52,54 +52,54 @@ func (service PlansService) List(params Params) (*Response, []Plan, error) {
 		XMLName xml.Name `xml:"plans"`
 		Plans   []Plan   `xml:"plan"`
 	}
-	res, err := service.client.do(req, &p)
+	resp, err := service.client.do(req, &p)
 
-	return res, p.Plans, err
+	return resp, p.Plans, err
 }
 
 // Get will lookup a specific plan by code.
 // https://docs.recurly.com/api/plans#lookup-plan
-func (service PlansService) Get(code string) (*Response, Plan, error) {
+func (service PlansService) Get(code string) (*Response, *Plan, error) {
 	action := fmt.Sprintf("plans/%s", code)
 	req, err := service.client.newRequest("GET", action, nil, nil)
 	if err != nil {
-		return nil, Plan{}, err
+		return nil, nil, err
 	}
 
-	var p Plan
-	res, err := service.client.do(req, &p)
+	var dst Plan
+	resp, err := service.client.do(req, &dst)
 
-	return res, p, err
+	return resp, &dst, err
 }
 
 // Create will create a new subscription plan.
 // https://docs.recurly.com/api/plans#create-plan
-func (service PlansService) Create(p Plan) (*Response, Plan, error) {
+func (service PlansService) Create(p Plan) (*Response, *Plan, error) {
 	req, err := service.client.newRequest("POST", "plans", nil, p)
 	if err != nil {
-		return nil, Plan{}, err
+		return nil, nil, err
 	}
 
-	var dest Plan
-	res, err := service.client.do(req, &dest)
+	var dst Plan
+	resp, err := service.client.do(req, &dst)
 
-	return res, dest, err
+	return resp, &dst, err
 }
 
 // Update will update the pricing or details for a plan. Existing subscriptions
 // will remain at the previous renewal amounts.
 // https://docs.recurly.com/api/plans#update-plan
-func (service PlansService) Update(code string, p Plan) (*Response, Plan, error) {
+func (service PlansService) Update(code string, p Plan) (*Response, *Plan, error) {
 	action := fmt.Sprintf("plans/%s", code)
 	req, err := service.client.newRequest("PUT", action, nil, p)
 	if err != nil {
-		return nil, Plan{}, err
+		return nil, nil, err
 	}
 
-	var dest Plan
-	res, err := service.client.do(req, &dest)
+	var dst Plan
+	resp, err := service.client.do(req, &dst)
 
-	return res, dest, err
+	return resp, &dst, err
 }
 
 // Delete will make a plan inactive. New accounts cannot be created on the plan.

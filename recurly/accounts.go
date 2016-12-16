@@ -133,65 +133,62 @@ func (service AccountsService) List(params Params) (*Response, []Account, error)
 		XMLName  xml.Name  `xml:"accounts"`
 		Accounts []Account `xml:"account"`
 	}
-	res, err := service.client.do(req, &a)
+	resp, err := service.client.do(req, &a)
 
 	for i := range a.Accounts {
 		a.Accounts[i].BillingInfo = nil
 	}
 
-	return res, a.Accounts, err
+	return resp, a.Accounts, err
 }
 
 // Get returns information about a single account.
 // https://docs.recurly.com/api/accounts#get-account
-func (service AccountsService) Get(code string) (*Response, Account, error) {
+func (service AccountsService) Get(code string) (*Response, *Account, error) {
 	action := fmt.Sprintf("accounts/%s", code)
 	req, err := service.client.newRequest("GET", action, nil, nil)
 	if err != nil {
-		return nil, Account{}, err
+		return nil, nil, err
 	}
 
 	var a Account
-	res, err := service.client.do(req, &a)
-
+	resp, err := service.client.do(req, &a)
 	a.BillingInfo = nil
 
-	return res, a, err
+	return resp, &a, err
 }
 
 // Create will create a new account. You may optionally include billing information.
 // https://docs.recurly.com/api/accounts#create-account
-func (service AccountsService) Create(a Account) (*Response, Account, error) {
+func (service AccountsService) Create(a Account) (*Response, *Account, error) {
 	req, err := service.client.newRequest("POST", "accounts", nil, a)
 	if err != nil {
-		return nil, Account{}, err
+		return nil, nil, err
 	}
 
-	var dest Account
-	res, err := service.client.do(req, &dest)
+	var dst Account
+	resp, err := service.client.do(req, &dst)
+	dst.BillingInfo = nil
 
-	dest.BillingInfo = nil
-
-	return res, dest, err
+	return resp, &dst, err
 }
 
 // Update will update an existing account.
 // It's recommended to create a new account object with only the changes you
 // want to make. The updated account object will be returned on success.
 // https://docs.recurly.com/api/accounts#update-account
-func (service AccountsService) Update(code string, a Account) (*Response, Account, error) {
+func (service AccountsService) Update(code string, a Account) (*Response, *Account, error) {
 	action := fmt.Sprintf("accounts/%s", code)
 	req, err := service.client.newRequest("PUT", action, nil, a)
 	if err != nil {
-		return nil, Account{}, err
+		return nil, nil, err
 	}
 
-	var dest Account
-	res, err := service.client.do(req, &dest)
+	var dst Account
+	resp, err := service.client.do(req, &dst)
+	dst.BillingInfo = nil
 
-	dest.BillingInfo = nil
-
-	return res, dest, err
+	return resp, &dst, err
 }
 
 // Close marks an account as closed and cancels any active subscriptions. Any
@@ -232,7 +229,7 @@ func (service AccountsService) ListNotes(code string) (*Response, []Note, error)
 		XMLName xml.Name `xml:"notes"`
 		Notes   []Note   `xml:"note"`
 	}
-	res, err := service.client.do(req, &n)
+	resp, err := service.client.do(req, &n)
 
-	return res, n.Notes, err
+	return resp, n.Notes, err
 }

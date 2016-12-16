@@ -85,13 +85,13 @@ func TestInvoices_List(t *testing.T) {
         </invoices>`)
 	})
 
-	r, invoices, err := client.Invoices.List(Params{"per_page": 1})
+	resp, invoices, err := client.Invoices.List(Params{"per_page": 1})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected list invoices to return OK")
-	} else if r.Request.URL.Query().Get("per_page") != "1" {
-		t.Fatalf("expected per_page parameter of 1, given %s", r.Request.URL.Query().Get("per_page"))
+	} else if resp.Request.URL.Query().Get("per_page") != "1" {
+		t.Fatalf("expected per_page parameter of 1, given %s", resp.Request.URL.Query().Get("per_page"))
 	} else if !reflect.DeepEqual(invoices, []Invoice{{
 		XMLName: xml.Name{Local: "invoice"},
 		Account: href{
@@ -232,12 +232,12 @@ func TestInvoices_ListAccount(t *testing.T) {
         </invoices>`)
 	})
 
-	r, invoices, err := client.Invoices.ListAccount("1", Params{"per_page": 1})
+	resp, invoices, err := client.Invoices.ListAccount("1", Params{"per_page": 1})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected list invoices to return OK")
-	} else if pp := r.Request.URL.Query().Get("per_page"); pp != "1" {
+	} else if pp := resp.Request.URL.Query().Get("per_page"); pp != "1" {
 		t.Fatalf("unexpected per_page: %s", pp)
 	} else if !reflect.DeepEqual(invoices, []Invoice{Invoice{
 		XMLName: xml.Name{Local: "invoice"},
@@ -424,15 +424,15 @@ func TestInvoices_Get(t *testing.T) {
     	</invoice>`)
 	})
 
-	r, invoice, err := client.Invoices.Get(1402)
+	resp, invoice, err := client.Invoices.Get(1402)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected get invoice to return OK")
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2011-08-25T12:00:00Z")
-	if !reflect.DeepEqual(invoice, Invoice{
+	if !reflect.DeepEqual(invoice, &Invoice{
 		XMLName: xml.Name{Local: "invoice"},
 		Account: href{
 			HREF: "https://your-subdomain.recurly.com/v2/accounts/1",
@@ -574,10 +574,10 @@ func TestInvoices_GetPDF(t *testing.T) {
 		fmt.Fprint(w, "binary pdf text")
 	})
 
-	r, pdf, err := client.Invoices.GetPDF(1402, "")
+	resp, pdf, err := client.Invoices.GetPDF(1402, "")
 	if err != nil {
 		t.Fatalf("error occurred making API call. Err: %s", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected get invoice to return OK")
 	}
 
@@ -604,10 +604,10 @@ func TestInvoices_GetPDFLanguage(t *testing.T) {
 		fmt.Fprint(w, "binary pdf text")
 	})
 
-	r, pdf, err := client.Invoices.GetPDF(1402, "French")
+	resp, pdf, err := client.Invoices.GetPDF(1402, "French")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected get invoice to return OK")
 	}
 
@@ -629,10 +629,10 @@ func TestInvoices_Preview(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
 	})
 
-	r, _, err := client.Invoices.Preview("1")
+	resp, _, err := client.Invoices.Preview("1")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected create invoice to return OK")
 	}
 }
@@ -649,10 +649,10 @@ func TestInvoices_Create(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
 	})
 
-	r, _, err := client.Invoices.Create("10", Invoice{})
+	resp, _, err := client.Invoices.Create("10", Invoice{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected create invoice to return OK")
 	}
 }
@@ -669,10 +669,10 @@ func TestInvoices_MarkPaid(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
 	})
 
-	r, _, err := client.Invoices.MarkAsPaid(1402)
+	resp, _, err := client.Invoices.MarkAsPaid(1402)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected create invoice to return OK")
 	}
 }
@@ -689,10 +689,10 @@ func TestInvoices_MarkFailed(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
 	})
 
-	r, _, err := client.Invoices.MarkAsFailed(1402)
+	resp, _, err := client.Invoices.MarkAsFailed(1402)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected create invoice to return OK")
 	}
 }

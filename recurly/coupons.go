@@ -51,38 +51,38 @@ func (service CouponsService) List(params Params) (*Response, []Coupon, error) {
 		XMLName xml.Name `xml:"coupons"`
 		Coupons []Coupon `xml:"coupon"`
 	}
-	res, err := service.client.do(req, &c)
+	resp, err := service.client.do(req, &c)
 
-	return res, c.Coupons, err
+	return resp, c.Coupons, err
 }
 
 // Get returns information about an active coupon.
 // https://dev.recurly.com/docs/lookup-a-coupon
-func (service CouponsService) Get(code string) (*Response, Coupon, error) {
+func (service CouponsService) Get(code string) (*Response, *Coupon, error) {
 	action := fmt.Sprintf("coupons/%s", code)
 	req, err := service.client.newRequest("GET", action, nil, nil)
 	if err != nil {
-		return nil, Coupon{}, err
+		return nil, nil, err
 	}
 
-	var a Coupon
-	res, err := service.client.do(req, &a)
+	var dst Coupon
+	resp, err := service.client.do(req, &dst)
 
-	return res, a, err
+	return resp, &dst, err
 }
 
 // Create a new coupon. Coupons cannot be updated after being created.
 // https://dev.recurly.com/docs/create-coupon
-func (service CouponsService) Create(c Coupon) (*Response, Coupon, error) {
+func (service CouponsService) Create(c Coupon) (*Response, *Coupon, error) {
 	req, err := service.client.newRequest("POST", "coupons", nil, c)
 	if err != nil {
-		return nil, Coupon{}, err
+		return nil, nil, err
 	}
 
-	var dest Coupon
-	res, err := service.client.do(req, &dest)
+	var dst Coupon
+	resp, err := service.client.do(req, &dst)
 
-	return res, dest, err
+	return resp, &dst, err
 }
 
 // Delete deactivates the coupon so it can no longer be redeemed.

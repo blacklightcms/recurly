@@ -28,33 +28,33 @@ type (
 // GetForAccount looks up information about the 'active' coupon redemption on
 // an account
 // https://dev.recurly.com/docs/lookup-a-coupon-redemption-on-an-account
-func (service RedemptionsService) GetForAccount(accountCode string) (*Response, Redemption, error) {
+func (service RedemptionsService) GetForAccount(accountCode string) (*Response, *Redemption, error) {
 	action := fmt.Sprintf("accounts/%s/redemption", accountCode)
 	req, err := service.client.newRequest("GET", action, nil, nil)
 	if err != nil {
-		return nil, Redemption{}, err
+		return nil, nil, err
 	}
 
-	var a Redemption
-	res, err := service.client.do(req, &a)
+	var dst Redemption
+	resp, err := service.client.do(req, &dst)
 
-	return res, a, err
+	return resp, &dst, err
 }
 
 // GetForInvoice looks up information about a coupon redemption applied
 // to an invoice.
 // https://dev.recurly.com/docs/lookup-a-coupon-redemption-on-an-invoice
-func (service RedemptionsService) GetForInvoice(invoiceNumber string) (*Response, Redemption, error) {
+func (service RedemptionsService) GetForInvoice(invoiceNumber string) (*Response, *Redemption, error) {
 	action := fmt.Sprintf("invoices/%s/redemption", invoiceNumber)
 	req, err := service.client.newRequest("GET", action, nil, nil)
 	if err != nil {
-		return nil, Redemption{}, err
+		return nil, nil, err
 	}
 
-	var a Redemption
-	res, err := service.client.do(req, &a)
+	var dst Redemption
+	resp, err := service.client.do(req, &dst)
 
-	return res, a, err
+	return resp, &dst, err
 }
 
 // Redeem will redeem a coupon before or after a subscription. Most coupons are
@@ -64,7 +64,7 @@ func (service RedemptionsService) GetForInvoice(invoiceNumber string) (*Response
 // will be applied to the next subscription creation (new subscription),
 // modification (e.g. upgrade or downgrade), or renewal.
 // https://dev.recurly.com/docs/redeem-a-coupon-before-or-after-a-subscription
-func (service RedemptionsService) Redeem(code string, accountCode string, currency string) (*Response, Redemption, error) {
+func (service RedemptionsService) Redeem(code string, accountCode string, currency string) (*Response, *Redemption, error) {
 	action := fmt.Sprintf("coupons/%s/redeem", code)
 	data := struct {
 		XMLName     xml.Name `xml:"redemption"`
@@ -76,13 +76,13 @@ func (service RedemptionsService) Redeem(code string, accountCode string, curren
 	}
 	req, err := service.client.newRequest("POST", action, nil, data)
 	if err != nil {
-		return nil, Redemption{}, err
+		return nil, nil, err
 	}
 
-	var dest Redemption
-	res, err := service.client.do(req, &dest)
+	var dst Redemption
+	resp, err := service.client.do(req, &dst)
 
-	return res, dest, err
+	return resp, &dst, err
 }
 
 // Delete removes a coupon from an account. Recurly will automatically remove

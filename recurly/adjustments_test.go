@@ -78,17 +78,17 @@ func TestAdjustments_List(t *testing.T) {
 			</adjustments>`)
 	})
 
-	r, adjustments, err := client.Adjustments.List("100", Params{"per_page": 1})
+	resp, adjustments, err := client.Adjustments.List("100", Params{"per_page": 1})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected list adjustments to return OK")
 	} else if len(adjustments) != 1 {
 		t.Fatalf("unexpected length: %d", len(adjustments))
-	} else if pp := r.Request.URL.Query().Get("per_page"); pp != "1" {
+	} else if pp := resp.Request.URL.Query().Get("per_page"); pp != "1" {
 		t.Fatalf("unexpected per_page: %s", pp)
-	} else if r.Next() != "1304958672" {
-		t.Fatalf("unexpected cursor: %s", r.Next())
+	} else if resp.Next() != "1304958672" {
+		t.Fatalf("unexpected cursor: %s", resp.Next())
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2011-08-31T03:30:00Z")
@@ -185,15 +185,15 @@ func TestAdjustments_Get(t *testing.T) {
 			</adjustment>`)
 	})
 
-	r, adjustment, err := client.Adjustments.Get("626db120a84102b1809909071c701c60")
+	resp, adjustment, err := client.Adjustments.Get("626db120a84102b1809909071c701c60")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected get adjustment to return OK")
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2015-02-04T23:13:07Z")
-	if !reflect.DeepEqual(adjustment, Adjustment{
+	if !reflect.DeepEqual(adjustment, &Adjustment{
 		XMLName: xml.Name{Local: "adjustment"},
 		Account: href{
 			HREF: "https://your-subdomain.recurly.com/v2/accounts/100",
@@ -267,11 +267,11 @@ func TestAdjustments_Create(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><adjustment></adjustment>`)
 	})
 
-	r, _, err := client.Adjustments.Create("1", Adjustment{})
+	resp, _, err := client.Adjustments.Create("1", Adjustment{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.StatusCode != 201 {
-		t.Fatalf("unexpected status code: %d", r.StatusCode)
+	} else if resp.StatusCode != 201 {
+		t.Fatalf("unexpected status code: %d", resp.StatusCode)
 	}
 }
 
@@ -286,10 +286,10 @@ func TestAdjustments_Delete(t *testing.T) {
 		w.WriteHeader(204)
 	})
 
-	r, err := client.Adjustments.Delete("945a4cb9afd64300b97b138407a51aef")
+	resp, err := client.Adjustments.Delete("945a4cb9afd64300b97b138407a51aef")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.StatusCode != 204 {
-		t.Fatalf("unexpected status code: %d", r.StatusCode)
+	} else if resp.StatusCode != 204 {
+		t.Fatalf("unexpected status code: %d", resp.StatusCode)
 	}
 }

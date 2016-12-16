@@ -39,55 +39,55 @@ func (service AddOnsService) List(planCode string, params Params) (*Response, []
 		XMLName xml.Name `xml:"add_ons"`
 		AddOns  []AddOn  `xml:"add_on"`
 	}
-	res, err := service.client.do(req, &p)
+	resp, err := service.client.do(req, &p)
 
-	return res, p.AddOns, err
+	return resp, p.AddOns, err
 }
 
 // Get returns information about an add on.
 // https://docs.recurly.com/api/plans/add-ons#lookup-addon
-func (service AddOnsService) Get(planCode string, code string) (*Response, AddOn, error) {
+func (service AddOnsService) Get(planCode string, code string) (*Response, *AddOn, error) {
 	action := fmt.Sprintf("plans/%s/add_ons/%s", planCode, code)
 	req, err := service.client.newRequest("GET", action, nil, nil)
 	if err != nil {
-		return nil, AddOn{}, err
+		return nil, nil, err
 	}
 
-	var a AddOn
-	res, err := service.client.do(req, &a)
+	var dst AddOn
+	resp, err := service.client.do(req, &dst)
 
-	return res, a, err
+	return resp, &dst, err
 }
 
 // Create adds an add on to a plan.
 // https://docs.recurly.com/api/plans/add-ons#create-addon
-func (service AddOnsService) Create(planCode string, a AddOn) (*Response, AddOn, error) {
+func (service AddOnsService) Create(planCode string, a AddOn) (*Response, *AddOn, error) {
 	action := fmt.Sprintf("plans/%s/add_ons", planCode)
 	req, err := service.client.newRequest("POST", action, nil, a)
 	if err != nil {
-		return nil, AddOn{}, err
+		return nil, nil, err
 	}
 
-	var dest AddOn
-	res, err := service.client.do(req, &dest)
+	var dst AddOn
+	resp, err := service.client.do(req, &dst)
 
-	return res, dest, err
+	return resp, &dst, err
 }
 
 // Update will update the pricing information or description for an add-on.
 // Subscriptions who have already subscribed to the add-on will not receive the new pricing.
 // https://docs.recurly.com/api/plans/add-ons#update-addon
-func (service AddOnsService) Update(planCode string, code string, a AddOn) (*Response, AddOn, error) {
+func (service AddOnsService) Update(planCode string, code string, a AddOn) (*Response, *AddOn, error) {
 	action := fmt.Sprintf("plans/%s/add_ons/%s", planCode, code)
 	req, err := service.client.newRequest("PUT", action, nil, a)
 	if err != nil {
-		return nil, AddOn{}, err
+		return nil, nil, err
 	}
 
-	var dest AddOn
-	res, err := service.client.do(req, &dest)
+	var dst AddOn
+	resp, err := service.client.do(req, &dst)
 
-	return res, dest, err
+	return resp, &dst, err
 }
 
 // Delete will remove an add on from a plan.

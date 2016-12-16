@@ -69,34 +69,28 @@ func TestAddOns_List(t *testing.T) {
 		</add_ons>`)
 	})
 
-	r, addOns, err := client.AddOns.List("gold", Params{"per_page": 1})
+	resp, addOns, err := client.AddOns.List("gold", Params{"per_page": 1})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected list add ons to return OK")
-	} else if len(addOns) != 1 {
-		t.Fatalf("unexpected length: %d", len(addOns))
-	} else if pp := r.Request.URL.Query().Get("per_page"); pp != "1" {
+	} else if pp := resp.Request.URL.Query().Get("per_page"); pp != "1" {
 		t.Fatalf("unexpected per_page: %s", pp)
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2011-06-28T12:34:56Z")
-	for _, given := range addOns {
-		expected := AddOn{
-			XMLName:                     xml.Name{Local: "add_on"},
-			Code:                        "ipaddresses",
-			Name:                        "IP Addresses",
-			DefaultQuantity:             NewInt(1),
-			DisplayQuantityOnHostedPage: NewBool(false),
-			TaxCode:                     "digital",
-			UnitAmountInCents:           UnitAmount{USD: 200},
-			AccountingCode:              "abc123",
-			CreatedAt:                   NewTime(ts),
-		}
-
-		if !reflect.DeepEqual(expected, given) {
-			t.Fatalf("unexpected add on: %v", given)
-		}
+	if !reflect.DeepEqual(addOns, []AddOn{AddOn{
+		XMLName:                     xml.Name{Local: "add_on"},
+		Code:                        "ipaddresses",
+		Name:                        "IP Addresses",
+		DefaultQuantity:             NewInt(1),
+		DisplayQuantityOnHostedPage: NewBool(false),
+		TaxCode:                     "digital",
+		UnitAmountInCents:           UnitAmount{USD: 200},
+		AccountingCode:              "abc123",
+		CreatedAt:                   NewTime(ts),
+	}}) {
+		t.Fatalf("unexpected add ons: %v", addOns)
 	}
 }
 
@@ -125,15 +119,15 @@ func TestAddOns_Get(t *testing.T) {
 			</add_on>`)
 	})
 
-	r, a, err := client.AddOns.Get("gold", "ipaddresses")
+	resp, a, err := client.AddOns.Get("gold", "ipaddresses")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected get add_on to return OK")
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2011-06-28T12:34:56Z")
-	expected := AddOn{
+	if !reflect.DeepEqual(a, &AddOn{
 		XMLName:                     xml.Name{Local: "add_on"},
 		Code:                        "ipaddresses",
 		Name:                        "IP Addresses",
@@ -143,9 +137,7 @@ func TestAddOns_Get(t *testing.T) {
 		UnitAmountInCents:           UnitAmount{USD: 200},
 		AccountingCode:              "abc123",
 		CreatedAt:                   NewTime(ts),
-	}
-
-	if !reflect.DeepEqual(expected, a) {
+	}) {
 		t.Fatalf("unexpected add on: %v", a)
 	}
 }
@@ -162,11 +154,11 @@ func TestAddOns_Create(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><add_on></add_on>`)
 	})
 
-	r, _, err := client.AddOns.Create("gold", AddOn{})
+	resp, _, err := client.AddOns.Create("gold", AddOn{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.StatusCode != 201 {
-		t.Fatalf("unexpected response: %d", r.StatusCode)
+	} else if resp.StatusCode != 201 {
+		t.Fatalf("unexpected response: %d", resp.StatusCode)
 	}
 }
 
@@ -182,10 +174,10 @@ func TestAddOns_Update(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><add_on></add_on>`)
 	})
 
-	r, _, err := client.AddOns.Update("gold", "ipaddresses", AddOn{})
+	resp, _, err := client.AddOns.Update("gold", "ipaddresses", AddOn{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected update add on to return OK")
 	}
 }
@@ -201,10 +193,10 @@ func TestAddOns_Delete(t *testing.T) {
 		rw.WriteHeader(204)
 	})
 
-	r, err := client.AddOns.Delete("gold", "ipaddresses")
+	resp, err := client.AddOns.Delete("gold", "ipaddresses")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected deleted add on to return OK")
 	}
 }

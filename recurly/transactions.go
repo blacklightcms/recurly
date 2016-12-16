@@ -131,9 +131,9 @@ func (service TransactionsService) List(params Params) (*Response, []Transaction
 		XMLName      xml.Name      `xml:"transactions"`
 		Transactions []Transaction `xml:"transaction"`
 	}
-	res, err := service.client.do(req, &p)
+	resp, err := service.client.do(req, &p)
 
-	return res, p.Transactions, err
+	return resp, p.Transactions, err
 }
 
 // ListAccount returns a list of transactions for an account
@@ -149,9 +149,9 @@ func (service TransactionsService) ListAccount(accountCode string, params Params
 		XMLName      xml.Name      `xml:"transactions"`
 		Transactions []Transaction `xml:"transaction"`
 	}
-	res, err := service.client.do(req, &p)
+	resp, err := service.client.do(req, &p)
 
-	return res, p.Transactions, err
+	return resp, p.Transactions, err
 }
 
 // Get returns account and billing information at the time the transaction was
@@ -159,17 +159,17 @@ func (service TransactionsService) ListAccount(accountCode string, params Params
 // transaction_error section may be included if the transaction failed.
 // Please see transaction error codes for more details.
 // https://dev.recurly.com/docs/lookup-transaction
-func (service TransactionsService) Get(uuid string) (*Response, Transaction, error) {
+func (service TransactionsService) Get(uuid string) (*Response, *Transaction, error) {
 	action := fmt.Sprintf("transactions/%s", uuid)
 	req, err := service.client.newRequest("GET", action, nil, nil)
 	if err != nil {
-		return nil, Transaction{}, err
+		return nil, nil, err
 	}
 
-	var a Transaction
-	res, err := service.client.do(req, &a)
+	var dst Transaction
+	resp, err := service.client.do(req, &dst)
 
-	return res, a, err
+	return resp, &dst, err
 }
 
 // Create creates a new transaction. The Recurly API provides a shortcut for
@@ -178,14 +178,14 @@ func (service TransactionsService) Get(uuid string) (*Response, Transaction, err
 // attributes must be supplied. When charging an existing account only the
 // account_code must be supplied.
 // https://dev.recurly.com/docs/create-transaction
-func (service TransactionsService) Create(nt NewTransaction) (*Response, Transaction, error) {
+func (service TransactionsService) Create(nt NewTransaction) (*Response, *Transaction, error) {
 	req, err := service.client.newRequest("POST", "transactions", nil, nt)
 	if err != nil {
-		return nil, Transaction{}, err
+		return nil, nil, err
 	}
 
-	var dest Transaction
-	res, err := service.client.do(req, &dest)
+	var dst Transaction
+	resp, err := service.client.do(req, &dst)
 
-	return res, dest, err
+	return resp, &dst, err
 }

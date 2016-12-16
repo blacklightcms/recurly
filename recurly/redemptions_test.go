@@ -44,7 +44,7 @@ func TestRedemptions_GetForAccount(t *testing.T) {
         </redemption>`)
 	})
 
-	r, a, err := client.Redemptions.GetForAccount("1")
+	r, redemption, err := client.Redemptions.GetForAccount("1")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
@@ -52,7 +52,7 @@ func TestRedemptions_GetForAccount(t *testing.T) {
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2011-06-27T12:34:56Z")
-	if !reflect.DeepEqual(a, Redemption{
+	if !reflect.DeepEqual(redemption, &Redemption{
 		XMLName: xml.Name{Local: "redemption"},
 		Coupon: href{
 			Code: "special",
@@ -68,7 +68,7 @@ func TestRedemptions_GetForAccount(t *testing.T) {
 		State:                  "active",
 		CreatedAt:              NewTime(ts),
 	}) {
-		t.Fatalf("unexpected redemption: %v", a)
+		t.Fatalf("unexpected redemption: %v", redemption)
 	}
 }
 
@@ -93,17 +93,15 @@ func TestRedemptions_GetForInvoice(t *testing.T) {
         </redemption>`)
 	})
 
-	r, a, err := client.Redemptions.GetForInvoice("1108")
+	r, redemption, err := client.Redemptions.GetForInvoice("1108")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	}
-
-	if r.IsError() {
+	} else if r.IsError() {
 		t.Fatal("expected get redemption to return OK")
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2011-06-27T12:34:56Z")
-	expected := Redemption{
+	if !reflect.DeepEqual(redemption, &Redemption{
 		XMLName: xml.Name{Local: "redemption"},
 		Coupon: href{
 			Code: "special",
@@ -118,10 +116,8 @@ func TestRedemptions_GetForInvoice(t *testing.T) {
 		Currency:               "USD",
 		State:                  "inactive",
 		CreatedAt:              NewTime(ts),
-	}
-
-	if !reflect.DeepEqual(expected, a) {
-		t.Fatalf("expected account to equal %#v, given %#v", expected, a)
+	}) {
+		t.Fatalf("unexpected redemption: %v", redemption)
 	}
 }
 

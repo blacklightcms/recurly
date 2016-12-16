@@ -172,14 +172,12 @@ func TestCoupons_List(t *testing.T) {
         </coupons>`)
 	})
 
-	r, coupons, err := client.Coupons.List(Params{"per_page": 1})
+	resp, coupons, err := client.Coupons.List(Params{"per_page": 1})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected list coupons to return OK")
-	} else if len(coupons) != 1 {
-		t.Fatalf("unexpected number of coupons: %d", len(coupons))
-	} else if pp := r.Request.URL.Query().Get("per_page"); pp != "1" {
+	} else if pp := resp.Request.URL.Query().Get("per_page"); pp != "1" {
 		t.Fatalf("unexpected per_page: %s", pp)
 	}
 
@@ -239,16 +237,16 @@ func TestCoupons_Get(t *testing.T) {
         	</coupon>`)
 	})
 
-	r, coupon, err := client.Coupons.Get("special")
+	resp, coupon, err := client.Coupons.Get("special")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected get coupon to return OK")
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2011-04-10T07:00:00Z")
 	redeem, _ := time.Parse(datetimeFormat, "2014-01-01T07:00:00Z")
-	if !reflect.DeepEqual(coupon, Coupon{
+	if !reflect.DeepEqual(coupon, &Coupon{
 		XMLName:           xml.Name{Local: "coupon"},
 		Code:              "special",
 		Name:              "Special 10% off",
@@ -281,10 +279,10 @@ func TestCoupons_Create(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><coupon></coupon>`)
 	})
 
-	r, _, err := client.Coupons.Create(Coupon{})
+	resp, _, err := client.Coupons.Create(Coupon{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected create coupon to return OK")
 	}
 }
@@ -300,10 +298,10 @@ func TestCoupons_Delete(t *testing.T) {
 		w.WriteHeader(204)
 	})
 
-	r, err := client.Coupons.Delete("special")
+	resp, err := client.Coupons.Delete("special")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected deleted coupon to return OK")
 	}
 }

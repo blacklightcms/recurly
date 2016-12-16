@@ -103,12 +103,12 @@ func TestBilling_Get(t *testing.T) {
 		</billing_info>`)
 	})
 
-	r, b, err := client.Billing.Get("1")
+	resp, b, err := client.Billing.Get("1")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected get billing info to return OK")
-	} else if !reflect.DeepEqual(b, Billing{
+	} else if !reflect.DeepEqual(b, &Billing{
 		XMLName:          xml.Name{Local: "billing_info"},
 		FirstName:        "Verena",
 		LastName:         "Example",
@@ -173,12 +173,12 @@ func TestBilling_Create_WithToken(t *testing.T) {
 		</billing_info>`)
 	})
 
-	r, b, err := client.Billing.CreateWithToken("1", token)
+	resp, b, err := client.Billing.CreateWithToken("1", token)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected creating billing info to return OK")
-	} else if !reflect.DeepEqual(b, Billing{
+	} else if !reflect.DeepEqual(b, &Billing{
 		XMLName:          xml.Name{Local: "billing_info"},
 		FirstName:        "Verena",
 		LastName:         "Example",
@@ -219,7 +219,7 @@ func TestBilling_Create_WithCC(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><billing_info></billing_info>`)
 	})
 
-	r, _, err := client.Billing.Create("1", Billing{
+	resp, _, err := client.Billing.Create("1", Billing{
 		FirstName: "Verena",
 		LastName:  "Example",
 		Address:   "123 Main St.",
@@ -234,7 +234,7 @@ func TestBilling_Create_WithCC(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected creating billing info to return OK")
 	}
 }
@@ -258,7 +258,7 @@ func TestBilling_Create_WithBankAccount(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><billing_info></billing_info>`)
 	})
 
-	r, _, err := client.Billing.Create("134", Billing{
+	resp, _, err := client.Billing.Create("134", Billing{
 		FirstName:     "Verena",
 		LastName:      "Example",
 		Address:       "123 Main St.",
@@ -274,8 +274,8 @@ func TestBilling_Create_WithBankAccount(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
-		t.Fatal("TestBillingCreateWithBankAccount Error: Expected creating billing info to return OK")
+	} else if resp.IsError() {
+		t.Fatal("expected creating billing info to return OK")
 	}
 }
 
@@ -299,11 +299,11 @@ func TestBilling_Update_WithToken(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><billing_info></billing_info>`)
 	})
 
-	r, _, err := client.Billing.UpdateWithToken("abceasf", token)
+	resp, _, err := client.Billing.UpdateWithToken("abceasf", token)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
-		t.Fatal("TestBillingUpdateWithToken Error: Expected updating billing info to return OK")
+	} else if resp.IsError() {
+		t.Fatal("expected updating billing info to return OK")
 	}
 }
 
@@ -321,14 +321,14 @@ func TestBilling_Update_InvalidToken(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><error><symbol>token_invalid</symbol><description>Token is either invalid or expired</description></error>`)
 	})
 
-	r, _, err := client.Billing.UpdateWithToken("abceasf", token)
+	resp, _, err := client.Billing.UpdateWithToken("abceasf", token)
 	if err != nil {
-		t.Fatalf("TestBillingUpdateWithInvalidToken Error: Error occurred making API call. Err: %s", err)
+		t.Fatalf("unexpected error: %v", err)
 	}
 
-	if r.IsOK() {
+	if resp.IsOK() {
 		t.Fatal("expected updating billing info with invalid token to return error")
-	} else if len(r.Errors) == 0 || r.Errors[0].Symbol != "token_invalid" {
+	} else if len(resp.Errors) == 0 || resp.Errors[0].Symbol != "token_invalid" {
 		t.Fatalf("error response not parsed properly")
 	}
 }
@@ -352,7 +352,7 @@ func TestBilling_Update_WithCC(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><billing_info></billing_info>`)
 	})
 
-	r, _, err := client.Billing.Update("1", Billing{
+	resp, _, err := client.Billing.Update("1", Billing{
 		FirstName: "Verena",
 		LastName:  "Example",
 		Address:   "123 Main St.",
@@ -376,7 +376,7 @@ func TestBilling_Update_WithCC(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected creating billing info to return OK")
 	}
 }
@@ -400,7 +400,7 @@ func TestBilling_Update_WithBankAccount(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><billing_info></billing_info>`)
 	})
 
-	r, _, err := client.Billing.Update("134", Billing{
+	resp, _, err := client.Billing.Update("134", Billing{
 		FirstName:     "Verena",
 		LastName:      "Example",
 		Address:       "123 Main St.",
@@ -425,7 +425,7 @@ func TestBilling_Update_WithBankAccount(t *testing.T) {
 
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected creating billing info to return OK")
 	}
 }
@@ -441,10 +441,10 @@ func TestBilling_Clear(t *testing.T) {
 		w.WriteHeader(204)
 	})
 
-	r, err := client.Billing.Clear("account@example.com")
+	resp, err := client.Billing.Clear("account@example.com")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected deleting billing_info to return OK")
 	}
 }

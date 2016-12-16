@@ -567,7 +567,7 @@ func TestSubscriptions_Get(t *testing.T) {
 		t.Fatal("expected list subcriptions to return OK")
 	}
 
-	if !reflect.DeepEqual(subscription, Subscription{
+	if !reflect.DeepEqual(subscription, &Subscription{
 		XMLName: xml.Name{Local: "subscription"},
 		Plan: nestedPlan{
 			Code: "gold",

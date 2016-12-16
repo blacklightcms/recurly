@@ -373,7 +373,7 @@ func TestTransactions_Get(t *testing.T) {
 		t.Fatal("expected get transaction to return OK")
 	}
 
-	if !reflect.DeepEqual(transaction, Transaction{
+	if !reflect.DeepEqual(transaction, &Transaction{
 		XMLName: xml.Name{Local: "transaction"},
 		Invoice: href{
 			HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",

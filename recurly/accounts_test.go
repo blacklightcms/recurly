@@ -97,17 +97,17 @@ func TestAccounts_List(t *testing.T) {
 		</accounts>`)
 	})
 
-	r, accounts, err := client.Accounts.List(nil)
+	resp, accounts, err := client.Accounts.List(nil)
 	if err != nil {
 		t.Fatalf("unxpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected list accounts to return OK")
 	} else if len(accounts) != 1 {
 		t.Fatalf("unexpected account length: %d", len(accounts))
-	} else if r.Prev() != "" {
-		t.Fatalf("unexpected cursor: %s", r.Prev())
-	} else if r.Next() != "1304958672" {
-		t.Fatalf("unexpected cursor: %s", r.Next())
+	} else if resp.Prev() != "" {
+		t.Fatalf("unexpected cursor: %s", resp.Prev())
+	} else if resp.Next() != "1304958672" {
+		t.Fatalf("unexpected cursor: %s", resp.Next())
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2011-10-25T12:00:00Z")
@@ -152,15 +152,15 @@ func TestAccounts_List_Pagination(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><accounts></accounts>`)
 	})
 
-	r, _, err := client.Accounts.List(Params{"cursor": "12345"})
+	resp, _, err := client.Accounts.List(Params{"cursor": "12345"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected list accounts to return OK")
-	} else if r.Prev() != "-1318344434" {
-		t.Fatalf("unexpected cursor: %s", r.Prev())
-	} else if r.Next() != "1318388868" {
-		t.Fatalf("unexpected cursor: %s", r.Next())
+	} else if resp.Prev() != "-1318344434" {
+		t.Fatalf("unexpected cursor: %s", resp.Prev())
+	} else if resp.Next() != "1318388868" {
+		t.Fatalf("unexpected cursor: %s", resp.Next())
 	}
 }
 
@@ -205,15 +205,15 @@ func TestAccounts_Get(t *testing.T) {
 			</account>`)
 	})
 
-	r, a, err := client.Accounts.Get("1")
+	resp, a, err := client.Accounts.Get("1")
 	if err != nil {
 		t.Fatalf("unxpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("Texpected get accounts to return OK")
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2011-10-25T12:00:00Z")
-	expected := Account{
+	if !reflect.DeepEqual(a, &Account{
 		XMLName:   xml.Name{Local: "account"},
 		Code:      "1",
 		State:     "active",
@@ -230,9 +230,7 @@ func TestAccounts_Get(t *testing.T) {
 		},
 		HostedLoginToken: "a92468579e9c4231a6c0031c4716c01d",
 		CreatedAt:        NewTime(ts),
-	}
-
-	if !reflect.DeepEqual(expected, a) {
+	}) {
 		t.Fatalf("unxpected value: %v", a)
 	}
 }
@@ -249,10 +247,10 @@ func TestAccounts_Create(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><account></account>`)
 	})
 
-	r, _, err := client.Accounts.Create(Account{})
+	resp, _, err := client.Accounts.Create(Account{})
 	if err != nil {
 		t.Fatalf("unxpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected create account to return OK")
 	}
 }
@@ -269,10 +267,10 @@ func TestAccounts_Update(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><account></account>`)
 	})
 
-	r, _, err := client.Accounts.Update("245", Account{})
+	resp, _, err := client.Accounts.Update("245", Account{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected update account to return OK")
 	}
 }
@@ -288,10 +286,10 @@ func TestAccounts_Close(t *testing.T) {
 		w.WriteHeader(204)
 	})
 
-	r, err := client.Accounts.Close("5322")
+	resp, err := client.Accounts.Close("5322")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected close account to return OK")
 	}
 }
@@ -307,10 +305,10 @@ func TestAccounts_Reopen(t *testing.T) {
 		w.WriteHeader(204)
 	})
 
-	r, err := client.Accounts.Reopen("5322")
+	resp, err := client.Accounts.Reopen("5322")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected reopen account to return OK")
 	}
 }
@@ -339,18 +337,18 @@ func TestAccounts_ListNotes(t *testing.T) {
 			</notes>`)
 	})
 
-	r, notes, err := client.Accounts.ListNotes("abcd@example.com")
+	resp, notes, err := client.Accounts.ListNotes("abcd@example.com")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if r.IsError() {
+	} else if resp.IsError() {
 		t.Fatal("expected list notes to return OK")
 	} else if !reflect.DeepEqual(notes, []Note{
-		Note{
+		{
 			XMLName:   xml.Name{Local: "note"},
 			Message:   "This is my second note",
 			CreatedAt: time.Date(2013, time.May, 14, 18, 53, 4, 0, time.UTC),
 		},
-		Note{
+		{
 			XMLName:   xml.Name{Local: "note"},
 			Message:   "This is my first note",
 			CreatedAt: time.Date(2013, time.May, 14, 18, 52, 50, 0, time.UTC),

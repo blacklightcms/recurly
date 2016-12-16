@@ -183,7 +183,7 @@ func TestPlans_Get(t *testing.T) {
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2015-05-29T17:38:15Z")
-	if !reflect.DeepEqual(plan, Plan{
+	if !reflect.DeepEqual(plan, &Plan{
 		XMLName: xml.Name{Local: "plan"},
 		Code:    "gold",
 		Name:    "Gold plan",
