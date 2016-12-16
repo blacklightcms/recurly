@@ -14,43 +14,44 @@ import (
 // Because Recurly supports partial updates, it's important that only defined
 // fields are handled properly -- including types like booleans and integers which
 // have zero values that we want to send.
-func TestAddOnsEncoding(t *testing.T) {
-	suite := []map[string]interface{}{
-		map[string]interface{}{"struct": AddOn{}, "xml": "<add_on></add_on>"},
-		map[string]interface{}{"struct": AddOn{Code: "xyz"}, "xml": "<add_on><add_on_code>xyz</add_on_code></add_on>"},
-		map[string]interface{}{"struct": AddOn{Name: "IP Addresses"}, "xml": "<add_on><name>IP Addresses</name></add_on>"},
-		map[string]interface{}{"struct": AddOn{DefaultQuantity: NewInt(0)}, "xml": "<add_on><default_quantity>0</default_quantity></add_on>"},
-		map[string]interface{}{"struct": AddOn{DefaultQuantity: NewInt(1)}, "xml": "<add_on><default_quantity>1</default_quantity></add_on>"},
-		map[string]interface{}{"struct": AddOn{DisplayQuantityOnHostedPage: NewBool(true)}, "xml": "<add_on><display_quantity_on_hosted_page>true</display_quantity_on_hosted_page></add_on>"},
-		map[string]interface{}{"struct": AddOn{DisplayQuantityOnHostedPage: NewBool(false)}, "xml": "<add_on><display_quantity_on_hosted_page>false</display_quantity_on_hosted_page></add_on>"},
-		map[string]interface{}{"struct": AddOn{TaxCode: "digital"}, "xml": "<add_on><tax_code>digital</tax_code></add_on>"},
-		map[string]interface{}{"struct": AddOn{UnitAmountInCents: UnitAmount{USD: 200}}, "xml": "<add_on><unit_amount_in_cents><USD>200</USD></unit_amount_in_cents></add_on>"},
-		map[string]interface{}{"struct": AddOn{AccountingCode: "abc123"}, "xml": "<add_on><accounting_code>abc123</accounting_code></add_on>"},
+func TestAddOns_Encoding(t *testing.T) {
+	tests := []struct {
+		v        AddOn
+		expected string
+	}{
+		{v: AddOn{}, expected: "<add_on></add_on>"},
+		{v: AddOn{Code: "xyz"}, expected: "<add_on><add_on_code>xyz</add_on_code></add_on>"},
+		{v: AddOn{Name: "IP Addresses"}, expected: "<add_on><name>IP Addresses</name></add_on>"},
+		{v: AddOn{DefaultQuantity: NewInt(0)}, expected: "<add_on><default_quantity>0</default_quantity></add_on>"},
+		{v: AddOn{DefaultQuantity: NewInt(1)}, expected: "<add_on><default_quantity>1</default_quantity></add_on>"},
+		{v: AddOn{DisplayQuantityOnHostedPage: NewBool(true)}, expected: "<add_on><display_quantity_on_hosted_page>true</display_quantity_on_hosted_page></add_on>"},
+		{v: AddOn{DisplayQuantityOnHostedPage: NewBool(false)}, expected: "<add_on><display_quantity_on_hosted_page>false</display_quantity_on_hosted_page></add_on>"},
+		{v: AddOn{TaxCode: "digital"}, expected: "<add_on><tax_code>digital</tax_code></add_on>"},
+		{v: AddOn{UnitAmountInCents: UnitAmount{USD: 200}}, expected: "<add_on><unit_amount_in_cents><USD>200</USD></unit_amount_in_cents></add_on>"},
+		{v: AddOn{AccountingCode: "abc123"}, expected: "<add_on><accounting_code>abc123</accounting_code></add_on>"},
 	}
 
-	for _, s := range suite {
-		buf := new(bytes.Buffer)
-		err := xml.NewEncoder(buf).Encode(s["struct"])
+	for _, tt := range tests {
+		var buf bytes.Buffer
+		err := xml.NewEncoder(&buf).Encode(tt.v)
 		if err != nil {
-			t.Errorf("TestAddOnEncoding Error: %s", err)
-		}
-
-		if buf.String() != s["xml"] {
-			t.Errorf("TestAddOnEncoding Error: Expected %s, given %s", s["xml"], buf.String())
+			t.Fatalf("unexpected error: %v", err)
+		} else if buf.String() != tt.expected {
+			t.Fatalf("unexpected value: %s", buf.String())
 		}
 	}
 }
 
-func TestAddOnsList(t *testing.T) {
+func TestAddOns_List(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/plans/gold/add_ons", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/plans/gold/add_ons", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
-			t.Errorf("TestAddOnsList Error: Expected %s request, given %s", "GET", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(200)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
 		<add_ons type="array">
 			<add_on href="https://your-subdomain.recurly.com/v2/plans/gold/add_ons/ipaddresses">
 				<plan href="https://your-subdomain.recurly.com/v2/plans/gold"/>
@@ -70,19 +71,13 @@ func TestAddOnsList(t *testing.T) {
 
 	r, addOns, err := client.AddOns.List("gold", Params{"per_page": 1})
 	if err != nil {
-		t.Errorf("TestAddOnsList Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestAddOnsList Error: Expected list add ons to return OK")
-	}
-
-	if len(addOns) != 1 {
-		t.Fatalf("TestAddOnsList Error: Expected 1 add on returned, given %d", len(addOns))
-	}
-
-	if r.Request.URL.Query().Get("per_page") != "1" {
-		t.Errorf("TestAddOnsList Error: Expected per_page parameter of 1, given %s", r.Request.URL.Query().Get("per_page"))
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected list add ons to return OK")
+	} else if len(addOns) != 1 {
+		t.Fatalf("unexpected length: %d", len(addOns))
+	} else if pp := r.Request.URL.Query().Get("per_page"); pp != "1" {
+		t.Fatalf("unexpected per_page: %s", pp)
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2011-06-28T12:34:56Z")
@@ -100,21 +95,21 @@ func TestAddOnsList(t *testing.T) {
 		}
 
 		if !reflect.DeepEqual(expected, given) {
-			t.Errorf("TestAddOnsList Error: expected add on to equal %#v, given %#v", expected, given)
+			t.Fatalf("unexpected add on: %v", given)
 		}
 	}
 }
 
-func TestGetAddOn(t *testing.T) {
+func TestAddOns_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/plans/gold/add_ons/ipaddresses", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/plans/gold/add_ons/ipaddresses", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
-			t.Errorf("TestGetAddOn Error: Expected %s request, given %s", "GET", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(200)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
 			<add_on href="https://your-subdomain.recurly.com/v2/plans/gold/add_ons/ipaddresses">
 				<plan href="https://your-subdomain.recurly.com/v2/plans/gold"/>
 				<add_on_code>ipaddresses</add_on_code>
@@ -132,11 +127,9 @@ func TestGetAddOn(t *testing.T) {
 
 	r, a, err := client.AddOns.Get("gold", "ipaddresses")
 	if err != nil {
-		t.Errorf("TestGetAddOn Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestGetAddOn Error: Expected get add_on to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected get add_on to return OK")
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2011-06-28T12:34:56Z")
@@ -153,71 +146,65 @@ func TestGetAddOn(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(expected, a) {
-		t.Errorf("TestGetAddOn Error: expected account to equal %#v, given %#v", expected, a)
+		t.Fatalf("unexpected add on: %v", a)
 	}
 }
 
-func TestCreateAddOn(t *testing.T) {
+func TestAddOns_Create(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/plans/gold/add_ons", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/plans/gold/add_ons", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
-			t.Errorf("TestCreateAddOn Error: Expected %s request, given %s", "POST", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(201)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><add_on></add_on>`)
+		w.WriteHeader(201)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><add_on></add_on>`)
 	})
 
 	r, _, err := client.AddOns.Create("gold", AddOn{})
 	if err != nil {
-		t.Errorf("TestCreateAddOn Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestCreateAddOn Error: Expected create add on to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.StatusCode != 201 {
+		t.Fatalf("unexpected response: %d", r.StatusCode)
 	}
 }
 
-func TestUpdateAddOn(t *testing.T) {
+func TestAddOns_Update(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/plans/gold/add_ons/ipaddresses", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/plans/gold/add_ons/ipaddresses", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "PUT" {
-			t.Errorf("TestUpdateAddOn Error: Expected %s request, given %s", "PUT", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(200)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><add_on></add_on>`)
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><add_on></add_on>`)
 	})
 
 	r, _, err := client.AddOns.Update("gold", "ipaddresses", AddOn{})
 	if err != nil {
-		t.Errorf("TestUpdateAddOn Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestUpdateAddOn Error: Expected update add on to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected update add on to return OK")
 	}
 }
 
-func TestDeleteAddOn(t *testing.T) {
+func TestAddOns_Delete(t *testing.T) {
 	setup()
 	defer teardown()
 
 	mux.HandleFunc("/v2/plans/gold/add_ons/ipaddresses", func(rw http.ResponseWriter, r *http.Request) {
 		if r.Method != "DELETE" {
-			t.Errorf("TestDeleteAddOn Error: Expected %s request, given %s", "DELETE", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
 		rw.WriteHeader(204)
 	})
 
 	r, err := client.AddOns.Delete("gold", "ipaddresses")
 	if err != nil {
-		t.Errorf("TestDeleteAddOn Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestDeleteAddOn Error: Expected deleted add on to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected deleted add on to return OK")
 	}
 }

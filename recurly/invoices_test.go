@@ -11,16 +11,16 @@ import (
 	"time"
 )
 
-func TestInvoicesList(t *testing.T) {
+func TestInvoices_List(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/invoices", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/invoices", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
-			t.Errorf("TestInvoicesList Error: Expected %s request, given %s", "GET", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(200)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
         <invoices type="array">
         	<invoice href="https://your-subdomain.recurly.com/v2/invoices/1005">
         		<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
@@ -87,102 +87,88 @@ func TestInvoicesList(t *testing.T) {
 
 	r, invoices, err := client.Invoices.List(Params{"per_page": 1})
 	if err != nil {
-		t.Errorf("TestInvoicesList Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestInvoicesList Error: Expected list invoices to return OK")
-	}
-
-	if len(invoices) != 1 {
-		t.Fatalf("TestInvoicesList Error: Expected 1 invoice returned, given %d", len(invoices))
-	}
-
-	if r.Request.URL.Query().Get("per_page") != "1" {
-		t.Errorf("TestInvoicesList Error: Expected per_page parameter of 1, given %s", r.Request.URL.Query().Get("per_page"))
-	}
-
-	for _, given := range invoices {
-		expected := Invoice{
-			XMLName: xml.Name{Local: "invoice"},
-			Account: href{
-				HREF: "https://your-subdomain.recurly.com/v2/accounts/1",
-				Code: "1",
-			},
-			Address: Address{
-				Address: "400 Alabama St.",
-				City:    "San Francisco",
-				State:   "CA",
-				Zip:     "94110",
-				Country: "US",
-			},
-			Subscription: href{
-				HREF: "https://your-subdomain.recurly.com/v2/subscriptions/17caaca1716f33572edc8146e0aaefde",
-				Code: "17caaca1716f33572edc8146e0aaefde",
-			},
-			OriginalInvoice: href{
-				HREF: "https://your-subdomain.recurly.com/v2/invoices/938571",
-				Code: "938571",
-			},
-			UUID:             "421f7b7d414e4c6792938e7c49d552e9",
-			State:            InvoiceStateOpen,
-			InvoiceNumber:    1005,
-			SubtotalInCents:  1200,
-			TaxInCents:       0,
-			TotalInCents:     1200,
-			Currency:         "USD",
-			CreatedAt:        newTimeFromString("2011-08-25T12:00:00Z"),
-			TaxType:          "usst",
-			TaxRegion:        "CA",
-			TaxRate:          float64(0),
-			NetTerms:         NewInt(0),
-			CollectionMethod: "automatic",
-			LineItems: []Adjustment{
-				Adjustment{
-					XMLName: xml.Name{Local: "adjustment"},
-					Account: href{
-						HREF: "https://your-subdomain.recurly.com/v2/accounts/100",
-						Code: "100",
-					},
-					Invoice: href{
-						HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
-						Code: "1108",
-					},
-					UUID:                   "626db120a84102b1809909071c701c60",
-					State:                  "invoiced",
-					Description:            "One-time Charged Fee",
-					ProductCode:            "basic",
-					Origin:                 "debit",
-					UnitAmountInCents:      2000,
-					Quantity:               1,
-					OriginalAdjustmentUUID: "2cc95aa62517e56d5bec3a48afa1b3b9",
-					TaxInCents:             180,
-					TotalInCents:           2180,
-					Currency:               "USD",
-					Taxable:                NewBool(false),
-					TaxExempt:              NewBool(false),
-					StartDate:              newTimeFromString("2011-08-31T03:30:00Z"),
-					CreatedAt:              newTimeFromString("2011-08-31T03:30:00Z"),
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected list invoices to return OK")
+	} else if r.Request.URL.Query().Get("per_page") != "1" {
+		t.Fatalf("expected per_page parameter of 1, given %s", r.Request.URL.Query().Get("per_page"))
+	} else if !reflect.DeepEqual(invoices, []Invoice{{
+		XMLName: xml.Name{Local: "invoice"},
+		Account: href{
+			HREF: "https://your-subdomain.recurly.com/v2/accounts/1",
+			Code: "1",
+		},
+		Address: Address{
+			Address: "400 Alabama St.",
+			City:    "San Francisco",
+			State:   "CA",
+			Zip:     "94110",
+			Country: "US",
+		},
+		Subscription: href{
+			HREF: "https://your-subdomain.recurly.com/v2/subscriptions/17caaca1716f33572edc8146e0aaefde",
+			Code: "17caaca1716f33572edc8146e0aaefde",
+		},
+		OriginalInvoice: href{
+			HREF: "https://your-subdomain.recurly.com/v2/invoices/938571",
+			Code: "938571",
+		},
+		UUID:             "421f7b7d414e4c6792938e7c49d552e9",
+		State:            InvoiceStateOpen,
+		InvoiceNumber:    1005,
+		SubtotalInCents:  1200,
+		TaxInCents:       0,
+		TotalInCents:     1200,
+		Currency:         "USD",
+		CreatedAt:        newTimeFromString("2011-08-25T12:00:00Z"),
+		TaxType:          "usst",
+		TaxRegion:        "CA",
+		TaxRate:          float64(0),
+		NetTerms:         NewInt(0),
+		CollectionMethod: "automatic",
+		LineItems: []Adjustment{
+			Adjustment{
+				XMLName: xml.Name{Local: "adjustment"},
+				Account: href{
+					HREF: "https://your-subdomain.recurly.com/v2/accounts/100",
+					Code: "100",
 				},
+				Invoice: href{
+					HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
+					Code: "1108",
+				},
+				UUID:                   "626db120a84102b1809909071c701c60",
+				State:                  "invoiced",
+				Description:            "One-time Charged Fee",
+				ProductCode:            "basic",
+				Origin:                 "debit",
+				UnitAmountInCents:      2000,
+				Quantity:               1,
+				OriginalAdjustmentUUID: "2cc95aa62517e56d5bec3a48afa1b3b9",
+				TaxInCents:             180,
+				TotalInCents:           2180,
+				Currency:               "USD",
+				Taxable:                NewBool(false),
+				TaxExempt:              NewBool(false),
+				StartDate:              newTimeFromString("2011-08-31T03:30:00Z"),
+				CreatedAt:              newTimeFromString("2011-08-31T03:30:00Z"),
 			},
-		}
-
-		if !reflect.DeepEqual(expected, given) {
-			t.Errorf("TestInvoicesList Error: expected invoice to equal %#v, given %#v", expected, given)
-		}
+		},
+	}}) {
+		t.Fatalf("unexpected invoices: %v", invoices)
 	}
 }
 
-func TestInvoicesListAccount(t *testing.T) {
+func TestInvoices_ListAccount(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/accounts/1/invoices", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/accounts/1/invoices", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
-			t.Errorf("TestInvoicesListAccount Error: Expected %s request, given %s", "GET", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(200)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
         <invoices type="array">
         	<invoice href="https://your-subdomain.recurly.com/v2/invoices/1005">
         		<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
@@ -248,100 +234,84 @@ func TestInvoicesListAccount(t *testing.T) {
 
 	r, invoices, err := client.Invoices.ListAccount("1", Params{"per_page": 1})
 	if err != nil {
-		t.Errorf("TestInvoicesListAccount Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestInvoicesListAccount Error: Expected list invoices to return OK")
-	}
-
-	if len(invoices) != 1 {
-		t.Fatalf("TestInvoicesListAccount Error: Expected 1 invoice returned, given %d", len(invoices))
-	}
-
-	if r.Request.URL.Query().Get("per_page") != "1" {
-		t.Errorf("TestInvoicesListAccount Error: Expected per_page parameter of 1, given %s", r.Request.URL.Query().Get("per_page"))
-	}
-
-	for _, given := range invoices {
-		expected := Invoice{
-			XMLName: xml.Name{Local: "invoice"},
-			Account: href{
-				HREF: "https://your-subdomain.recurly.com/v2/accounts/1",
-				Code: "1",
-			},
-			Address: Address{
-				Address: "400 Alabama St.",
-				City:    "San Francisco",
-				State:   "CA",
-				Zip:     "94110",
-				Country: "US",
-			},
-			Subscription: href{
-				HREF: "https://your-subdomain.recurly.com/v2/subscriptions/17caaca1716f33572edc8146e0aaefde",
-				Code: "17caaca1716f33572edc8146e0aaefde",
-			},
-			UUID:             "421f7b7d414e4c6792938e7c49d552e9",
-			State:            InvoiceStateOpen,
-			InvoiceNumber:    1005,
-			SubtotalInCents:  1200,
-			TaxInCents:       0,
-			TotalInCents:     1200,
-			Currency:         "USD",
-			CreatedAt:        newTimeFromString("2011-08-25T12:00:00Z"),
-			TaxType:          "usst",
-			TaxRegion:        "CA",
-			TaxRate:          float64(0),
-			NetTerms:         NewInt(0),
-			CollectionMethod: "automatic",
-			LineItems: []Adjustment{
-				Adjustment{
-					XMLName: xml.Name{Local: "adjustment"},
-					Account: href{
-						HREF: "https://your-subdomain.recurly.com/v2/accounts/100",
-						Code: "100",
-					},
-					Invoice: href{
-						HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
-						Code: "1108",
-					},
-					UUID:                   "626db120a84102b1809909071c701c60",
-					State:                  "invoiced",
-					Description:            "One-time Charged Fee",
-					ProductCode:            "basic",
-					Origin:                 "debit",
-					UnitAmountInCents:      2000,
-					Quantity:               1,
-					OriginalAdjustmentUUID: "2cc95aa62517e56d5bec3a48afa1b3b9",
-					TaxInCents:             180,
-					TotalInCents:           2180,
-					Currency:               "USD",
-					Taxable:                NewBool(false),
-					TaxExempt:              NewBool(false),
-					StartDate:              newTimeFromString("2011-08-31T03:30:00Z"),
-					CreatedAt:              newTimeFromString("2011-08-31T03:30:00Z"),
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected list invoices to return OK")
+	} else if pp := r.Request.URL.Query().Get("per_page"); pp != "1" {
+		t.Fatalf("unexpected per_page: %s", pp)
+	} else if !reflect.DeepEqual(invoices, []Invoice{Invoice{
+		XMLName: xml.Name{Local: "invoice"},
+		Account: href{
+			HREF: "https://your-subdomain.recurly.com/v2/accounts/1",
+			Code: "1",
+		},
+		Address: Address{
+			Address: "400 Alabama St.",
+			City:    "San Francisco",
+			State:   "CA",
+			Zip:     "94110",
+			Country: "US",
+		},
+		Subscription: href{
+			HREF: "https://your-subdomain.recurly.com/v2/subscriptions/17caaca1716f33572edc8146e0aaefde",
+			Code: "17caaca1716f33572edc8146e0aaefde",
+		},
+		UUID:             "421f7b7d414e4c6792938e7c49d552e9",
+		State:            InvoiceStateOpen,
+		InvoiceNumber:    1005,
+		SubtotalInCents:  1200,
+		TaxInCents:       0,
+		TotalInCents:     1200,
+		Currency:         "USD",
+		CreatedAt:        newTimeFromString("2011-08-25T12:00:00Z"),
+		TaxType:          "usst",
+		TaxRegion:        "CA",
+		TaxRate:          float64(0),
+		NetTerms:         NewInt(0),
+		CollectionMethod: "automatic",
+		LineItems: []Adjustment{
+			Adjustment{
+				XMLName: xml.Name{Local: "adjustment"},
+				Account: href{
+					HREF: "https://your-subdomain.recurly.com/v2/accounts/100",
+					Code: "100",
 				},
+				Invoice: href{
+					HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
+					Code: "1108",
+				},
+				UUID:                   "626db120a84102b1809909071c701c60",
+				State:                  "invoiced",
+				Description:            "One-time Charged Fee",
+				ProductCode:            "basic",
+				Origin:                 "debit",
+				UnitAmountInCents:      2000,
+				Quantity:               1,
+				OriginalAdjustmentUUID: "2cc95aa62517e56d5bec3a48afa1b3b9",
+				TaxInCents:             180,
+				TotalInCents:           2180,
+				Currency:               "USD",
+				Taxable:                NewBool(false),
+				TaxExempt:              NewBool(false),
+				StartDate:              newTimeFromString("2011-08-31T03:30:00Z"),
+				CreatedAt:              newTimeFromString("2011-08-31T03:30:00Z"),
 			},
-		}
-
-		if !reflect.DeepEqual(expected, given) {
-			t.Errorf("TestInvoicesListAccount Error: expected invoice to equal %#v, given %#v", expected, given)
-		}
+		},
+	}}) {
+		t.Fatalf("unexpected invoices: %v", invoices)
 	}
 }
 
-// list for account todo
-
-func TestGetInvoice(t *testing.T) {
+func TestInvoices_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/invoices/1402", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/invoices/1402", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
-			t.Errorf("TestGetInvoice Error: Expected %s request, given %s", "GET", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(200)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
         <invoice href="https://your-subdomain.recurly.com/v2/invoices/1005">
     		<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
     		<address>
@@ -454,17 +424,15 @@ func TestGetInvoice(t *testing.T) {
     	</invoice>`)
 	})
 
-	r, a, err := client.Invoices.Get(1402)
+	r, invoice, err := client.Invoices.Get(1402)
 	if err != nil {
-		t.Errorf("TestGetInvoice Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestGetInvoice Error: Expected get invoice to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected get invoice to return OK")
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2011-08-25T12:00:00Z")
-	expected := Invoice{
+	if !reflect.DeepEqual(invoice, Invoice{
 		XMLName: xml.Name{Local: "invoice"},
 		Account: href{
 			HREF: "https://your-subdomain.recurly.com/v2/accounts/1",
@@ -584,167 +552,147 @@ func TestGetInvoice(t *testing.T) {
 				},
 			},
 		},
-	}
-
-	if !reflect.DeepEqual(expected, a) {
-		t.Errorf("TestGetInvoice Error: expected account to equal %#v, given %#v", expected, a)
+	}) {
+		t.Fatalf("unexpected invoice: %v", invoice)
 	}
 }
 
-func TestGetPDFInvoice(t *testing.T) {
+func TestInvoices_GetPDF(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/invoices/1402", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/invoices/1402", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
-			t.Errorf("TestGetInvoice Error: Expected %s request, given %s", "GET", r.Method)
-		}
-		if r.Header.Get("Accept") != "application/pdf" {
-			t.Errorf("TestGetInvoice Error: Expected accept header of application/pdf, given %s", r.Header.Get("Accept"))
-		}
-		if r.Header.Get("Accept-Language") != "English" {
-			t.Errorf("TestGetInvoice Error: Expected accept-language header of English, given %s", r.Header.Get("Accept-Language"))
+			t.Fatalf("unexpected method: %s", r.Method)
+		} else if r.Header.Get("Accept") != "application/pdf" {
+			t.Fatalf("unexpected Accept heading: %s", r.Header.Get("Accept"))
+		} else if r.Header.Get("Accept-Language") != "English" {
+			t.Fatalf("unexpected Accept-Language header: %s", r.Header.Get("Accept-Language"))
 		}
 
-		rw.WriteHeader(200)
-		fmt.Fprint(rw, "binary pdf text")
+		w.WriteHeader(200)
+		fmt.Fprint(w, "binary pdf text")
 	})
 
 	r, pdf, err := client.Invoices.GetPDF(1402, "")
 	if err != nil {
-		t.Errorf("TestGetInvoice Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestGetInvoice Error: Expected get invoice to return OK")
+		t.Fatalf("error occurred making API call. Err: %s", err)
+	} else if r.IsError() {
+		t.Fatal("expected get invoice to return OK")
 	}
 
 	expected := bytes.NewBufferString("binary pdf text")
-
 	if !reflect.DeepEqual(expected, pdf) {
-		t.Errorf("TestGetInvoice Error: expected account to equal %#v, given %#v", expected, pdf)
+		t.Fatalf("unexpected pdf invoice: %s", pdf)
 	}
 }
 
-func TestGetPDFInvoiceLanguage(t *testing.T) {
+func TestInvoices_GetPDFLanguage(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/invoices/1402", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/invoices/1402", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
-			t.Errorf("TestGetInvoice Error: Expected %s request, given %s", "GET", r.Method)
-		}
-		if r.Header.Get("Accept") != "application/pdf" {
-			t.Errorf("TestGetInvoice Error: Expected accept header of application/pdf, given %s", r.Header.Get("Accept"))
-		}
-		if r.Header.Get("Accept-Language") != "French" {
-			t.Errorf("TestGetInvoice Error: Expected accept-language header of French, given %s", r.Header.Get("Accept-Language"))
+			t.Fatalf("unexpected method: %s", r.Method)
+		} else if r.Header.Get("Accept") != "application/pdf" {
+			t.Fatalf("unexpected Accept heading: %s", r.Header.Get("Accept"))
+		} else if r.Header.Get("Accept-Language") != "French" {
+			t.Fatalf("unexpected Accept-Language header: %s", r.Header.Get("Accept-Language"))
 		}
 
-		rw.WriteHeader(200)
-		fmt.Fprint(rw, "binary pdf text")
+		w.WriteHeader(200)
+		fmt.Fprint(w, "binary pdf text")
 	})
 
 	r, pdf, err := client.Invoices.GetPDF(1402, "French")
 	if err != nil {
-		t.Errorf("TestGetInvoice Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestGetInvoice Error: Expected get invoice to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected get invoice to return OK")
 	}
 
 	expected := bytes.NewBufferString("binary pdf text")
-
 	if !reflect.DeepEqual(expected, pdf) {
-		t.Errorf("TestGetInvoice Error: expected account to equal %#v, given %#v", expected, pdf)
+		t.Fatalf("unexpected pdf: %v", pdf)
 	}
 }
 
-func TestPreviewInvoice(t *testing.T) {
+func TestInvoices_Preview(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/accounts/1/invoices/preview", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/accounts/1/invoices/preview", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
-			t.Errorf("TestCreateInvoice Error: Expected %s request, given %s", "POST", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(201)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
+		w.WriteHeader(201)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
 	})
 
 	r, _, err := client.Invoices.Preview("1")
 	if err != nil {
-		t.Errorf("TestCreateInvoice Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestCreateInvoice Error: Expected create invoice to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected create invoice to return OK")
 	}
 }
 
-func TestCreateInvoice(t *testing.T) {
+func TestInvoices_Create(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/accounts/10/invoices", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/accounts/10/invoices", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
-			t.Errorf("TestCreateInvoice Error: Expected %s request, given %s", "POST", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(201)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
+		w.WriteHeader(201)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
 	})
 
 	r, _, err := client.Invoices.Create("10", Invoice{})
 	if err != nil {
-		t.Errorf("TestCreateInvoice Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestCreateInvoice Error: Expected create invoice to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected create invoice to return OK")
 	}
 }
 
-func TestMarkInvoiceAsPaid(t *testing.T) {
+func TestInvoices_MarkPaid(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/invoices/1402/mark_successful", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/invoices/1402/mark_successful", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "PUT" {
-			t.Errorf("TestMarkInvoiceAsPaid Error: Expected %s request, given %s", "PUT", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(200)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
 	})
 
 	r, _, err := client.Invoices.MarkAsPaid(1402)
 	if err != nil {
-		t.Errorf("TestMarkInvoiceAsPaid Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestMarkInvoiceAsPaid Error: Expected create invoice to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected create invoice to return OK")
 	}
 }
 
-func TestMarkInvoiceAsFailed(t *testing.T) {
+func TestInvoices_MarkFailed(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/invoices/1402/mark_failed", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/invoices/1402/mark_failed", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "PUT" {
-			t.Errorf("TestMarkInvoiceAsFailed Error: Expected %s request, given %s", "PUT", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(200)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
 	})
 
 	r, _, err := client.Invoices.MarkAsFailed(1402)
 	if err != nil {
-		t.Errorf("TestMarkInvoiceAsFailed Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestMarkInvoiceAsFailed Error: Expected create invoice to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected create invoice to return OK")
 	}
 }

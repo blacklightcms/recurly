@@ -15,104 +15,140 @@ import (
 // Because Recurly supports partial updates, it's important that only defined
 // fields are handled properly -- including types like booleans and integers which
 // have zero values that we want to send.
-func TestCouponsEncoding(t *testing.T) {
+func TestCoupons_Encoding(t *testing.T) {
 	redeem, _ := time.Parse(datetimeFormat, "2014-01-01T07:00:00Z")
-	suite := []map[string]interface{}{
-		map[string]interface{}{"struct": Coupon{}, "xml": "<coupon><coupon_code></coupon_code><name></name><discount_type></discount_type></coupon>"},
-		map[string]interface{}{"struct": Coupon{
-			Code:         "special",
-			Name:         "Special 10% off",
-			DiscountType: "percent",
-		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type></coupon>"},
-		map[string]interface{}{"struct": Coupon{
-			Code:              "special",
-			Name:              "Special 10% off",
-			HostedDescription: "Save 10%",
-			DiscountType:      "percent",
-		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><hosted_description>Save 10%</hosted_description><discount_type>percent</discount_type></coupon>"},
-		map[string]interface{}{"struct": Coupon{
-			Code:               "special",
-			Name:               "Special 10% off",
-			InvoiceDescription: "Coupon: Special 10% off",
-			DiscountType:       "percent",
-		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><invoice_description>Coupon: Special 10% off</invoice_description><discount_type>percent</discount_type></coupon>"},
-		map[string]interface{}{"struct": Coupon{
-			Code:         "special",
-			Name:         "Special 10% off",
-			DiscountType: "percent",
-			RedeemByDate: NewTime(redeem),
-		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><redeem_by_date>2014-01-01T07:00:00Z</redeem_by_date></coupon>"},
-		map[string]interface{}{"struct": Coupon{
-			Code:         "special",
-			Name:         "Special 10% off",
-			DiscountType: "percent",
-			SingleUse:    NewBool(true),
-		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><single_use>true</single_use></coupon>"},
-		map[string]interface{}{"struct": Coupon{
-			Code:             "special",
-			Name:             "Special 10% off",
-			DiscountType:     "percent",
-			AppliesForMonths: NewInt(3),
-		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><applies_for_months>3</applies_for_months></coupon>"},
-		map[string]interface{}{"struct": Coupon{
-			Code:           "special",
-			Name:           "Special 10% off",
-			DiscountType:   "percent",
-			MaxRedemptions: NewInt(20),
-		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><max_redemptions>20</max_redemptions></coupon>"},
-		map[string]interface{}{"struct": Coupon{
-			Code:              "special",
-			Name:              "Special 10% off",
-			DiscountType:      "percent",
-			AppliesToAllPlans: NewBool(false),
-		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><applies_to_all_plans>false</applies_to_all_plans></coupon>"},
-		map[string]interface{}{"struct": Coupon{
-			Code:            "special",
-			Name:            "Special 10% off",
-			DiscountType:    "percent",
-			DiscountPercent: 10,
-		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><discount_percent>10</discount_percent></coupon>"},
-		map[string]interface{}{"struct": Coupon{
-			Code:            "special",
-			Name:            "Special $10 off",
-			DiscountType:    "dollars",
-			DiscountPercent: 1000,
-		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special $10 off</name><discount_type>dollars</discount_type><discount_percent>1000</discount_percent></coupon>"},
-		map[string]interface{}{"struct": Coupon{
-			Code:              "special",
-			Name:              "Special 10% off",
-			DiscountType:      "percent",
-			AppliesToAllPlans: NewBool(false),
-			PlanCodes: &[]CouponPlanCode{
-				CouponPlanCode{Code: "gold"},
-				CouponPlanCode{Code: "silver"},
+	tests := []struct {
+		v        Coupon
+		expected string
+	}{
+		{
+			v:        Coupon{},
+			expected: "<coupon><coupon_code></coupon_code><name></name><discount_type></discount_type></coupon>",
+		},
+		{
+			v: Coupon{
+				Code:         "special",
+				Name:         "Special 10% off",
+				DiscountType: "percent",
 			},
-		}, "xml": "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><applies_to_all_plans>false</applies_to_all_plans><plan_codes><plan_code>gold</plan_code><plan_code>silver</plan_code></plan_codes></coupon>"},
+			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type></coupon>",
+		},
+		{
+			v: Coupon{
+				Code:              "special",
+				Name:              "Special 10% off",
+				HostedDescription: "Save 10%",
+				DiscountType:      "percent",
+			},
+			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><hosted_description>Save 10%</hosted_description><discount_type>percent</discount_type></coupon>",
+		},
+		{
+			v: Coupon{
+				Code:               "special",
+				Name:               "Special 10% off",
+				InvoiceDescription: "Coupon: Special 10% off",
+				DiscountType:       "percent",
+			},
+			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><invoice_description>Coupon: Special 10% off</invoice_description><discount_type>percent</discount_type></coupon>",
+		},
+		{
+			v: Coupon{
+				Code:         "special",
+				Name:         "Special 10% off",
+				DiscountType: "percent",
+				RedeemByDate: NewTime(redeem),
+			},
+			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><redeem_by_date>2014-01-01T07:00:00Z</redeem_by_date></coupon>",
+		},
+		{
+			v: Coupon{
+				Code:         "special",
+				Name:         "Special 10% off",
+				DiscountType: "percent",
+				SingleUse:    NewBool(true),
+			},
+			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><single_use>true</single_use></coupon>",
+		},
+		{
+			v: Coupon{
+				Code:             "special",
+				Name:             "Special 10% off",
+				DiscountType:     "percent",
+				AppliesForMonths: NewInt(3),
+			},
+			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><applies_for_months>3</applies_for_months></coupon>",
+		},
+		{
+			v: Coupon{
+				Code:           "special",
+				Name:           "Special 10% off",
+				DiscountType:   "percent",
+				MaxRedemptions: NewInt(20),
+			},
+			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><max_redemptions>20</max_redemptions></coupon>",
+		},
+		{
+			v: Coupon{
+				Code:              "special",
+				Name:              "Special 10% off",
+				DiscountType:      "percent",
+				AppliesToAllPlans: NewBool(false),
+			},
+			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><applies_to_all_plans>false</applies_to_all_plans></coupon>",
+		},
+		{
+			v: Coupon{
+				Code:            "special",
+				Name:            "Special 10% off",
+				DiscountType:    "percent",
+				DiscountPercent: 10,
+			},
+			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><discount_percent>10</discount_percent></coupon>",
+		},
+		{
+			v: Coupon{
+				Code:            "special",
+				Name:            "Special $10 off",
+				DiscountType:    "dollars",
+				DiscountPercent: 1000,
+			},
+			expected: "<coupon><coupon_code>special</coupon_code><name>Special $10 off</name><discount_type>dollars</discount_type><discount_percent>1000</discount_percent></coupon>",
+		},
+		{
+			v: Coupon{
+				Code:              "special",
+				Name:              "Special 10% off",
+				DiscountType:      "percent",
+				AppliesToAllPlans: NewBool(false),
+				PlanCodes: &[]CouponPlanCode{
+					CouponPlanCode{Code: "gold"},
+					CouponPlanCode{Code: "silver"},
+				},
+			},
+			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><applies_to_all_plans>false</applies_to_all_plans><plan_codes><plan_code>gold</plan_code><plan_code>silver</plan_code></plan_codes></coupon>",
+		},
 	}
 
-	for _, s := range suite {
-		buf := new(bytes.Buffer)
-		err := xml.NewEncoder(buf).Encode(s["struct"])
-		if err != nil {
-			t.Errorf("TestCouponsEncoding Error: %s", err)
-		}
-
-		if buf.String() != s["xml"] {
-			t.Errorf("TestCouponsEncoding Error: Expected %s, given %s", s["xml"], buf.String())
+	for _, tt := range tests {
+		var buf bytes.Buffer
+		if err := xml.NewEncoder(&buf).Encode(tt.v); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		} else if buf.String() != tt.expected {
+			t.Fatalf("unexpected coupon: %v", buf.String())
 		}
 	}
 }
 
-func TestCouponsList(t *testing.T) {
+func TestCoupons_List(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/coupons", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/coupons", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
-			t.Errorf("TestCouponsList Error: Expected %s request, given %s", "GET", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(200)
-		io.WriteString(rw, `<?xml version="1.0" encoding="UTF-8"?>
+		w.WriteHeader(200)
+		io.WriteString(w, `<?xml version="1.0" encoding="UTF-8"?>
         <coupons type="array">
         	<coupon href="https://your-subdomain.recurly.com/v2/coupons/special">
         		<redemptions href="https://your-subdomain.recurly.com/v2/coupons/special/redemptions"/>
@@ -138,25 +174,19 @@ func TestCouponsList(t *testing.T) {
 
 	r, coupons, err := client.Coupons.List(Params{"per_page": 1})
 	if err != nil {
-		t.Errorf("TestCouponsList Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestCouponsList Error: Expected list coupons to return OK")
-	}
-
-	if len(coupons) != 1 {
-		t.Fatalf("TestCouponsList Error: Expected 1 coupon returned, given %d", len(coupons))
-	}
-
-	if r.Request.URL.Query().Get("per_page") != "1" {
-		t.Errorf("TestCouponsList Error: Expected per_page parameter of 1, given %s", r.Request.URL.Query().Get("per_page"))
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected list coupons to return OK")
+	} else if len(coupons) != 1 {
+		t.Fatalf("unexpected number of coupons: %d", len(coupons))
+	} else if pp := r.Request.URL.Query().Get("per_page"); pp != "1" {
+		t.Fatalf("unexpected per_page: %s", pp)
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2011-04-10T07:00:00Z")
 	redeem, _ := time.Parse(datetimeFormat, "2014-01-01T07:00:00Z")
-	for _, given := range coupons {
-		expected := Coupon{
+	if !reflect.DeepEqual(coupons, []Coupon{
+		{
 			XMLName:           xml.Name{Local: "coupon"},
 			Code:              "special",
 			Name:              "Special 10% off",
@@ -172,24 +202,22 @@ func TestCouponsList(t *testing.T) {
 				CouponPlanCode{Code: "gold"},
 				CouponPlanCode{Code: "platinum"},
 			},
-		}
-
-		if !reflect.DeepEqual(expected, given) {
-			t.Errorf("TestCouponsList Error: expected coupon to equal %#v, given %#v", expected, given)
-		}
+		},
+	}) {
+		t.Fatalf("unexpected coupons: %v", coupons)
 	}
 }
 
-func TestGetCoupon(t *testing.T) {
+func TestCoupons_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/coupons/special", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/coupons/special", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
-			t.Errorf("TestGetCoupon Error: Expected %s request, given %s", "GET", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(200)
-		io.WriteString(rw, `<?xml version="1.0" encoding="UTF-8"?>
+		w.WriteHeader(200)
+		io.WriteString(w, `<?xml version="1.0" encoding="UTF-8"?>
             <coupon href="https://your-subdomain.recurly.com/v2/coupons/special">
         		<redemptions href="https://your-subdomain.recurly.com/v2/coupons/special/redemptions"/>
         		<coupon_code>special</coupon_code>
@@ -211,18 +239,16 @@ func TestGetCoupon(t *testing.T) {
         	</coupon>`)
 	})
 
-	r, a, err := client.Coupons.Get("special")
+	r, coupon, err := client.Coupons.Get("special")
 	if err != nil {
-		t.Errorf("TestGetCoupon Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestGetCoupon Error: Expected get coupon to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected get coupon to return OK")
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2011-04-10T07:00:00Z")
 	redeem, _ := time.Parse(datetimeFormat, "2014-01-01T07:00:00Z")
-	expected := Coupon{
+	if !reflect.DeepEqual(coupon, Coupon{
 		XMLName:           xml.Name{Local: "coupon"},
 		Code:              "special",
 		Name:              "Special 10% off",
@@ -238,52 +264,46 @@ func TestGetCoupon(t *testing.T) {
 			CouponPlanCode{Code: "gold"},
 			CouponPlanCode{Code: "platinum"},
 		},
-	}
-
-	if !reflect.DeepEqual(expected, a) {
-		t.Errorf("TestGetCoupon Error: expected account to equal %#v, given %#v", expected, a)
+	}) {
+		t.Fatalf("unexpected coupon: %v", coupon)
 	}
 }
 
-func TestCreateCoupon(t *testing.T) {
+func TestCoupons_Create(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/coupons", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/coupons", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
-			t.Errorf("TestCreateCoupon Error: Expected %s request, given %s", "POST", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(201)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><coupon></coupon>`)
+		w.WriteHeader(201)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><coupon></coupon>`)
 	})
 
 	r, _, err := client.Coupons.Create(Coupon{})
 	if err != nil {
-		t.Errorf("TestCreateCoupon Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestCreateCoupon Error: Expected create coupon to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected create coupon to return OK")
 	}
 }
 
-func TestDeleteCoupon(t *testing.T) {
+func TestCoupons_Delete(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/coupons/special", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/coupons/special", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "DELETE" {
-			t.Errorf("TestDeleteCoupon Error: Expected %s request, given %s", "DELETE", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(204)
+		w.WriteHeader(204)
 	})
 
 	r, err := client.Coupons.Delete("special")
 	if err != nil {
-		t.Errorf("TestDeleteCoupon Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestDeleteCoupon Error: Expected deleted coupon to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected deleted coupon to return OK")
 	}
 }

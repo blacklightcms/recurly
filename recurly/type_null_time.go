@@ -9,13 +9,11 @@ const (
 	datetimeFormat = "2006-01-02T15:04:05Z07:00"
 )
 
-type (
-	// NullTime is used for properly handling time.Time types that could be null.
-	NullTime struct {
-		*time.Time
-		Raw string `xml:",innerxml"`
-	}
-)
+// NullTime is used for properly handling time.Time types that could be null.
+type NullTime struct {
+	*time.Time
+	Raw string `xml:",innerxml"`
+}
 
 // NewTime generates a new NullTime.
 func NewTime(t time.Time) NullTime {

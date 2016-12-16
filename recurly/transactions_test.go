@@ -15,34 +15,28 @@ import (
 // Because Recurly supports partial updates, it's important that only defined
 // fields are handled properly -- including types like booleans and integers which
 // have zero values that we want to send.
-func TestTransactionsEncoding(t *testing.T) {
-	suite := []map[string]interface{}{
-		map[string]interface{}{"struct": Transaction{}, "xml": "<transaction><amount_in_cents>0</amount_in_cents><currency></currency><details><account></account></details></transaction>"},
+func TestTransactions_Encoding(t *testing.T) {
+	var transaction Transaction
+	buf, err := xml.Marshal(transaction)
+	if err != nil {
+		t.Fatalf("TestTransactionEncoding Error: %s", err)
 	}
 
-	for _, s := range suite {
-		buf := new(bytes.Buffer)
-		err := xml.NewEncoder(buf).Encode(s["struct"])
-		if err != nil {
-			t.Errorf("TestTransactionEncoding Error: %s", err)
-		}
-
-		if buf.String() != s["xml"] {
-			t.Errorf("TestTransactionEncoding Error: Expected %s, given %s", s["xml"], buf.String())
-		}
+	if string(buf) != "<transaction><amount_in_cents>0</amount_in_cents><currency></currency><details><account></account></details></transaction>" {
+		t.Fatalf("unexpected encoding: %s", string(buf))
 	}
 }
 
-func TestTransactionsList(t *testing.T) {
+func TestTransactions_List(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/transactions", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/transactions", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
-			t.Errorf("TestTransactionsList Error: Expected %s request, given %s", "GET", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(200)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
         <transactions type="array">
         	<transaction href="https://your-subdomain.recurly.com/v2/transactions/a13acd8fe4294916b79aec87b7ea441f" type="credit_card">
         		<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
@@ -100,100 +94,87 @@ func TestTransactionsList(t *testing.T) {
 
 	r, transactions, err := client.Transactions.List(Params{"per_page": 1})
 	if err != nil {
-		t.Errorf("TestTransactionsList Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
+		t.Fatalf("TestTransactionsList Error: Error occurred making API call. Err: %s", err)
+	} else if r.IsError() {
 		t.Fatal("TestTransactionsList Error: Expected list transactions to return OK")
+	} else if pp := r.Request.URL.Query().Get("per_page"); pp != "1" {
+		t.Fatalf("unexpected per_page: %s", pp)
 	}
 
-	if len(transactions) != 1 {
-		t.Fatalf("TestTransactionsList Error: Expected 1 transaction returned, given %d", len(transactions))
-	}
-
-	if r.Request.URL.Query().Get("per_page") != "1" {
-		t.Errorf("TestTransactionsList Error: Expected per_page parameter of 1, given %s", r.Request.URL.Query().Get("per_page"))
-	}
-
-	ts, _ := time.Parse(datetimeFormat, "2015-06-10T15:25:06Z")
-	for _, given := range transactions {
-		expected := Transaction{
-			XMLName: xml.Name{Local: "transaction"},
-			Invoice: href{
-				HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
-				Code: "1108",
+	if !reflect.DeepEqual(transactions, []Transaction{Transaction{
+		XMLName: xml.Name{Local: "transaction"},
+		Invoice: href{
+			HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
+			Code: "1108",
+		},
+		Subscription: href{
+			HREF: "https://your-subdomain.recurly.com/v2/subscriptions/17caaca1716f33572edc8146e0aaefde",
+			Code: "17caaca1716f33572edc8146e0aaefde",
+		},
+		UUID:          "a13acd8fe4294916b79aec87b7ea441f",
+		Action:        "purchase",
+		AmountInCents: 1000,
+		TaxInCents:    0,
+		Currency:      "USD",
+		Status:        "success",
+		PaymentMethod: "credit_card",
+		Reference:     "5416477",
+		Source:        "subscription",
+		Recurring:     NewBool(true),
+		Test:          true,
+		Voidable:      NewBool(true),
+		Refundable:    NewBool(true),
+		IPAddress:     net.ParseIP("127.0.0.1"),
+		CVVResult: CVVResult{
+			transactionResult{
+				Code:    "M",
+				Message: "Match",
 			},
-			Subscription: href{
-				HREF: "https://your-subdomain.recurly.com/v2/subscriptions/17caaca1716f33572edc8146e0aaefde",
-				Code: "17caaca1716f33572edc8146e0aaefde",
+		},
+		AVSResult: AVSResult{
+			transactionResult{
+				Code:    "D",
+				Message: "Street address and postal code match.",
 			},
-			UUID:          "a13acd8fe4294916b79aec87b7ea441f",
-			Action:        "purchase",
-			AmountInCents: 1000,
-			TaxInCents:    0,
-			Currency:      "USD",
-			Status:        "success",
-			PaymentMethod: "credit_card",
-			Reference:     "5416477",
-			Source:        "subscription",
-			Recurring:     NewBool(true),
-			Test:          true,
-			Voidable:      NewBool(true),
-			Refundable:    NewBool(true),
-			IPAddress:     net.ParseIP("127.0.0.1"),
-			CVVResult: CVVResult{
-				transactionResult{
-					Code:    "M",
-					Message: "Match",
-				},
-			},
-			AVSResult: AVSResult{
-				transactionResult{
-					Code:    "D",
-					Message: "Street address and postal code match.",
-				},
-			},
-			CreatedAt: NewTime(ts),
-			Account: Account{
-				XMLName:   xml.Name{Local: "account"},
-				Code:      "1",
+		},
+		CreatedAt: NewTime(time.Date(2015, time.June, 10, 15, 25, 6, 0, time.UTC)),
+		Account: Account{
+			XMLName:   xml.Name{Local: "account"},
+			Code:      "1",
+			FirstName: "Verena",
+			LastName:  "Example",
+			Email:     "verena@test.com",
+			BillingInfo: &Billing{
+				XMLName:   xml.Name{Local: "billing_info"},
 				FirstName: "Verena",
 				LastName:  "Example",
-				Email:     "verena@test.com",
-				BillingInfo: &Billing{
-					XMLName:   xml.Name{Local: "billing_info"},
-					FirstName: "Verena",
-					LastName:  "Example",
-					Address:   "123 Main St.",
-					City:      "San Francisco",
-					State:     "CA",
-					Zip:       "94105",
-					Country:   "US",
-					CardType:  "Visa",
-					Year:      2017,
-					Month:     11,
-					FirstSix:  411111,
-					LastFour:  1111,
-				},
+				Address:   "123 Main St.",
+				City:      "San Francisco",
+				State:     "CA",
+				Zip:       "94105",
+				Country:   "US",
+				CardType:  "Visa",
+				Year:      2017,
+				Month:     11,
+				FirstSix:  411111,
+				LastFour:  1111,
 			},
-		}
-
-		if !reflect.DeepEqual(expected, given) {
-			t.Errorf("TestTransactionsList Error: expected transaction to equal %#v, given %#v", expected, given)
-		}
+		},
+	}}) {
+		t.Fatalf("unexpected transaction: %v", transactions)
 	}
 }
 
-func TestTransactionsListAccount(t *testing.T) {
+func TestTransactions_ListAccount(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/accounts/1/transactions", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/accounts/1/transactions", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
-			t.Errorf("TestTransactionsListAccount Error: Expected %s request, given %s", "GET", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(200)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
         <transactions type="array">
         	<transaction href="https://your-subdomain.recurly.com/v2/transactions/a13acd8fe4294916b79aec87b7ea441f" type="credit_card">
         		<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
@@ -251,100 +232,87 @@ func TestTransactionsListAccount(t *testing.T) {
 
 	r, transactions, err := client.Transactions.ListAccount("1", Params{"per_page": 1})
 	if err != nil {
-		t.Errorf("TestTransactionsListAccount Error: Error occurred making API call. Err: %s", err)
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected list for account transactions to return OK")
+	} else if pp := r.Request.URL.Query().Get("per_page"); pp != "1" {
+		t.Fatalf("unexpected per_page: %s", pp)
 	}
 
-	if r.IsError() {
-		t.Fatal("TestTransactionsListAccount Error: Expected list for account transactions to return OK")
-	}
-
-	if len(transactions) != 1 {
-		t.Fatalf("TestTransactionsListAccount Error: Expected 1 transaction returned, given %d", len(transactions))
-	}
-
-	if r.Request.URL.Query().Get("per_page") != "1" {
-		t.Errorf("TestTransactionsListAccount Error: Expected per_page parameter of 1, given %s", r.Request.URL.Query().Get("per_page"))
-	}
-
-	ts, _ := time.Parse(datetimeFormat, "2015-06-10T15:25:06Z")
-	for _, given := range transactions {
-		expected := Transaction{
-			XMLName: xml.Name{Local: "transaction"},
-			Invoice: href{
-				HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
-				Code: "1108",
+	if !reflect.DeepEqual(transactions, []Transaction{Transaction{
+		XMLName: xml.Name{Local: "transaction"},
+		Invoice: href{
+			HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
+			Code: "1108",
+		},
+		Subscription: href{
+			HREF: "https://your-subdomain.recurly.com/v2/subscriptions/17caaca1716f33572edc8146e0aaefde",
+			Code: "17caaca1716f33572edc8146e0aaefde",
+		},
+		UUID:          "a13acd8fe4294916b79aec87b7ea441f",
+		Action:        "purchase",
+		AmountInCents: 1000,
+		TaxInCents:    0,
+		Currency:      "USD",
+		Status:        "success",
+		PaymentMethod: "credit_card",
+		Reference:     "5416477",
+		Source:        "subscription",
+		Recurring:     NewBool(true),
+		Test:          true,
+		Voidable:      NewBool(true),
+		Refundable:    NewBool(true),
+		IPAddress:     net.ParseIP("127.0.0.1"),
+		CVVResult: CVVResult{
+			transactionResult{
+				Code:    "M",
+				Message: "Match",
 			},
-			Subscription: href{
-				HREF: "https://your-subdomain.recurly.com/v2/subscriptions/17caaca1716f33572edc8146e0aaefde",
-				Code: "17caaca1716f33572edc8146e0aaefde",
+		},
+		AVSResult: AVSResult{
+			transactionResult{
+				Code:    "D",
+				Message: "Street address and postal code match.",
 			},
-			UUID:          "a13acd8fe4294916b79aec87b7ea441f",
-			Action:        "purchase",
-			AmountInCents: 1000,
-			TaxInCents:    0,
-			Currency:      "USD",
-			Status:        "success",
-			PaymentMethod: "credit_card",
-			Reference:     "5416477",
-			Source:        "subscription",
-			Recurring:     NewBool(true),
-			Test:          true,
-			Voidable:      NewBool(true),
-			Refundable:    NewBool(true),
-			IPAddress:     net.ParseIP("127.0.0.1"),
-			CVVResult: CVVResult{
-				transactionResult{
-					Code:    "M",
-					Message: "Match",
-				},
-			},
-			AVSResult: AVSResult{
-				transactionResult{
-					Code:    "D",
-					Message: "Street address and postal code match.",
-				},
-			},
-			CreatedAt: NewTime(ts),
-			Account: Account{
-				XMLName:   xml.Name{Local: "account"},
-				Code:      "1",
+		},
+		CreatedAt: NewTime(time.Date(2015, time.June, 10, 15, 25, 6, 0, time.UTC)),
+		Account: Account{
+			XMLName:   xml.Name{Local: "account"},
+			Code:      "1",
+			FirstName: "Verena",
+			LastName:  "Example",
+			Email:     "verena@test.com",
+			BillingInfo: &Billing{
+				XMLName:   xml.Name{Local: "billing_info"},
 				FirstName: "Verena",
 				LastName:  "Example",
-				Email:     "verena@test.com",
-				BillingInfo: &Billing{
-					XMLName:   xml.Name{Local: "billing_info"},
-					FirstName: "Verena",
-					LastName:  "Example",
-					Address:   "123 Main St.",
-					City:      "San Francisco",
-					State:     "CA",
-					Zip:       "94105",
-					Country:   "US",
-					CardType:  "Visa",
-					Year:      2017,
-					Month:     11,
-					FirstSix:  411111,
-					LastFour:  1111,
-				},
+				Address:   "123 Main St.",
+				City:      "San Francisco",
+				State:     "CA",
+				Zip:       "94105",
+				Country:   "US",
+				CardType:  "Visa",
+				Year:      2017,
+				Month:     11,
+				FirstSix:  411111,
+				LastFour:  1111,
 			},
-		}
-
-		if !reflect.DeepEqual(expected, given) {
-			t.Errorf("TestTransactionsListAccount Error: expected transaction to equal %#v, given %#v", expected, given)
-		}
+		},
+	}}) {
+		t.Fatalf("unexpected transactions: %v", transactions)
 	}
 }
 
-func TestGetTransaction(t *testing.T) {
+func TestTransactions_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/transactions/a13acd8fe4294916b79aec87b7ea441f", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/transactions/a13acd8fe4294916b79aec87b7ea441f", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
-			t.Errorf("TestGetTransaction Error: Expected %s request, given %s", "GET", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(200)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
             <transaction href="https://your-subdomain.recurly.com/v2/transactions/a13acd8fe4294916b79aec87b7ea441f" type="credit_card">
     		<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
     		<invoice href="https://your-subdomain.recurly.com/v2/invoices/1108"/>
@@ -398,17 +366,14 @@ func TestGetTransaction(t *testing.T) {
     	</transaction>`)
 	})
 
-	r, a, err := client.Transactions.Get("a13acd8fe4294916b79aec87b7ea441f")
+	r, transaction, err := client.Transactions.Get("a13acd8fe4294916b79aec87b7ea441f")
 	if err != nil {
-		t.Errorf("TestGetTransaction Error: Error occurred making API call. Err: %s", err)
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected get transaction to return OK")
 	}
 
-	if r.IsError() {
-		t.Fatal("TestGetTransaction Error: Expected get transaction to return OK")
-	}
-
-	ts, _ := time.Parse(datetimeFormat, "2015-06-10T15:25:06Z")
-	expected := Transaction{
+	if !reflect.DeepEqual(transaction, Transaction{
 		XMLName: xml.Name{Local: "transaction"},
 		Invoice: href{
 			HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
@@ -444,7 +409,7 @@ func TestGetTransaction(t *testing.T) {
 				Message: "Street address and postal code match.",
 			},
 		},
-		CreatedAt: NewTime(ts),
+		CreatedAt: NewTime(time.Date(2015, time.June, 10, 15, 25, 6, 0, time.UTC)),
 		Account: Account{
 			XMLName:   xml.Name{Local: "account"},
 			Code:      "1",
@@ -467,30 +432,29 @@ func TestGetTransaction(t *testing.T) {
 				LastFour:  1111,
 			},
 		},
-	}
-
-	if !reflect.DeepEqual(expected, a) {
-		t.Errorf("TestGetTransaction Error: expected account to equal %#v, given %#v", expected, a)
+	}) {
+		t.Fatalf("unexpected transaction: %+v", transaction)
 	}
 }
 
-func TestNewTransaction(t *testing.T) {
+func TestTransactions_New(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/transactions", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/transactions", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
-			t.Errorf("TestNewTransaction Error: Expected %s request, given %s", "POST", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
+		defer r.Body.Close()
 		expected := `<transaction><amount_in_cents>100</amount_in_cents><currency>USD</currency><account><account_code>25</account_code></account></transaction>`
-		given := new(bytes.Buffer)
+		var given bytes.Buffer
 		given.ReadFrom(r.Body)
 		if expected != given.String() {
-			t.Errorf("TestNewTransaction Error: Expected request body of %s, given %s", expected, given.String())
+			t.Fatalf("unexpected input: %s", given.String())
 		}
 
-		rw.WriteHeader(200)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><transaction></transaction>`)
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><transaction></transaction>`)
 	})
 
 	r, _, err := client.Transactions.Create(NewTransaction{
@@ -501,25 +465,23 @@ func TestNewTransaction(t *testing.T) {
 		},
 	})
 	if err != nil {
-		t.Errorf("TestNewTransaction Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestNewTransaction Error: Expected create transaction to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected create transaction to return OK")
 	}
 }
 
-func TestNewTransactionFraudCard(t *testing.T) {
+func TestTransactions_Err_FraudCard(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/transactions", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/transactions", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
-			t.Errorf("TestNewTransactionFraudCard Error: Expected %s request, given %s", "POST", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
 
-		rw.WriteHeader(422)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
+		w.WriteHeader(422)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
 			<errors>
 			  <transaction_error>
 			    <error_code>fraud_gateway</error_code>
@@ -602,69 +564,53 @@ func TestNewTransactionFraudCard(t *testing.T) {
 		},
 	})
 	if err != nil {
-		t.Errorf("TestNewTransactionFraudCard Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsOK() {
-		t.Fatal("TestNewTransactionFraudCard Error: Expected create fraudulent transaction to return error")
-	}
-
-	expected := TransactionError{
+		t.Fatalf("error occurred making API call. Err: %s", err)
+	} else if r.IsOK() {
+		t.Fatal("expected create fraudulent transaction to return error")
+	} else if !reflect.DeepEqual(r.TransactionError, TransactionError{
 		XMLName:         xml.Name{Local: "transaction_error"},
 		ErrorCode:       "fraud_gateway",
 		ErrorCategory:   "fraud",
 		MerchantMessage: "The payment gateway declined the transaction due to fraud filters enabled in your gateway.",
 		CustomerMessage: "The transaction was declined. Please use a different card, contact your bank, or contact support.",
-	}
-
-	if !reflect.DeepEqual(expected, r.TransactionError) {
-		t.Errorf("TestNewTransactionFraudCard Error: Expected transaction error of %+v, given %+v", expected, r.TransactionError)
+	}) {
+		t.Fatalf("error did not match: %v", r.TransactionError)
 	}
 }
 
-func TestCVVIsFunctions(t *testing.T) {
+func TestCVV(t *testing.T) {
 	c := CVVResult{transactionResult{Code: "M"}}
 	if !c.IsMatch() {
-		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to be match", "M")
-	}
-
-	if c.IsNoMatch() || c.NotProcessed() || c.ShouldHaveBeenPresent() || c.UnableToProcess() {
-		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to ONLY be match", "M")
+		t.Fatalf("expected %q code to be match", "M")
+	} else if c.IsNoMatch() || c.NotProcessed() || c.ShouldHaveBeenPresent() || c.UnableToProcess() {
+		t.Fatalf("expected %q code to ONLY be match", "M")
 	}
 
 	c = CVVResult{transactionResult{Code: "N"}}
 	if !c.IsNoMatch() {
-		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to not be a match", "N")
-	}
-
-	if c.IsMatch() || c.NotProcessed() || c.ShouldHaveBeenPresent() || c.UnableToProcess() {
-		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to ONLY be match", "N")
+		t.Fatalf("expected %q code to not be a match", "N")
+	} else if c.IsMatch() || c.NotProcessed() || c.ShouldHaveBeenPresent() || c.UnableToProcess() {
+		t.Fatalf("expected %q code to ONLY be match", "N")
 	}
 
 	c = CVVResult{transactionResult{Code: "P"}}
 	if !c.NotProcessed() {
-		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to not be a match", "P")
-	}
-
-	if c.IsMatch() || c.IsNoMatch() || c.ShouldHaveBeenPresent() || c.UnableToProcess() {
-		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to ONLY be match", "P")
+		t.Fatalf("expected %q code to not be a match", "P")
+	} else if c.IsMatch() || c.IsNoMatch() || c.ShouldHaveBeenPresent() || c.UnableToProcess() {
+		t.Fatalf("expected %q code to ONLY be match", "P")
 	}
 
 	c = CVVResult{transactionResult{Code: "S"}}
 	if !c.ShouldHaveBeenPresent() {
-		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to not be a match", "S")
-	}
-
-	if c.IsMatch() || c.IsNoMatch() || c.NotProcessed() || c.UnableToProcess() {
-		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to ONLY be match", "S")
+		t.Fatalf("expected %q code to not be a match", "S")
+	} else if c.IsMatch() || c.IsNoMatch() || c.NotProcessed() || c.UnableToProcess() {
+		t.Fatalf("expected %q code to ONLY be match", "S")
 	}
 
 	c = CVVResult{transactionResult{Code: "U"}}
 	if !c.UnableToProcess() {
-		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to not be a match", "U")
-	}
-
-	if c.IsMatch() || c.IsNoMatch() || c.NotProcessed() || c.ShouldHaveBeenPresent() {
-		t.Errorf("TestCVVIsFunctions Error: Expected '%s' code to ONLY be match", "U")
+		t.Fatalf("expected %q code to not be a match", "U")
+	} else if c.IsMatch() || c.IsNoMatch() || c.NotProcessed() || c.ShouldHaveBeenPresent() {
+		t.Fatalf("expected %q code to ONLY be match", "U")
 	}
 }

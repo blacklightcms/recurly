@@ -11,34 +11,28 @@ import (
 )
 
 // TestRedemptionEncoding ensures structs are encoded to XML properly.
-func TestRedemptionsEncoding(t *testing.T) {
-	suite := []map[string]interface{}{
-		map[string]interface{}{"struct": Redemption{}, "xml": "<redemption></redemption>"},
-	}
+func TestRedemptions_Encoding(t *testing.T) {
+	var r Redemption
 
-	for _, s := range suite {
-		buf := new(bytes.Buffer)
-		err := xml.NewEncoder(buf).Encode(s["struct"])
-		if err != nil {
-			t.Errorf("TestRedemptionsEncoding Error: %s", err)
-		}
-
-		if buf.String() != s["xml"] {
-			t.Errorf("TestRedemptionsEncoding Error: Expected %s, given %s", s["xml"], buf.String())
-		}
+	var buf bytes.Buffer
+	err := xml.NewEncoder(&buf).Encode(r)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if buf.String() != "<redemption></redemption>" {
+		t.Fatalf("unexpected vvalue: %s", buf.String())
 	}
 }
 
-func TestGetForAccountRedemption(t *testing.T) {
+func TestRedemptions_GetForAccount(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/accounts/1/redemption", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/accounts/1/redemption", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
-			t.Errorf("TestGetForAccountRedemption Error: Expected %s request, given %s", "GET", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(200)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
         <redemption href="https://your-subdomain.recurly.com/v2/accounts/1/redemption">
             <coupon href="https://your-subdomain.recurly.com/v2/coupons/special"/>
             <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
@@ -52,15 +46,13 @@ func TestGetForAccountRedemption(t *testing.T) {
 
 	r, a, err := client.Redemptions.GetForAccount("1")
 	if err != nil {
-		t.Errorf("TestGetForAccountRedemption Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestGetForAccountRedemption Error: Expected get redemption to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected get redemption to return OK")
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2011-06-27T12:34:56Z")
-	expected := Redemption{
+	if !reflect.DeepEqual(a, Redemption{
 		XMLName: xml.Name{Local: "redemption"},
 		Coupon: href{
 			Code: "special",
@@ -75,23 +67,21 @@ func TestGetForAccountRedemption(t *testing.T) {
 		Currency:               "USD",
 		State:                  "active",
 		CreatedAt:              NewTime(ts),
-	}
-
-	if !reflect.DeepEqual(expected, a) {
-		t.Errorf("TestGetForAccountRedemption Error: expected account to equal %#v, given %#v", expected, a)
+	}) {
+		t.Fatalf("unexpected redemption: %v", a)
 	}
 }
 
-func TestGetForInvoiceRedemption(t *testing.T) {
+func TestRedemptions_GetForInvoice(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/invoices/1108/redemption", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/invoices/1108/redemption", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
-			t.Errorf("TestGetForInvoiceRedemption Error: Expected %s request, given %s", "GET", r.Method)
+			t.Fatalf("expected %s request, given %s", "GET", r.Method)
 		}
-		rw.WriteHeader(200)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
         <redemption href="https://your-subdomain.recurly.com/v2/accounts/1/redemption">
             <coupon href="https://your-subdomain.recurly.com/v2/coupons/special"/>
             <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
@@ -105,11 +95,11 @@ func TestGetForInvoiceRedemption(t *testing.T) {
 
 	r, a, err := client.Redemptions.GetForInvoice("1108")
 	if err != nil {
-		t.Errorf("TestGetForInvoiceRedemption Error: Error occurred making API call. Err: %s", err)
+		t.Fatalf("unexpected error: %v", err)
 	}
 
 	if r.IsError() {
-		t.Fatal("TestGetForInvoiceRedemption Error: Expected get redemption to return OK")
+		t.Fatal("expected get redemption to return OK")
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2011-06-27T12:34:56Z")
@@ -131,56 +121,52 @@ func TestGetForInvoiceRedemption(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(expected, a) {
-		t.Errorf("TestGetForInvoiceRedemption Error: expected account to equal %#v, given %#v", expected, a)
+		t.Fatalf("expected account to equal %#v, given %#v", expected, a)
 	}
 }
 
-func TestRedeemCoupon(t *testing.T) {
+func TestRedemptions_RedeemCoupon(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/coupons/special/redeem", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/coupons/special/redeem", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
-			t.Errorf("TestRedeemCoupon Error: Expected %s request, given %s", "POST", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		given := new(bytes.Buffer)
+		var given bytes.Buffer
 		given.ReadFrom(r.Body)
 		expected := "<redemption><account_code>1</account_code><currency>USD</currency></redemption>"
 		if expected != given.String() {
-			t.Errorf("TestRedeemCoupon Error: Expected request body of %s, given %s", expected, given.String())
+			t.Fatalf("unexpected input: %s", given.String())
 		}
 
-		rw.WriteHeader(201)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><redemption></redemption>`)
+		w.WriteHeader(201)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><redemption></redemption>`)
 	})
 
 	r, _, err := client.Redemptions.Redeem("special", "1", "USD")
 	if err != nil {
-		t.Errorf("TestRedeemCoupon Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestRedeemCoupon Error: Expected redeeming add on to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected redeeming add on to return OK")
 	}
 }
 
-func TestDeleteRedemption(t *testing.T) {
+func TestRedemptions_Delete(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/accounts/27/redemption", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/accounts/27/redemption", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "DELETE" {
-			t.Errorf("TestRemoveRedemption Error: Expected %s request, given %s", "Delete", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(204)
+		w.WriteHeader(204)
 	})
 
 	r, err := client.Redemptions.Delete("27")
 	if err != nil {
-		t.Errorf("TestRemoveRedemption Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestRemoveRedemption Error: Expected delete add on to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected delete add on to return OK")
 	}
 }

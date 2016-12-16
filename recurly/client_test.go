@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestNewClient(t *testing.T) {
+func TestClient(t *testing.T) {
 	expected := &Client{
 		client:    http.DefaultClient,
 		subDomain: "foo",
@@ -19,90 +19,70 @@ func TestNewClient(t *testing.T) {
 
 	given := NewClient("foo", "bar", nil)
 	if expected.subDomain != given.subDomain {
-		t.Errorf("TestNewClient Error: Expected subDomain of %s, given %s", expected.subDomain, given.subDomain)
-	}
-
-	if expected.apiKey != given.apiKey {
-		t.Errorf("TestNewClient Error: Expected apiKey of %s, given %s", expected.apiKey, given.apiKey)
-	}
-
-	if expected.BaseURL != given.BaseURL {
-		t.Errorf("TestNewClient Error: Expected BaseURL of %s, given %s", expected.BaseURL, given.BaseURL)
+		t.Fatalf("unexpected subdomain: %s", given.subDomain)
+	} else if expected.apiKey != given.apiKey {
+		t.Fatalf("unexpected api key: %s", given.apiKey)
+	} else if expected.BaseURL != given.BaseURL {
+		t.Fatalf("unexpected base url: %s", given.BaseURL)
 	}
 }
 
-func TestNewRequest(t *testing.T) {
+func TestClient_NewRequest(t *testing.T) {
 	client = NewClient("test", "abc", nil)
 
 	req, err := client.newRequest("GET", "accounts/14579", Params{"foo": "bar"}, nil)
 	if err != nil {
-		t.Errorf("TestNewRequest Error: %v", err)
-	}
-
-	if req.URL.Path != "/v2/accounts/14579" {
-		t.Errorf("TestNewRequest: expected path to equal %v, actual %v", "/v2/accounts/14579", req.URL.Path)
-	}
-
-	if req.Method != "GET" {
-		t.Errorf("TestNewRequest: expected method to equal %s, actual %s", "GET", req.Method)
-	}
-
-	if req.Header.Get("Accept") != "application/xml" {
-		t.Errorf("TestNewRequest: expected accept header of %s, given %s", "application/xml", req.Header.Get("Accept"))
-	}
-
-	if req.Header.Get("Content-Type") != "" {
-		t.Errorf("TestNewRequest: expected empty content-type header, given %s", req.Header.Get("Content-Type"))
+		t.Fatalf("unexpected error: %v", err)
+	} else if req.URL.Path != "/v2/accounts/14579" {
+		t.Fatalf("unexpected path: %s", req.URL.Path)
+	} else if req.Method != "GET" {
+		t.Fatalf("unexpected method: %s", req.Method)
+	} else if req.Header.Get("Accept") != "application/xml" {
+		t.Fatalf("unexpected Accept header: %s", req.Header.Get("Accept"))
+	} else if req.Header.Get("Content-Type") != "" {
+		t.Fatalf("unexpected Content-Type header: %s", req.Header.Get("Content-Type"))
 	}
 
 	query := req.URL.Query()
 	for name, expected := range map[string]string{"foo": "bar"} {
 		actual := query.Get(name)
 		if actual != expected {
-			t.Errorf("TestNewRequest: expected '%s' to equal '%s', actual '%s'", name, expected, actual)
+			t.Fatalf("expected '%s' to equal '%s', actual '%s'", name, expected, actual)
 		}
 	}
 
 	req, err = client.newRequest("PUT", "accounts/abc", nil, Account{Code: "abc"})
 	if err != nil {
-		t.Errorf("TestNewRequest Error: %v", err)
-	}
-
-	if req.URL.Path != "/v2/accounts/abc" {
-		t.Errorf("TestNewRequest: expected path to equal %v, actual %v", "/v2/accounts/abc", req.URL.Path)
-	}
-
-	if req.Method != "PUT" {
-		t.Errorf("TestNewRequest: expected method to equal %s, actual %s", "PUT", req.Method)
-	}
-
-	if req.Header.Get("Accept") != "application/xml" {
-		t.Errorf("TestNewRequest: expected accept header of %s, given %s", "application/xml", req.Header.Get("Accept"))
-	}
-
-	if req.Header.Get("Content-Type") != "application/xml; charset=utf-8" {
-		t.Errorf("TestNewRequest: expected content-type header of %s, given %s", "application/xml; charset=utf-8", req.Header.Get("Content-Type"))
+		t.Fatalf("unexpected error: %v", err)
+	} else if req.URL.Path != "/v2/accounts/abc" {
+		t.Fatalf("unexpected path: %s", req.URL.Path)
+	} else if req.Method != "PUT" {
+		t.Fatalf("unexpected method: %s", req.Method)
+	} else if req.Header.Get("Accept") != "application/xml" {
+		t.Fatalf("unexpected Accept header: %s", req.Header.Get("Accept"))
+	} else if req.Header.Get("Content-Type") != "application/xml; charset=utf-8" {
+		t.Fatalf("unexpected Content-Type header: %s", req.Header.Get("Content-Type"))
 	}
 
 	expected := []byte("<account><account_code>abc</account_code></account>")
 	given, _ := ioutil.ReadAll(req.Body)
 	if !reflect.DeepEqual(expected, given) {
-		t.Errorf("TestNewRequest: expected string body equal to %s, given %s", expected, given)
+		t.Fatalf("expected string body equal to %s, given %s", expected, given)
 	}
 
 	query = req.URL.Query()
 	if len(query) != 0 {
-		t.Errorf("TestNewRequest: expected %d query params, given %d", 0, len(query))
+		t.Fatalf("expected %d query params, given %d", 0, len(query))
 	}
 }
 
-func TestRequestThatReturnsErrorMessages(t *testing.T) {
+func TestClient_Error(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/error", func(rw http.ResponseWriter, r *http.Request) {
-		rw.WriteHeader(422)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
+	mux.HandleFunc("/error", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(422)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
 			<errors>
 				<error field="model_name.field_name" symbol="not_a_number" lang="en-US">is not a number</error>
 				<error field="foo.bar" symbol="not_good" lang="en-US">is not good</error>
@@ -111,16 +91,14 @@ func TestRequestThatReturnsErrorMessages(t *testing.T) {
 
 	req, err := http.NewRequest("GET", client.BaseURL+"error", nil)
 	if err != nil {
-		t.Fatalf("TestRequestThatReturnsErrorMessages Error: Error creating request. err: %s", err)
+		t.Fatalf("error creating request. err: %v", err)
 	}
 
 	resp, err := client.do(req, nil)
 	if err != nil {
-		t.Fatalf("TestRequestThatReturnsErrorMessages Error: Error making request. err: %s", err)
-	}
-
-	if resp.IsOK() {
-		t.Errorf("TestRequestThatReturnsErrorMessages Error: Expected response to not be ok")
+		t.Fatalf("error making request. err: %v", err)
+	} else if resp.IsOK() {
+		t.Fatalf("expected response to not be ok")
 	}
 
 	expected := []Error{
@@ -139,11 +117,11 @@ func TestRequestThatReturnsErrorMessages(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(expected, resp.Errors) {
-		t.Errorf("TestRequestThatReturnsErrorMessages Error: Expected errors of %#v, given %#v", expected, resp.Errors)
+		t.Fatalf("unexpected error: %v", resp.Errors)
 	}
 }
 
-func TestRequestUnmarshalsIntoStruct(t *testing.T) {
+func TestClient_Unmarshal(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -183,36 +161,24 @@ func TestRequestUnmarshalsIntoStruct(t *testing.T) {
 
 	req, err := http.NewRequest("GET", client.BaseURL+"account/1", nil)
 	if err != nil {
-		t.Fatalf("TestRequestUnmarshalsIntoStruct Error: Error creating request. err: %s", err)
+		t.Fatalf("unexpected error: %v", err)
 	}
 
 	var a Account
 	resp, err := client.do(req, &a)
 	if err != nil {
-		t.Fatalf("TestRequestUnmarshalsIntoStruct Error: Error making request. err: %s", err)
+		t.Fatalf("unexpected error: %v", err)
+	} else if resp.IsError() {
+		t.Fatalf("expected response to be ok")
 	}
 
-	if resp.IsError() {
-		t.Errorf("TestRequestUnmarshalsIntoStruct Error: Expected response to be ok")
-	}
-
-	expected := "Verena"
-	if expected != a.FirstName {
-		t.Errorf("TestRequestUnmarshalsIntoStruct Error: Expected first name to be %s, given %s", expected, a.FirstName)
-	}
-
-	expected = "Example"
-	if expected != a.LastName {
-		t.Errorf("TestRequestUnmarshalsIntoStruct Error: Expected first name to be %s, given %s", expected, a.LastName)
-	}
-
-	expected = "a92468579e9c4231a6c0031c4716c01d"
-	if expected != a.HostedLoginToken {
-		t.Errorf("TestRequestUnmarshalsIntoStruct Error: Expected first name to be %s, given %s", expected, a.HostedLoginToken)
-	}
-
-	expected = "123 Main St."
-	if expected != a.Address.Address {
-		t.Errorf("TestRequestUnmarshalsIntoStruct Error: Expected address1 to be %s, given %s", expected, a.Address.Address)
+	if a.FirstName != "Verena" {
+		t.Fatalf("unexpected first name: %s", a.FirstName)
+	} else if a.LastName != "Example" {
+		t.Fatalf("unexpected last name: %s", a.LastName)
+	} else if a.HostedLoginToken != "a92468579e9c4231a6c0031c4716c01d" {
+		t.Fatalf("unexpected hosted login token: %s", a.HostedLoginToken)
+	} else if a.Address.Address != "123 Main St." {
+		t.Fatalf("unexpected address: %s", a.Address.Address)
 	}
 }

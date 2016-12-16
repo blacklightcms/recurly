@@ -3,7 +3,6 @@ package recurly
 import (
 	"net/http"
 	"net/http/httptest"
-	"strconv"
 	"testing"
 )
 
@@ -35,7 +34,7 @@ func teardown() {
 	server.Close()
 }
 
-func TestResponseConvenienceMethods(t *testing.T) {
+func TestResponse_ConvenienceMethods(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -51,47 +50,43 @@ func TestResponseConvenienceMethods(t *testing.T) {
 		rw.WriteHeader(http.StatusInternalServerError)
 	})
 
-	suite := []map[string]string{
-		map[string]string{"endpoint": "success", "ok": "true", "error": "false", "clientError": "false", "serverError": "false"},
-		map[string]string{"endpoint": "client-error", "ok": "false", "error": "true", "clientError": "true", "serverError": "false"},
-		map[string]string{"endpoint": "server-error", "ok": "false", "error": "true", "clientError": "false", "serverError": "true"},
+	tests := []struct {
+		endpoint  string
+		ok        bool
+		err       bool
+		clientErr bool
+		serverErr bool
+	}{
+		{endpoint: "success", ok: true},
+		{endpoint: "client-error", ok: false, err: true, clientErr: true, serverErr: false},
+		{endpoint: "server-error", ok: false, err: true, clientErr: false, serverErr: true},
 	}
 
-	for i, s := range suite {
-		req, err := http.NewRequest("GET", client.BaseURL+s["endpoint"], nil)
+	for i, tt := range tests {
+		req, err := http.NewRequest("GET", client.BaseURL+tt.endpoint, nil)
 		if err != nil {
-			t.Fatalf("TestResponse Error (%d): Error creating request for %s. err: %s", i, s["endpoint"], err)
+			t.Fatalf("(%d): error creating request for %s. err: %s", i, tt.endpoint, err)
 		}
 
 		resp, err := client.client.Do(req)
 		if err != nil {
-			t.Fatalf("TestResponse Error (%d): Error making request for %s. err: %s", i, s["endpoint"], err)
+			t.Fatalf("(%d): Error making request for %s. err: %s", i, tt.endpoint, err)
 		}
 
 		r := &Response{Response: resp}
-		expected, _ := strconv.ParseBool(s["ok"])
-		if expected != r.IsOK() {
-			t.Errorf("TestResponse Error (%d): Expected ok to be %v for %s, given %v", i, expected, s["endpoint"], r.IsOK())
-		}
-
-		expected, _ = strconv.ParseBool(s["error"])
-		if expected != r.IsError() {
-			t.Errorf("TestResponse Error (%d): Expected error to be %v for %s, given %v", i, expected, s["endpoint"], r.IsError())
-		}
-
-		expected, _ = strconv.ParseBool(s["clientError"])
-		if expected != r.IsClientError() {
-			t.Errorf("TestResponse Error (%d): Expected clientError to be %v for %s, given %v", i, expected, s["endpoint"], r.IsClientError())
-		}
-
-		expected, _ = strconv.ParseBool(s["serverError"])
-		if expected != r.IsServerError() {
-			t.Errorf("TestResponse Error (%d): Expected serverError to be %v for %s, given %v", i, expected, s["endpoint"], r.IsServerError())
+		if tt.ok != r.IsOK() {
+			t.Fatalf("(%d): Expected ok to be %v for %s, given %v", i, tt.ok, tt.endpoint, r.IsOK())
+		} else if tt.err != r.IsError() {
+			t.Fatalf("(%d): Expected error to be %v for %s, given %v", i, tt.err, tt.endpoint, r.IsError())
+		} else if tt.clientErr != r.IsClientError() {
+			t.Fatalf("(%d): Expected clientError to be %v for %s, given %v", i, tt.clientErr, tt.endpoint, r.IsClientError())
+		} else if tt.serverErr != r.IsServerError() {
+			t.Fatalf("(%d): Expected serverError to be %v for %s, given %v", i, tt.serverErr, tt.endpoint, r.IsServerError())
 		}
 	}
 }
 
-func TestPaginationLinks(t *testing.T) {
+func TestResponse_CursorLinkParsing(t *testing.T) {
 	setup()
 	defer teardown()
 
@@ -110,29 +105,32 @@ func TestPaginationLinks(t *testing.T) {
 		rw.WriteHeader(http.StatusOK)
 	})
 
-	suite := []map[string]string{
-		{"endpoint": "/case0", "next": "1827545887837797260", "prev": ""},
-		{"endpoint": "/case1", "next": "1824642383070236054", "prev": "-1325183252208393488"},
-		{"endpoint": "/case2", "next": "1234566890", "prev": ""},
+	tests := []struct {
+		endpoint string
+		next     string
+		prev     string
+	}{
+		{endpoint: "/case0", next: "1827545887837797260", prev: ""},
+		{endpoint: "/case1", next: "1824642383070236054", prev: "-1325183252208393488"},
+		{endpoint: "/case2", next: "1234566890", prev: ""},
 	}
 
-	for i, s := range suite {
-		req, err := http.NewRequest("GET", client.BaseURL+s["endpoint"], nil)
+	for i, tt := range tests {
+		req, err := http.NewRequest("GET", client.BaseURL+tt.endpoint, nil)
 		if err != nil {
-			t.Fatalf("TestPaginationLinks Error (%d): Error creating request for %s. err: %s", i, s["endpoint"], err)
+			t.Fatalf("unexpected error: %v", err)
 		}
 
 		resp, err := client.client.Do(req)
 		if err != nil {
-			t.Fatalf("TestPaginationLinks Error (%d): Error making request for %s. err: %s", i, s["endpoint"], err)
+			t.Fatalf("unexpected error: %v", err)
 		}
 
 		r := &Response{Response: resp}
-
-		if r.Next() != s["next"] {
-			t.Errorf("TestPaginationLinks Error (%d): Expected next cursor to be %v, got %s, given %v", i, s["next"], r.Next(), s["endpoint"])
-		} else if r.Prev() != s["prev"] {
-			t.Errorf("TestPaginationLinks Error (%d): Expected prev cursor to be %v, for %s, given %v", i, s["prev"], r.Prev(), s["endpoint"])
+		if r.Next() != tt.next {
+			t.Fatalf("(%d): Expected next cursor to be %v, got %s, given %v", i, tt.next, r.Next(), tt.endpoint)
+		} else if r.Prev() != tt.prev {
+			t.Fatalf("(%d): Expected prev cursor to be %v, for %s, given %v", i, tt.prev, r.Prev(), tt.endpoint)
 		}
 	}
 }

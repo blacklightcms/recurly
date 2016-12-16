@@ -14,42 +14,42 @@ import (
 // Because Recurly supports partial updates, it's important that only defined
 // fields are handled properly -- including types like booleans and integers which
 // have zero values that we want to send.
-func TestAdjustmentsEncoding(t *testing.T) {
-	suite := []map[string]interface{}{
+func TestAdjustments_Encoding(t *testing.T) {
+	tests := []struct {
+		v        Adjustment
+		expected string
+	}{
 		// Unit amount in cents and currency are required fields. They should always be present.
-		map[string]interface{}{"struct": Adjustment{}, "xml": "<adjustment><unit_amount_in_cents>0</unit_amount_in_cents><currency></currency></adjustment>"},
-		map[string]interface{}{"struct": Adjustment{UnitAmountInCents: 2000, Currency: "USD"}, "xml": "<adjustment><unit_amount_in_cents>2000</unit_amount_in_cents><currency>USD</currency></adjustment>"},
-		map[string]interface{}{"struct": Adjustment{Description: "Charge for extra bandwidth", UnitAmountInCents: 2000, Currency: "USD"}, "xml": "<adjustment><description>Charge for extra bandwidth</description><unit_amount_in_cents>2000</unit_amount_in_cents><currency>USD</currency></adjustment>"},
-		map[string]interface{}{"struct": Adjustment{Quantity: 1, UnitAmountInCents: 2000, Currency: "CAD"}, "xml": "<adjustment><unit_amount_in_cents>2000</unit_amount_in_cents><quantity>1</quantity><currency>CAD</currency></adjustment>"},
-		map[string]interface{}{"struct": Adjustment{AccountingCode: "bandwidth", UnitAmountInCents: 2000, Currency: "CAD"}, "xml": "<adjustment><accounting_code>bandwidth</accounting_code><unit_amount_in_cents>2000</unit_amount_in_cents><currency>CAD</currency></adjustment>"},
-		map[string]interface{}{"struct": Adjustment{TaxExempt: NewBool(false), UnitAmountInCents: 2000, Currency: "USD"}, "xml": "<adjustment><unit_amount_in_cents>2000</unit_amount_in_cents><currency>USD</currency><tax_exempt>false</tax_exempt></adjustment>"},
-		map[string]interface{}{"struct": Adjustment{TaxCode: "digital", UnitAmountInCents: 2000, Currency: "USD"}, "xml": "<adjustment><unit_amount_in_cents>2000</unit_amount_in_cents><currency>USD</currency><tax_code>digital</tax_code></adjustment>"},
+		{v: Adjustment{}, expected: "<adjustment><unit_amount_in_cents>0</unit_amount_in_cents><currency></currency></adjustment>"},
+		{v: Adjustment{UnitAmountInCents: 2000, Currency: "USD"}, expected: "<adjustment><unit_amount_in_cents>2000</unit_amount_in_cents><currency>USD</currency></adjustment>"},
+		{v: Adjustment{Description: "Charge for extra bandwidth", UnitAmountInCents: 2000, Currency: "USD"}, expected: "<adjustment><description>Charge for extra bandwidth</description><unit_amount_in_cents>2000</unit_amount_in_cents><currency>USD</currency></adjustment>"},
+		{v: Adjustment{Quantity: 1, UnitAmountInCents: 2000, Currency: "CAD"}, expected: "<adjustment><unit_amount_in_cents>2000</unit_amount_in_cents><quantity>1</quantity><currency>CAD</currency></adjustment>"},
+		{v: Adjustment{AccountingCode: "bandwidth", UnitAmountInCents: 2000, Currency: "CAD"}, expected: "<adjustment><accounting_code>bandwidth</accounting_code><unit_amount_in_cents>2000</unit_amount_in_cents><currency>CAD</currency></adjustment>"},
+		{v: Adjustment{TaxExempt: NewBool(false), UnitAmountInCents: 2000, Currency: "USD"}, expected: "<adjustment><unit_amount_in_cents>2000</unit_amount_in_cents><currency>USD</currency><tax_exempt>false</tax_exempt></adjustment>"},
+		{v: Adjustment{TaxCode: "digital", UnitAmountInCents: 2000, Currency: "USD"}, expected: "<adjustment><unit_amount_in_cents>2000</unit_amount_in_cents><currency>USD</currency><tax_code>digital</tax_code></adjustment>"},
 	}
 
-	for _, s := range suite {
-		buf := new(bytes.Buffer)
-		err := xml.NewEncoder(buf).Encode(s["struct"])
-		if err != nil {
-			t.Errorf("TestAdjustmentEncoding Error: %s", err)
-		}
-
-		if buf.String() != s["xml"] {
-			t.Errorf("TestAdjustmentEncoding Error: Expected %s, given %s", s["xml"], buf.String())
+	for _, tt := range tests {
+		var buf bytes.Buffer
+		if err := xml.NewEncoder(&buf).Encode(tt.v); err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		} else if buf.String() != tt.expected {
+			t.Fatalf("unexpected value: %s", buf.String())
 		}
 	}
 }
 
-func TestAdjustmentsList(t *testing.T) {
+func TestAdjustments_List(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/accounts/100/adjustments", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/accounts/100/adjustments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
-			t.Errorf("TestAdjustmentsList Error: Expected %s request, given %s", "GET", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.Header().Set("Link", `<https://your-subdomain.recurly.com/v2/accounts/100/adjustments?cursor=1304958672>; rel="next"`)
-		rw.WriteHeader(200)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
+		w.Header().Set("Link", `<https://your-subdomain.recurly.com/v2/accounts/100/adjustments?cursor=1304958672>; rel="next"`)
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
 			<adjustments type="array">
 				<adjustment href="https://your-subdomain.recurly.com/v2/adjustments/626db120a84102b1809909071c701c60" type="charge">
 					<account href="https://your-subdomain.recurly.com/v2/accounts/100"/>
@@ -80,70 +80,58 @@ func TestAdjustmentsList(t *testing.T) {
 
 	r, adjustments, err := client.Adjustments.List("100", Params{"per_page": 1})
 	if err != nil {
-		t.Errorf("TestAdjustmentsList Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestAdjustmentsList Error: Expected list adjustments to return OK")
-	}
-
-	if len(adjustments) != 1 {
-		t.Fatalf("TestAdjustmentsList Error: Expected 1 adjustment returned, given %d", len(adjustments))
-	}
-
-	if r.Request.URL.Query().Get("per_page") != "1" {
-		t.Errorf("TestAdjustmentsList Error: Expected per_page parameter of 1, given %s", r.Request.URL.Query().Get("per_page"))
-	}
-
-	if r.Next() != "1304958672" {
-		t.Errorf("TestAdjustmentsList Error: Expected next cursor to equal %s, given %s", "1304958672", r.Next())
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected list adjustments to return OK")
+	} else if len(adjustments) != 1 {
+		t.Fatalf("unexpected length: %d", len(adjustments))
+	} else if pp := r.Request.URL.Query().Get("per_page"); pp != "1" {
+		t.Fatalf("unexpected per_page: %s", pp)
+	} else if r.Next() != "1304958672" {
+		t.Fatalf("unexpected cursor: %s", r.Next())
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2011-08-31T03:30:00Z")
-	for _, given := range adjustments {
-		expected := Adjustment{
-			XMLName: xml.Name{Local: "adjustment"},
-			Account: href{
-				HREF: "https://your-subdomain.recurly.com/v2/accounts/100",
-				Code: "100",
-			},
-			Invoice: href{
-				HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
-				Code: "1108",
-			},
-			UUID:                   "626db120a84102b1809909071c701c60",
-			State:                  "invoiced",
-			Description:            "One-time Charged Fee",
-			ProductCode:            "basic",
-			Origin:                 "debit",
-			UnitAmountInCents:      2000,
-			Quantity:               1,
-			OriginalAdjustmentUUID: "2cc95aa62517e56d5bec3a48afa1b3b9",
-			TaxInCents:             180,
-			TotalInCents:           2180,
-			Currency:               "USD",
-			Taxable:                NewBool(false),
-			TaxExempt:              NewBool(false),
-			StartDate:              NewTime(ts),
-			CreatedAt:              NewTime(ts),
-		}
-
-		if !reflect.DeepEqual(expected, given) {
-			t.Errorf("TestAdjustmentsList Error: expected adjustment to equal %#v, given %#v", expected, given)
-		}
+	if !reflect.DeepEqual(adjustments, []Adjustment{Adjustment{
+		XMLName: xml.Name{Local: "adjustment"},
+		Account: href{
+			HREF: "https://your-subdomain.recurly.com/v2/accounts/100",
+			Code: "100",
+		},
+		Invoice: href{
+			HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
+			Code: "1108",
+		},
+		UUID:                   "626db120a84102b1809909071c701c60",
+		State:                  "invoiced",
+		Description:            "One-time Charged Fee",
+		ProductCode:            "basic",
+		Origin:                 "debit",
+		UnitAmountInCents:      2000,
+		Quantity:               1,
+		OriginalAdjustmentUUID: "2cc95aa62517e56d5bec3a48afa1b3b9",
+		TaxInCents:             180,
+		TotalInCents:           2180,
+		Currency:               "USD",
+		Taxable:                NewBool(false),
+		TaxExempt:              NewBool(false),
+		StartDate:              NewTime(ts),
+		CreatedAt:              NewTime(ts),
+	}}) {
+		t.Fatalf("unexpected adjustments: %v", adjustments)
 	}
 }
 
-func TestGetAdjustment(t *testing.T) {
+func TestAdjustments_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/adjustments/626db120a84102b1809909071c701c60", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/adjustments/626db120a84102b1809909071c701c60", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
-			t.Errorf("TestGetAdjustment Error: Expected %s request, given %s", "GET", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(200)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?>
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
 			<adjustment href="https://your-subdomain.recurly.com/v2/adjustments/626db120a84102b1809909071c701c60" type="charge">
 				<account href="https://your-subdomain.recurly.com/v2/accounts/100"/>
 				<invoice href="https://your-subdomain.recurly.com/v2/invoices/1108"/>
@@ -199,15 +187,13 @@ func TestGetAdjustment(t *testing.T) {
 
 	r, adjustment, err := client.Adjustments.Get("626db120a84102b1809909071c701c60")
 	if err != nil {
-		t.Errorf("TestGetAdjustment Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestGetAdjustment Error: Expected get adjustment to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected get adjustment to return OK")
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2015-02-04T23:13:07Z")
-	expected := Adjustment{
+	if !reflect.DeepEqual(adjustment, Adjustment{
 		XMLName: xml.Name{Local: "adjustment"},
 		Account: href{
 			HREF: "https://your-subdomain.recurly.com/v2/accounts/100",
@@ -264,52 +250,46 @@ func TestGetAdjustment(t *testing.T) {
 		},
 		StartDate: NewTime(ts),
 		CreatedAt: NewTime(ts),
-	}
-
-	if !reflect.DeepEqual(expected, adjustment) {
-		t.Errorf("TestGetAdjustment Error: expected adjustment to equal %#v, given %#v", expected, adjustment)
+	}) {
+		t.Fatalf("unexpected adjustment: %v", adjustment)
 	}
 }
 
-func TestCreateAdjustment(t *testing.T) {
+func TestAdjustments_Create(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/accounts/1/adjustments", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/accounts/1/adjustments", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
-			t.Errorf("TestCreateAdjustment Error: Expected %s request, given %s", "POST", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(201)
-		fmt.Fprint(rw, `<?xml version="1.0" encoding="UTF-8"?><adjustment></adjustment>`)
+		w.WriteHeader(201)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><adjustment></adjustment>`)
 	})
 
 	r, _, err := client.Adjustments.Create("1", Adjustment{})
 	if err != nil {
-		t.Errorf("TestCreateAdjustment Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestCreateAdjustment Error: Expected create adjustment to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.StatusCode != 201 {
+		t.Fatalf("unexpected status code: %d", r.StatusCode)
 	}
 }
 
-func TestDeleteAdjustment(t *testing.T) {
+func TestAdjustments_Delete(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/adjustments/945a4cb9afd64300b97b138407a51aef", func(rw http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/adjustments/945a4cb9afd64300b97b138407a51aef", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "DELETE" {
-			t.Errorf("TestDeleteAdjustment Error: Expected %s request, given %s", "DELETE", r.Method)
+			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		rw.WriteHeader(204)
+		w.WriteHeader(204)
 	})
 
 	r, err := client.Adjustments.Delete("945a4cb9afd64300b97b138407a51aef")
 	if err != nil {
-		t.Errorf("TestDeleteAdjustment Error: Error occurred making API call. Err: %s", err)
-	}
-
-	if r.IsError() {
-		t.Fatal("TestDeleteAdjustment Error: Expected create adjustment to return OK")
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.StatusCode != 204 {
+		t.Fatalf("unexpected status code: %d", r.StatusCode)
 	}
 }

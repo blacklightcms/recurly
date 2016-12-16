@@ -31,11 +31,9 @@ func TestTypeHREFUnmarshal(t *testing.T) {
 
 	var given h
 	if err := xml.NewDecoder(str).Decode(&given); err != nil {
-		t.Errorf("TestTypeHREFUnmarshal Error: error decoding xml. Err: %s", err)
-	}
-
-	if !reflect.DeepEqual(expected, given) {
-		t.Errorf("TestTypeHREFUnmarshal Error: Expected unmarshal to be %#v, given %#v", expected, given)
+		t.Fatalf("unexpected error: %v", err)
+	} else if !reflect.DeepEqual(expected, given) {
+		t.Fatalf("unexpected result: %v", given)
 	}
 }
 
@@ -61,12 +59,10 @@ func TestTypeHREFMarshal(t *testing.T) {
 
 	expected := `<foo><name>Bob</name></foo>`
 
-	given := new(bytes.Buffer)
-	if err := xml.NewEncoder(given).Encode(v); err != nil {
-		t.Errorf("TestTypeHREFMarshal Error: error encoding xml. Err: %s", err)
-	}
-
-	if expected != given.String() {
-		t.Errorf("TestTypeHREFMarshal Error: Expected marshal to be %s, given %s", expected, given.String())
+	var given bytes.Buffer
+	if err := xml.NewEncoder(&given).Encode(v); err != nil {
+		t.Fatalf("error encoding xml. Err: %s", err)
+	} else if expected != given.String() {
+		t.Fatalf("Expected marshal to be %s, given %s", expected, given.String())
 	}
 }
