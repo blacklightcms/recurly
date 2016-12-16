@@ -12,10 +12,7 @@ type (
 
 // NewInt builds a new NullInt struct.
 func NewInt(i int) NullInt {
-	return NullInt{
-		Int:   i,
-		Valid: true,
-	}
+	return NullInt{Int: i, Valid: true}
 }
 
 // UnmarshalXML unmarshals an int properly, as well as marshaling an empty string to nil.

@@ -328,8 +328,13 @@ func TestBilling_Update_InvalidToken(t *testing.T) {
 
 	if resp.IsOK() {
 		t.Fatal("expected updating billing info with invalid token to return error")
-	} else if len(resp.Errors) == 0 || resp.Errors[0].Symbol != "token_invalid" {
-		t.Fatalf("error response not parsed properly")
+	} else if !reflect.DeepEqual(resp.Errors, []Error{
+		{
+			Symbol:  "token_invalid",
+			Message: "Token is either invalid or expired",
+		},
+	}) {
+		t.Fatalf("unexpected errors: %v", resp.Errors)
 	}
 }
 

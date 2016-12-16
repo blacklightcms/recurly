@@ -102,8 +102,6 @@ func TestAccounts_List(t *testing.T) {
 		t.Fatalf("unxpected error: %v", err)
 	} else if resp.IsError() {
 		t.Fatal("expected list accounts to return OK")
-	} else if len(accounts) != 1 {
-		t.Fatalf("unexpected account length: %d", len(accounts))
 	} else if resp.Prev() != "" {
 		t.Fatalf("unexpected cursor: %s", resp.Prev())
 	} else if resp.Next() != "1304958672" {
@@ -111,29 +109,25 @@ func TestAccounts_List(t *testing.T) {
 	}
 
 	ts, _ := time.Parse(datetimeFormat, "2011-10-25T12:00:00Z")
-	for _, given := range accounts {
-		expected := Account{
-			XMLName:   xml.Name{Local: "account"},
-			Code:      "1",
-			State:     "active",
-			Email:     "verena@example.com",
-			FirstName: "Verena",
-			LastName:  "Example",
-			TaxExempt: NewBool(false),
-			Address: Address{
-				Address: "123 Main St.",
-				City:    "San Francisco",
-				State:   "CA",
-				Zip:     "94105",
-				Country: "US",
-			},
-			HostedLoginToken: "a92468579e9c4231a6c0031c4716c01d",
-			CreatedAt:        NewTime(ts),
-		}
-
-		if !reflect.DeepEqual(expected, given) {
-			t.Fatalf("unexpected account: %v", given)
-		}
+	if !reflect.DeepEqual(accounts, []Account{Account{
+		XMLName:   xml.Name{Local: "account"},
+		Code:      "1",
+		State:     "active",
+		Email:     "verena@example.com",
+		FirstName: "Verena",
+		LastName:  "Example",
+		TaxExempt: NewBool(false),
+		Address: Address{
+			Address: "123 Main St.",
+			City:    "San Francisco",
+			State:   "CA",
+			Zip:     "94105",
+			Country: "US",
+		},
+		HostedLoginToken: "a92468579e9c4231a6c0031c4716c01d",
+		CreatedAt:        NewTime(ts),
+	}}) {
+		t.Fatalf("unexpected account: %v", accounts)
 	}
 }
 

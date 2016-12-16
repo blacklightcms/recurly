@@ -83,8 +83,6 @@ func TestAdjustments_List(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	} else if resp.IsError() {
 		t.Fatal("expected list adjustments to return OK")
-	} else if len(adjustments) != 1 {
-		t.Fatalf("unexpected length: %d", len(adjustments))
 	} else if pp := resp.Request.URL.Query().Get("per_page"); pp != "1" {
 		t.Fatalf("unexpected per_page: %s", pp)
 	} else if resp.Next() != "1304958672" {
