@@ -93,11 +93,8 @@ func TestInvoices_List(t *testing.T) {
 	} else if resp.Request.URL.Query().Get("per_page") != "1" {
 		t.Fatalf("expected per_page parameter of 1, given %s", resp.Request.URL.Query().Get("per_page"))
 	} else if !reflect.DeepEqual(invoices, []Invoice{{
-		XMLName: xml.Name{Local: "invoice"},
-		Account: href{
-			HREF: "https://your-subdomain.recurly.com/v2/accounts/1",
-			Code: "1",
-		},
+		XMLName:     xml.Name{Local: "invoice"},
+		AccountCode: "1",
 		Address: Address{
 			Address: "400 Alabama St.",
 			City:    "San Francisco",
@@ -105,14 +102,8 @@ func TestInvoices_List(t *testing.T) {
 			Zip:     "94110",
 			Country: "US",
 		},
-		Subscription: href{
-			HREF: "https://your-subdomain.recurly.com/v2/subscriptions/17caaca1716f33572edc8146e0aaefde",
-			Code: "17caaca1716f33572edc8146e0aaefde",
-		},
-		OriginalInvoice: href{
-			HREF: "https://your-subdomain.recurly.com/v2/invoices/938571",
-			Code: "938571",
-		},
+		SubscriptionUUID:      "17caaca1716f33572edc8146e0aaefde",
+		OriginalInvoiceNumber: 938571,
 		UUID:             "421f7b7d414e4c6792938e7c49d552e9",
 		State:            InvoiceStateOpen,
 		InvoiceNumber:    1005,
@@ -128,15 +119,9 @@ func TestInvoices_List(t *testing.T) {
 		CollectionMethod: "automatic",
 		LineItems: []Adjustment{
 			Adjustment{
-				XMLName: xml.Name{Local: "adjustment"},
-				Account: href{
-					HREF: "https://your-subdomain.recurly.com/v2/accounts/100",
-					Code: "100",
-				},
-				Invoice: href{
-					HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
-					Code: "1108",
-				},
+				XMLName:                xml.Name{Local: "adjustment"},
+				AccountCode:            "100",
+				InvoiceNumber:          "1108",
 				UUID:                   "626db120a84102b1809909071c701c60",
 				State:                  "invoiced",
 				Description:            "One-time Charged Fee",
@@ -240,11 +225,8 @@ func TestInvoices_ListAccount(t *testing.T) {
 	} else if pp := resp.Request.URL.Query().Get("per_page"); pp != "1" {
 		t.Fatalf("unexpected per_page: %s", pp)
 	} else if !reflect.DeepEqual(invoices, []Invoice{Invoice{
-		XMLName: xml.Name{Local: "invoice"},
-		Account: href{
-			HREF: "https://your-subdomain.recurly.com/v2/accounts/1",
-			Code: "1",
-		},
+		XMLName:     xml.Name{Local: "invoice"},
+		AccountCode: "1",
 		Address: Address{
 			Address: "400 Alabama St.",
 			City:    "San Francisco",
@@ -252,10 +234,7 @@ func TestInvoices_ListAccount(t *testing.T) {
 			Zip:     "94110",
 			Country: "US",
 		},
-		Subscription: href{
-			HREF: "https://your-subdomain.recurly.com/v2/subscriptions/17caaca1716f33572edc8146e0aaefde",
-			Code: "17caaca1716f33572edc8146e0aaefde",
-		},
+		SubscriptionUUID: "17caaca1716f33572edc8146e0aaefde",
 		UUID:             "421f7b7d414e4c6792938e7c49d552e9",
 		State:            InvoiceStateOpen,
 		InvoiceNumber:    1005,
@@ -271,15 +250,9 @@ func TestInvoices_ListAccount(t *testing.T) {
 		CollectionMethod: "automatic",
 		LineItems: []Adjustment{
 			Adjustment{
-				XMLName: xml.Name{Local: "adjustment"},
-				Account: href{
-					HREF: "https://your-subdomain.recurly.com/v2/accounts/100",
-					Code: "100",
-				},
-				Invoice: href{
-					HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
-					Code: "1108",
-				},
+				XMLName:                xml.Name{Local: "adjustment"},
+				AccountCode:            "100",
+				InvoiceNumber:          "1108",
 				UUID:                   "626db120a84102b1809909071c701c60",
 				State:                  "invoiced",
 				Description:            "One-time Charged Fee",
@@ -433,11 +406,8 @@ func TestInvoices_Get(t *testing.T) {
 
 	ts, _ := time.Parse(datetimeFormat, "2011-08-25T12:00:00Z")
 	if !reflect.DeepEqual(invoice, &Invoice{
-		XMLName: xml.Name{Local: "invoice"},
-		Account: href{
-			HREF: "https://your-subdomain.recurly.com/v2/accounts/1",
-			Code: "1",
-		},
+		XMLName:     xml.Name{Local: "invoice"},
+		AccountCode: "1",
 		Address: Address{
 			Address: "400 Alabama St.",
 			City:    "San Francisco",
@@ -445,10 +415,7 @@ func TestInvoices_Get(t *testing.T) {
 			Zip:     "94110",
 			Country: "US",
 		},
-		Subscription: href{
-			HREF: "https://your-subdomain.recurly.com/v2/subscriptions/17caaca1716f33572edc8146e0aaefde",
-			Code: "17caaca1716f33572edc8146e0aaefde",
-		},
+		SubscriptionUUID: "17caaca1716f33572edc8146e0aaefde",
 		UUID:             "421f7b7d414e4c6792938e7c49d552e9",
 		State:            InvoiceStateOpen,
 		InvoiceNumber:    1005,
@@ -464,15 +431,9 @@ func TestInvoices_Get(t *testing.T) {
 		CollectionMethod: "automatic",
 		LineItems: []Adjustment{
 			Adjustment{
-				XMLName: xml.Name{Local: "adjustment"},
-				Account: href{
-					HREF: "https://your-subdomain.recurly.com/v2/accounts/100",
-					Code: "100",
-				},
-				Invoice: href{
-					HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
-					Code: "1108",
-				},
+				XMLName:                xml.Name{Local: "adjustment"},
+				AccountCode:            "100",
+				InvoiceNumber:          "1108",
 				UUID:                   "626db120a84102b1809909071c701c60",
 				State:                  "invoiced",
 				Description:            "One-time Charged Fee",
@@ -492,29 +453,23 @@ func TestInvoices_Get(t *testing.T) {
 		},
 		Transactions: []Transaction{
 			Transaction{
-				XMLName: xml.Name{Local: "transaction"},
-				Invoice: href{
-					HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
-					Code: "1108",
-				},
-				Subscription: href{
-					HREF: "https://your-subdomain.recurly.com/v2/subscriptions/17caaca1716f33572edc8146e0aaefde",
-					Code: "17caaca1716f33572edc8146e0aaefde",
-				},
-				UUID:          "a13acd8fe4294916b79aec87b7ea441f",
-				Action:        "purchase",
-				AmountInCents: 1000,
-				TaxInCents:    0,
-				Currency:      "USD",
-				Status:        "success",
-				PaymentMethod: "credit_card",
-				Reference:     "5416477",
-				Source:        "subscription",
-				Recurring:     NewBool(true),
-				Test:          true,
-				Voidable:      NewBool(true),
-				Refundable:    NewBool(true),
-				IPAddress:     net.ParseIP("127.0.0.1"),
+				XMLName:          xml.Name{Local: "transaction"},
+				InvoiceNumber:    "1108",
+				SubscriptionUUID: "17caaca1716f33572edc8146e0aaefde",
+				UUID:             "a13acd8fe4294916b79aec87b7ea441f",
+				Action:           "purchase",
+				AmountInCents:    1000,
+				TaxInCents:       0,
+				Currency:         "USD",
+				Status:           "success",
+				PaymentMethod:    "credit_card",
+				Reference:        "5416477",
+				Source:           "subscription",
+				Recurring:        NewBool(true),
+				Test:             true,
+				Voidable:         NewBool(true),
+				Refundable:       NewBool(true),
+				IPAddress:        net.ParseIP("127.0.0.1"),
 				CVVResult: CVVResult{
 					transactionResult{
 						Code:    "M",

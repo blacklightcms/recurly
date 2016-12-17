@@ -15,8 +15,8 @@ type (
 	// Adjustment works with charges and credits on a given account.
 	Adjustment struct {
 		XMLName                xml.Name    `xml:"adjustment"`
-		Account                href        `xml:"account,omitempty"`
-		Invoice                href        `xml:"invoice,omitempty"`
+		AccountCode            hrefString  `xml:"account,omitempty"` // Read only
+		InvoiceNumber          hrefString  `xml:"invoice,omitempty"` // Read only
 		UUID                   string      `xml:"uuid,omitempty"`
 		State                  string      `xml:"state,omitempty"`
 		Description            string      `xml:"description,omitempty"`

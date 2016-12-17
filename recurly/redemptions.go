@@ -14,14 +14,14 @@ type (
 
 	// Redemption holds redeemed coupons for an account or invoice.
 	Redemption struct {
-		XMLName                xml.Name `xml:"redemption"`
-		Coupon                 href     `xml:"coupon,omitempty"`
-		Account                href     `xml:"account,omitempty"`
-		SingleUse              NullBool `xml:"single_use,omitempty"`
-		TotalDiscountedInCents int      `xml:"total_discounted_in_cents,omitempty"`
-		Currency               string   `xml:"currency,omitempty"`
-		State                  string   `xml:"state,omitempty"`
-		CreatedAt              NullTime `xml:"created_at,omitempty"`
+		XMLName                xml.Name   `xml:"redemption"`
+		Coupon                 hrefString `xml:"coupon,omitempty"`
+		AccountCode            hrefString `xml:"account,omitempty"`
+		SingleUse              NullBool   `xml:"single_use,omitempty"`
+		TotalDiscountedInCents int        `xml:"total_discounted_in_cents,omitempty"`
+		Currency               string     `xml:"currency,omitempty"`
+		State                  string     `xml:"state,omitempty"`
+		CreatedAt              NullTime   `xml:"created_at,omitempty"`
 	}
 )
 

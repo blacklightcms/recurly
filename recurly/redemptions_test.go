@@ -53,15 +53,9 @@ func TestRedemptions_GetForAccount(t *testing.T) {
 
 	ts, _ := time.Parse(datetimeFormat, "2011-06-27T12:34:56Z")
 	if !reflect.DeepEqual(redemption, &Redemption{
-		XMLName: xml.Name{Local: "redemption"},
-		Coupon: href{
-			Code: "special",
-			HREF: "https://your-subdomain.recurly.com/v2/coupons/special",
-		},
-		Account: href{
-			Code: "1",
-			HREF: "https://your-subdomain.recurly.com/v2/accounts/1",
-		},
+		XMLName:                xml.Name{Local: "redemption"},
+		Coupon:                 "special",
+		AccountCode:            "1",
 		SingleUse:              NewBool(false),
 		TotalDiscountedInCents: 0,
 		Currency:               "USD",
@@ -102,15 +96,9 @@ func TestRedemptions_GetForInvoice(t *testing.T) {
 
 	ts, _ := time.Parse(datetimeFormat, "2011-06-27T12:34:56Z")
 	if !reflect.DeepEqual(redemption, &Redemption{
-		XMLName: xml.Name{Local: "redemption"},
-		Coupon: href{
-			Code: "special",
-			HREF: "https://your-subdomain.recurly.com/v2/coupons/special",
-		},
-		Account: href{
-			Code: "1",
-			HREF: "https://your-subdomain.recurly.com/v2/accounts/1",
-		},
+		XMLName:                xml.Name{Local: "redemption"},
+		Coupon:                 "special",
+		AccountCode:            "1",
 		SingleUse:              NewBool(true),
 		TotalDiscountedInCents: 0,
 		Currency:               "USD",

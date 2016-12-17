@@ -15,28 +15,28 @@ type (
 
 	// Invoice is an individual invoice for an account.
 	Invoice struct {
-		XMLName             xml.Name `xml:"invoice,omitempty"`
-		Account             href     `xml:"account,omitempty"`
-		Address             Address  `xml:"address,omitempty"`
-		Subscription        href     `xml:"subscription,omitempty"`
-		OriginalInvoice     href     `xml:"original_invoice,omitempty"`
-		UUID                string   `xml:"uuid,omitempty"`
-		State               string   `xml:"state,omitempty"`
-		InvoiceNumberPrefix string   `xml:"invoice_number_prefix,omitempty"`
-		InvoiceNumber       int      `xml:"invoice_number,omitempty"`
-		PONumber            string   `xml:"po_number,omitempty"`
-		VATNumber           string   `xml:"vat_number,omitempty"`
-		SubtotalInCents     int      `xml:"subtotal_in_cents,omitempty"`
-		TaxInCents          int      `xml:"tax_in_cents,omitempty"`
-		TotalInCents        int      `xml:"total_in_cents,omitempty"`
-		Currency            string   `xml:"currency,omitempty"`
-		CreatedAt           NullTime `xml:"created_at,omitempty"`
-		ClosedAt            NullTime `xml:"closed_at,omitempty"`
-		TaxType             string   `xml:"tax_type,omitempty"`
-		TaxRegion           string   `xml:"tax_region,omitempty"`
-		TaxRate             float64  `xml:"tax_rate,omitempty"`
-		NetTerms            NullInt  `xml:"net_terms,omitempty"`
-		CollectionMethod    string   `xml:"collection_method,omitempty"`
+		XMLName               xml.Name   `xml:"invoice,omitempty"`
+		AccountCode           hrefString `xml:"account,omitempty"` // Read only
+		Address               Address    `xml:"address,omitempty"`
+		SubscriptionUUID      hrefString `xml:"subscription,omitempty"`
+		OriginalInvoiceNumber hrefInt    `xml:"original_invoice,omitempty"` // Read only
+		UUID                  string     `xml:"uuid,omitempty"`
+		State                 string     `xml:"state,omitempty"`
+		InvoiceNumberPrefix   string     `xml:"invoice_number_prefix,omitempty"`
+		InvoiceNumber         int        `xml:"invoice_number,omitempty"`
+		PONumber              string     `xml:"po_number,omitempty"`
+		VATNumber             string     `xml:"vat_number,omitempty"`
+		SubtotalInCents       int        `xml:"subtotal_in_cents,omitempty"`
+		TaxInCents            int        `xml:"tax_in_cents,omitempty"`
+		TotalInCents          int        `xml:"total_in_cents,omitempty"`
+		Currency              string     `xml:"currency,omitempty"`
+		CreatedAt             NullTime   `xml:"created_at,omitempty"`
+		ClosedAt              NullTime   `xml:"closed_at,omitempty"`
+		TaxType               string     `xml:"tax_type,omitempty"`
+		TaxRegion             string     `xml:"tax_region,omitempty"`
+		TaxRate               float64    `xml:"tax_rate,omitempty"`
+		NetTerms              NullInt    `xml:"net_terms,omitempty"`
+		CollectionMethod      string     `xml:"collection_method,omitempty"`
 		// Redemption ? UUID is diffferent from others @todo
 		LineItems    []Adjustment  `xml:"line_items>adjustment,omitempty"`
 		Transactions []Transaction `xml:"transactions>transaction,omitempty"`

@@ -17,8 +17,8 @@ type (
 	Subscription struct {
 		XMLName                xml.Name            `xml:"subscription"`
 		Plan                   nestedPlan          `xml:"plan,omitempty"`
-		Account                href                `xml:"account"`
-		Invoice                href                `xml:"invoice"`
+		AccountCode            hrefString          `xml:"account"` // Read only
+		InvoiceNumber          hrefString          `xml:"invoice"` // Read only
 		UUID                   string              `xml:"uuid,omitempty"`
 		State                  string              `xml:"state,omitempty"`
 		UnitAmountInCents      int                 `xml:"unit_amount_in_cents,omitempty"`

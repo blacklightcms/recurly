@@ -3,35 +3,46 @@ package recurly
 import (
 	"encoding/xml"
 	"regexp"
+	"strconv"
 )
 
-type (
-	// href takes href links and extracts out the code/ID into a struct
-	href struct {
-		nullMarshal
-		HREF string
-		Code string
-	}
-)
+type hrefString string
 
 var rxHREF = regexp.MustCompile(`([^/]+)$`)
 
 // UnmarshalXML unmarshals an int properly, as well as marshaling an empty string to nil.
-func (h *href) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+func (h *hrefString) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v struct {
 		HREF string `xml:"href,attr"`
 	}
-	err := d.DecodeElement(&v, &start)
+	if err := d.DecodeElement(&v, &start); err != nil {
+		return err
+	} else if v.HREF == "" {
+		return nil
+	}
+
+	*h = hrefString(rxHREF.FindString(v.HREF))
+	return nil
+}
+
+type hrefInt int
+
+// UnmarshalXML unmarshals an int properly, as well as marshaling an empty string to nil.
+func (h *hrefInt) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var v struct {
+		HREF string `xml:"href,attr"`
+	}
+	if err := d.DecodeElement(&v, &start); err != nil {
+		return err
+	} else if v.HREF == "" {
+		return nil
+	}
+
+	i, err := strconv.Atoi(rxHREF.FindString(v.HREF))
 	if err != nil {
 		return err
 	}
 
-	str := rxHREF.FindString(v.HREF)
-
-	*h = href{
-		HREF: v.HREF,
-		Code: str,
-	}
-
+	*h = hrefInt(i)
 	return nil
 }
