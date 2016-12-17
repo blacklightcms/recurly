@@ -123,8 +123,8 @@ const (
 
 // List returns a list of the accounts on your site.
 // https://docs.recurly.com/api/accounts#list-accounts
-func (service AccountsService) List(params Params) (*Response, []Account, error) {
-	req, err := service.client.newRequest("GET", "accounts", params, nil)
+func (s *AccountsService) List(params Params) (*Response, []Account, error) {
+	req, err := s.client.newRequest("GET", "accounts", params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -133,7 +133,7 @@ func (service AccountsService) List(params Params) (*Response, []Account, error)
 		XMLName  xml.Name  `xml:"accounts"`
 		Accounts []Account `xml:"account"`
 	}
-	resp, err := service.client.do(req, &a)
+	resp, err := s.client.do(req, &a)
 
 	for i := range a.Accounts {
 		a.Accounts[i].BillingInfo = nil
@@ -144,15 +144,15 @@ func (service AccountsService) List(params Params) (*Response, []Account, error)
 
 // Get returns information about a single account.
 // https://docs.recurly.com/api/accounts#get-account
-func (service AccountsService) Get(code string) (*Response, *Account, error) {
+func (s *AccountsService) Get(code string) (*Response, *Account, error) {
 	action := fmt.Sprintf("accounts/%s", code)
-	req, err := service.client.newRequest("GET", action, nil, nil)
+	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var a Account
-	resp, err := service.client.do(req, &a)
+	resp, err := s.client.do(req, &a)
 	a.BillingInfo = nil
 
 	return resp, &a, err
@@ -160,14 +160,14 @@ func (service AccountsService) Get(code string) (*Response, *Account, error) {
 
 // Create will create a new account. You may optionally include billing information.
 // https://docs.recurly.com/api/accounts#create-account
-func (service AccountsService) Create(a Account) (*Response, *Account, error) {
-	req, err := service.client.newRequest("POST", "accounts", nil, a)
+func (s *AccountsService) Create(a Account) (*Response, *Account, error) {
+	req, err := s.client.newRequest("POST", "accounts", nil, a)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Account
-	resp, err := service.client.do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 	dst.BillingInfo = nil
 
 	return resp, &dst, err
@@ -177,15 +177,15 @@ func (service AccountsService) Create(a Account) (*Response, *Account, error) {
 // It's recommended to create a new account object with only the changes you
 // want to make. The updated account object will be returned on success.
 // https://docs.recurly.com/api/accounts#update-account
-func (service AccountsService) Update(code string, a Account) (*Response, *Account, error) {
+func (s *AccountsService) Update(code string, a Account) (*Response, *Account, error) {
 	action := fmt.Sprintf("accounts/%s", code)
-	req, err := service.client.newRequest("PUT", action, nil, a)
+	req, err := s.client.newRequest("PUT", action, nil, a)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Account
-	resp, err := service.client.do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 	dst.BillingInfo = nil
 
 	return resp, &dst, err
@@ -194,33 +194,33 @@ func (service AccountsService) Update(code string, a Account) (*Response, *Accou
 // Close marks an account as closed and cancels any active subscriptions. Any
 // saved billing information will also be permanently removed from the account.
 // https://docs.recurly.com/api/accounts#close-account
-func (service AccountsService) Close(code string) (*Response, error) {
+func (s *AccountsService) Close(code string) (*Response, error) {
 	action := fmt.Sprintf("accounts/%s", code)
-	req, err := service.client.newRequest("DELETE", action, nil, nil)
+	req, err := s.client.newRequest("DELETE", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return service.client.do(req, nil)
+	return s.client.do(req, nil)
 }
 
 // Reopen transitions a closed account back to active.
 // https://docs.recurly.com/api/accounts#reopen-account
-func (service AccountsService) Reopen(code string) (*Response, error) {
+func (s *AccountsService) Reopen(code string) (*Response, error) {
 	action := fmt.Sprintf("accounts/%s/reopen", code)
-	req, err := service.client.newRequest("PUT", action, nil, nil)
+	req, err := s.client.newRequest("PUT", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return service.client.do(req, nil)
+	return s.client.do(req, nil)
 }
 
 // ListNotes returns a list of the notes on an account sorted in descending order.
 // https://docs.recurly.com/api/accounts#get-account-notes
-func (service AccountsService) ListNotes(code string) (*Response, []Note, error) {
+func (s *AccountsService) ListNotes(code string) (*Response, []Note, error) {
 	action := fmt.Sprintf("accounts/%s/notes", code)
-	req, err := service.client.newRequest("GET", action, nil, nil)
+	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -229,7 +229,7 @@ func (service AccountsService) ListNotes(code string) (*Response, []Note, error)
 		XMLName xml.Name `xml:"notes"`
 		Notes   []Note   `xml:"note"`
 	}
-	resp, err := service.client.do(req, &n)
+	resp, err := s.client.do(req, &n)
 
 	return resp, n.Notes, err
 }

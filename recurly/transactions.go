@@ -121,8 +121,8 @@ const (
 
 // List returns a list of transactions
 // https://dev.recurly.com/docs/list-transactions
-func (service TransactionsService) List(params Params) (*Response, []Transaction, error) {
-	req, err := service.client.newRequest("GET", "transactions", params, nil)
+func (s *TransactionsService) List(params Params) (*Response, []Transaction, error) {
+	req, err := s.client.newRequest("GET", "transactions", params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -131,16 +131,16 @@ func (service TransactionsService) List(params Params) (*Response, []Transaction
 		XMLName      xml.Name      `xml:"transactions"`
 		Transactions []Transaction `xml:"transaction"`
 	}
-	resp, err := service.client.do(req, &p)
+	resp, err := s.client.do(req, &p)
 
 	return resp, p.Transactions, err
 }
 
 // ListAccount returns a list of transactions for an account
 // https://dev.recurly.com/docs/list-accounts-transactions
-func (service TransactionsService) ListAccount(accountCode string, params Params) (*Response, []Transaction, error) {
+func (s *TransactionsService) ListAccount(accountCode string, params Params) (*Response, []Transaction, error) {
 	action := fmt.Sprintf("accounts/%s/transactions", accountCode)
-	req, err := service.client.newRequest("GET", action, params, nil)
+	req, err := s.client.newRequest("GET", action, params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -149,7 +149,7 @@ func (service TransactionsService) ListAccount(accountCode string, params Params
 		XMLName      xml.Name      `xml:"transactions"`
 		Transactions []Transaction `xml:"transaction"`
 	}
-	resp, err := service.client.do(req, &p)
+	resp, err := s.client.do(req, &p)
 
 	return resp, p.Transactions, err
 }
@@ -159,15 +159,15 @@ func (service TransactionsService) ListAccount(accountCode string, params Params
 // transaction_error section may be included if the transaction failed.
 // Please see transaction error codes for more details.
 // https://dev.recurly.com/docs/lookup-transaction
-func (service TransactionsService) Get(uuid string) (*Response, *Transaction, error) {
+func (s *TransactionsService) Get(uuid string) (*Response, *Transaction, error) {
 	action := fmt.Sprintf("transactions/%s", uuid)
-	req, err := service.client.newRequest("GET", action, nil, nil)
+	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Transaction
-	resp, err := service.client.do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -178,14 +178,14 @@ func (service TransactionsService) Get(uuid string) (*Response, *Transaction, er
 // attributes must be supplied. When charging an existing account only the
 // account_code must be supplied.
 // https://dev.recurly.com/docs/create-transaction
-func (service TransactionsService) Create(nt NewTransaction) (*Response, *Transaction, error) {
-	req, err := service.client.newRequest("POST", "transactions", nil, nt)
+func (s *TransactionsService) Create(nt NewTransaction) (*Response, *Transaction, error) {
+	req, err := s.client.newRequest("POST", "transactions", nil, nt)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Transaction
-	resp, err := service.client.do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }

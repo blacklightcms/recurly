@@ -74,7 +74,7 @@ func NewClient(subDomain string, apiKey string, httpClient *http.Client) *Client
 }
 
 // newRequest creates an authenticated API request that is ready to send.
-func (c Client) newRequest(method string, action string, params Params, body interface{}) (*http.Request, error) {
+func (c *Client) newRequest(method string, action string, params Params, body interface{}) (*http.Request, error) {
 	method = strings.ToUpper(method)
 	endpoint := fmt.Sprintf("%sv2/%s", c.BaseURL, action)
 
@@ -89,16 +89,15 @@ func (c Client) newRequest(method string, action string, params Params, body int
 	}
 
 	// Request body
-	var buf io.ReadWriter
+	var buf bytes.Buffer
 	if body != nil {
-		buf = new(bytes.Buffer)
-		err := xml.NewEncoder(buf).Encode(body)
+		err := xml.NewEncoder(&buf).Encode(body)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	req, err := http.NewRequest(method, endpoint, buf)
+	req, err := http.NewRequest(method, endpoint, &buf)
 
 	req.SetBasicAuth(c.apiKey, "")
 	req.Header.Set("Accept", "application/xml")
@@ -114,7 +113,7 @@ func (c Client) newRequest(method string, action string, params Params, body int
 // as parse any validation errors that may have occurred.
 // It returns a Response object that provides a wrapper around http.Response
 // with some convenience methods.
-func (c Client) do(req *http.Request, v interface{}) (*Response, error) {
+func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 	req.Close = true
 	resp, err := c.client.Do(req)
 	if err != nil {
@@ -128,35 +127,33 @@ func (c Client) do(req *http.Request, v interface{}) (*Response, error) {
 	// log.Println(res.Header.Get("link"))
 
 	response := &Response{Response: resp}
-	if response.IsError() {
-		// Parse validation errors
+	decoder := xml.NewDecoder(resp.Body)
+	if response.IsError() { // Parse validation errors
 		if response.StatusCode == 422 {
 			var ve struct {
 				XMLName          xml.Name         `xml:"errors"`
 				Errors           []Error          `xml:"error"`
 				TransactionError TransactionError `xml:"transaction_error,omitempty"`
 			}
-			err = xml.NewDecoder(resp.Body).Decode(&ve)
-			if err != nil {
+
+			if err = decoder.Decode(&ve); err != nil {
 				return response, err
 			}
 
 			response.Errors = ve.Errors
 			response.TransactionError = ve.TransactionError
-		} else if response.IsClientError() {
-			// Parse possible individual error message
+		} else if response.IsClientError() { // Parse possible individual error message
 			var ve struct {
 				XMLName     xml.Name `xml:"error"`
 				Symbol      string   `xml:"symbol"`
 				Description string   `xml:"description"`
 			}
-			err = xml.NewDecoder(resp.Body).Decode(&ve)
-			if err != nil {
+			if err = decoder.Decode(&ve); err != nil {
 				return response, err
 			}
 
 			response.Errors = []Error{
-				Error{
+				{
 					Symbol:  ve.Symbol,
 					Message: ve.Description,
 				},
@@ -170,7 +167,7 @@ func (c Client) do(req *http.Request, v interface{}) (*Response, error) {
 		if w, ok := v.(io.Writer); ok {
 			io.Copy(w, resp.Body)
 		} else {
-			err = xml.NewDecoder(resp.Body).Decode(&v)
+			err = decoder.Decode(&v)
 		}
 	}
 

@@ -50,29 +50,29 @@ var (
 )
 
 // IsOK returns true if the request was successful.
-func (r Response) IsOK() bool {
+func (r *Response) IsOK() bool {
 	return r.Response.StatusCode >= 200 && r.Response.StatusCode <= 299
 }
 
 // IsError returns true if the request was not successful.
-func (r Response) IsError() bool {
+func (r *Response) IsError() bool {
 	return !r.IsOK()
 }
 
 // IsClientError returns true if the request resulted in a 400-499 status code.
-func (r Response) IsClientError() bool {
+func (r *Response) IsClientError() bool {
 	return r.Response.StatusCode >= 400 && r.Response.StatusCode <= 499
 }
 
 // IsServerError returns true if the request resulted in a 500-599 status code --
 // indicating you may want to retry the request later.
-func (r Response) IsServerError() bool {
+func (r *Response) IsServerError() bool {
 	return r.Response.StatusCode >= 500 && r.Response.StatusCode <= 599
 }
 
 // Prev returns the cursor for the previous page of paginated results. If no
 // previous page exists, an empty string is returned.
-func (r Response) Prev() string {
+func (r *Response) Prev() string {
 	if !r.IsOK() || r.Header.Get("Link") == "" {
 		return ""
 	}
@@ -96,7 +96,7 @@ func (r Response) Prev() string {
 
 // Next returns the cursor for the next page of paginated results. If no
 // next page exists, an empty string is returned.
-func (r Response) Next() string {
+func (r *Response) Next() string {
 	if !r.IsOK() || r.Header.Get("Link") == "" {
 		return ""
 	}

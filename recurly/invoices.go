@@ -62,8 +62,8 @@ const (
 
 // List returns a list of all invoices.
 // https://dev.recurly.com/docs/list-invoices
-func (service InvoicesService) List(params Params) (*Response, []Invoice, error) {
-	req, err := service.client.newRequest("GET", "invoices", params, nil)
+func (s *InvoicesService) List(params Params) (*Response, []Invoice, error) {
+	req, err := s.client.newRequest("GET", "invoices", params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -72,16 +72,16 @@ func (service InvoicesService) List(params Params) (*Response, []Invoice, error)
 		XMLName  xml.Name  `xml:"invoices"`
 		Invoices []Invoice `xml:"invoice"`
 	}
-	resp, err := service.client.do(req, &p)
+	resp, err := s.client.do(req, &p)
 
 	return resp, p.Invoices, err
 }
 
 // ListAccount returns a list of all invoices for an account.
 // https://dev.recurly.com/docs/list-an-accounts-invoices
-func (service InvoicesService) ListAccount(accountCode string, params Params) (*Response, []Invoice, error) {
+func (s *InvoicesService) ListAccount(accountCode string, params Params) (*Response, []Invoice, error) {
 	action := fmt.Sprintf("accounts/%s/invoices", accountCode)
-	req, err := service.client.newRequest("GET", action, params, nil)
+	req, err := s.client.newRequest("GET", action, params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -90,7 +90,7 @@ func (service InvoicesService) ListAccount(accountCode string, params Params) (*
 		XMLName  xml.Name  `xml:"invoices"`
 		Invoices []Invoice `xml:"invoice"`
 	}
-	resp, err := service.client.do(req, &p)
+	resp, err := s.client.do(req, &p)
 
 	return resp, p.Invoices, err
 }
@@ -98,15 +98,15 @@ func (service InvoicesService) ListAccount(accountCode string, params Params) (*
 // Get returns detailed information about an invoice including line items and
 // payments.
 // https://dev.recurly.com/docs/lookup-invoice-details
-func (service InvoicesService) Get(invoiceNumber int) (*Response, *Invoice, error) {
+func (s *InvoicesService) Get(invoiceNumber int) (*Response, *Invoice, error) {
 	action := fmt.Sprintf("invoices/%d", invoiceNumber)
-	req, err := service.client.newRequest("GET", action, nil, nil)
+	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Invoice
-	resp, err := service.client.do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -116,9 +116,9 @@ func (service InvoicesService) Get(invoiceNumber int) (*Response, *Invoice, erro
 // invoice into. If empty, English will be used. Options: Danish, German,
 // Spanish, French, Hindi, Japanese, Dutch, Portuguese, Russian, Turkish, Chinese.
 // https://dev.recurly.com/docs/retrieve-a-pdf-invoice
-func (service InvoicesService) GetPDF(invoiceNumber int, language string) (*Response, *bytes.Buffer, error) {
+func (s *InvoicesService) GetPDF(invoiceNumber int, language string) (*Response, *bytes.Buffer, error) {
 	action := fmt.Sprintf("invoices/%d", invoiceNumber)
-	req, err := service.client.newRequest("GET", action, nil, nil)
+	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -131,7 +131,7 @@ func (service InvoicesService) GetPDF(invoiceNumber int, language string) (*Resp
 	req.Header.Set("Accept-Language", language)
 
 	var pdf bytes.Buffer
-	resp, err := service.client.do(req, &pdf)
+	resp, err := s.client.do(req, &pdf)
 
 	return resp, &pdf, err
 }
@@ -139,15 +139,15 @@ func (service InvoicesService) GetPDF(invoiceNumber int, language string) (*Resp
 // Preview allows you to display the invoice details, including estimated tax,
 // before you post it.
 // https://dev.recurly.com/docs/post-an-invoice-invoice-pending-charges-on-an-acco
-func (service InvoicesService) Preview(accountCode string) (*Response, *Invoice, error) {
+func (s *InvoicesService) Preview(accountCode string) (*Response, *Invoice, error) {
 	action := fmt.Sprintf("accounts/%s/invoices/preview", accountCode)
-	req, err := service.client.newRequest("POST", action, nil, nil)
+	req, err := s.client.newRequest("POST", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Invoice
-	resp, err := service.client.do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -159,45 +159,45 @@ func (service InvoicesService) Preview(accountCode string) (*Response, *Invoice,
 // invoice an account before the renewal. If the subscriber has a yearly
 // subscription, you might want to collect the one-time charges well before the renewal.
 // https://dev.recurly.com/docs/post-an-invoice-invoice-pending-charges-on-an-acco
-func (service InvoicesService) Create(accountCode string, invoice Invoice) (*Response, *Invoice, error) {
+func (s *InvoicesService) Create(accountCode string, invoice Invoice) (*Response, *Invoice, error) {
 	action := fmt.Sprintf("accounts/%s/invoices", accountCode)
-	req, err := service.client.newRequest("POST", action, nil, invoice)
+	req, err := s.client.newRequest("POST", action, nil, invoice)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Invoice
-	resp, err := service.client.do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
 
 // MarkAsPaid marks an invoice as paid successfully.
 // https://dev.recurly.com/docs/mark-an-invoice-as-paid-successfully
-func (service InvoicesService) MarkAsPaid(invoiceNumber int) (*Response, *Invoice, error) {
+func (s *InvoicesService) MarkAsPaid(invoiceNumber int) (*Response, *Invoice, error) {
 	action := fmt.Sprintf("invoices/%d/mark_successful", invoiceNumber)
-	req, err := service.client.newRequest("PUT", action, nil, nil)
+	req, err := s.client.newRequest("PUT", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Invoice
-	resp, err := service.client.do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
 
 // MarkAsFailed marks an invoice as failed.
 // https://dev.recurly.com/docs/mark-an-invoice-as-failed-collection
-func (service InvoicesService) MarkAsFailed(invoiceNumber int) (*Response, *Invoice, error) {
+func (s *InvoicesService) MarkAsFailed(invoiceNumber int) (*Response, *Invoice, error) {
 	action := fmt.Sprintf("invoices/%d/mark_failed", invoiceNumber)
-	req, err := service.client.newRequest("PUT", action, nil, nil)
+	req, err := s.client.newRequest("PUT", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Invoice
-	resp, err := service.client.do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }

@@ -82,9 +82,9 @@ func (a Adjustment) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 
 // List retrieves all charges and credits issued for an account
 // https://docs.recurly.com/api/adjustments#list-adjustments
-func (service AdjustmentsService) List(accountCode string, params Params) (*Response, []Adjustment, error) {
+func (s *AdjustmentsService) List(accountCode string, params Params) (*Response, []Adjustment, error) {
 	action := fmt.Sprintf("accounts/%s/adjustments", accountCode)
-	req, err := service.client.newRequest("GET", action, params, nil)
+	req, err := s.client.newRequest("GET", action, params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -93,22 +93,22 @@ func (service AdjustmentsService) List(accountCode string, params Params) (*Resp
 		XMLName     xml.Name     `xml:"adjustments"`
 		Adjustments []Adjustment `xml:"adjustment"`
 	}
-	resp, err := service.client.do(req, &a)
+	resp, err := s.client.do(req, &a)
 
 	return resp, a.Adjustments, err
 }
 
 // Get returns information about a single adjustment.
 // https://docs.recurly.com/api/adjustments#get-adjustments
-func (service AdjustmentsService) Get(uuid string) (*Response, *Adjustment, error) {
+func (s *AdjustmentsService) Get(uuid string) (*Response, *Adjustment, error) {
 	action := fmt.Sprintf("adjustments/%s", uuid)
-	req, err := service.client.newRequest("GET", action, nil, nil)
+	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Adjustment
-	resp, err := service.client.do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -119,27 +119,27 @@ func (service AdjustmentsService) Get(uuid string) (*Response, *Adjustment, erro
 // posting an invoice. Charges may be removed from an account if they have
 // not been invoiced.
 // https://docs.recurly.com/api/adjustments#create-adjustment
-func (service AdjustmentsService) Create(accountCode string, a Adjustment) (*Response, *Adjustment, error) {
+func (s *AdjustmentsService) Create(accountCode string, a Adjustment) (*Response, *Adjustment, error) {
 	action := fmt.Sprintf("accounts/%s/adjustments", accountCode)
-	req, err := service.client.newRequest("POST", action, nil, a)
+	req, err := s.client.newRequest("POST", action, nil, a)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Adjustment
-	resp, err := service.client.do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
 
 // Delete removes a non-invoiced adjustment from an account.
 // https://docs.recurly.com/api/adjustments#delete-adjustment
-func (service AdjustmentsService) Delete(uuid string) (*Response, error) {
+func (s *AdjustmentsService) Delete(uuid string) (*Response, error) {
 	action := fmt.Sprintf("adjustments/%s", uuid)
-	req, err := service.client.newRequest("DELETE", action, nil, nil)
+	req, err := s.client.newRequest("DELETE", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return service.client.do(req, nil)
+	return s.client.do(req, nil)
 }

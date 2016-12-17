@@ -41,8 +41,8 @@ type (
 
 // List returns a list of all the coupons on your site.
 // https://dev.recurly.com/docs/list-active-coupons
-func (service CouponsService) List(params Params) (*Response, []Coupon, error) {
-	req, err := service.client.newRequest("GET", "coupons", params, nil)
+func (s *CouponsService) List(params Params) (*Response, []Coupon, error) {
+	req, err := s.client.newRequest("GET", "coupons", params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -51,48 +51,48 @@ func (service CouponsService) List(params Params) (*Response, []Coupon, error) {
 		XMLName xml.Name `xml:"coupons"`
 		Coupons []Coupon `xml:"coupon"`
 	}
-	resp, err := service.client.do(req, &c)
+	resp, err := s.client.do(req, &c)
 
 	return resp, c.Coupons, err
 }
 
 // Get returns information about an active coupon.
 // https://dev.recurly.com/docs/lookup-a-coupon
-func (service CouponsService) Get(code string) (*Response, *Coupon, error) {
+func (s *CouponsService) Get(code string) (*Response, *Coupon, error) {
 	action := fmt.Sprintf("coupons/%s", code)
-	req, err := service.client.newRequest("GET", action, nil, nil)
+	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Coupon
-	resp, err := service.client.do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
 
 // Create a new coupon. Coupons cannot be updated after being created.
 // https://dev.recurly.com/docs/create-coupon
-func (service CouponsService) Create(c Coupon) (*Response, *Coupon, error) {
-	req, err := service.client.newRequest("POST", "coupons", nil, c)
+func (s *CouponsService) Create(c Coupon) (*Response, *Coupon, error) {
+	req, err := s.client.newRequest("POST", "coupons", nil, c)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Coupon
-	resp, err := service.client.do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
 
 // Delete deactivates the coupon so it can no longer be redeemed.
 // https://docs.recurly.com/api/plans/add-ons#delete-addon
-func (service CouponsService) Delete(code string) (*Response, error) {
+func (s *CouponsService) Delete(code string) (*Response, error) {
 	action := fmt.Sprintf("coupons/%s", code)
-	req, err := service.client.newRequest("DELETE", action, nil, nil)
+	req, err := s.client.newRequest("DELETE", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return service.client.do(req, nil)
+	return s.client.do(req, nil)
 }
