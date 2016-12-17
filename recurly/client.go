@@ -38,7 +38,7 @@ type (
 		Invoices      InvoicesService
 		Plans         PlansService
 		AddOns        AddOnsService
-		Subscriptions SubscriptionsService
+		Subscriptions SubscriptionsInterface
 		Transactions  TransactionsService
 	}
 

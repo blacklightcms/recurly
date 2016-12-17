@@ -7,6 +7,25 @@ import (
 )
 
 type (
+	// SubscriptionsInterface defines methods for the subscription related methods
+	// of the recurly API.
+	SubscriptionsInterface interface {
+		List(params Params) (*Response, []Subscription, error)
+		ListAccount(accountCode string, params Params) (*Response, []Subscription, error)
+		Get(uuid string) (*Response, Subscription, error)
+		Create(s NewSubscription) (*Response, Subscription, error)
+		Preview(s NewSubscription) (*Response, Subscription, error)
+		Update(uuid string, s UpdateSubscription) (*Response, Subscription, error)
+		UpdateNotes(uuid string, n SubscriptionNotes) (*Response, Subscription, error)
+		PreviewChange(uuid string, s UpdateSubscription) (*Response, Subscription, error)
+		Cancel(uuid string) (*Response, Subscription, error)
+		Reactivate(uuid string) (*Response, Subscription, error)
+		TerminateWithPartialRefund(uuid string) (*Response, Subscription, error)
+		TerminateWithFullRefund(uuid string) (*Response, Subscription, error)
+		TerminateWithoutRefund(uuid string) (*Response, Subscription, error)
+		Postpone(uuid string, dt time.Time, bulk bool) (*Response, Subscription, error)
+	}
+
 	// SubscriptionsService handles communication with the subscription related methods
 	// of the recurly API.
 	SubscriptionsService struct {
@@ -99,6 +118,9 @@ type (
 		VATReverseChargeNotes string   `xml:"vat_reverse_charge_notes,omitempty"`
 	}
 )
+
+// Ensure SubscriptionsService implements interface.
+var _ SubscriptionsInterface = &SubscriptionsService{}
 
 const (
 	// SubscriptionStateActive represents subscriptions that are valid for the
