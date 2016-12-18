@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
+	"io/ioutil"
 	"net"
 	"net/http"
 	"reflect"
@@ -119,9 +120,8 @@ func TestInvoices_List(t *testing.T) {
 		CollectionMethod: "automatic",
 		LineItems: []Adjustment{
 			Adjustment{
-				XMLName:                xml.Name{Local: "adjustment"},
 				AccountCode:            "100",
-				InvoiceNumber:          "1108",
+				InvoiceNumber:          1108,
 				UUID:                   "626db120a84102b1809909071c701c60",
 				State:                  "invoiced",
 				Description:            "One-time Charged Fee",
@@ -250,9 +250,8 @@ func TestInvoices_ListAccount(t *testing.T) {
 		CollectionMethod: "automatic",
 		LineItems: []Adjustment{
 			Adjustment{
-				XMLName:                xml.Name{Local: "adjustment"},
 				AccountCode:            "100",
-				InvoiceNumber:          "1108",
+				InvoiceNumber:          1108,
 				UUID:                   "626db120a84102b1809909071c701c60",
 				State:                  "invoiced",
 				Description:            "One-time Charged Fee",
@@ -431,9 +430,8 @@ func TestInvoices_Get(t *testing.T) {
 		CollectionMethod: "automatic",
 		LineItems: []Adjustment{
 			Adjustment{
-				XMLName:                xml.Name{Local: "adjustment"},
 				AccountCode:            "100",
-				InvoiceNumber:          "1108",
+				InvoiceNumber:          1108,
 				UUID:                   "626db120a84102b1809909071c701c60",
 				State:                  "invoiced",
 				Description:            "One-time Charged Fee",
@@ -453,8 +451,7 @@ func TestInvoices_Get(t *testing.T) {
 		},
 		Transactions: []Transaction{
 			Transaction{
-				XMLName:          xml.Name{Local: "transaction"},
-				InvoiceNumber:    "1108",
+				InvoiceNumber:    1108,
 				SubscriptionUUID: "17caaca1716f33572edc8146e0aaefde",
 				UUID:             "a13acd8fe4294916b79aec87b7ea441f",
 				Action:           "purchase",
@@ -612,6 +609,40 @@ func TestInvoices_Create(t *testing.T) {
 	}
 }
 
+func TestInvoices_Create_Params(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/accounts/10/invoices", func(w http.ResponseWriter, r *http.Request) {
+		b, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer r.Body.Close()
+		if !bytes.Equal(b, []byte("<invoice><po_number>ABC</po_number><net_terms>30</net_terms><collection_method>COLLECTION_METHOD</collection_method><terms_and_conditions>TERMS</terms_and_conditions><customer_notes>CUSTOMER_NOTES</customer_notes><vat_reverse_charge_notes>VAT_REVERSE_CHARGE_NOTES</vat_reverse_charge_notes></invoice>")) {
+			t.Fatalf("unexpected input: %s", string(b))
+		}
+		w.WriteHeader(201)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
+	})
+
+	// Fields ordered in same order as struct xml tags, XML above in same order
+	// for equality check.
+	resp, _, err := client.Invoices.Create("10", Invoice{
+		PONumber:              "ABC",
+		NetTerms:              NewInt(30),
+		CollectionMethod:      "COLLECTION_METHOD",
+		TermsAndConditions:    "TERMS",
+		CustomerNotes:         "CUSTOMER_NOTES",
+		VatReverseChargeNotes: "VAT_REVERSE_CHARGE_NOTES",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if resp.IsError() {
+		t.Fatal("expected create invoice to return OK")
+	}
+}
+
 func TestInvoices_MarkPaid(t *testing.T) {
 	setup()
 	defer teardown()
@@ -624,7 +655,7 @@ func TestInvoices_MarkPaid(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
 	})
 
-	resp, _, err := client.Invoices.MarkAsPaid(1402)
+	resp, _, err := client.Invoices.MarkPaid(1402)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if resp.IsError() {
@@ -644,7 +675,7 @@ func TestInvoices_MarkFailed(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
 	})
 
-	resp, _, err := client.Invoices.MarkAsFailed(1402)
+	resp, _, err := client.Invoices.MarkFailed(1402)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if resp.IsError() {

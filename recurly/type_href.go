@@ -6,9 +6,9 @@ import (
 	"strconv"
 )
 
-type hrefString string
-
 var rxHREF = regexp.MustCompile(`([^/]+)$`)
+
+type hrefString string
 
 // UnmarshalXML unmarshals an int properly, as well as marshaling an empty string to nil.
 func (h *hrefString) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {

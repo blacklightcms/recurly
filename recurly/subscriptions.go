@@ -17,8 +17,8 @@ type (
 	Subscription struct {
 		XMLName                xml.Name            `xml:"subscription"`
 		Plan                   nestedPlan          `xml:"plan,omitempty"`
-		AccountCode            hrefString          `xml:"account"` // Read only
-		InvoiceNumber          hrefString          `xml:"invoice"` // Read only
+		AccountCode            string              `xml:"-"`
+		InvoiceNumber          int                 `xml:"-"`
 		UUID                   string              `xml:"uuid,omitempty"`
 		State                  string              `xml:"state,omitempty"`
 		UnitAmountInCents      int                 `xml:"unit_amount_in_cents,omitempty"`
@@ -127,6 +127,66 @@ const (
 	// and have a past-due invoice
 	SubscriptionStatePastDue = "past_due"
 )
+
+// UnmarshalXML unmarshals transactions and handles intermediary state during unmarshaling
+// for types like href.
+func (s *Subscription) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var v struct {
+		XMLName                xml.Name            `xml:"subscription"`
+		Plan                   nestedPlan          `xml:"plan,omitempty"`
+		AccountCode            hrefString          `xml:"account"`
+		InvoiceNumber          hrefInt             `xml:"invoice"`
+		UUID                   string              `xml:"uuid,omitempty"`
+		State                  string              `xml:"state,omitempty"`
+		UnitAmountInCents      int                 `xml:"unit_amount_in_cents,omitempty"`
+		Currency               string              `xml:"currency,omitempty"`
+		Quantity               int                 `xml:"quantity,omitempty"`
+		ActivatedAt            NullTime            `xml:"activated_at,omitempty"`
+		CanceledAt             NullTime            `xml:"canceled_at,omitempty"`
+		ExpiresAt              NullTime            `xml:"expires_at,omitempty"`
+		CurrentPeriodStartedAt NullTime            `xml:"current_period_started_at,omitempty"`
+		CurrentPeriodEndsAt    NullTime            `xml:"current_period_ends_at,omitempty"`
+		TrialStartedAt         NullTime            `xml:"trial_started_at,omitempty"`
+		TrialEndsAt            NullTime            `xml:"trial_ends_at,omitempty"`
+		TaxInCents             int                 `xml:"tax_in_cents,omitempty"`
+		TaxType                string              `xml:"tax_type,omitempty"`
+		TaxRegion              string              `xml:"tax_region,omitempty"`
+		TaxRate                float64             `xml:"tax_rate,omitempty"`
+		PONumber               string              `xml:"po_number,omitempty"`
+		NetTerms               NullInt             `xml:"net_terms,omitempty"`
+		SubscriptionAddOns     []SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
+	}
+	if err := d.DecodeElement(&v, &start); err != nil {
+		return err
+	}
+	*s = Subscription{
+		XMLName:                v.XMLName,
+		Plan:                   v.Plan,
+		AccountCode:            string(v.AccountCode),
+		InvoiceNumber:          int(v.InvoiceNumber),
+		UUID:                   v.UUID,
+		State:                  v.State,
+		UnitAmountInCents:      v.UnitAmountInCents,
+		Currency:               v.Currency,
+		Quantity:               v.Quantity,
+		ActivatedAt:            v.ActivatedAt,
+		CanceledAt:             v.CanceledAt,
+		ExpiresAt:              v.ExpiresAt,
+		CurrentPeriodStartedAt: v.CurrentPeriodStartedAt,
+		CurrentPeriodEndsAt:    v.CurrentPeriodEndsAt,
+		TrialStartedAt:         v.TrialStartedAt,
+		TrialEndsAt:            v.TrialEndsAt,
+		TaxInCents:             v.TaxInCents,
+		TaxType:                v.TaxType,
+		TaxRegion:              v.TaxRegion,
+		TaxRate:                v.TaxRate,
+		PONumber:               v.PONumber,
+		NetTerms:               v.NetTerms,
+		SubscriptionAddOns:     v.SubscriptionAddOns,
+	}
+
+	return nil
+}
 
 // MakeUpdate creates an UpdateSubscription with values that need to be passed
 // on update to be retained (meaning nil/zero values will delete that value).

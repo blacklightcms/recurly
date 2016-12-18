@@ -91,9 +91,8 @@ func TestAdjustments_List(t *testing.T) {
 
 	ts, _ := time.Parse(datetimeFormat, "2011-08-31T03:30:00Z")
 	if !reflect.DeepEqual(adjustments, []Adjustment{Adjustment{
-		XMLName:                xml.Name{Local: "adjustment"},
 		AccountCode:            "100",
-		InvoiceNumber:          "1108",
+		InvoiceNumber:          1108,
 		UUID:                   "626db120a84102b1809909071c701c60",
 		State:                  "invoiced",
 		Description:            "One-time Charged Fee",
@@ -186,9 +185,8 @@ func TestAdjustments_Get(t *testing.T) {
 
 	ts, _ := time.Parse(datetimeFormat, "2015-02-04T23:13:07Z")
 	if !reflect.DeepEqual(adjustment, &Adjustment{
-		XMLName:                xml.Name{Local: "adjustment"},
 		AccountCode:            "100",
-		InvoiceNumber:          "1108",
+		InvoiceNumber:          1108,
 		UUID:                   "626db120a84102b1809909071c701c60",
 		State:                  "invoiced",
 		Description:            "One-time Charged Fee",

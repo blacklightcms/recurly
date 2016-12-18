@@ -30,16 +30,16 @@ type (
 		BaseURL string
 
 		// Services used for talking with different parts of the Recurly API
-		Accounts      AccountsService
-		Adjustments   AdjustmentsService
-		Billing       BillingService
-		Coupons       CouponsService
-		Redemptions   RedemptionsService
-		Invoices      InvoicesService
-		Plans         PlansService
-		AddOns        AddOnsService
-		Subscriptions SubscriptionsService
-		Transactions  TransactionsService
+		Accounts      *AccountsService
+		Adjustments   *AdjustmentsService
+		Billing       *BillingService
+		Coupons       *CouponsService
+		Redemptions   *RedemptionsService
+		Invoices      *InvoicesService
+		Plans         *PlansService
+		AddOns        *AddOnsService
+		Subscriptions *SubscriptionsService
+		Transactions  *TransactionsService
 	}
 
 	// Params are used to send parameters with the request.
@@ -59,16 +59,16 @@ func NewClient(subDomain string, apiKey string, httpClient *http.Client) *Client
 		BaseURL:   fmt.Sprintf(defaultBaseURL, subDomain),
 	}
 
-	c.Accounts = AccountsService{client: c}
-	c.Adjustments = AdjustmentsService{client: c}
-	c.Billing = BillingService{client: c}
-	c.Coupons = CouponsService{client: c}
-	c.Redemptions = RedemptionsService{client: c}
-	c.Invoices = InvoicesService{client: c}
-	c.Plans = PlansService{client: c}
-	c.AddOns = AddOnsService{client: c}
-	c.Subscriptions = SubscriptionsService{client: c}
-	c.Transactions = TransactionsService{client: c}
+	c.Accounts = &AccountsService{client: c}
+	c.Adjustments = &AdjustmentsService{client: c}
+	c.Billing = &BillingService{client: c}
+	c.Coupons = &CouponsService{client: c}
+	c.Redemptions = &RedemptionsService{client: c}
+	c.Invoices = &InvoicesService{client: c}
+	c.Plans = &PlansService{client: c}
+	c.AddOns = &AddOnsService{client: c}
+	c.Subscriptions = &SubscriptionsService{client: c}
+	c.Transactions = &TransactionsService{client: c}
 
 	return c
 }

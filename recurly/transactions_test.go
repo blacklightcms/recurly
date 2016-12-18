@@ -19,10 +19,10 @@ func TestTransactions_Encoding(t *testing.T) {
 	var transaction Transaction
 	buf, err := xml.Marshal(transaction)
 	if err != nil {
-		t.Fatalf("TestTransactionEncoding Error: %s", err)
+		t.Fatal(err)
 	}
 
-	if string(buf) != "<transaction><amount_in_cents>0</amount_in_cents><currency></currency><details><account></account></details></transaction>" {
+	if string(buf) != "<transaction><amount_in_cents>0</amount_in_cents><currency></currency><account></account></transaction>" {
 		t.Fatalf("unexpected encoding: %s", string(buf))
 	}
 }
@@ -102,8 +102,7 @@ func TestTransactions_List(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(transactions, []Transaction{Transaction{
-		XMLName:          xml.Name{Local: "transaction"},
-		InvoiceNumber:    "1108",
+		InvoiceNumber:    1108,
 		SubscriptionUUID: "17caaca1716f33572edc8146e0aaefde",
 		UUID:             "a13acd8fe4294916b79aec87b7ea441f",
 		Action:           "purchase",
@@ -234,8 +233,7 @@ func TestTransactions_ListAccount(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(transactions, []Transaction{Transaction{
-		XMLName:          xml.Name{Local: "transaction"},
-		InvoiceNumber:    "1108",
+		InvoiceNumber:    1108,
 		SubscriptionUUID: "17caaca1716f33572edc8146e0aaefde",
 		UUID:             "a13acd8fe4294916b79aec87b7ea441f",
 		Action:           "purchase",
@@ -362,8 +360,7 @@ func TestTransactions_Get(t *testing.T) {
 	}
 
 	if !reflect.DeepEqual(transaction, &Transaction{
-		XMLName:          xml.Name{Local: "transaction"},
-		InvoiceNumber:    "1108",
+		InvoiceNumber:    1108,
 		SubscriptionUUID: "17caaca1716f33572edc8146e0aaefde",
 		UUID:             "a13acd8fe4294916b79aec87b7ea441f",
 		Action:           "purchase",
@@ -439,7 +436,7 @@ func TestTransactions_New(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><transaction></transaction>`)
 	})
 
-	r, _, err := client.Transactions.Create(NewTransaction{
+	r, _, err := client.Transactions.Create(Transaction{
 		AmountInCents: 100,
 		Currency:      "USD",
 		Account: Account{
@@ -531,7 +528,7 @@ func TestTransactions_Err_FraudCard(t *testing.T) {
 			</errors>`)
 	})
 
-	r, _, err := client.Transactions.Create(NewTransaction{
+	r, _, err := client.Transactions.Create(Transaction{
 		AmountInCents: 100,
 		Currency:      "USD",
 		Account: Account{

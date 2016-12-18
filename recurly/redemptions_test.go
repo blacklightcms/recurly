@@ -2,26 +2,12 @@ package recurly
 
 import (
 	"bytes"
-	"encoding/xml"
 	"fmt"
 	"net/http"
 	"reflect"
 	"testing"
 	"time"
 )
-
-// TestRedemptionEncoding ensures structs are encoded to XML properly.
-func TestRedemptions_Encoding(t *testing.T) {
-	var r Redemption
-
-	var buf bytes.Buffer
-	err := xml.NewEncoder(&buf).Encode(r)
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	} else if buf.String() != "<redemption></redemption>" {
-		t.Fatalf("unexpected vvalue: %s", buf.String())
-	}
-}
 
 func TestRedemptions_GetForAccount(t *testing.T) {
 	setup()
@@ -53,8 +39,7 @@ func TestRedemptions_GetForAccount(t *testing.T) {
 
 	ts, _ := time.Parse(datetimeFormat, "2011-06-27T12:34:56Z")
 	if !reflect.DeepEqual(redemption, &Redemption{
-		XMLName:                xml.Name{Local: "redemption"},
-		Coupon:                 "special",
+		CouponCode:             "special",
 		AccountCode:            "1",
 		SingleUse:              NewBool(false),
 		TotalDiscountedInCents: 0,
@@ -96,8 +81,7 @@ func TestRedemptions_GetForInvoice(t *testing.T) {
 
 	ts, _ := time.Parse(datetimeFormat, "2011-06-27T12:34:56Z")
 	if !reflect.DeepEqual(redemption, &Redemption{
-		XMLName:                xml.Name{Local: "redemption"},
-		Coupon:                 "special",
+		CouponCode:             "special",
 		AccountCode:            "1",
 		SingleUse:              NewBool(true),
 		TotalDiscountedInCents: 0,
