@@ -32,9 +32,7 @@ recurly.Response embeds http.Response and provides some convenience methods:
 ```go
 if resp.IsOK() {
     fmt.Println("Response was a 200-299 status code")
-}
-
-if resp.IsError() {
+} else if resp.IsError() {
     fmt.Println("Response was NOT a 200-299 status code")
 
     // Loop through errors (422 status code only)
@@ -45,9 +43,7 @@ if resp.IsError() {
 
 if resp.IsClientError() {
     fmt.Println("You messed up. Response was a 400-499 status code")
-}
-
-if resp.IsServerError() {
+} else if resp.IsServerError() {
     fmt.Println("Try again later. Response was a 500-599 status code")
 }
 
@@ -194,11 +190,10 @@ resp, b, err := client.Billing.Create("134", Billing{
 })
 ```
 
-### Creating Transactions and Subscriptions
-Transactions and subscriptions have different formats for creating and reading.
-Due to that, they have a special use case when creating -- there is a ```NewTransaction```
-and ```NewSubscription``` struct respectively. These structs are only used for
-creating.
+### Creating Subscriptions
+Subscriptions have different formats for creating and reading.
+Due to that, they have a special use case when creating -- a ```NewSubscription```
+struct respectively. `NewSubscription` structs are only used for creating.
 
 When updating a subscription, you should use the ```UpdateSubscription``` struct.
 All other creates/updates throughout use the same struct to create/update as to read.
@@ -294,35 +289,6 @@ nt := recurly.NewTime(t) // time is now in UTC
 fmt.Println(t.String()) // 2015-08-03T19:11:33Z
 ```
 
-## HREF type
-The HREF type handles links returned from Recurly like this:
-```xml
-<subscriptions type="array">
-  <subscription href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96">
-    <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
-    <invoice href="https://your-subdomain.recurly.com/v2/invoices/1108"/>
-    <uuid>44f83d7cba354d5b84812419f923ea96</uuid>
-    <state>active</state>
-    <!-- ... -->
-  </subscription>
-</subscriptions>
-```
-
-In the ```Subscription``` struct, Account and Invoice are HREF types that will look like this:
-
-```go
-expected := Subscription{
-    Account: href{
-        HREF: "https://your-subdomain.recurly.com/v2/accounts/1",
-        Code: "1",
-    },
-    Invoice: href{
-        HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
-        Code: "1108",
-    },
-}
-```
-
 You can then use s.Account.Code to retrieve account info, or s.Invoice.Code to
 retrieve invoice info.
 
@@ -346,23 +312,7 @@ TransactionError struct {
 [Link to transaction error documentation](https://recurly.readme.io/v2.0/page/transaction-errors).
 
 ## Roadmap
-The API should now be mostly stable. I'm going to leave this notice here for a bit
-in case any one in the community has comments or suggestions for improvements.
-
-~~The API is still being finalized and may change over the coming weeks. Here is
-what's coming before things stabilize:~~
- * ~~Support for paginating beyond the first page with cursors needs to be completed~~
- * ~~Coupons, coupon redemptions, invoices, and transactions. All other
- portions of the API are complete.~~
- * ~~Documentation and more usage examples.~~
- * ~~There is currently no support for updating billing info with a credit card or
- bank account directly. Using [recurly.js](https://docs.recurly.com/js/) token is the only supported method currently.
- Because the the token method using [recurly.js](https://docs.recurly.com/js/) is the recommended method, this
- is currently a low priority. The placeholder functions are already in place so
- this will not affect API stability of the library.~~
- * [Webhook](https://dev.recurly.com/page/webhooks) support. This will come last after API stability.
-
-~~Once that notice is removed things will be stable.~~ Contributions are welcome.
+ * [Webhook](https://dev.recurly.com/page/webhooks) support.
 
 ## License
 go-recurly is available under the [MIT License](http://opensource.org/licenses/MIT).
