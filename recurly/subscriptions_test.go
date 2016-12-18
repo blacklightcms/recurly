@@ -361,11 +361,12 @@ func TestSubscriptions_List(t *testing.T) {
 				<po_number nil="nil"></po_number>
 				<net_terms type="integer">0</net_terms>
 				<subscription_add_ons type="array">
-				<subscription_add_on>
-				<add_on_code>my_add_on</add_on_code>
-				<unit_amount_in_cents type="integer">1</unit_amount_in_cents>
-				<quantity type="integer">1</quantity>
-				</subscription_add_on>
+					<subscription_add_on>
+						<add_on_type>fixed</add_on_type>
+						<add_on_code>my_add_on</add_on_code>
+						<unit_amount_in_cents type="integer">1</unit_amount_in_cents>
+						<quantity type="integer">1</quantity>
+					</subscription_add_on>
 				</subscription_add_ons>
 				<a name="cancel" href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/cancel" method="put"/>
 				<a name="terminate" href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/terminate" method="put"/>
@@ -376,7 +377,7 @@ func TestSubscriptions_List(t *testing.T) {
 
 	r, subscriptions, err := client.Subscriptions.List(Params{"per_page": 1})
 	if err != nil {
-		t.Fatalf("error occurred making API call. Err: %s", err)
+		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
 		t.Fatal("expected list subcriptions to return OK")
 	} else if pp := r.Request.URL.Query().Get("per_page"); pp != "1" {
@@ -409,8 +410,9 @@ func TestSubscriptions_List(t *testing.T) {
 		TaxRate:                0.0875,
 		NetTerms:               NewInt(0),
 		SubscriptionAddOns: []SubscriptionAddOn{
-			SubscriptionAddOn{
+			{
 				XMLName:           xml.Name{Local: "subscription_add_on"},
+				Type:              "fixed",
 				Code:              "my_add_on",
 				Quantity:          1,
 				UnitAmountInCents: 1,
