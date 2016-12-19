@@ -1,4 +1,4 @@
-package notifications_test
+package webhooks_test
 
 import (
 	"encoding/xml"
@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/blacklightcms/go-recurly/recurly"
-	"github.com/blacklightcms/go-recurly/recurly/notifications"
+	"github.com/blacklightcms/go-recurly/recurly/webhooks"
 )
 
 func MustOpenFile(name string) *os.File {
@@ -20,11 +20,11 @@ func MustOpenFile(name string) *os.File {
 
 func TestParse_SuccessfulPaymentNotification(t *testing.T) {
 	xmlFile := MustOpenFile("testdata/successful_payment_notification.xml")
-	if result, err := notifications.Parse(xmlFile); err != nil {
+	if result, err := webhooks.Parse(xmlFile); err != nil {
 		t.Fatal(err)
-	} else if n, ok := result.(*notifications.SuccessfulPaymentNotification); !ok {
-		t.Fatalf("unable to reflect interface")
-	} else if !reflect.DeepEqual(n, &notifications.SuccessfulPaymentNotification{
+	} else if n, ok := result.(*webhooks.SuccessfulPaymentNotification); !ok {
+		t.Fatalf("unexpected type: %T, result")
+	} else if !reflect.DeepEqual(n, &webhooks.SuccessfulPaymentNotification{
 		Account: recurly.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
@@ -35,8 +35,8 @@ func TestParse_SuccessfulPaymentNotification(t *testing.T) {
 			CompanyName: "Company, Inc.",
 		},
 		Transaction: recurly.Transaction{
-			XMLName:       xml.Name{Local: "transaction"},
 			UUID:          "a5143c1d3a6f4a8287d0e2cc1d4c0427",
+			InvoiceNumber: 2059,
 			Action:        "purchase",
 			AmountInCents: 1000,
 			Status:        "success",
@@ -46,7 +46,6 @@ func TestParse_SuccessfulPaymentNotification(t *testing.T) {
 			Voidable:      recurly.NullBool{Bool: true, Valid: true},
 			Refundable:    recurly.NullBool{Bool: true, Valid: true},
 		},
-		InvoiceNumber: 2059,
 	}) {
 		t.Fatalf("unexpected notification: %#v", n)
 	}
@@ -54,11 +53,11 @@ func TestParse_SuccessfulPaymentNotification(t *testing.T) {
 
 func TestParse_FailedPaymentNotification(t *testing.T) {
 	xmlFile := MustOpenFile("testdata/failed_payment_notification.xml")
-	if result, err := notifications.Parse(xmlFile); err != nil {
+	if result, err := webhooks.Parse(xmlFile); err != nil {
 		t.Fatal(err)
-	} else if n, ok := result.(*notifications.FailedPaymentNotification); !ok {
-		t.Fatalf("unable to reflect interface")
-	} else if !reflect.DeepEqual(n, &notifications.FailedPaymentNotification{
+	} else if n, ok := result.(*webhooks.FailedPaymentNotification); !ok {
+		t.Fatalf("unexpected type: %T, result")
+	} else if !reflect.DeepEqual(n, &webhooks.FailedPaymentNotification{
 		Account: recurly.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
@@ -69,8 +68,8 @@ func TestParse_FailedPaymentNotification(t *testing.T) {
 			CompanyName: "Company, Inc.",
 		},
 		Transaction: recurly.Transaction{
-			XMLName:       xml.Name{Local: "transaction"},
 			UUID:          "a5143c1d3a6f4a8287d0e2cc1d4c0427",
+			InvoiceNumber: 2059,
 			Action:        "purchase",
 			AmountInCents: 1000,
 			Status:        "Declined",
@@ -80,7 +79,6 @@ func TestParse_FailedPaymentNotification(t *testing.T) {
 			Voidable:      recurly.NullBool{Bool: false, Valid: true},
 			Refundable:    recurly.NullBool{Bool: false, Valid: true},
 		},
-		InvoiceNumber: 2059,
 	}) {
 		t.Fatalf("unexpected notification: %#v", n)
 	}
@@ -88,12 +86,12 @@ func TestParse_FailedPaymentNotification(t *testing.T) {
 
 func TestParse_PastDueInvoiceNotification(t *testing.T) {
 	xmlFile := MustOpenFile("testdata/past_due_invoice_notification.xml")
-	result, err := notifications.Parse(xmlFile)
+	result, err := webhooks.Parse(xmlFile)
 	if err != nil {
 		t.Fatal(err)
-	} else if n, ok := result.(*notifications.PastDueInvoiceNotification); !ok {
-		t.Fatalf("unable to reflect interface")
-	} else if !reflect.DeepEqual(n, &notifications.PastDueInvoiceNotification{
+	} else if n, ok := result.(*webhooks.PastDueInvoiceNotification); !ok {
+		t.Fatalf("unexpected type: %T, result")
+	} else if !reflect.DeepEqual(n, &webhooks.PastDueInvoiceNotification{
 		Account: recurly.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
@@ -117,11 +115,11 @@ func TestParse_PastDueInvoiceNotification(t *testing.T) {
 
 func TestParse_ErrUnknownNotification(t *testing.T) {
 	xmlFile := MustOpenFile("testdata/unknown_notification.xml")
-	result, err := notifications.Parse(xmlFile)
+	result, err := webhooks.Parse(xmlFile)
 	if result != nil {
 		t.Fatalf("unexpected notification: %#v", result)
-	} else if e, ok := err.(notifications.ErrUnknownNotification); !ok {
-		t.Fatalf("unable to reflect interface")
+	} else if e, ok := err.(webhooks.ErrUnknownNotification); !ok {
+		t.Fatalf("unexpected type: %T, result")
 	} else if err.Error() != "unknown notification: unknown_notification" {
 		t.Fatalf("unexpected error string: %s", err.Error())
 	} else if e.Name() != "unknown_notification" {

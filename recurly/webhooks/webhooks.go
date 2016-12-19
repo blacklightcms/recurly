@@ -1,4 +1,4 @@
-package notifications
+package webhooks
 
 import (
 	"encoding/xml"
@@ -23,22 +23,20 @@ type notificationName struct {
 type (
 	// SuccessfulPaymentNotification is sent when a payment is successful.
 	SuccessfulPaymentNotification struct {
-		Account       recurly.Account
-		Transaction   recurly.Transaction
-		InvoiceNumber int `xml:"-"`
+		Account     recurly.Account     `xml:"account"`
+		Transaction recurly.Transaction `xml:"transaction"`
 	}
 
 	// FailedPaymentNotification is sent when a payment fails.
 	FailedPaymentNotification struct {
-		Account       recurly.Account
-		Transaction   recurly.Transaction
-		InvoiceNumber int `xml:"-"`
+		Account     recurly.Account     `xml:"account"`
+		Transaction recurly.Transaction `xml:"transaction"`
 	}
 
 	// PastDueInvoiceNotification is sent when an invoice is past due.
 	PastDueInvoiceNotification struct {
-		Account recurly.Account
-		Invoice recurly.Invoice
+		Account recurly.Account `xml:"account"`
+		Invoice recurly.Invoice `xml:"invoice"`
 	}
 )
 
@@ -50,14 +48,14 @@ type transactionHolder interface {
 }
 
 // setTransactionFields sets fields on the transaction struct.
-func (n *SuccessfulPaymentNotification) setTransactionFields(id string, in int) {
+func (n *SuccessfulPaymentNotification) setTransactionFields(id string, invoiceNumber int) {
 	n.Transaction.UUID = id
-	n.InvoiceNumber = in
+	n.Transaction.InvoiceNumber = invoiceNumber
 }
 
-func (n *FailedPaymentNotification) setTransactionFields(id string, in int) {
+func (n *FailedPaymentNotification) setTransactionFields(id string, invoiceNumber int) {
 	n.Transaction.UUID = id
-	n.InvoiceNumber = in
+	n.Transaction.InvoiceNumber = invoiceNumber
 }
 
 // transaction allows the transaction id and invoice number to be unmarshalled
@@ -112,8 +110,7 @@ func Parse(r io.Reader) (interface{}, error) {
 		if err := xml.Unmarshal(notification, &unknown); err != nil {
 			return nil, err
 		}
-		unknown.name = n.XMLName.Local
-		return nil, unknown
+		return nil, ErrUnknownNotification{name: n.XMLName.Local}
 	}
 
 	if err := xml.Unmarshal(notification, dst); err != nil {
