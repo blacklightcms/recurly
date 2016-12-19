@@ -106,10 +106,6 @@ func Parse(r io.Reader) (interface{}, error) {
 	case PastDueInvoice:
 		dst = &PastDueInvoiceNotification{}
 	default:
-		var unknown ErrUnknownNotification
-		if err := xml.Unmarshal(notification, &unknown); err != nil {
-			return nil, err
-		}
 		return nil, ErrUnknownNotification{name: n.XMLName.Local}
 	}
 
