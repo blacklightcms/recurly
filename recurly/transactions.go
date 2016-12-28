@@ -6,6 +6,16 @@ import (
 	"net"
 )
 
+// TransactionsInterface represents the interactions available on transactions.
+type TransactionsInterface interface {
+	List(params Params) (*Response, []Transaction, error)
+	ListAccount(accountCode string, params Params) (*Response, []Transaction, error)
+	Get(uuid string) (*Response, *Transaction, error)
+	Create(t Transaction) (*Response, *Transaction, error)
+}
+
+var _ TransactionsInterface = &TransactionsService{}
+
 type (
 	// TransactionsService handles communication with the transactions related methods
 	// of the recurly API.
