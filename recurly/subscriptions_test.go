@@ -603,6 +603,39 @@ func TestSubscriptions_Create(t *testing.T) {
 	}
 }
 
+func TestSubscriptions_Create_TransactionError(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/subscriptions", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		w.WriteHeader(422)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
+			<errors>
+			  <transaction_error>
+			    <error_code>fraud_security_code</error_code>
+			  </transaction_error>
+			  <error field="transaction.account.billing_info.verification_value" symbol="declined_bad">did not match</error>
+			  <transaction href="https://your-subdomain.recurly.com/v2/transactions/3d1c6aa86e3d447eb0f3b4a6e3e074d9" type="credit_card">
+			    <uuid>3d1c6aa86e3d447eb0f3b4a6e3e074d9</uuid>
+			  </transaction>
+			</errors>`)
+	})
+
+	r, _, err := client.Subscriptions.Create(NewSubscription{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if !r.IsError() {
+		t.Fatal("expected create subscription to return OK")
+	} else if r.Transaction.UUID != "3d1c6aa86e3d447eb0f3b4a6e3e074d9" {
+		t.Fatalf("unexpected transaction uuid: %s", r.Transaction.UUID)
+	} else if r.TransactionError.ErrorCode != "fraud_security_code" {
+		t.Fatalf("unexpected transaction error code: %s", r.TransactionError.ErrorCode)
+	}
+}
+
 func TestSubscriptions_Preview(t *testing.T) {
 	setup()
 	defer teardown()

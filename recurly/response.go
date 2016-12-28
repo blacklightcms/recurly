@@ -16,8 +16,12 @@ type (
 		// Errors holds an array of validation errors if any occurred.
 		Errors []Error
 
+		// Transaction holds the transaction returned with a transaction error.
+		// This will only be populated when a TransactionError is present.
+		Transaction Transaction
+
 		// TransactionError holds transaction errors from your payment gateway.
-		// This will only be populdated when creating a new subscription,
+		// This will only be populated when creating a new subscription,
 		// updating billing information, and processing a one-time transaction.
 		// https://recurly.readme.io/v2.0/page/transaction-errors
 		TransactionError TransactionError

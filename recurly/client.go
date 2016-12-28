@@ -133,6 +133,7 @@ func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 			var ve struct {
 				XMLName          xml.Name         `xml:"errors"`
 				Errors           []Error          `xml:"error"`
+				Transaction      Transaction      `xml:"transaction,omitempty"`
 				TransactionError TransactionError `xml:"transaction_error,omitempty"`
 			}
 
@@ -141,6 +142,7 @@ func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 			}
 
 			response.Errors = ve.Errors
+			response.Transaction = ve.Transaction
 			response.TransactionError = ve.TransactionError
 		} else if response.IsClientError() { // Parse possible individual error message
 			var ve struct {
