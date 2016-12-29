@@ -546,7 +546,7 @@ func TestTransactions_Err_FraudCard(t *testing.T) {
 		t.Fatalf("error occurred making API call. Err: %s", err)
 	} else if r.IsOK() {
 		t.Fatal("expected create fraudulent transaction to return error")
-	} else if !reflect.DeepEqual(r.TransactionError, TransactionError{
+	} else if !reflect.DeepEqual(r.TransactionError, &TransactionError{
 		XMLName:         xml.Name{Local: "transaction_error"},
 		ErrorCode:       "fraud_gateway",
 		ErrorCategory:   "fraud",
