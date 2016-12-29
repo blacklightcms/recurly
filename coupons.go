@@ -1,10 +1,6 @@
 package recurly
 
-import (
-	"encoding/xml"
-
-	"github.com/blacklightcms/go-recurly/types"
-)
+import "encoding/xml"
 
 type (
 	// Coupon represents an individual coupon on your site.
@@ -18,12 +14,12 @@ type (
 		DiscountType       string            `xml:"discount_type"`
 		DiscountPercent    int               `xml:"discount_percent,omitempty"`
 		DiscountInCents    int               `xml:"discount_in_cents,omitempty"`
-		RedeemByDate       types.NullTime    `xml:"redeem_by_date,omitempty"`
-		SingleUse          types.NullBool    `xml:"single_use,omitempty"`
-		AppliesForMonths   types.NullInt     `xml:"applies_for_months,omitempty"`
-		MaxRedemptions     types.NullInt     `xml:"max_redemptions,omitempty"`
-		AppliesToAllPlans  types.NullBool    `xml:"applies_to_all_plans,omitempty"`
-		CreatedAt          types.NullTime    `xml:"created_at,omitempty"`
+		RedeemByDate       NullTime          `xml:"redeem_by_date,omitempty"`
+		SingleUse          NullBool          `xml:"single_use,omitempty"`
+		AppliesForMonths   NullInt           `xml:"applies_for_months,omitempty"`
+		MaxRedemptions     NullInt           `xml:"max_redemptions,omitempty"`
+		AppliesToAllPlans  NullBool          `xml:"applies_to_all_plans,omitempty"`
+		CreatedAt          NullTime          `xml:"created_at,omitempty"`
 		PlanCodes          *[]CouponPlanCode `xml:"plan_codes>plan_code,omitempty"`
 	}
 

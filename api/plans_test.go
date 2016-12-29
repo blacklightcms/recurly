@@ -10,7 +10,6 @@ import (
 	"time"
 
 	recurly "github.com/blacklightcms/go-recurly"
-	"github.com/blacklightcms/go-recurly/types"
 )
 
 // TestPlansEncoding ensures structs are encoded to XML properly.
@@ -24,23 +23,23 @@ func TestPlans_Encoding(t *testing.T) {
 	}{
 		// name is a required field. It should always be present.
 		{v: recurly.Plan{}, expected: "<plan><name></name></plan>"},
-		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: types.UnitAmount{USD: 1500}, Description: "abc"}, expected: "<plan><name>Gold plan</name><description>abc</description><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
-		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: types.UnitAmount{USD: 1500}, AccountingCode: "gold"}, expected: "<plan><name>Gold plan</name><accounting_code>gold</accounting_code><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
-		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: types.UnitAmount{USD: 1500}, IntervalUnit: "months"}, expected: "<plan><name>Gold plan</name><plan_interval_unit>months</plan_interval_unit><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
-		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: types.UnitAmount{USD: 1500}, IntervalLength: 1}, expected: "<plan><name>Gold plan</name><plan_interval_length>1</plan_interval_length><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
-		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: types.UnitAmount{USD: 1500}, TrialIntervalUnit: "days"}, expected: "<plan><name>Gold plan</name><trial_interval_unit>days</trial_interval_unit><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
-		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: types.UnitAmount{USD: 1500}, TrialIntervalLength: 10}, expected: "<plan><name>Gold plan</name><trial_interval_length>10</trial_interval_length><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
-		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: types.UnitAmount{USD: 1500}, IntervalUnit: "months"}, expected: "<plan><name>Gold plan</name><plan_interval_unit>months</plan_interval_unit><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
-		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: types.UnitAmount{USD: 1500}, SetupFeeInCents: types.UnitAmount{USD: 1000, EUR: 800}}, expected: "<plan><name>Gold plan</name><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents><setup_fee_in_cents><USD>1000</USD><EUR>800</EUR></setup_fee_in_cents></plan>"},
-		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: types.UnitAmount{USD: 1500}, TotalBillingCycles: types.NewInt(24)}, expected: "<plan><name>Gold plan</name><total_billing_cycles>24</total_billing_cycles><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
-		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: types.UnitAmount{USD: 1500}, UnitName: "unit"}, expected: "<plan><name>Gold plan</name><unit_name>unit</unit_name><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
-		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: types.UnitAmount{USD: 1500}, DisplayQuantity: types.NewBool(true)}, expected: "<plan><name>Gold plan</name><display_quantity>true</display_quantity><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
-		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: types.UnitAmount{USD: 1500}, DisplayQuantity: types.NewBool(false)}, expected: "<plan><name>Gold plan</name><display_quantity>false</display_quantity><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
-		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: types.UnitAmount{USD: 1500}, SuccessURL: "https://example.com/success"}, expected: "<plan><name>Gold plan</name><success_url>https://example.com/success</success_url><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
-		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: types.UnitAmount{USD: 1500}, CancelURL: "https://example.com/cancel"}, expected: "<plan><name>Gold plan</name><cancel_url>https://example.com/cancel</cancel_url><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
-		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: types.UnitAmount{USD: 1500}, TaxExempt: types.NewBool(true)}, expected: "<plan><name>Gold plan</name><tax_exempt>true</tax_exempt><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
-		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: types.UnitAmount{USD: 1500}, TaxExempt: types.NewBool(false)}, expected: "<plan><name>Gold plan</name><tax_exempt>false</tax_exempt><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
-		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: types.UnitAmount{USD: 1500}, TaxCode: "physical"}, expected: "<plan><name>Gold plan</name><tax_code>physical</tax_code><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
+		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, Description: "abc"}, expected: "<plan><name>Gold plan</name><description>abc</description><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
+		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, AccountingCode: "gold"}, expected: "<plan><name>Gold plan</name><accounting_code>gold</accounting_code><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
+		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, IntervalUnit: "months"}, expected: "<plan><name>Gold plan</name><plan_interval_unit>months</plan_interval_unit><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
+		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, IntervalLength: 1}, expected: "<plan><name>Gold plan</name><plan_interval_length>1</plan_interval_length><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
+		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, TrialIntervalUnit: "days"}, expected: "<plan><name>Gold plan</name><trial_interval_unit>days</trial_interval_unit><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
+		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, TrialIntervalLength: 10}, expected: "<plan><name>Gold plan</name><trial_interval_length>10</trial_interval_length><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
+		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, IntervalUnit: "months"}, expected: "<plan><name>Gold plan</name><plan_interval_unit>months</plan_interval_unit><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
+		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, SetupFeeInCents: recurly.UnitAmount{USD: 1000, EUR: 800}}, expected: "<plan><name>Gold plan</name><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents><setup_fee_in_cents><USD>1000</USD><EUR>800</EUR></setup_fee_in_cents></plan>"},
+		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, TotalBillingCycles: recurly.NewInt(24)}, expected: "<plan><name>Gold plan</name><total_billing_cycles>24</total_billing_cycles><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
+		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, UnitName: "unit"}, expected: "<plan><name>Gold plan</name><unit_name>unit</unit_name><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
+		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, DisplayQuantity: recurly.NewBool(true)}, expected: "<plan><name>Gold plan</name><display_quantity>true</display_quantity><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
+		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, DisplayQuantity: recurly.NewBool(false)}, expected: "<plan><name>Gold plan</name><display_quantity>false</display_quantity><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
+		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, SuccessURL: "https://example.com/success"}, expected: "<plan><name>Gold plan</name><success_url>https://example.com/success</success_url><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
+		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, CancelURL: "https://example.com/cancel"}, expected: "<plan><name>Gold plan</name><cancel_url>https://example.com/cancel</cancel_url><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
+		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, TaxExempt: recurly.NewBool(true)}, expected: "<plan><name>Gold plan</name><tax_exempt>true</tax_exempt><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
+		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, TaxExempt: recurly.NewBool(false)}, expected: "<plan><name>Gold plan</name><tax_exempt>false</tax_exempt><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
+		{v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, TaxCode: "physical"}, expected: "<plan><name>Gold plan</name><tax_code>physical</tax_code><unit_amount_in_cents><USD>1500</USD></unit_amount_in_cents></plan>"},
 	}
 
 	for _, tt := range tests {
@@ -107,30 +106,30 @@ func TestPlans_List(t *testing.T) {
 		t.Fatalf("expected per_page parameter of 1, given %s", r.Request.URL.Query().Get("per_page"))
 	}
 
-	ts, _ := time.Parse(types.GetDateTimeFormat(), "2015-05-29T17:38:15Z")
+	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2015-05-29T17:38:15Z")
 	if !reflect.DeepEqual(plans, []recurly.Plan{
 		{
 			XMLName: xml.Name{Local: "plan"},
 			Code:    "gold",
 			Name:    "Gold plan",
-			DisplayDonationAmounts:   types.NewBool(false),
-			DisplayQuantity:          types.NewBool(false),
-			DisplayPhoneNumber:       types.NewBool(false),
-			BypassHostedConfirmation: types.NewBool(false),
+			DisplayDonationAmounts:   recurly.NewBool(false),
+			DisplayQuantity:          recurly.NewBool(false),
+			DisplayPhoneNumber:       recurly.NewBool(false),
+			BypassHostedConfirmation: recurly.NewBool(false),
 			UnitName:                 "unit",
 			IntervalUnit:             "months",
 			IntervalLength:           1,
 			TrialIntervalUnit:        "days",
-			TaxExempt:                types.NewBool(false),
-			UnitAmountInCents: types.UnitAmount{
+			TaxExempt:                recurly.NewBool(false),
+			UnitAmountInCents: recurly.UnitAmount{
 				USD: 6000,
 				EUR: 4500,
 			},
-			SetupFeeInCents: types.UnitAmount{
+			SetupFeeInCents: recurly.UnitAmount{
 				USD: 1000,
 				EUR: 800,
 			},
-			CreatedAt: types.NewTime(ts),
+			CreatedAt: recurly.NewTime(ts),
 		},
 	}) {
 		t.Fatalf("unexpected plan: %v", plans)
@@ -187,29 +186,29 @@ func TestPlans_Get(t *testing.T) {
 		t.Fatal("expected get plan to return OK")
 	}
 
-	ts, _ := time.Parse(types.GetDateTimeFormat(), "2015-05-29T17:38:15Z")
+	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2015-05-29T17:38:15Z")
 	if !reflect.DeepEqual(plan, &recurly.Plan{
 		XMLName: xml.Name{Local: "plan"},
 		Code:    "gold",
 		Name:    "Gold plan",
-		DisplayDonationAmounts:   types.NewBool(false),
-		DisplayQuantity:          types.NewBool(false),
-		DisplayPhoneNumber:       types.NewBool(false),
-		BypassHostedConfirmation: types.NewBool(false),
+		DisplayDonationAmounts:   recurly.NewBool(false),
+		DisplayQuantity:          recurly.NewBool(false),
+		DisplayPhoneNumber:       recurly.NewBool(false),
+		BypassHostedConfirmation: recurly.NewBool(false),
 		UnitName:                 "unit",
 		IntervalUnit:             "months",
 		IntervalLength:           1,
 		TrialIntervalUnit:        "days",
-		TaxExempt:                types.NewBool(false),
-		UnitAmountInCents: types.UnitAmount{
+		TaxExempt:                recurly.NewBool(false),
+		UnitAmountInCents: recurly.UnitAmount{
 			USD: 6000,
 			EUR: 4500,
 		},
-		SetupFeeInCents: types.UnitAmount{
+		SetupFeeInCents: recurly.UnitAmount{
 			USD: 1000,
 			EUR: 800,
 		},
-		CreatedAt: types.NewTime(ts),
+		CreatedAt: recurly.NewTime(ts),
 	}) {
 		t.Fatalf("unexpected plan: %v", plan)
 	}

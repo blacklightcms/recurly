@@ -3,8 +3,6 @@ package recurly
 import (
 	"encoding/xml"
 	"net"
-
-	"github.com/blacklightcms/go-recurly/types"
 )
 
 type (
@@ -21,21 +19,21 @@ type (
 		PaymentMethod    string
 		Reference        string
 		Source           string
-		Recurring        types.NullBool
+		Recurring        NullBool
 		Test             bool
-		Voidable         types.NullBool
-		Refundable       types.NullBool
+		Voidable         NullBool
+		Refundable       NullBool
 		IPAddress        net.IP
-		CVVResult        CVVResult      // Read only
-		AVSResult        AVSResult      // Read only
-		AVSResultStreet  string         // Read only
-		AVSResultPostal  string         // Read only
-		CreatedAt        types.NullTime // Read only
+		CVVResult        CVVResult // Read only
+		AVSResult        AVSResult // Read only
+		AVSResultStreet  string    // Read only
+		AVSResultPostal  string    // Read only
+		CreatedAt        NullTime  // Read only
 		Account          Account
 	}
 
 	TransactionResult struct {
-		types.NullMarshal
+		NullMarshal
 		Code    string `xml:"code,attr"`
 		Message string `xml:",innerxml"`
 	}
@@ -58,21 +56,21 @@ type (
 // instead of as <details><account></account></details> (like it is in Transaction).
 func (t Transaction) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	dst := struct {
-		XMLName       xml.Name       `xml:"transaction"`
-		Action        string         `xml:"action,omitempty"`
-		AmountInCents int            `xml:"amount_in_cents"`
-		TaxInCents    int            `xml:"tax_in_cents,omitempty"`
-		Currency      string         `xml:"currency"`
-		Status        string         `xml:"status,omitempty"`
-		PaymentMethod string         `xml:"payment_method,omitempty"`
-		Reference     string         `xml:"reference,omitempty"`
-		Source        string         `xml:"source,omitempty"`
-		Recurring     types.NullBool `xml:"recurring,omitempty"`
-		Test          bool           `xml:"test,omitempty"`
-		Voidable      types.NullBool `xml:"voidable,omitempty"`
-		Refundable    types.NullBool `xml:"refundable,omitempty"`
-		IPAddress     net.IP         `xml:"ip_address,omitempty"`
-		Account       Account        `xml:"account"`
+		XMLName       xml.Name `xml:"transaction"`
+		Action        string   `xml:"action,omitempty"`
+		AmountInCents int      `xml:"amount_in_cents"`
+		TaxInCents    int      `xml:"tax_in_cents,omitempty"`
+		Currency      string   `xml:"currency"`
+		Status        string   `xml:"status,omitempty"`
+		PaymentMethod string   `xml:"payment_method,omitempty"`
+		Reference     string   `xml:"reference,omitempty"`
+		Source        string   `xml:"source,omitempty"`
+		Recurring     NullBool `xml:"recurring,omitempty"`
+		Test          bool     `xml:"test,omitempty"`
+		Voidable      NullBool `xml:"voidable,omitempty"`
+		Refundable    NullBool `xml:"refundable,omitempty"`
+		IPAddress     net.IP   `xml:"ip_address,omitempty"`
+		Account       Account  `xml:"account"`
 	}{
 		Action:        t.Action,
 		AmountInCents: t.AmountInCents,
@@ -97,29 +95,29 @@ func (t Transaction) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 // for types like href.
 func (t *Transaction) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v struct {
-		XMLName          xml.Name         `xml:"transaction"`
-		InvoiceNumber    types.HrefInt    `xml:"invoice"`      // use hrefInt for parsing
-		SubscriptionUUID types.HrefString `xml:"subscription"` // use hrefString for parsing
-		UUID             string           `xml:"uuid,omitempty"`
-		Action           string           `xml:"action,omitempty"`
-		AmountInCents    int              `xml:"amount_in_cents"`
-		TaxInCents       int              `xml:"tax_in_cents,omitempty"`
-		Currency         string           `xml:"currency"`
-		Status           string           `xml:"status,omitempty"`
-		PaymentMethod    string           `xml:"payment_method,omitempty"`
-		Reference        string           `xml:"reference,omitempty"`
-		Source           string           `xml:"source,omitempty"`
-		Recurring        types.NullBool   `xml:"recurring,omitempty"`
-		Test             bool             `xml:"test,omitempty"`
-		Voidable         types.NullBool   `xml:"voidable,omitempty"`
-		Refundable       types.NullBool   `xml:"refundable,omitempty"`
-		IPAddress        net.IP           `xml:"ip_address,omitempty"`
-		CVVResult        CVVResult        `xml:"cvv_result"`
-		AVSResult        AVSResult        `xml:"avs_result"`
-		AVSResultStreet  string           `xml:"avs_result_street,omitempty"`
-		AVSResultPostal  string           `xml:"avs_result_postal,omitempty"`
-		CreatedAt        types.NullTime   `xml:"created_at,omitempty"`
-		Account          Account          `xml:"details>account"`
+		XMLName          xml.Name   `xml:"transaction"`
+		InvoiceNumber    HrefInt    `xml:"invoice"`      // use hrefInt for parsing
+		SubscriptionUUID HrefString `xml:"subscription"` // use hrefString for parsing
+		UUID             string     `xml:"uuid,omitempty"`
+		Action           string     `xml:"action,omitempty"`
+		AmountInCents    int        `xml:"amount_in_cents"`
+		TaxInCents       int        `xml:"tax_in_cents,omitempty"`
+		Currency         string     `xml:"currency"`
+		Status           string     `xml:"status,omitempty"`
+		PaymentMethod    string     `xml:"payment_method,omitempty"`
+		Reference        string     `xml:"reference,omitempty"`
+		Source           string     `xml:"source,omitempty"`
+		Recurring        NullBool   `xml:"recurring,omitempty"`
+		Test             bool       `xml:"test,omitempty"`
+		Voidable         NullBool   `xml:"voidable,omitempty"`
+		Refundable       NullBool   `xml:"refundable,omitempty"`
+		IPAddress        net.IP     `xml:"ip_address,omitempty"`
+		CVVResult        CVVResult  `xml:"cvv_result"`
+		AVSResult        AVSResult  `xml:"avs_result"`
+		AVSResultStreet  string     `xml:"avs_result_street,omitempty"`
+		AVSResultPostal  string     `xml:"avs_result_postal,omitempty"`
+		CreatedAt        NullTime   `xml:"created_at,omitempty"`
+		Account          Account    `xml:"details>account"`
 	}
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err

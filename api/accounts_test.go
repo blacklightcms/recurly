@@ -10,7 +10,6 @@ import (
 	"time"
 
 	recurly "github.com/blacklightcms/go-recurly"
-	"github.com/blacklightcms/go-recurly/types"
 )
 
 // TestAccountEncoding ensures structs are encoded to XML properly.
@@ -31,8 +30,8 @@ func TestAccounts_Encoding(t *testing.T) {
 		{v: recurly.Account{FirstName: "Larry", LastName: "Larrison"}, expected: "<account><first_name>Larry</first_name><last_name>Larrison</last_name></account>"},
 		{v: recurly.Account{CompanyName: "Acme, Inc"}, expected: "<account><company_name>Acme, Inc</company_name></account>"},
 		{v: recurly.Account{VATNumber: "123456789"}, expected: "<account><vat_number>123456789</vat_number></account>"},
-		{v: recurly.Account{TaxExempt: types.NewBool(true)}, expected: "<account><tax_exempt>true</tax_exempt></account>"},
-		{v: recurly.Account{TaxExempt: types.NewBool(false)}, expected: "<account><tax_exempt>false</tax_exempt></account>"},
+		{v: recurly.Account{TaxExempt: recurly.NewBool(true)}, expected: "<account><tax_exempt>true</tax_exempt></account>"},
+		{v: recurly.Account{TaxExempt: recurly.NewBool(false)}, expected: "<account><tax_exempt>false</tax_exempt></account>"},
 		{v: recurly.Account{AcceptLanguage: "en_US"}, expected: "<account><accept_language>en_US</accept_language></account>"},
 		{v: recurly.Account{FirstName: "Larry", Address: recurly.Address{Address: "123 Main St.", City: "San Francisco", State: "CA", Zip: "94105", Country: "US"}}, expected: "<account><first_name>Larry</first_name><address><address1>123 Main St.</address1><city>San Francisco</city><state>CA</state><zip>94105</zip><country>US</country></address></account>"},
 		{v: recurly.Account{Code: "test@example.com", BillingInfo: &recurly.Billing{Token: "507c7f79bcf86cd7994f6c0e"}}, expected: "<account><account_code>test@example.com</account_code><billing_info><token_id>507c7f79bcf86cd7994f6c0e</token_id></billing_info></account>"},
@@ -111,7 +110,7 @@ func TestAccounts_List(t *testing.T) {
 		t.Fatalf("unexpected cursor: %s", resp.Next())
 	}
 
-	ts, _ := time.Parse(types.GetDateTimeFormat(), "2011-10-25T12:00:00Z")
+	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-10-25T12:00:00Z")
 	if !reflect.DeepEqual(accounts, []recurly.Account{recurly.Account{
 		XMLName:   xml.Name{Local: "account"},
 		Code:      "1",
@@ -119,7 +118,7 @@ func TestAccounts_List(t *testing.T) {
 		Email:     "verena@example.com",
 		FirstName: "Verena",
 		LastName:  "Example",
-		TaxExempt: types.NewBool(false),
+		TaxExempt: recurly.NewBool(false),
 		Address: recurly.Address{
 			Address: "123 Main St.",
 			City:    "San Francisco",
@@ -128,7 +127,7 @@ func TestAccounts_List(t *testing.T) {
 			Country: "US",
 		},
 		HostedLoginToken: "a92468579e9c4231a6c0031c4716c01d",
-		CreatedAt:        types.NewTime(ts),
+		CreatedAt:        recurly.NewTime(ts),
 	}}) {
 		t.Fatalf("unexpected account: %v", accounts)
 	}
@@ -209,7 +208,7 @@ func TestAccounts_Get(t *testing.T) {
 		t.Fatal("Texpected get accounts to return OK")
 	}
 
-	ts, _ := time.Parse(types.GetDateTimeFormat(), "2011-10-25T12:00:00Z")
+	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-10-25T12:00:00Z")
 	if !reflect.DeepEqual(a, &recurly.Account{
 		XMLName:   xml.Name{Local: "account"},
 		Code:      "1",
@@ -217,7 +216,7 @@ func TestAccounts_Get(t *testing.T) {
 		Email:     "verena@example.com",
 		FirstName: "Verena",
 		LastName:  "Example",
-		TaxExempt: types.NewBool(false),
+		TaxExempt: recurly.NewBool(false),
 		Address: recurly.Address{
 			Address: "123 Main St.",
 			City:    "San Francisco",
@@ -226,7 +225,7 @@ func TestAccounts_Get(t *testing.T) {
 			Country: "US",
 		},
 		HostedLoginToken: "a92468579e9c4231a6c0031c4716c01d",
-		CreatedAt:        types.NewTime(ts),
+		CreatedAt:        recurly.NewTime(ts),
 	}) {
 		t.Fatalf("unxpected value: %v", a)
 	}

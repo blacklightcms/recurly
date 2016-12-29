@@ -43,8 +43,8 @@ func TestParse_SuccessfulPaymentNotification(t *testing.T) {
 			Reference:     "reference",
 			Source:        "subscription",
 			Test:          true,
-			Voidable:      types.NullBool{Bool: true, Valid: true},
-			Refundable:    types.NullBool{Bool: true, Valid: true},
+			Voidable:      recurly.NullBool{Bool: true, Valid: true},
+			Refundable:    recurly.NullBool{Bool: true, Valid: true},
 		},
 	}) {
 		t.Fatalf("unexpected notification: %#v", n)
@@ -76,8 +76,8 @@ func TestParse_FailedPaymentNotification(t *testing.T) {
 			Reference:     "reference",
 			Source:        "subscription",
 			Test:          true,
-			Voidable:      types.NullBool{Bool: false, Valid: true},
-			Refundable:    types.NullBool{Bool: false, Valid: true},
+			Voidable:      recurly.NullBool{Bool: false, Valid: true},
+			Refundable:    recurly.NullBool{Bool: false, Valid: true},
 		},
 	}) {
 		t.Fatalf("unexpected notification: %#v", n)

@@ -10,7 +10,6 @@ import (
 	"time"
 
 	recurly "github.com/blacklightcms/go-recurly"
-	"github.com/blacklightcms/go-recurly/types"
 )
 
 // TestAddOnEncoding ensures structs are encoded to XML properly.
@@ -25,12 +24,12 @@ func TestAddOns_Encoding(t *testing.T) {
 		{v: recurly.AddOn{}, expected: "<add_on></add_on>"},
 		{v: recurly.AddOn{Code: "xyz"}, expected: "<add_on><add_on_code>xyz</add_on_code></add_on>"},
 		{v: recurly.AddOn{Name: "IP Addresses"}, expected: "<add_on><name>IP Addresses</name></add_on>"},
-		{v: recurly.AddOn{DefaultQuantity: types.NewInt(0)}, expected: "<add_on><default_quantity>0</default_quantity></add_on>"},
-		{v: recurly.AddOn{DefaultQuantity: types.NewInt(1)}, expected: "<add_on><default_quantity>1</default_quantity></add_on>"},
-		{v: recurly.AddOn{DisplayQuantityOnHostedPage: types.NewBool(true)}, expected: "<add_on><display_quantity_on_hosted_page>true</display_quantity_on_hosted_page></add_on>"},
-		{v: recurly.AddOn{DisplayQuantityOnHostedPage: types.NewBool(false)}, expected: "<add_on><display_quantity_on_hosted_page>false</display_quantity_on_hosted_page></add_on>"},
+		{v: recurly.AddOn{DefaultQuantity: recurly.NewInt(0)}, expected: "<add_on><default_quantity>0</default_quantity></add_on>"},
+		{v: recurly.AddOn{DefaultQuantity: recurly.NewInt(1)}, expected: "<add_on><default_quantity>1</default_quantity></add_on>"},
+		{v: recurly.AddOn{DisplayQuantityOnHostedPage: recurly.NewBool(true)}, expected: "<add_on><display_quantity_on_hosted_page>true</display_quantity_on_hosted_page></add_on>"},
+		{v: recurly.AddOn{DisplayQuantityOnHostedPage: recurly.NewBool(false)}, expected: "<add_on><display_quantity_on_hosted_page>false</display_quantity_on_hosted_page></add_on>"},
 		{v: recurly.AddOn{TaxCode: "digital"}, expected: "<add_on><tax_code>digital</tax_code></add_on>"},
-		{v: recurly.AddOn{UnitAmountInCents: types.UnitAmount{USD: 200}}, expected: "<add_on><unit_amount_in_cents><USD>200</USD></unit_amount_in_cents></add_on>"},
+		{v: recurly.AddOn{UnitAmountInCents: recurly.UnitAmount{USD: 200}}, expected: "<add_on><unit_amount_in_cents><USD>200</USD></unit_amount_in_cents></add_on>"},
 		{v: recurly.AddOn{AccountingCode: "abc123"}, expected: "<add_on><accounting_code>abc123</accounting_code></add_on>"},
 	}
 
@@ -81,18 +80,18 @@ func TestAddOns_List(t *testing.T) {
 		t.Fatalf("unexpected per_page: %s", pp)
 	}
 
-	ts, _ := time.Parse(types.GetDateTimeFormat(), "2011-06-28T12:34:56Z")
+	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-06-28T12:34:56Z")
 	if !reflect.DeepEqual(addOns, []recurly.AddOn{
 		{
 			XMLName:                     xml.Name{Local: "add_on"},
 			Code:                        "ipaddresses",
 			Name:                        "IP Addresses",
-			DefaultQuantity:             types.NewInt(1),
-			DisplayQuantityOnHostedPage: types.NewBool(false),
+			DefaultQuantity:             recurly.NewInt(1),
+			DisplayQuantityOnHostedPage: recurly.NewBool(false),
 			TaxCode:                     "digital",
-			UnitAmountInCents:           types.UnitAmount{USD: 200},
+			UnitAmountInCents:           recurly.UnitAmount{USD: 200},
 			AccountingCode:              "abc123",
-			CreatedAt:                   types.NewTime(ts),
+			CreatedAt:                   recurly.NewTime(ts),
 		},
 	}) {
 		t.Fatalf("unexpected add ons: %v", addOns)
@@ -131,17 +130,17 @@ func TestAddOns_Get(t *testing.T) {
 		t.Fatal("expected get add_on to return OK")
 	}
 
-	ts, _ := time.Parse(types.GetDateTimeFormat(), "2011-06-28T12:34:56Z")
+	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-06-28T12:34:56Z")
 	if !reflect.DeepEqual(a, &recurly.AddOn{
 		XMLName:                     xml.Name{Local: "add_on"},
 		Code:                        "ipaddresses",
 		Name:                        "IP Addresses",
-		DefaultQuantity:             types.NewInt(1),
-		DisplayQuantityOnHostedPage: types.NewBool(false),
+		DefaultQuantity:             recurly.NewInt(1),
+		DisplayQuantityOnHostedPage: recurly.NewBool(false),
 		TaxCode:                     "digital",
-		UnitAmountInCents:           types.UnitAmount{USD: 200},
+		UnitAmountInCents:           recurly.UnitAmount{USD: 200},
 		AccountingCode:              "abc123",
-		CreatedAt:                   types.NewTime(ts),
+		CreatedAt:                   recurly.NewTime(ts),
 	}) {
 		t.Fatalf("unexpected add on: %v", a)
 	}

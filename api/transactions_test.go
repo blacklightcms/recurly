@@ -11,7 +11,6 @@ import (
 	"time"
 
 	recurly "github.com/blacklightcms/go-recurly"
-	"github.com/blacklightcms/go-recurly/types"
 )
 
 // TestTransactionEncoding ensures structs are encoded to XML properly.
@@ -117,10 +116,10 @@ func TestTransactions_List(t *testing.T) {
 			PaymentMethod:    "credit_card",
 			Reference:        "5416477",
 			Source:           "subscription",
-			Recurring:        types.NewBool(true),
+			Recurring:        recurly.NewBool(true),
 			Test:             true,
-			Voidable:         types.NewBool(true),
-			Refundable:       types.NewBool(true),
+			Voidable:         recurly.NewBool(true),
+			Refundable:       recurly.NewBool(true),
 			IPAddress:        net.ParseIP("127.0.0.1"),
 			CVVResult: recurly.CVVResult{
 				recurly.TransactionResult{
@@ -134,7 +133,7 @@ func TestTransactions_List(t *testing.T) {
 					Message: "Street address and postal code match.",
 				},
 			},
-			CreatedAt: types.NewTime(time.Date(2015, time.June, 10, 15, 25, 6, 0, time.UTC)),
+			CreatedAt: recurly.NewTime(time.Date(2015, time.June, 10, 15, 25, 6, 0, time.UTC)),
 			Account: recurly.Account{
 				XMLName:   xml.Name{Local: "account"},
 				Code:      "1",
@@ -250,10 +249,10 @@ func TestTransactions_ListAccount(t *testing.T) {
 			PaymentMethod:    "credit_card",
 			Reference:        "5416477",
 			Source:           "subscription",
-			Recurring:        types.NewBool(true),
+			Recurring:        recurly.NewBool(true),
 			Test:             true,
-			Voidable:         types.NewBool(true),
-			Refundable:       types.NewBool(true),
+			Voidable:         recurly.NewBool(true),
+			Refundable:       recurly.NewBool(true),
 			IPAddress:        net.ParseIP("127.0.0.1"),
 			CVVResult: recurly.CVVResult{
 				recurly.TransactionResult{
@@ -267,7 +266,7 @@ func TestTransactions_ListAccount(t *testing.T) {
 					Message: "Street address and postal code match.",
 				},
 			},
-			CreatedAt: types.NewTime(time.Date(2015, time.June, 10, 15, 25, 6, 0, time.UTC)),
+			CreatedAt: recurly.NewTime(time.Date(2015, time.June, 10, 15, 25, 6, 0, time.UTC)),
 			Account: recurly.Account{
 				XMLName:   xml.Name{Local: "account"},
 				Code:      "1",
@@ -378,10 +377,10 @@ func TestTransactions_Get(t *testing.T) {
 		PaymentMethod:    "credit_card",
 		Reference:        "5416477",
 		Source:           "subscription",
-		Recurring:        types.NewBool(true),
+		Recurring:        recurly.NewBool(true),
 		Test:             true,
-		Voidable:         types.NewBool(true),
-		Refundable:       types.NewBool(true),
+		Voidable:         recurly.NewBool(true),
+		Refundable:       recurly.NewBool(true),
 		IPAddress:        net.ParseIP("127.0.0.1"),
 		CVVResult: recurly.CVVResult{
 			recurly.TransactionResult{
@@ -395,7 +394,7 @@ func TestTransactions_Get(t *testing.T) {
 				Message: "Street address and postal code match.",
 			},
 		},
-		CreatedAt: types.NewTime(time.Date(2015, time.June, 10, 15, 25, 6, 0, time.UTC)),
+		CreatedAt: recurly.NewTime(time.Date(2015, time.June, 10, 15, 25, 6, 0, time.UTC)),
 		Account: recurly.Account{
 			XMLName:   xml.Name{Local: "account"},
 			Code:      "1",

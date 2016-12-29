@@ -10,7 +10,6 @@ import (
 	"time"
 
 	recurly "github.com/blacklightcms/go-recurly"
-	"github.com/blacklightcms/go-recurly/types"
 )
 
 // TestAdjustmentEncoding ensures structs are encoded to XML properly.
@@ -28,7 +27,7 @@ func TestAdjustments_Encoding(t *testing.T) {
 		{v: recurly.Adjustment{Description: "Charge for extra bandwidth", UnitAmountInCents: 2000, Currency: "USD"}, expected: "<adjustment><description>Charge for extra bandwidth</description><unit_amount_in_cents>2000</unit_amount_in_cents><currency>USD</currency></adjustment>"},
 		{v: recurly.Adjustment{Quantity: 1, UnitAmountInCents: 2000, Currency: "CAD"}, expected: "<adjustment><unit_amount_in_cents>2000</unit_amount_in_cents><quantity>1</quantity><currency>CAD</currency></adjustment>"},
 		{v: recurly.Adjustment{AccountingCode: "bandwidth", UnitAmountInCents: 2000, Currency: "CAD"}, expected: "<adjustment><accounting_code>bandwidth</accounting_code><unit_amount_in_cents>2000</unit_amount_in_cents><currency>CAD</currency></adjustment>"},
-		{v: recurly.Adjustment{TaxExempt: types.NewBool(false), UnitAmountInCents: 2000, Currency: "USD"}, expected: "<adjustment><unit_amount_in_cents>2000</unit_amount_in_cents><currency>USD</currency><tax_exempt>false</tax_exempt></adjustment>"},
+		{v: recurly.Adjustment{TaxExempt: recurly.NewBool(false), UnitAmountInCents: 2000, Currency: "USD"}, expected: "<adjustment><unit_amount_in_cents>2000</unit_amount_in_cents><currency>USD</currency><tax_exempt>false</tax_exempt></adjustment>"},
 		{v: recurly.Adjustment{TaxCode: "digital", UnitAmountInCents: 2000, Currency: "USD"}, expected: "<adjustment><unit_amount_in_cents>2000</unit_amount_in_cents><currency>USD</currency><tax_code>digital</tax_code></adjustment>"},
 	}
 
@@ -92,7 +91,7 @@ func TestAdjustments_List(t *testing.T) {
 		t.Fatalf("unexpected cursor: %s", resp.Next())
 	}
 
-	ts, _ := time.Parse(types.GetDateTimeFormat(), "2011-08-31T03:30:00Z")
+	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-08-31T03:30:00Z")
 	if !reflect.DeepEqual(adjustments, []recurly.Adjustment{
 		{
 			AccountCode:            "100",
@@ -108,10 +107,10 @@ func TestAdjustments_List(t *testing.T) {
 			TaxInCents:             180,
 			TotalInCents:           2180,
 			Currency:               "USD",
-			Taxable:                types.NewBool(false),
-			TaxExempt:              types.NewBool(false),
-			StartDate:              types.NewTime(ts),
-			CreatedAt:              types.NewTime(ts),
+			Taxable:                recurly.NewBool(false),
+			TaxExempt:              recurly.NewBool(false),
+			StartDate:              recurly.NewTime(ts),
+			CreatedAt:              recurly.NewTime(ts),
 		},
 	}) {
 		t.Fatalf("unexpected adjustments: %v", adjustments)
@@ -188,7 +187,7 @@ func TestAdjustments_Get(t *testing.T) {
 		t.Fatal("expected get adjustment to return OK")
 	}
 
-	ts, _ := time.Parse(types.GetDateTimeFormat(), "2015-02-04T23:13:07Z")
+	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2015-02-04T23:13:07Z")
 	if !reflect.DeepEqual(adjustment, &recurly.Adjustment{
 		AccountCode:            "100",
 		InvoiceNumber:          1108,
@@ -203,11 +202,11 @@ func TestAdjustments_Get(t *testing.T) {
 		TaxInCents:             175,
 		TotalInCents:           2175,
 		Currency:               "USD",
-		Taxable:                types.NewBool(false),
+		Taxable:                recurly.NewBool(false),
 		TaxType:                "usst",
 		TaxRegion:              "CA",
 		TaxRate:                0.0875,
-		TaxExempt:              types.NewBool(false),
+		TaxExempt:              recurly.NewBool(false),
 		TaxDetails: []recurly.TaxDetail{
 			{
 				XMLName:    xml.Name{Local: "tax_detail"},
@@ -237,8 +236,8 @@ func TestAdjustments_Get(t *testing.T) {
 				TaxInCents: 25,
 			},
 		},
-		StartDate: types.NewTime(ts),
-		CreatedAt: types.NewTime(ts),
+		StartDate: recurly.NewTime(ts),
+		CreatedAt: recurly.NewTime(ts),
 	}) {
 		t.Fatalf("unexpected adjustment: %v", adjustment)
 	}

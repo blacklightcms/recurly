@@ -1,10 +1,6 @@
 package recurly
 
-import (
-	"encoding/xml"
-
-	"github.com/blacklightcms/go-recurly/types"
-)
+import "encoding/xml"
 
 type (
 	// Subscription represents an individual subscription.
@@ -18,19 +14,19 @@ type (
 		UnitAmountInCents      int                 `xml:"unit_amount_in_cents,omitempty"`
 		Currency               string              `xml:"currency,omitempty"`
 		Quantity               int                 `xml:"quantity,omitempty"`
-		ActivatedAt            types.NullTime      `xml:"activated_at,omitempty"`
-		CanceledAt             types.NullTime      `xml:"canceled_at,omitempty"`
-		ExpiresAt              types.NullTime      `xml:"expires_at,omitempty"`
-		CurrentPeriodStartedAt types.NullTime      `xml:"current_period_started_at,omitempty"`
-		CurrentPeriodEndsAt    types.NullTime      `xml:"current_period_ends_at,omitempty"`
-		TrialStartedAt         types.NullTime      `xml:"trial_started_at,omitempty"`
-		TrialEndsAt            types.NullTime      `xml:"trial_ends_at,omitempty"`
+		ActivatedAt            NullTime            `xml:"activated_at,omitempty"`
+		CanceledAt             NullTime            `xml:"canceled_at,omitempty"`
+		ExpiresAt              NullTime            `xml:"expires_at,omitempty"`
+		CurrentPeriodStartedAt NullTime            `xml:"current_period_started_at,omitempty"`
+		CurrentPeriodEndsAt    NullTime            `xml:"current_period_ends_at,omitempty"`
+		TrialStartedAt         NullTime            `xml:"trial_started_at,omitempty"`
+		TrialEndsAt            NullTime            `xml:"trial_ends_at,omitempty"`
 		TaxInCents             int                 `xml:"tax_in_cents,omitempty"`
 		TaxType                string              `xml:"tax_type,omitempty"`
 		TaxRegion              string              `xml:"tax_region,omitempty"`
 		TaxRate                float64             `xml:"tax_rate,omitempty"`
 		PONumber               string              `xml:"po_number,omitempty"`
-		NetTerms               types.NullInt       `xml:"net_terms,omitempty"`
+		NetTerms               NullInt             `xml:"net_terms,omitempty"`
 		SubscriptionAddOns     []SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
 	}
 
@@ -40,7 +36,7 @@ type (
 	}
 
 	// SubscriptionAddOn are add ons to subscriptions.
-	// https://docs.recurly.com/api/subscriptions/subscription-add-ons
+	// https://docs.com/api/subscriptions/subscription-add-ons
 	SubscriptionAddOn struct {
 		XMLName           xml.Name `xml:"subscription_add_on"`
 		Type              string   `xml:"add_on_type,omitempty"`
@@ -59,18 +55,18 @@ type (
 		UnitAmountInCents       int                  `xml:"unit_amount_in_cents,omitempty"`
 		Currency                string               `xml:"currency"`
 		Quantity                int                  `xml:"quantity,omitempty"`
-		TrialEndsAt             types.NullTime       `xml:"trial_ends_at,omitempty"`
-		StartsAt                types.NullTime       `xml:"starts_at,omitempty"`
+		TrialEndsAt             NullTime             `xml:"trial_ends_at,omitempty"`
+		StartsAt                NullTime             `xml:"starts_at,omitempty"`
 		TotalBillingCycles      int                  `xml:"total_billing_cycles,omitempty"`
-		FirstRenewalDate        types.NullTime       `xml:"first_renewal_date,omitempty"`
+		FirstRenewalDate        NullTime             `xml:"first_renewal_date,omitempty"`
 		CollectionMethod        string               `xml:"collection_method,omitempty"`
-		NetTerms                types.NullInt        `xml:"net_terms,omitempty"`
+		NetTerms                NullInt              `xml:"net_terms,omitempty"`
 		PONumber                string               `xml:"po_number,omitempty"`
 		Bulk                    bool                 `xml:"bulk,omitempty"`
 		TermsAndConditions      string               `xml:"terms_and_conditions,omitempty"`
 		CustomerNotes           string               `xml:"customer_notes,omitempty"`
 		VATReverseChargeNotes   string               `xml:"vat_reverse_charge_notes,omitempty"`
-		BankAccountAuthorizedAt types.NullTime       `xml:"bank_account_authorized_at,omitempty"`
+		BankAccountAuthorizedAt NullTime             `xml:"bank_account_authorized_at,omitempty"`
 	}
 
 	// UpdateSubscription is used to update subscriptions
@@ -81,7 +77,7 @@ type (
 		Quantity           int                  `xml:"quantity,omitempty"`
 		UnitAmountInCents  int                  `xml:"unit_amount_in_cents,omitempty"`
 		CollectionMethod   string               `xml:"collection_method,omitempty"`
-		NetTerms           types.NullInt        `xml:"net_terms,omitempty"`
+		NetTerms           NullInt              `xml:"net_terms,omitempty"`
 		PONumber           string               `xml:"po_number,omitempty"`
 		SubscriptionAddOns *[]SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
 	}
@@ -129,26 +125,26 @@ func (s *Subscription) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 	var v struct {
 		XMLName                xml.Name            `xml:"subscription"`
 		Plan                   NestedPlan          `xml:"plan,omitempty"`
-		AccountCode            types.HrefString    `xml:"account"`
-		InvoiceNumber          types.HrefInt       `xml:"invoice"`
+		AccountCode            HrefString          `xml:"account"`
+		InvoiceNumber          HrefInt             `xml:"invoice"`
 		UUID                   string              `xml:"uuid,omitempty"`
 		State                  string              `xml:"state,omitempty"`
 		UnitAmountInCents      int                 `xml:"unit_amount_in_cents,omitempty"`
 		Currency               string              `xml:"currency,omitempty"`
 		Quantity               int                 `xml:"quantity,omitempty"`
-		ActivatedAt            types.NullTime      `xml:"activated_at,omitempty"`
-		CanceledAt             types.NullTime      `xml:"canceled_at,omitempty"`
-		ExpiresAt              types.NullTime      `xml:"expires_at,omitempty"`
-		CurrentPeriodStartedAt types.NullTime      `xml:"current_period_started_at,omitempty"`
-		CurrentPeriodEndsAt    types.NullTime      `xml:"current_period_ends_at,omitempty"`
-		TrialStartedAt         types.NullTime      `xml:"trial_started_at,omitempty"`
-		TrialEndsAt            types.NullTime      `xml:"trial_ends_at,omitempty"`
+		ActivatedAt            NullTime            `xml:"activated_at,omitempty"`
+		CanceledAt             NullTime            `xml:"canceled_at,omitempty"`
+		ExpiresAt              NullTime            `xml:"expires_at,omitempty"`
+		CurrentPeriodStartedAt NullTime            `xml:"current_period_started_at,omitempty"`
+		CurrentPeriodEndsAt    NullTime            `xml:"current_period_ends_at,omitempty"`
+		TrialStartedAt         NullTime            `xml:"trial_started_at,omitempty"`
+		TrialEndsAt            NullTime            `xml:"trial_ends_at,omitempty"`
 		TaxInCents             int                 `xml:"tax_in_cents,omitempty"`
 		TaxType                string              `xml:"tax_type,omitempty"`
 		TaxRegion              string              `xml:"tax_region,omitempty"`
 		TaxRate                float64             `xml:"tax_rate,omitempty"`
 		PONumber               string              `xml:"po_number,omitempty"`
-		NetTerms               types.NullInt       `xml:"net_terms,omitempty"`
+		NetTerms               NullInt             `xml:"net_terms,omitempty"`
 		SubscriptionAddOns     []SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
 	}
 	if err := d.DecodeElement(&v, &start); err != nil {

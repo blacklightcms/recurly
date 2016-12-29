@@ -1,21 +1,17 @@
 package recurly
 
-import (
-	"encoding/xml"
-
-	"github.com/blacklightcms/go-recurly/types"
-)
+import "encoding/xml"
 
 type (
 	// Redemption holds redeemed coupons for an account or invoice.
 	Redemption struct {
 		CouponCode             string
 		AccountCode            string
-		SingleUse              types.NullBool
+		SingleUse              NullBool
 		TotalDiscountedInCents int
 		Currency               string
 		State                  string
-		CreatedAt              types.NullTime
+		CreatedAt              NullTime
 	}
 )
 
@@ -23,14 +19,14 @@ type (
 // for coupons and accounts to CouponCode and AccountCodes.
 func (r *Redemption) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v struct {
-		XMLName                xml.Name         `xml:"redemption"`
-		CouponCode             types.HrefString `xml:"coupon,omitempty"`
-		AccountCode            types.HrefString `xml:"account,omitempty"`
-		SingleUse              types.NullBool   `xml:"single_use,omitempty"`
-		TotalDiscountedInCents int              `xml:"total_discounted_in_cents,omitempty"`
-		Currency               string           `xml:"currency,omitempty"`
-		State                  string           `xml:"state,omitempty"`
-		CreatedAt              types.NullTime   `xml:"created_at,omitempty"`
+		XMLName                xml.Name   `xml:"redemption"`
+		CouponCode             HrefString `xml:"coupon,omitempty"`
+		AccountCode            HrefString `xml:"account,omitempty"`
+		SingleUse              NullBool   `xml:"single_use,omitempty"`
+		TotalDiscountedInCents int        `xml:"total_discounted_in_cents,omitempty"`
+		Currency               string     `xml:"currency,omitempty"`
+		State                  string     `xml:"state,omitempty"`
+		CreatedAt              NullTime   `xml:"created_at,omitempty"`
 	}
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err

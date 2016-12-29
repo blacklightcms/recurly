@@ -12,7 +12,6 @@ import (
 	"time"
 
 	recurly "github.com/blacklightcms/go-recurly"
-	"github.com/blacklightcms/go-recurly/types"
 )
 
 func TestInvoices_List(t *testing.T) {
@@ -115,11 +114,11 @@ func TestInvoices_List(t *testing.T) {
 		TaxInCents:       0,
 		TotalInCents:     1200,
 		Currency:         "USD",
-		CreatedAt:        types.NewTimeFromString("2011-08-25T12:00:00Z"),
+		CreatedAt:        recurly.NewTimeFromString("2011-08-25T12:00:00Z"),
 		TaxType:          "usst",
 		TaxRegion:        "CA",
 		TaxRate:          float64(0),
-		NetTerms:         types.NewInt(0),
+		NetTerms:         recurly.NewInt(0),
 		CollectionMethod: "automatic",
 		LineItems: []recurly.Adjustment{
 			{
@@ -136,10 +135,10 @@ func TestInvoices_List(t *testing.T) {
 				TaxInCents:             180,
 				TotalInCents:           2180,
 				Currency:               "USD",
-				Taxable:                types.NewBool(false),
-				TaxExempt:              types.NewBool(false),
-				StartDate:              types.NewTimeFromString("2011-08-31T03:30:00Z"),
-				CreatedAt:              types.NewTimeFromString("2011-08-31T03:30:00Z"),
+				Taxable:                recurly.NewBool(false),
+				TaxExempt:              recurly.NewBool(false),
+				StartDate:              recurly.NewTimeFromString("2011-08-31T03:30:00Z"),
+				CreatedAt:              recurly.NewTimeFromString("2011-08-31T03:30:00Z"),
 			},
 		},
 	}}) {
@@ -246,11 +245,11 @@ func TestInvoices_ListAccount(t *testing.T) {
 			TaxInCents:       0,
 			TotalInCents:     1200,
 			Currency:         "USD",
-			CreatedAt:        types.NewTimeFromString("2011-08-25T12:00:00Z"),
+			CreatedAt:        recurly.NewTimeFromString("2011-08-25T12:00:00Z"),
 			TaxType:          "usst",
 			TaxRegion:        "CA",
 			TaxRate:          float64(0),
-			NetTerms:         types.NewInt(0),
+			NetTerms:         recurly.NewInt(0),
 			CollectionMethod: "automatic",
 			LineItems: []recurly.Adjustment{
 				{
@@ -267,10 +266,10 @@ func TestInvoices_ListAccount(t *testing.T) {
 					TaxInCents:             180,
 					TotalInCents:           2180,
 					Currency:               "USD",
-					Taxable:                types.NewBool(false),
-					TaxExempt:              types.NewBool(false),
-					StartDate:              types.NewTimeFromString("2011-08-31T03:30:00Z"),
-					CreatedAt:              types.NewTimeFromString("2011-08-31T03:30:00Z"),
+					Taxable:                recurly.NewBool(false),
+					TaxExempt:              recurly.NewBool(false),
+					StartDate:              recurly.NewTimeFromString("2011-08-31T03:30:00Z"),
+					CreatedAt:              recurly.NewTimeFromString("2011-08-31T03:30:00Z"),
 				},
 			},
 		},
@@ -408,7 +407,7 @@ func TestInvoices_Get(t *testing.T) {
 		t.Fatal("expected get invoice to return OK")
 	}
 
-	ts, _ := time.Parse(types.GetDateTimeFormat(), "2011-08-25T12:00:00Z")
+	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-08-25T12:00:00Z")
 	if !reflect.DeepEqual(invoice, &recurly.Invoice{
 		XMLName:     xml.Name{Local: "invoice"},
 		AccountCode: "1",
@@ -427,11 +426,11 @@ func TestInvoices_Get(t *testing.T) {
 		TaxInCents:       0,
 		TotalInCents:     1200,
 		Currency:         "USD",
-		CreatedAt:        types.NewTime(ts),
+		CreatedAt:        recurly.NewTime(ts),
 		TaxType:          "usst",
 		TaxRegion:        "CA",
 		TaxRate:          float64(0),
-		NetTerms:         types.NewInt(0),
+		NetTerms:         recurly.NewInt(0),
 		CollectionMethod: "automatic",
 		LineItems: []recurly.Adjustment{
 			{
@@ -448,10 +447,10 @@ func TestInvoices_Get(t *testing.T) {
 				TaxInCents:             180,
 				TotalInCents:           2180,
 				Currency:               "USD",
-				Taxable:                types.NewBool(false),
-				TaxExempt:              types.NewBool(false),
-				StartDate:              types.NewTimeFromString("2011-08-31T03:30:00Z"),
-				CreatedAt:              types.NewTimeFromString("2011-08-31T03:30:00Z"),
+				Taxable:                recurly.NewBool(false),
+				TaxExempt:              recurly.NewBool(false),
+				StartDate:              recurly.NewTimeFromString("2011-08-31T03:30:00Z"),
+				CreatedAt:              recurly.NewTimeFromString("2011-08-31T03:30:00Z"),
 			},
 		},
 		Transactions: []recurly.Transaction{
@@ -467,10 +466,10 @@ func TestInvoices_Get(t *testing.T) {
 				PaymentMethod:    "credit_card",
 				Reference:        "5416477",
 				Source:           "subscription",
-				Recurring:        types.NewBool(true),
+				Recurring:        recurly.NewBool(true),
 				Test:             true,
-				Voidable:         types.NewBool(true),
-				Refundable:       types.NewBool(true),
+				Voidable:         recurly.NewBool(true),
+				Refundable:       recurly.NewBool(true),
 				IPAddress:        net.ParseIP("127.0.0.1"),
 				CVVResult: recurly.CVVResult{
 					recurly.TransactionResult{
@@ -484,7 +483,7 @@ func TestInvoices_Get(t *testing.T) {
 						Message: "Street address and postal code match.",
 					},
 				},
-				CreatedAt: types.NewTimeFromString("2015-06-10T15:25:06Z"),
+				CreatedAt: recurly.NewTimeFromString("2015-06-10T15:25:06Z"),
 				Account: recurly.Account{
 					XMLName:   xml.Name{Local: "account"},
 					Code:      "1",
@@ -635,7 +634,7 @@ func TestInvoices_Create_Params(t *testing.T) {
 	// for equality check.
 	resp, _, err := client.Invoices.Create("10", recurly.Invoice{
 		PONumber:              "ABC",
-		NetTerms:              types.NewInt(30),
+		NetTerms:              recurly.NewInt(30),
 		CollectionMethod:      "COLLECTION_METHOD",
 		TermsAndConditions:    "TERMS",
 		CustomerNotes:         "CUSTOMER_NOTES",

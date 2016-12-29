@@ -11,7 +11,6 @@ import (
 	"time"
 
 	recurly "github.com/blacklightcms/go-recurly"
-	"github.com/blacklightcms/go-recurly/types"
 )
 
 // TestCouponsEncoding ensures structs are encoded to XML properly.
@@ -19,7 +18,7 @@ import (
 // fields are handled properly -- including types like booleans and integers which
 // have zero values that we want to send.
 func TestCoupons_Encoding(t *testing.T) {
-	redeem, _ := time.Parse(types.GetDateTimeFormat(), "2014-01-01T07:00:00Z")
+	redeem, _ := time.Parse(recurly.GetDateTimeFormat(), "2014-01-01T07:00:00Z")
 	tests := []struct {
 		v        recurly.Coupon
 		expected string
@@ -59,7 +58,7 @@ func TestCoupons_Encoding(t *testing.T) {
 				Code:         "special",
 				Name:         "Special 10% off",
 				DiscountType: "percent",
-				RedeemByDate: types.NewTime(redeem),
+				RedeemByDate: recurly.NewTime(redeem),
 			},
 			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><redeem_by_date>2014-01-01T07:00:00Z</redeem_by_date></coupon>",
 		},
@@ -68,7 +67,7 @@ func TestCoupons_Encoding(t *testing.T) {
 				Code:         "special",
 				Name:         "Special 10% off",
 				DiscountType: "percent",
-				SingleUse:    types.NewBool(true),
+				SingleUse:    recurly.NewBool(true),
 			},
 			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><single_use>true</single_use></coupon>",
 		},
@@ -77,7 +76,7 @@ func TestCoupons_Encoding(t *testing.T) {
 				Code:             "special",
 				Name:             "Special 10% off",
 				DiscountType:     "percent",
-				AppliesForMonths: types.NewInt(3),
+				AppliesForMonths: recurly.NewInt(3),
 			},
 			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><applies_for_months>3</applies_for_months></coupon>",
 		},
@@ -86,7 +85,7 @@ func TestCoupons_Encoding(t *testing.T) {
 				Code:           "special",
 				Name:           "Special 10% off",
 				DiscountType:   "percent",
-				MaxRedemptions: types.NewInt(20),
+				MaxRedemptions: recurly.NewInt(20),
 			},
 			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><max_redemptions>20</max_redemptions></coupon>",
 		},
@@ -95,7 +94,7 @@ func TestCoupons_Encoding(t *testing.T) {
 				Code:              "special",
 				Name:              "Special 10% off",
 				DiscountType:      "percent",
-				AppliesToAllPlans: types.NewBool(false),
+				AppliesToAllPlans: recurly.NewBool(false),
 			},
 			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><applies_to_all_plans>false</applies_to_all_plans></coupon>",
 		},
@@ -122,7 +121,7 @@ func TestCoupons_Encoding(t *testing.T) {
 				Code:              "special",
 				Name:              "Special 10% off",
 				DiscountType:      "percent",
-				AppliesToAllPlans: types.NewBool(false),
+				AppliesToAllPlans: recurly.NewBool(false),
 				PlanCodes: &[]recurly.CouponPlanCode{
 					{Code: "gold"},
 					{Code: "silver"},
@@ -184,8 +183,8 @@ func TestCoupons_List(t *testing.T) {
 		t.Fatalf("unexpected per_page: %s", pp)
 	}
 
-	ts, _ := time.Parse(types.GetDateTimeFormat(), "2011-04-10T07:00:00Z")
-	redeem, _ := time.Parse(types.GetDateTimeFormat(), "2014-01-01T07:00:00Z")
+	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-04-10T07:00:00Z")
+	redeem, _ := time.Parse(recurly.GetDateTimeFormat(), "2014-01-01T07:00:00Z")
 	if !reflect.DeepEqual(coupons, []recurly.Coupon{
 		{
 			XMLName:           xml.Name{Local: "coupon"},
@@ -194,11 +193,11 @@ func TestCoupons_List(t *testing.T) {
 			State:             "redeemable",
 			DiscountType:      "percent",
 			DiscountPercent:   10,
-			RedeemByDate:      types.NewTime(redeem),
-			SingleUse:         types.NewBool(true),
-			MaxRedemptions:    types.NewInt(10),
-			AppliesToAllPlans: types.NewBool(false),
-			CreatedAt:         types.NewTime(ts),
+			RedeemByDate:      recurly.NewTime(redeem),
+			SingleUse:         recurly.NewBool(true),
+			MaxRedemptions:    recurly.NewInt(10),
+			AppliesToAllPlans: recurly.NewBool(false),
+			CreatedAt:         recurly.NewTime(ts),
 			PlanCodes: &[]recurly.CouponPlanCode{
 				{Code: "gold"},
 				{Code: "platinum"},
@@ -247,8 +246,8 @@ func TestCoupons_Get(t *testing.T) {
 		t.Fatal("expected get coupon to return OK")
 	}
 
-	ts, _ := time.Parse(types.GetDateTimeFormat(), "2011-04-10T07:00:00Z")
-	redeem, _ := time.Parse(types.GetDateTimeFormat(), "2014-01-01T07:00:00Z")
+	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-04-10T07:00:00Z")
+	redeem, _ := time.Parse(recurly.GetDateTimeFormat(), "2014-01-01T07:00:00Z")
 	if !reflect.DeepEqual(coupon, &recurly.Coupon{
 		XMLName:           xml.Name{Local: "coupon"},
 		Code:              "special",
@@ -256,11 +255,11 @@ func TestCoupons_Get(t *testing.T) {
 		State:             "redeemable",
 		DiscountType:      "percent",
 		DiscountPercent:   10,
-		RedeemByDate:      types.NewTime(redeem),
-		SingleUse:         types.NewBool(true),
-		MaxRedemptions:    types.NewInt(10),
-		AppliesToAllPlans: types.NewBool(false),
-		CreatedAt:         types.NewTime(ts),
+		RedeemByDate:      recurly.NewTime(redeem),
+		SingleUse:         recurly.NewBool(true),
+		MaxRedemptions:    recurly.NewInt(10),
+		AppliesToAllPlans: recurly.NewBool(false),
+		CreatedAt:         recurly.NewTime(ts),
 		PlanCodes: &[]recurly.CouponPlanCode{
 			{Code: "gold"},
 			{Code: "platinum"},

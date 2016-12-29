@@ -10,7 +10,6 @@ import (
 	"time"
 
 	recurly "github.com/blacklightcms/go-recurly"
-	"github.com/blacklightcms/go-recurly/types"
 )
 
 // TestSubscriptionsEncoding ensures structs are encoded to XML properly.
@@ -18,7 +17,7 @@ import (
 // fields are handled properly -- including types like booleans and integers which
 // have zero values that we want to send.
 func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
-	ts, _ := time.Parse(types.GetDateTimeFormat(), "2015-06-03T13:42:23.764061Z")
+	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2015-06-03T13:42:23.764061Z")
 	tests := []struct {
 		v        recurly.NewSubscription
 		expected string
@@ -96,7 +95,7 @@ func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 				Account: recurly.Account{
 					Code: "123",
 				},
-				TrialEndsAt: types.NewTime(ts),
+				TrialEndsAt: recurly.NewTime(ts),
 			},
 			expected: "<subscription><plan_code>gold</plan_code><account><account_code>123</account_code></account><currency>USD</currency><trial_ends_at>2015-06-03T13:42:23Z</trial_ends_at></subscription>",
 		},
@@ -107,7 +106,7 @@ func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 				Account: recurly.Account{
 					Code: "123",
 				},
-				StartsAt: types.NewTime(ts),
+				StartsAt: recurly.NewTime(ts),
 			},
 			expected: "<subscription><plan_code>gold</plan_code><account><account_code>123</account_code></account><currency>USD</currency><starts_at>2015-06-03T13:42:23Z</starts_at></subscription>",
 		},
@@ -129,7 +128,7 @@ func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 				Account: recurly.Account{
 					Code: "123",
 				},
-				FirstRenewalDate: types.NewTime(ts),
+				FirstRenewalDate: recurly.NewTime(ts),
 			},
 			expected: "<subscription><plan_code>gold</plan_code><account><account_code>123</account_code></account><currency>USD</currency><first_renewal_date>2015-06-03T13:42:23Z</first_renewal_date></subscription>",
 		},
@@ -151,7 +150,7 @@ func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 				Account: recurly.Account{
 					Code: "123",
 				},
-				NetTerms: types.NewInt(30),
+				NetTerms: recurly.NewInt(30),
 			},
 			expected: "<subscription><plan_code>gold</plan_code><account><account_code>123</account_code></account><currency>USD</currency><net_terms>30</net_terms></subscription>",
 		},
@@ -162,7 +161,7 @@ func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 				Account: recurly.Account{
 					Code: "123",
 				},
-				NetTerms: types.NewInt(0),
+				NetTerms: recurly.NewInt(0),
 			},
 			expected: "<subscription><plan_code>gold</plan_code><account><account_code>123</account_code></account><currency>USD</currency><net_terms>0</net_terms></subscription>",
 		},
@@ -240,7 +239,7 @@ func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 				Account: recurly.Account{
 					Code: "123",
 				},
-				BankAccountAuthorizedAt: types.NewTime(ts),
+				BankAccountAuthorizedAt: recurly.NewTime(ts),
 			},
 			expected: "<subscription><plan_code>gold</plan_code><account><account_code>123</account_code></account><currency>USD</currency><bank_account_authorized_at>2015-06-03T13:42:23Z</bank_account_authorized_at></subscription>",
 		},
@@ -285,7 +284,7 @@ func TestSubscriptions_UpdateSubscription_Encoding(t *testing.T) {
 			expected: "<subscription><collection_method>manual</collection_method></subscription>",
 		},
 		{
-			v:        recurly.UpdateSubscription{NetTerms: types.NewInt(0)},
+			v:        recurly.UpdateSubscription{NetTerms: recurly.NewInt(0)},
 			expected: "<subscription><net_terms>0</net_terms></subscription>",
 		},
 		{
@@ -312,7 +311,7 @@ func TestSubscriptions_UpdateSubscription_Encoding(t *testing.T) {
 					},
 				},
 				PONumber: "abc-123",
-				NetTerms: types.NewInt(23),
+				NetTerms: recurly.NewInt(23),
 			}.MakeUpdate(),
 			expected: "<subscription><net_terms>23</net_terms><subscription_add_ons><subscription_add_on><add_on_code>extra_users</add_on_code><unit_amount_in_cents>1000</unit_amount_in_cents><quantity>2</quantity></subscription_add_on></subscription_add_ons></subscription>",
 		},
@@ -387,9 +386,9 @@ func TestSubscriptions_List(t *testing.T) {
 		t.Fatalf("unexpected per_page: %s", pp)
 	}
 
-	activated, _ := time.Parse(types.GetDateTimeFormat(), "2011-05-27T07:00:00Z")
-	cpStartedAt, _ := time.Parse(types.GetDateTimeFormat(), "2011-06-27T07:00:00Z")
-	cpEndsAt, _ := time.Parse(types.GetDateTimeFormat(), "2010-07-27T07:00:00Z")
+	activated, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-05-27T07:00:00Z")
+	cpStartedAt, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-06-27T07:00:00Z")
+	cpEndsAt, _ := time.Parse(recurly.GetDateTimeFormat(), "2010-07-27T07:00:00Z")
 
 	if !reflect.DeepEqual(subscriptions, []recurly.Subscription{
 		{
@@ -405,14 +404,14 @@ func TestSubscriptions_List(t *testing.T) {
 			UnitAmountInCents:      800,
 			Currency:               "EUR",
 			Quantity:               1,
-			ActivatedAt:            types.NewTime(activated),
-			CurrentPeriodStartedAt: types.NewTime(cpStartedAt),
-			CurrentPeriodEndsAt:    types.NewTime(cpEndsAt),
+			ActivatedAt:            recurly.NewTime(activated),
+			CurrentPeriodStartedAt: recurly.NewTime(cpStartedAt),
+			CurrentPeriodEndsAt:    recurly.NewTime(cpEndsAt),
 			TaxInCents:             72,
 			TaxType:                "usst",
 			TaxRegion:              "CA",
 			TaxRate:                0.0875,
-			NetTerms:               types.NewInt(0),
+			NetTerms:               recurly.NewInt(0),
 			SubscriptionAddOns: []recurly.SubscriptionAddOn{
 				{
 					XMLName:           xml.Name{Local: "subscription_add_on"},
@@ -482,9 +481,9 @@ func TestSubscriptions_ListAccount(t *testing.T) {
 		t.Fatalf("unexpected per_page: %s", pp)
 	}
 
-	activated, _ := time.Parse(types.GetDateTimeFormat(), "2011-05-27T07:00:00Z")
-	cpStartedAt, _ := time.Parse(types.GetDateTimeFormat(), "2011-06-27T07:00:00Z")
-	cpEndsAt, _ := time.Parse(types.GetDateTimeFormat(), "2010-07-27T07:00:00Z")
+	activated, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-05-27T07:00:00Z")
+	cpStartedAt, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-06-27T07:00:00Z")
+	cpEndsAt, _ := time.Parse(recurly.GetDateTimeFormat(), "2010-07-27T07:00:00Z")
 
 	if !reflect.DeepEqual(subscriptions, []recurly.Subscription{
 		{
@@ -500,14 +499,14 @@ func TestSubscriptions_ListAccount(t *testing.T) {
 			UnitAmountInCents:      800,
 			Currency:               "EUR",
 			Quantity:               1,
-			ActivatedAt:            types.NewTime(activated),
-			CurrentPeriodStartedAt: types.NewTime(cpStartedAt),
-			CurrentPeriodEndsAt:    types.NewTime(cpEndsAt),
+			ActivatedAt:            recurly.NewTime(activated),
+			CurrentPeriodStartedAt: recurly.NewTime(cpStartedAt),
+			CurrentPeriodEndsAt:    recurly.NewTime(cpEndsAt),
 			TaxInCents:             72,
 			TaxType:                "usst",
 			TaxRegion:              "CA",
 			TaxRate:                0.0875,
-			NetTerms:               types.NewInt(0),
+			NetTerms:               recurly.NewInt(0),
 		},
 	}) {
 		t.Fatalf("unexpected subscriptions: %v", subscriptions)
@@ -577,14 +576,14 @@ func TestSubscriptions_Get(t *testing.T) {
 		UnitAmountInCents:      800,
 		Currency:               "EUR",
 		Quantity:               1,
-		ActivatedAt:            types.NewTime(time.Date(2011, time.May, 27, 7, 0, 0, 0, time.UTC)),
-		CurrentPeriodStartedAt: types.NewTime(time.Date(2011, time.June, 27, 7, 0, 0, 0, time.UTC)),
-		CurrentPeriodEndsAt:    types.NewTime(time.Date(2011, time.July, 27, 7, 0, 0, 0, time.UTC)),
+		ActivatedAt:            recurly.NewTime(time.Date(2011, time.May, 27, 7, 0, 0, 0, time.UTC)),
+		CurrentPeriodStartedAt: recurly.NewTime(time.Date(2011, time.June, 27, 7, 0, 0, 0, time.UTC)),
+		CurrentPeriodEndsAt:    recurly.NewTime(time.Date(2011, time.July, 27, 7, 0, 0, 0, time.UTC)),
 		TaxInCents:             72,
 		TaxType:                "usst",
 		TaxRegion:              "CA",
 		TaxRate:                0.0875,
-		NetTerms:               types.NewInt(0),
+		NetTerms:               recurly.NewInt(0),
 	}) {
 		t.Fatalf("unexpected subscription: %v", subscription)
 	}
@@ -833,7 +832,7 @@ func TestSubscriptions_Postpone(t *testing.T) {
 	setup()
 	defer teardown()
 
-	ts, _ := time.Parse(types.GetDateTimeFormat(), "2015-08-27T07:00:00Z")
+	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2015-08-27T07:00:00Z")
 	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/postpone", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "PUT" {
 			t.Fatalf("unexpected method: %s", r.Method)
