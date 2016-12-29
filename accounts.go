@@ -5,44 +5,42 @@ import (
 	"time"
 )
 
-type (
-	// Account represents an individual account on your site
-	Account struct {
-		XMLName          xml.Name `xml:"account"`
-		Code             string   `xml:"account_code,omitempty"`
-		State            string   `xml:"state,omitempty"`
-		Username         string   `xml:"username,omitempty"`
-		Email            string   `xml:"email,omitempty"`
-		FirstName        string   `xml:"first_name,omitempty"`
-		LastName         string   `xml:"last_name,omitempty"`
-		CompanyName      string   `xml:"company_name,omitempty"`
-		VATNumber        string   `xml:"vat_number,omitempty"`
-		TaxExempt        NullBool `xml:"tax_exempt,omitempty"`
-		BillingInfo      *Billing `xml:"billing_info,omitempty"`
-		Address          Address  `xml:"address,omitempty"`
-		AcceptLanguage   string   `xml:"accept_language,omitempty"`
-		HostedLoginToken string   `xml:"hosted_login_token,omitempty"`
-		CreatedAt        NullTime `xml:"created_at,omitempty"`
-	}
+// Account represents an individual account on your site
+type Account struct {
+	XMLName          xml.Name `xml:"account"`
+	Code             string   `xml:"account_code,omitempty"`
+	State            string   `xml:"state,omitempty"`
+	Username         string   `xml:"username,omitempty"`
+	Email            string   `xml:"email,omitempty"`
+	FirstName        string   `xml:"first_name,omitempty"`
+	LastName         string   `xml:"last_name,omitempty"`
+	CompanyName      string   `xml:"company_name,omitempty"`
+	VATNumber        string   `xml:"vat_number,omitempty"`
+	TaxExempt        NullBool `xml:"tax_exempt,omitempty"`
+	BillingInfo      *Billing `xml:"billing_info,omitempty"`
+	Address          Address  `xml:"address,omitempty"`
+	AcceptLanguage   string   `xml:"accept_language,omitempty"`
+	HostedLoginToken string   `xml:"hosted_login_token,omitempty"`
+	CreatedAt        NullTime `xml:"created_at,omitempty"`
+}
 
-	// Address is used for embedded addresses within other structs.
-	Address struct {
-		Address  string `xml:"address1,omitempty"`
-		Address2 string `xml:"address2,omitempty"`
-		City     string `xml:"city,omitempty"`
-		State    string `xml:"state,omitempty"`
-		Zip      string `xml:"zip,omitempty"`
-		Country  string `xml:"country,omitempty"`
-		Phone    string `xml:"phone,omitempty"`
-	}
+// Address is used for embedded addresses within other structs.
+type Address struct {
+	Address  string `xml:"address1,omitempty"`
+	Address2 string `xml:"address2,omitempty"`
+	City     string `xml:"city,omitempty"`
+	State    string `xml:"state,omitempty"`
+	Zip      string `xml:"zip,omitempty"`
+	Country  string `xml:"country,omitempty"`
+	Phone    string `xml:"phone,omitempty"`
+}
 
-	// Note holds account notes.
-	Note struct {
-		XMLName   xml.Name  `xml:"note"`
-		Message   string    `xml:"message,omitempty"`
-		CreatedAt time.Time `xml:"created_at,omitempty"`
-	}
-)
+// Note holds account notes.
+type Note struct {
+	XMLName   xml.Name  `xml:"note"`
+	Message   string    `xml:"message,omitempty"`
+	CreatedAt time.Time `xml:"created_at,omitempty"`
+}
 
 // MarshalXML ensures addresses marshal to nil if empty without the need
 // to use pointers.

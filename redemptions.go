@@ -2,18 +2,16 @@ package recurly
 
 import "encoding/xml"
 
-type (
-	// Redemption holds redeemed coupons for an account or invoice.
-	Redemption struct {
-		CouponCode             string
-		AccountCode            string
-		SingleUse              NullBool
-		TotalDiscountedInCents int
-		Currency               string
-		State                  string
-		CreatedAt              NullTime
-	}
-)
+// Redemption holds redeemed coupons for an account or invoice.
+type Redemption struct {
+	CouponCode             string
+	AccountCode            string
+	SingleUse              NullBool
+	TotalDiscountedInCents int
+	Currency               string
+	State                  string
+	CreatedAt              NullTime
+}
 
 // UnmarshalXML unmarshal a coupon redemption object. Minaly converts href links
 // for coupons and accounts to CouponCode and AccountCodes.

@@ -2,46 +2,44 @@ package recurly
 
 import "encoding/xml"
 
-type (
-	// Adjustment works with charges and credits on a given account.
-	Adjustment struct {
-		AccountCode            string
-		InvoiceNumber          int
-		UUID                   string
-		State                  string
-		Description            string
-		AccountingCode         string
-		ProductCode            string
-		Origin                 string
-		UnitAmountInCents      int
-		Quantity               int
-		OriginalAdjustmentUUID string
-		DiscountInCents        int
-		TaxInCents             int
-		TotalInCents           int
-		Currency               string
-		Taxable                NullBool
-		TaxCode                string
-		TaxType                string
-		TaxRegion              string
-		TaxRate                float64
-		TaxExempt              NullBool
-		TaxDetails             []TaxDetail
-		StartDate              NullTime
-		EndDate                NullTime
-		CreatedAt              NullTime
-	}
+// Adjustment works with charges and credits on a given account.
+type Adjustment struct {
+	AccountCode            string
+	InvoiceNumber          int
+	UUID                   string
+	State                  string
+	Description            string
+	AccountingCode         string
+	ProductCode            string
+	Origin                 string
+	UnitAmountInCents      int
+	Quantity               int
+	OriginalAdjustmentUUID string
+	DiscountInCents        int
+	TaxInCents             int
+	TotalInCents           int
+	Currency               string
+	Taxable                NullBool
+	TaxCode                string
+	TaxType                string
+	TaxRegion              string
+	TaxRate                float64
+	TaxExempt              NullBool
+	TaxDetails             []TaxDetail
+	StartDate              NullTime
+	EndDate                NullTime
+	CreatedAt              NullTime
+}
 
-	// TaxDetail holds tax information and is embedded in an Adjustment.
-	// TaxDetails are a read only field, so theys houldn't marshall
-	TaxDetail struct {
-		XMLName    xml.Name `xml:"tax_detail"`
-		Name       string   `xml:"name,omitempty"`
-		Type       string   `xml:"type,omitempty"`
-		TaxRate    float64  `xml:"tax_rate,omitempty"`
-		TaxInCents int      `xml:"tax_in_cents,omitempty"`
-	}
-)
+// TaxDetail holds tax information and is embedded in an Adjustment.
+// TaxDetails are a read only field, so theys houldn't marshall
+type TaxDetail struct {
+	XMLName    xml.Name `xml:"tax_detail"`
+	Name       string   `xml:"name,omitempty"`
+	Type       string   `xml:"type,omitempty"`
+	TaxRate    float64  `xml:"tax_rate,omitempty"`
+	TaxInCents int      `xml:"tax_in_cents,omitempty"`
+}
 
 // MarshalXML marshals only the fields needed for creating/updating adjustments
 // with the recurly API.

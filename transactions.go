@@ -5,51 +5,49 @@ import (
 	"net"
 )
 
-type (
-	// Transaction represents an individual transaction.
-	Transaction struct {
-		InvoiceNumber    int    // Read only
-		SubscriptionUUID string // Read only
-		UUID             string // Read only
-		Action           string
-		AmountInCents    int
-		TaxInCents       int
-		Currency         string
-		Status           string
-		PaymentMethod    string
-		Reference        string
-		Source           string
-		Recurring        NullBool
-		Test             bool
-		Voidable         NullBool
-		Refundable       NullBool
-		IPAddress        net.IP
-		CVVResult        CVVResult // Read only
-		AVSResult        AVSResult // Read only
-		AVSResultStreet  string    // Read only
-		AVSResultPostal  string    // Read only
-		CreatedAt        NullTime  // Read only
-		Account          Account
-	}
+// Transaction represents an individual transaction.
+type Transaction struct {
+	InvoiceNumber    int    // Read only
+	SubscriptionUUID string // Read only
+	UUID             string // Read only
+	Action           string
+	AmountInCents    int
+	TaxInCents       int
+	Currency         string
+	Status           string
+	PaymentMethod    string
+	Reference        string
+	Source           string
+	Recurring        NullBool
+	Test             bool
+	Voidable         NullBool
+	Refundable       NullBool
+	IPAddress        net.IP
+	CVVResult        CVVResult // Read only
+	AVSResult        AVSResult // Read only
+	AVSResultStreet  string    // Read only
+	AVSResultPostal  string    // Read only
+	CreatedAt        NullTime  // Read only
+	Account          Account
+}
 
-	TransactionResult struct {
-		NullMarshal
-		Code    string `xml:"code,attr"`
-		Message string `xml:",innerxml"`
-	}
+type TransactionResult struct {
+	NullMarshal
+	Code    string `xml:"code,attr"`
+	Message string `xml:",innerxml"`
+}
 
-	// CVVResult holds transaction results for CVV fields.
-	// https://www.chasepaymentech.com/card_verification_codes.html
-	CVVResult struct {
-		TransactionResult
-	}
+// CVVResult holds transaction results for CVV fields.
+// https://www.chasepaymentech.com/card_verification_codes.html
+type CVVResult struct {
+	TransactionResult
+}
 
-	// AVSResult holds transaction results for address verification.
-	// http://developer.authorize.net/tools/errorgenerationguide/
-	AVSResult struct {
-		TransactionResult
-	}
-)
+// AVSResult holds transaction results for address verification.
+// http://developer.authorize.net/tools/errorgenerationguide/
+type AVSResult struct {
+	TransactionResult
+}
 
 // MarshalXML marshals a transaction sending only the fields recurly allows for writes.
 // Read only fields are not encoded, and account is written as <account></account>

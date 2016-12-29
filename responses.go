@@ -8,45 +8,43 @@ import (
 	"strings"
 )
 
-type (
-	// Response is returned for each API call.
-	Response struct {
-		*http.Response
+// Response is returned for each API call.
+type Response struct {
+	*http.Response
 
-		// Errors holds an array of validation errors if any occurred.
-		Errors []Error
+	// Errors holds an array of validation errors if any occurred.
+	Errors []Error
 
-		// Transaction holds the transaction returned with a transaction error.
-		// This will be populated when creating a new subscription if the payment fails.
-		Transaction *Transaction
+	// Transaction holds the transaction returned with a transaction error.
+	// This will be populated when creating a new subscription if the payment fails.
+	Transaction *Transaction
 
-		// TransactionError holds transaction errors from your payment gateway.
-		// This will only be populated when creating a new subscription,
-		// updating billing information, and processing a one-time transaction.
-		// https://recurly.readme.io/v2.0/page/transaction-errors
-		TransactionError *TransactionError
-	}
-
-	// Error is an individual validation error
-	Error struct {
-		XMLName xml.Name `xml:"error"`
-		Message string   `xml:",innerxml"`
-		Field   string   `xml:"field,attr"`
-		Symbol  string   `xml:"symbol,attr"`
-	}
-
-	// TransactionError is an error encounted from your payment gateway that
-	// recurly has standardized.
+	// TransactionError holds transaction errors from your payment gateway.
+	// This will only be populated when creating a new subscription,
+	// updating billing information, and processing a one-time transaction.
 	// https://recurly.readme.io/v2.0/page/transaction-errors
-	TransactionError struct {
-		XMLName          xml.Name `xml:"transaction_error"`
-		ErrorCode        string   `xml:"error_code,omitempty"`
-		ErrorCategory    string   `xml:"error_category,omitempty"`
-		MerchantMessage  string   `xml:"merchant_message,omitempty"`
-		CustomerMessage  string   `xml:"customer_message,omitempty"`
-		GatewayErrorCode string   `xml:"gateway_error_code,omitempty"`
-	}
-)
+	TransactionError *TransactionError
+}
+
+// Error is an individual validation error
+type Error struct {
+	XMLName xml.Name `xml:"error"`
+	Message string   `xml:",innerxml"`
+	Field   string   `xml:"field,attr"`
+	Symbol  string   `xml:"symbol,attr"`
+}
+
+// TransactionError is an error encounted from your payment gateway that
+// recurly has standardized.
+// https://recurly.readme.io/v2.0/page/transaction-errors
+type TransactionError struct {
+	XMLName          xml.Name `xml:"transaction_error"`
+	ErrorCode        string   `xml:"error_code,omitempty"`
+	ErrorCategory    string   `xml:"error_category,omitempty"`
+	MerchantMessage  string   `xml:"merchant_message,omitempty"`
+	CustomerMessage  string   `xml:"customer_message,omitempty"`
+	GatewayErrorCode string   `xml:"gateway_error_code,omitempty"`
+}
 
 var (
 	// rxPaginationLink is a regex to parse prev/next links from the Link header
