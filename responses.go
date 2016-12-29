@@ -26,26 +26,6 @@ type Response struct {
 	TransactionError *TransactionError
 }
 
-// Error is an individual validation error
-type Error struct {
-	XMLName xml.Name `xml:"error"`
-	Message string   `xml:",innerxml"`
-	Field   string   `xml:"field,attr"`
-	Symbol  string   `xml:"symbol,attr"`
-}
-
-// TransactionError is an error encounted from your payment gateway that
-// recurly has standardized.
-// https://recurly.readme.io/v2.0/page/transaction-errors
-type TransactionError struct {
-	XMLName          xml.Name `xml:"transaction_error"`
-	ErrorCode        string   `xml:"error_code,omitempty"`
-	ErrorCategory    string   `xml:"error_category,omitempty"`
-	MerchantMessage  string   `xml:"merchant_message,omitempty"`
-	CustomerMessage  string   `xml:"customer_message,omitempty"`
-	GatewayErrorCode string   `xml:"gateway_error_code,omitempty"`
-}
-
 var (
 	// rxPaginationLink is a regex to parse prev/next links from the Link header
 	rxPaginationLink = regexp.MustCompile(`<([^>]+)>;`)
@@ -118,4 +98,24 @@ func (r *Response) Next() string {
 	}
 
 	return ""
+}
+
+// Error is an individual validation error
+type Error struct {
+	XMLName xml.Name `xml:"error"`
+	Message string   `xml:",innerxml"`
+	Field   string   `xml:"field,attr"`
+	Symbol  string   `xml:"symbol,attr"`
+}
+
+// TransactionError is an error encounted from your payment gateway that
+// recurly has standardized.
+// https://recurly.readme.io/v2.0/page/transaction-errors
+type TransactionError struct {
+	XMLName          xml.Name `xml:"transaction_error"`
+	ErrorCode        string   `xml:"error_code,omitempty"`
+	ErrorCategory    string   `xml:"error_category,omitempty"`
+	MerchantMessage  string   `xml:"merchant_message,omitempty"`
+	CustomerMessage  string   `xml:"customer_message,omitempty"`
+	GatewayErrorCode string   `xml:"gateway_error_code,omitempty"`
 }

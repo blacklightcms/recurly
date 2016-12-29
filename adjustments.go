@@ -31,16 +31,6 @@ type Adjustment struct {
 	CreatedAt              NullTime
 }
 
-// TaxDetail holds tax information and is embedded in an Adjustment.
-// TaxDetails are a read only field, so theys houldn't marshall
-type TaxDetail struct {
-	XMLName    xml.Name `xml:"tax_detail"`
-	Name       string   `xml:"name,omitempty"`
-	Type       string   `xml:"type,omitempty"`
-	TaxRate    float64  `xml:"tax_rate,omitempty"`
-	TaxInCents int      `xml:"tax_in_cents,omitempty"`
-}
-
 // MarshalXML marshals only the fields needed for creating/updating adjustments
 // with the recurly API.
 func (a Adjustment) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
@@ -129,4 +119,14 @@ func (a *Adjustment) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error 
 	}
 
 	return nil
+}
+
+// TaxDetail holds tax information and is embedded in an Adjustment.
+// TaxDetails are a read only field, so theys houldn't marshall
+type TaxDetail struct {
+	XMLName    xml.Name `xml:"tax_detail"`
+	Name       string   `xml:"name,omitempty"`
+	Type       string   `xml:"type,omitempty"`
+	TaxRate    float64  `xml:"tax_rate,omitempty"`
+	TaxInCents int      `xml:"tax_in_cents,omitempty"`
 }

@@ -5,6 +5,17 @@ import (
 	"net"
 )
 
+const (
+	// TransactionStatusSuccess is the status for a successful transaction.
+	TransactionStatusSuccess = "success"
+
+	// TransactionStatusFailed is the status for a failed transaction.
+	TransactionStatusFailed = "failed"
+
+	// TransactionStatusVoid is the status for a voided transaction.
+	TransactionStatusVoid = "void"
+)
+
 // Transaction represents an individual transaction.
 type Transaction struct {
 	InvoiceNumber    int    // Read only
@@ -29,24 +40,6 @@ type Transaction struct {
 	AVSResultPostal  string    // Read only
 	CreatedAt        NullTime  // Read only
 	Account          Account
-}
-
-type TransactionResult struct {
-	NullMarshal
-	Code    string `xml:"code,attr"`
-	Message string `xml:",innerxml"`
-}
-
-// CVVResult holds transaction results for CVV fields.
-// https://www.chasepaymentech.com/card_verification_codes.html
-type CVVResult struct {
-	TransactionResult
-}
-
-// AVSResult holds transaction results for address verification.
-// http://developer.authorize.net/tools/errorgenerationguide/
-type AVSResult struct {
-	TransactionResult
 }
 
 // MarshalXML marshals a transaction sending only the fields recurly allows for writes.
@@ -148,6 +141,18 @@ func (t *Transaction) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 	return nil
 }
 
+type TransactionResult struct {
+	NullMarshal
+	Code    string `xml:"code,attr"`
+	Message string `xml:",innerxml"`
+}
+
+// CVVResult holds transaction results for CVV fields.
+// https://www.chasepaymentech.com/card_verification_codes.html
+type CVVResult struct {
+	TransactionResult
+}
+
 // IsMatch returns true if the CVV code is a match.
 func (c CVVResult) IsMatch() bool {
 	return c.Code == "M" || c.Code == "Y"
@@ -174,13 +179,8 @@ func (c CVVResult) UnableToProcess() bool {
 	return c.Code == "U"
 }
 
-const (
-	// TransactionStatusSuccess is the status for a successful transaction.
-	TransactionStatusSuccess = "success"
-
-	// TransactionStatusFailed is the status for a failed transaction.
-	TransactionStatusFailed = "failed"
-
-	// TransactionStatusVoid is the status for a voided transaction.
-	TransactionStatusVoid = "void"
-)
+// AVSResult holds transaction results for address verification.
+// http://developer.authorize.net/tools/errorgenerationguide/
+type AVSResult struct {
+	TransactionResult
+}

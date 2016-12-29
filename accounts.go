@@ -35,13 +35,6 @@ type Address struct {
 	Phone    string `xml:"phone,omitempty"`
 }
 
-// Note holds account notes.
-type Note struct {
-	XMLName   xml.Name  `xml:"note"`
-	Message   string    `xml:"message,omitempty"`
-	CreatedAt time.Time `xml:"created_at,omitempty"`
-}
-
 // MarshalXML ensures addresses marshal to nil if empty without the need
 // to use pointers.
 func (a Address) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
@@ -102,4 +95,11 @@ func (a Address) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "address"}})
 
 	return nil
+}
+
+// Note holds account notes.
+type Note struct {
+	XMLName   xml.Name  `xml:"note"`
+	Message   string    `xml:"message,omitempty"`
+	CreatedAt time.Time `xml:"created_at,omitempty"`
 }

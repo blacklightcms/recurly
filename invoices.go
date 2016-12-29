@@ -2,6 +2,23 @@ package recurly
 
 import "encoding/xml"
 
+const (
+	// InvoiceStateOpen is an invoice state for invoices that are open, pending
+	// collection.
+	InvoiceStateOpen = "open"
+
+	// InvoiceStateCollected is an invoice state for invoices that have been
+	// successfully collected.
+	InvoiceStateCollected = "collected"
+
+	// InvoiceStateFailed is an invoice state for invoices that failed to collect.
+	InvoiceStateFailed = "failed"
+
+	// InvoiceStatePastDue is an invoice state for invoices where initial collection
+	// failed, but Recurly is still attempting collection.
+	InvoiceStatePastDue = "past_due"
+)
+
 // Invoice is an individual invoice for an account.
 // The only fields annotated with XML tags are those for posting an invoice.
 // Unmarshaling an invoice is handled by the custom UnmarshalXML function.
@@ -34,23 +51,6 @@ type Invoice struct {
 	LineItems             []Adjustment  `xml:"-"`
 	Transactions          []Transaction `xml:"-"`
 }
-
-const (
-	// InvoiceStateOpen is an invoice state for invoices that are open, pending
-	// collection.
-	InvoiceStateOpen = "open"
-
-	// InvoiceStateCollected is an invoice state for invoices that have been
-	// successfully collected.
-	InvoiceStateCollected = "collected"
-
-	// InvoiceStateFailed is an invoice state for invoices that failed to collect.
-	InvoiceStateFailed = "failed"
-
-	// InvoiceStatePastDue is an invoice state for invoices where initial collection
-	// failed, but Recurly is still attempting collection.
-	InvoiceStatePastDue = "past_due"
-)
 
 // UnmarshalXML unmarshals invoices and handles intermediary state during unmarshaling
 // for types like href.
