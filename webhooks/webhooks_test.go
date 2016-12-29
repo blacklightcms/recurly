@@ -6,8 +6,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/blacklightcms/go-recurly/recurly/webhooks"
-	"github.com/blacklightcms/go-recurly/types"
+	recurly "github.com/blacklightcms/go-recurly"
+	"github.com/blacklightcms/go-recurly/webhooks"
 )
 
 func MustOpenFile(name string) *os.File {
