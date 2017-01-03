@@ -22,7 +22,7 @@ func NewAddOnsImpl(client *Client) *addOnsImpl {
 // https://docs.recurly.com/api/plans/add-ons#list-addons
 func (s *addOnsImpl) List(planCode string, params Params) (*Response, []AddOn, error) {
 	action := fmt.Sprintf("plans/%s/add_ons", planCode)
-	req, err := s.client.NewRequest("GET", action, params, nil)
+	req, err := s.client.newRequest("GET", action, params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -31,7 +31,7 @@ func (s *addOnsImpl) List(planCode string, params Params) (*Response, []AddOn, e
 		XMLName xml.Name `xml:"add_ons"`
 		AddOns  []AddOn  `xml:"add_on"`
 	}
-	resp, err := s.client.Do(req, &p)
+	resp, err := s.client.do(req, &p)
 
 	return resp, p.AddOns, err
 }
@@ -40,13 +40,13 @@ func (s *addOnsImpl) List(planCode string, params Params) (*Response, []AddOn, e
 // https://docs.recurly.com/api/plans/add-ons#lookup-addon
 func (s *addOnsImpl) Get(planCode string, code string) (*Response, *AddOn, error) {
 	action := fmt.Sprintf("plans/%s/add_ons/%s", planCode, code)
-	req, err := s.client.NewRequest("GET", action, nil, nil)
+	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst AddOn
-	resp, err := s.client.Do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -55,13 +55,13 @@ func (s *addOnsImpl) Get(planCode string, code string) (*Response, *AddOn, error
 // https://docs.recurly.com/api/plans/add-ons#create-addon
 func (s *addOnsImpl) Create(planCode string, a AddOn) (*Response, *AddOn, error) {
 	action := fmt.Sprintf("plans/%s/add_ons", planCode)
-	req, err := s.client.NewRequest("POST", action, nil, a)
+	req, err := s.client.newRequest("POST", action, nil, a)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst AddOn
-	resp, err := s.client.Do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -71,13 +71,13 @@ func (s *addOnsImpl) Create(planCode string, a AddOn) (*Response, *AddOn, error)
 // https://docs.recurly.com/api/plans/add-ons#update-addon
 func (s *addOnsImpl) Update(planCode string, code string, a AddOn) (*Response, *AddOn, error) {
 	action := fmt.Sprintf("plans/%s/add_ons/%s", planCode, code)
-	req, err := s.client.NewRequest("PUT", action, nil, a)
+	req, err := s.client.newRequest("PUT", action, nil, a)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst AddOn
-	resp, err := s.client.Do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -86,10 +86,10 @@ func (s *addOnsImpl) Update(planCode string, code string, a AddOn) (*Response, *
 // https://docs.recurly.com/api/plans/add-ons#delete-addon
 func (s *addOnsImpl) Delete(planCode string, code string) (*Response, error) {
 	action := fmt.Sprintf("plans/%s/add_ons/%s", planCode, code)
-	req, err := s.client.NewRequest("DELETE", action, nil, nil)
+	req, err := s.client.newRequest("DELETE", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.client.Do(req, nil)
+	return s.client.do(req, nil)
 }

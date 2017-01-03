@@ -21,7 +21,7 @@ func NewCouponsImpl(client *Client) *couponsImpl {
 // List returns a list of all the coupons on your site.
 // https://dev.recurly.com/docs/list-active-coupons
 func (s *couponsImpl) List(params Params) (*Response, []Coupon, error) {
-	req, err := s.client.NewRequest("GET", "coupons", params, nil)
+	req, err := s.client.newRequest("GET", "coupons", params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -30,7 +30,7 @@ func (s *couponsImpl) List(params Params) (*Response, []Coupon, error) {
 		XMLName xml.Name `xml:"coupons"`
 		Coupons []Coupon `xml:"coupon"`
 	}
-	resp, err := s.client.Do(req, &c)
+	resp, err := s.client.do(req, &c)
 
 	return resp, c.Coupons, err
 }
@@ -39,13 +39,13 @@ func (s *couponsImpl) List(params Params) (*Response, []Coupon, error) {
 // https://dev.recurly.com/docs/lookup-a-coupon
 func (s *couponsImpl) Get(code string) (*Response, *Coupon, error) {
 	action := fmt.Sprintf("coupons/%s", code)
-	req, err := s.client.NewRequest("GET", action, nil, nil)
+	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Coupon
-	resp, err := s.client.Do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -53,13 +53,13 @@ func (s *couponsImpl) Get(code string) (*Response, *Coupon, error) {
 // Create a new coupon. Coupons cannot be updated after being created.
 // https://dev.recurly.com/docs/create-coupon
 func (s *couponsImpl) Create(c Coupon) (*Response, *Coupon, error) {
-	req, err := s.client.NewRequest("POST", "coupons", nil, c)
+	req, err := s.client.newRequest("POST", "coupons", nil, c)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Coupon
-	resp, err := s.client.Do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -68,10 +68,10 @@ func (s *couponsImpl) Create(c Coupon) (*Response, *Coupon, error) {
 // https://docs.recurly.com/api/plans/add-ons#delete-addon
 func (s *couponsImpl) Delete(code string) (*Response, error) {
 	action := fmt.Sprintf("coupons/%s", code)
-	req, err := s.client.NewRequest("DELETE", action, nil, nil)
+	req, err := s.client.newRequest("DELETE", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.client.Do(req, nil)
+	return s.client.do(req, nil)
 }

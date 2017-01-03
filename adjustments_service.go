@@ -22,7 +22,7 @@ func NewAdjustmentsImpl(client *Client) *adjustmentsImpl {
 // https://docs.recurly.com/api/adjustments#list-adjustments
 func (s *adjustmentsImpl) List(accountCode string, params Params) (*Response, []Adjustment, error) {
 	action := fmt.Sprintf("accounts/%s/adjustments", accountCode)
-	req, err := s.client.NewRequest("GET", action, params, nil)
+	req, err := s.client.newRequest("GET", action, params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -31,7 +31,7 @@ func (s *adjustmentsImpl) List(accountCode string, params Params) (*Response, []
 		XMLName     xml.Name     `xml:"adjustments"`
 		Adjustments []Adjustment `xml:"adjustment"`
 	}
-	resp, err := s.client.Do(req, &a)
+	resp, err := s.client.do(req, &a)
 
 	return resp, a.Adjustments, err
 }
@@ -40,13 +40,13 @@ func (s *adjustmentsImpl) List(accountCode string, params Params) (*Response, []
 // https://docs.recurly.com/api/adjustments#get-adjustments
 func (s *adjustmentsImpl) Get(uuid string) (*Response, *Adjustment, error) {
 	action := fmt.Sprintf("adjustments/%s", uuid)
-	req, err := s.client.NewRequest("GET", action, nil, nil)
+	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Adjustment
-	resp, err := s.client.Do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -59,13 +59,13 @@ func (s *adjustmentsImpl) Get(uuid string) (*Response, *Adjustment, error) {
 // https://docs.recurly.com/api/adjustments#create-adjustment
 func (s *adjustmentsImpl) Create(accountCode string, a Adjustment) (*Response, *Adjustment, error) {
 	action := fmt.Sprintf("accounts/%s/adjustments", accountCode)
-	req, err := s.client.NewRequest("POST", action, nil, a)
+	req, err := s.client.newRequest("POST", action, nil, a)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Adjustment
-	resp, err := s.client.Do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -74,10 +74,10 @@ func (s *adjustmentsImpl) Create(accountCode string, a Adjustment) (*Response, *
 // https://docs.recurly.com/api/adjustments#delete-adjustment
 func (s *adjustmentsImpl) Delete(uuid string) (*Response, error) {
 	action := fmt.Sprintf("adjustments/%s", uuid)
-	req, err := s.client.NewRequest("DELETE", action, nil, nil)
+	req, err := s.client.newRequest("DELETE", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.client.Do(req, nil)
+	return s.client.do(req, nil)
 }

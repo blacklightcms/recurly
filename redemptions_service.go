@@ -23,13 +23,13 @@ func NewRedemptionsImpl(client *Client) *redemptionsImpl {
 // https://dev.recurly.com/docs/lookup-a-coupon-redemption-on-an-account
 func (s *redemptionsImpl) GetForAccount(accountCode string) (*Response, *Redemption, error) {
 	action := fmt.Sprintf("accounts/%s/redemption", accountCode)
-	req, err := s.client.NewRequest("GET", action, nil, nil)
+	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Redemption
-	resp, err := s.client.Do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -39,13 +39,13 @@ func (s *redemptionsImpl) GetForAccount(accountCode string) (*Response, *Redempt
 // https://dev.recurly.com/docs/lookup-a-coupon-redemption-on-an-invoice
 func (s *redemptionsImpl) GetForInvoice(invoiceNumber string) (*Response, *Redemption, error) {
 	action := fmt.Sprintf("invoices/%s/redemption", invoiceNumber)
-	req, err := s.client.NewRequest("GET", action, nil, nil)
+	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Redemption
-	resp, err := s.client.Do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -67,13 +67,13 @@ func (s *redemptionsImpl) Redeem(code string, accountCode string, currency strin
 		AccountCode: accountCode,
 		Currency:    currency,
 	}
-	req, err := s.client.NewRequest("POST", action, nil, data)
+	req, err := s.client.newRequest("POST", action, nil, data)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Redemption
-	resp, err := s.client.Do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -86,10 +86,10 @@ func (s *redemptionsImpl) Redeem(code string, accountCode string, currency strin
 // https://dev.recurly.com/docs/remove-a-coupon-from-an-account
 func (s *redemptionsImpl) Delete(accountCode string) (*Response, error) {
 	action := fmt.Sprintf("accounts/%s/redemption", accountCode)
-	req, err := s.client.NewRequest("DELETE", action, nil, nil)
+	req, err := s.client.newRequest("DELETE", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.client.Do(req, nil)
+	return s.client.do(req, nil)
 }

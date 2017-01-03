@@ -15,7 +15,7 @@ const defaultBaseURL = "https://%s.com/"
 // Client manages communication with the Recurly API.
 type Client struct {
 	// client is the HTTP Client used to communicate with the API.
-	Client *http.Client
+	client *http.Client
 
 	// subdomain is your account's sub domain used for authentication.
 	subDomain string
@@ -46,7 +46,7 @@ func NewClient(subDomain, apiKey string, httpClient *http.Client) *Client {
 	}
 
 	client := &Client{
-		Client:    httpClient,
+		client:    httpClient,
 		subDomain: subDomain,
 		apiKey:    apiKey,
 		BaseURL:   fmt.Sprintf(defaultBaseURL, subDomain),
@@ -66,8 +66,8 @@ func NewClient(subDomain, apiKey string, httpClient *http.Client) *Client {
 	return client
 }
 
-// NewRequest creates an authenticated API request that is ready to send.
-func (c *Client) NewRequest(method string, action string, params Params, body interface{}) (*http.Request, error) {
+// newRequest creates an authenticated API request that is ready to send.
+func (c *Client) newRequest(method string, action string, params Params, body interface{}) (*http.Request, error) {
 	method = strings.ToUpper(method)
 	endpoint := fmt.Sprintf("%sv2/%s", c.BaseURL, action)
 
@@ -101,14 +101,14 @@ func (c *Client) NewRequest(method string, action string, params Params, body in
 	return req, err
 }
 
-// Do takes a prepared API request and makes the API call to Recurly.
+// do takes a prepared API request and makes the API call to Recurly.
 // It will decode the XML into a destination struct you provide as well
 // as parse any validation errors that may have occurred.
 // It returns a Response object that provides a wrapper around http.Response
 // with some convenience methods.
-func (c *Client) Do(req *http.Request, v interface{}) (*Response, error) {
+func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 	req.Close = true
-	resp, err := c.Client.Do(req)
+	resp, err := c.client.Do(req)
 	if err != nil {
 		return nil, err
 	}

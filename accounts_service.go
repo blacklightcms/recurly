@@ -29,7 +29,7 @@ func NewAccountsImpl(client *Client) *accountsImpl {
 // List returns a list of the accounts on your site.
 // https://docs.recurly.com/api/accounts#list-accounts
 func (s *accountsImpl) List(params Params) (*Response, []Account, error) {
-	req, err := s.client.NewRequest("GET", "accounts", params, nil)
+	req, err := s.client.newRequest("GET", "accounts", params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -38,7 +38,7 @@ func (s *accountsImpl) List(params Params) (*Response, []Account, error) {
 		XMLName  xml.Name  `xml:"accounts"`
 		Accounts []Account `xml:"account"`
 	}
-	resp, err := s.client.Do(req, &a)
+	resp, err := s.client.do(req, &a)
 
 	for i := range a.Accounts {
 		a.Accounts[i].BillingInfo = nil
@@ -51,13 +51,13 @@ func (s *accountsImpl) List(params Params) (*Response, []Account, error) {
 // https://docs.recurly.com/api/accounts#get-account
 func (s *accountsImpl) Get(code string) (*Response, *Account, error) {
 	action := fmt.Sprintf("accounts/%s", code)
-	req, err := s.client.NewRequest("GET", action, nil, nil)
+	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var a Account
-	resp, err := s.client.Do(req, &a)
+	resp, err := s.client.do(req, &a)
 	a.BillingInfo = nil
 
 	return resp, &a, err
@@ -66,13 +66,13 @@ func (s *accountsImpl) Get(code string) (*Response, *Account, error) {
 // Create will create a new account. You may optionally include billing information.
 // https://docs.recurly.com/api/accounts#create-account
 func (s *accountsImpl) Create(a Account) (*Response, *Account, error) {
-	req, err := s.client.NewRequest("POST", "accounts", nil, a)
+	req, err := s.client.newRequest("POST", "accounts", nil, a)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Account
-	resp, err := s.client.Do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 	dst.BillingInfo = nil
 
 	return resp, &dst, err
@@ -84,13 +84,13 @@ func (s *accountsImpl) Create(a Account) (*Response, *Account, error) {
 // https://docs.recurly.com/api/accounts#update-account
 func (s *accountsImpl) Update(code string, a Account) (*Response, *Account, error) {
 	action := fmt.Sprintf("accounts/%s", code)
-	req, err := s.client.NewRequest("PUT", action, nil, a)
+	req, err := s.client.newRequest("PUT", action, nil, a)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Account
-	resp, err := s.client.Do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 	dst.BillingInfo = nil
 
 	return resp, &dst, err
@@ -101,31 +101,31 @@ func (s *accountsImpl) Update(code string, a Account) (*Response, *Account, erro
 // https://docs.recurly.com/api/accounts#close-account
 func (s *accountsImpl) Close(code string) (*Response, error) {
 	action := fmt.Sprintf("accounts/%s", code)
-	req, err := s.client.NewRequest("DELETE", action, nil, nil)
+	req, err := s.client.newRequest("DELETE", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.client.Do(req, nil)
+	return s.client.do(req, nil)
 }
 
 // Reopen transitions a closed account back to active.
 // https://docs.recurly.com/api/accounts#reopen-account
 func (s *accountsImpl) Reopen(code string) (*Response, error) {
 	action := fmt.Sprintf("accounts/%s/reopen", code)
-	req, err := s.client.NewRequest("PUT", action, nil, nil)
+	req, err := s.client.newRequest("PUT", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.client.Do(req, nil)
+	return s.client.do(req, nil)
 }
 
 // ListNotes returns a list of the notes on an account sorted in descending order.
 // https://docs.recurly.com/api/accounts#get-account-notes
 func (s *accountsImpl) ListNotes(code string) (*Response, []Note, error) {
 	action := fmt.Sprintf("accounts/%s/notes", code)
-	req, err := s.client.NewRequest("GET", action, nil, nil)
+	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -134,7 +134,7 @@ func (s *accountsImpl) ListNotes(code string) (*Response, []Note, error) {
 		XMLName xml.Name `xml:"notes"`
 		Notes   []Note   `xml:"note"`
 	}
-	resp, err := s.client.Do(req, &n)
+	resp, err := s.client.do(req, &n)
 
 	return resp, n.Notes, err
 }

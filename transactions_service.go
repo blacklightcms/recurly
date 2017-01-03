@@ -21,7 +21,7 @@ func NewTransactionsImpl(client *Client) *transactionsImpl {
 // List returns a list of transactions
 // https://dev.recurly.com/docs/list-transactions
 func (s *transactionsImpl) List(params Params) (*Response, []Transaction, error) {
-	req, err := s.client.NewRequest("GET", "transactions", params, nil)
+	req, err := s.client.newRequest("GET", "transactions", params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -30,7 +30,7 @@ func (s *transactionsImpl) List(params Params) (*Response, []Transaction, error)
 		XMLName      xml.Name      `xml:"transactions"`
 		Transactions []Transaction `xml:"transaction"`
 	}
-	resp, err := s.client.Do(req, &v)
+	resp, err := s.client.do(req, &v)
 
 	return resp, v.Transactions, err
 }
@@ -39,7 +39,7 @@ func (s *transactionsImpl) List(params Params) (*Response, []Transaction, error)
 // https://dev.recurly.com/docs/list-accounts-transactions
 func (s *transactionsImpl) ListAccount(accountCode string, params Params) (*Response, []Transaction, error) {
 	action := fmt.Sprintf("accounts/%s/transactions", accountCode)
-	req, err := s.client.NewRequest("GET", action, params, nil)
+	req, err := s.client.newRequest("GET", action, params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -48,7 +48,7 @@ func (s *transactionsImpl) ListAccount(accountCode string, params Params) (*Resp
 		XMLName      xml.Name      `xml:"transactions"`
 		Transactions []Transaction `xml:"transaction"`
 	}
-	resp, err := s.client.Do(req, &v)
+	resp, err := s.client.do(req, &v)
 
 	return resp, v.Transactions, err
 }
@@ -60,13 +60,13 @@ func (s *transactionsImpl) ListAccount(accountCode string, params Params) (*Resp
 // https://dev.recurly.com/docs/lookup-transaction
 func (s *transactionsImpl) Get(uuid string) (*Response, *Transaction, error) {
 	action := fmt.Sprintf("transactions/%s", uuid)
-	req, err := s.client.NewRequest("GET", action, nil, nil)
+	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Transaction
-	resp, err := s.client.Do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -80,13 +80,13 @@ func (s *transactionsImpl) Get(uuid string) (*Response, *Transaction, error) {
 // See the documentation and Transaction.MarshalXML function for a detailed field list.
 // https://dev.recurly.com/docs/create-transaction
 func (s *transactionsImpl) Create(t Transaction) (*Response, *Transaction, error) {
-	req, err := s.client.NewRequest("POST", "transactions", nil, t)
+	req, err := s.client.newRequest("POST", "transactions", nil, t)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst Transaction
-	resp, err := s.client.Do(req, &dst)
+	resp, err := s.client.do(req, &dst)
 
 	return resp, &dst, err
 }
