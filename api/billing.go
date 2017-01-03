@@ -11,20 +11,20 @@ var _ recurly.BillingService = &BillingService{}
 // BillingService handles all interaction with the billing info portion
 // of the recurly API.
 type BillingService struct {
-	client *Client
+	client *recurly.Client
 }
 
 // Get returns only the account's current billing information.
 // https://docs.recurly.com/api/billing-info#lookup-billing-info
 func (s *BillingService) Get(accountCode string) (*recurly.Response, *recurly.Billing, error) {
 	action := fmt.Sprintf("accounts/%s/billing_info", accountCode)
-	req, err := s.client.newRequest("GET", action, nil, nil)
+	req, err := s.client.NewRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Billing
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -36,13 +36,13 @@ func (s *BillingService) Get(accountCode string) (*recurly.Response, *recurly.Bi
 // https://dev.recurly.com/docs/create-an-accounts-billing-info-bank-account
 func (s *BillingService) Create(accountCode string, b recurly.Billing) (*recurly.Response, *recurly.Billing, error) {
 	action := fmt.Sprintf("accounts/%s/billing_info", accountCode)
-	req, err := s.client.newRequest("POST", action, nil, b)
+	req, err := s.client.NewRequest("POST", action, nil, b)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Billing
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -52,13 +52,13 @@ func (s *BillingService) Create(accountCode string, b recurly.Billing) (*recurly
 // https://docs.recurly.com/api/billing-info#create-billing-info-token
 func (s *BillingService) CreateWithToken(accountCode string, token string) (*recurly.Response, *recurly.Billing, error) {
 	action := fmt.Sprintf("accounts/%s/billing_info", accountCode)
-	req, err := s.client.newRequest("POST", action, nil, recurly.Billing{Token: token})
+	req, err := s.client.NewRequest("POST", action, nil, recurly.Billing{Token: token})
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Billing
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -94,13 +94,13 @@ func (s *BillingService) Update(accountCode string, b recurly.Billing) (*recurly
 	}
 
 	action := fmt.Sprintf("accounts/%s/billing_info", accountCode)
-	req, err := s.client.newRequest("PUT", action, nil, clean)
+	req, err := s.client.NewRequest("PUT", action, nil, clean)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Billing
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -110,13 +110,13 @@ func (s *BillingService) Update(accountCode string, b recurly.Billing) (*recurly
 // https://docs.recurly.com/api/billing-info#update-billing-info-token
 func (s *BillingService) UpdateWithToken(accountCode string, token string) (*recurly.Response, *recurly.Billing, error) {
 	action := fmt.Sprintf("accounts/%s/billing_info", accountCode)
-	req, err := s.client.newRequest("PUT", action, nil, recurly.Billing{Token: token})
+	req, err := s.client.NewRequest("PUT", action, nil, recurly.Billing{Token: token})
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Billing
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -127,10 +127,10 @@ func (s *BillingService) UpdateWithToken(accountCode string, token string) (*rec
 // https://docs.recurly.com/api/billing-info#clear-billing-info
 func (s *BillingService) Clear(accountCode string) (*recurly.Response, error) {
 	action := fmt.Sprintf("accounts/%s/billing_info", accountCode)
-	req, err := s.client.newRequest("DELETE", action, nil, nil)
+	req, err := s.client.NewRequest("DELETE", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.client.do(req, nil)
+	return s.client.Do(req, nil)
 }

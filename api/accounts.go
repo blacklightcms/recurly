@@ -12,7 +12,7 @@ var _ recurly.AccountsService = &AccountsService{}
 // AccountsService handles communication with the accounts related methods
 // of the recurly API.
 type AccountsService struct {
-	client *Client
+	client *recurly.Client
 }
 
 const (
@@ -26,7 +26,7 @@ const (
 // List returns a list of the accounts on your site.
 // https://docs.recurly.com/api/accounts#list-accounts
 func (s *AccountsService) List(params recurly.Params) (*recurly.Response, []recurly.Account, error) {
-	req, err := s.client.newRequest("GET", "accounts", params, nil)
+	req, err := s.client.NewRequest("GET", "accounts", params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -35,7 +35,7 @@ func (s *AccountsService) List(params recurly.Params) (*recurly.Response, []recu
 		XMLName  xml.Name          `xml:"accounts"`
 		Accounts []recurly.Account `xml:"account"`
 	}
-	resp, err := s.client.do(req, &a)
+	resp, err := s.client.Do(req, &a)
 
 	for i := range a.Accounts {
 		a.Accounts[i].BillingInfo = nil
@@ -48,13 +48,13 @@ func (s *AccountsService) List(params recurly.Params) (*recurly.Response, []recu
 // https://docs.recurly.com/api/accounts#get-account
 func (s *AccountsService) Get(code string) (*recurly.Response, *recurly.Account, error) {
 	action := fmt.Sprintf("accounts/%s", code)
-	req, err := s.client.newRequest("GET", action, nil, nil)
+	req, err := s.client.NewRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var a recurly.Account
-	resp, err := s.client.do(req, &a)
+	resp, err := s.client.Do(req, &a)
 	a.BillingInfo = nil
 
 	return resp, &a, err
@@ -63,13 +63,13 @@ func (s *AccountsService) Get(code string) (*recurly.Response, *recurly.Account,
 // Create will create a new account. You may optionally include billing information.
 // https://docs.recurly.com/api/accounts#create-account
 func (s *AccountsService) Create(a recurly.Account) (*recurly.Response, *recurly.Account, error) {
-	req, err := s.client.newRequest("POST", "accounts", nil, a)
+	req, err := s.client.NewRequest("POST", "accounts", nil, a)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Account
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 	dst.BillingInfo = nil
 
 	return resp, &dst, err
@@ -81,13 +81,13 @@ func (s *AccountsService) Create(a recurly.Account) (*recurly.Response, *recurly
 // https://docs.recurly.com/api/accounts#update-account
 func (s *AccountsService) Update(code string, a recurly.Account) (*recurly.Response, *recurly.Account, error) {
 	action := fmt.Sprintf("accounts/%s", code)
-	req, err := s.client.newRequest("PUT", action, nil, a)
+	req, err := s.client.NewRequest("PUT", action, nil, a)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Account
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 	dst.BillingInfo = nil
 
 	return resp, &dst, err
@@ -98,31 +98,31 @@ func (s *AccountsService) Update(code string, a recurly.Account) (*recurly.Respo
 // https://docs.recurly.com/api/accounts#close-account
 func (s *AccountsService) Close(code string) (*recurly.Response, error) {
 	action := fmt.Sprintf("accounts/%s", code)
-	req, err := s.client.newRequest("DELETE", action, nil, nil)
+	req, err := s.client.NewRequest("DELETE", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.client.do(req, nil)
+	return s.client.Do(req, nil)
 }
 
 // Reopen transitions a closed account back to active.
 // https://docs.recurly.com/api/accounts#reopen-account
 func (s *AccountsService) Reopen(code string) (*recurly.Response, error) {
 	action := fmt.Sprintf("accounts/%s/reopen", code)
-	req, err := s.client.newRequest("PUT", action, nil, nil)
+	req, err := s.client.NewRequest("PUT", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.client.do(req, nil)
+	return s.client.Do(req, nil)
 }
 
 // ListNotes returns a list of the notes on an account sorted in descending order.
 // https://docs.recurly.com/api/accounts#get-account-notes
 func (s *AccountsService) ListNotes(code string) (*recurly.Response, []recurly.Note, error) {
 	action := fmt.Sprintf("accounts/%s/notes", code)
-	req, err := s.client.newRequest("GET", action, nil, nil)
+	req, err := s.client.NewRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -131,7 +131,7 @@ func (s *AccountsService) ListNotes(code string) (*recurly.Response, []recurly.N
 		XMLName xml.Name       `xml:"notes"`
 		Notes   []recurly.Note `xml:"note"`
 	}
-	resp, err := s.client.do(req, &n)
+	resp, err := s.client.Do(req, &n)
 
 	return resp, n.Notes, err
 }

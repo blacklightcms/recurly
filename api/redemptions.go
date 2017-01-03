@@ -12,7 +12,7 @@ var _ recurly.RedemptionsService = &RedemptionsService{}
 // RedemptionsService handles communication with the coupon redemption
 // related methods of the recurly API.
 type RedemptionsService struct {
-	client *Client
+	client *recurly.Client
 }
 
 // GetForAccount looks up information about the 'active' coupon redemption on
@@ -20,13 +20,13 @@ type RedemptionsService struct {
 // https://dev.recurly.com/docs/lookup-a-coupon-redemption-on-an-account
 func (s *RedemptionsService) GetForAccount(accountCode string) (*recurly.Response, *recurly.Redemption, error) {
 	action := fmt.Sprintf("accounts/%s/redemption", accountCode)
-	req, err := s.client.newRequest("GET", action, nil, nil)
+	req, err := s.client.NewRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Redemption
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -36,13 +36,13 @@ func (s *RedemptionsService) GetForAccount(accountCode string) (*recurly.Respons
 // https://dev.recurly.com/docs/lookup-a-coupon-redemption-on-an-invoice
 func (s *RedemptionsService) GetForInvoice(invoiceNumber string) (*recurly.Response, *recurly.Redemption, error) {
 	action := fmt.Sprintf("invoices/%s/redemption", invoiceNumber)
-	req, err := s.client.newRequest("GET", action, nil, nil)
+	req, err := s.client.NewRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Redemption
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -64,13 +64,13 @@ func (s *RedemptionsService) Redeem(code string, accountCode string, currency st
 		AccountCode: accountCode,
 		Currency:    currency,
 	}
-	req, err := s.client.newRequest("POST", action, nil, data)
+	req, err := s.client.NewRequest("POST", action, nil, data)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Redemption
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -83,10 +83,10 @@ func (s *RedemptionsService) Redeem(code string, accountCode string, currency st
 // https://dev.recurly.com/docs/remove-a-coupon-from-an-account
 func (s *RedemptionsService) Delete(accountCode string) (*recurly.Response, error) {
 	action := fmt.Sprintf("accounts/%s/redemption", accountCode)
-	req, err := s.client.newRequest("DELETE", action, nil, nil)
+	req, err := s.client.NewRequest("DELETE", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.client.do(req, nil)
+	return s.client.Do(req, nil)
 }

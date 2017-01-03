@@ -13,13 +13,13 @@ var _ recurly.InvoicesService = &InvoicesService{}
 // InvoicesService handles communication with theinvoices related methods
 // of the recurly API.
 type InvoicesService struct {
-	client *Client
+	client *recurly.Client
 }
 
 // List returns a list of all invoices.
 // https://dev.recurly.com/docs/list-invoices
 func (s *InvoicesService) List(params recurly.Params) (*recurly.Response, []recurly.Invoice, error) {
-	req, err := s.client.newRequest("GET", "invoices", params, nil)
+	req, err := s.client.NewRequest("GET", "invoices", params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -28,7 +28,7 @@ func (s *InvoicesService) List(params recurly.Params) (*recurly.Response, []recu
 		XMLName  xml.Name          `xml:"invoices"`
 		Invoices []recurly.Invoice `xml:"invoice"`
 	}
-	resp, err := s.client.do(req, &p)
+	resp, err := s.client.Do(req, &p)
 
 	return resp, p.Invoices, err
 }
@@ -37,7 +37,7 @@ func (s *InvoicesService) List(params recurly.Params) (*recurly.Response, []recu
 // https://dev.recurly.com/docs/list-an-accounts-invoices
 func (s *InvoicesService) ListAccount(accountCode string, params recurly.Params) (*recurly.Response, []recurly.Invoice, error) {
 	action := fmt.Sprintf("accounts/%s/invoices", accountCode)
-	req, err := s.client.newRequest("GET", action, params, nil)
+	req, err := s.client.NewRequest("GET", action, params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -46,7 +46,7 @@ func (s *InvoicesService) ListAccount(accountCode string, params recurly.Params)
 		XMLName  xml.Name          `xml:"invoices"`
 		Invoices []recurly.Invoice `xml:"invoice"`
 	}
-	resp, err := s.client.do(req, &p)
+	resp, err := s.client.Do(req, &p)
 
 	return resp, p.Invoices, err
 }
@@ -56,13 +56,13 @@ func (s *InvoicesService) ListAccount(accountCode string, params recurly.Params)
 // https://dev.recurly.com/docs/lookup-invoice-details
 func (s *InvoicesService) Get(invoiceNumber int) (*recurly.Response, *recurly.Invoice, error) {
 	action := fmt.Sprintf("invoices/%d", invoiceNumber)
-	req, err := s.client.newRequest("GET", action, nil, nil)
+	req, err := s.client.NewRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Invoice
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -74,7 +74,7 @@ func (s *InvoicesService) Get(invoiceNumber int) (*recurly.Response, *recurly.In
 // https://dev.recurly.com/docs/retrieve-a-pdf-invoice
 func (s *InvoicesService) GetPDF(invoiceNumber int, language string) (*recurly.Response, *bytes.Buffer, error) {
 	action := fmt.Sprintf("invoices/%d", invoiceNumber)
-	req, err := s.client.newRequest("GET", action, nil, nil)
+	req, err := s.client.NewRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -87,7 +87,7 @@ func (s *InvoicesService) GetPDF(invoiceNumber int, language string) (*recurly.R
 	req.Header.Set("Accept-Language", language)
 
 	var pdf bytes.Buffer
-	resp, err := s.client.do(req, &pdf)
+	resp, err := s.client.Do(req, &pdf)
 
 	return resp, &pdf, err
 }
@@ -97,13 +97,13 @@ func (s *InvoicesService) GetPDF(invoiceNumber int, language string) (*recurly.R
 // https://dev.recurly.com/docs/post-an-invoice-invoice-pending-charges-on-an-acco
 func (s *InvoicesService) Preview(accountCode string) (*recurly.Response, *recurly.Invoice, error) {
 	action := fmt.Sprintf("accounts/%s/invoices/preview", accountCode)
-	req, err := s.client.newRequest("POST", action, nil, nil)
+	req, err := s.client.NewRequest("POST", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Invoice
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -117,13 +117,13 @@ func (s *InvoicesService) Preview(accountCode string) (*recurly.Response, *recur
 // https://dev.recurly.com/docs/post-an-invoice-invoice-pending-charges-on-an-acco
 func (s *InvoicesService) Create(accountCode string, invoice recurly.Invoice) (*recurly.Response, *recurly.Invoice, error) {
 	action := fmt.Sprintf("accounts/%s/invoices", accountCode)
-	req, err := s.client.newRequest("POST", action, nil, invoice)
+	req, err := s.client.NewRequest("POST", action, nil, invoice)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Invoice
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -132,13 +132,13 @@ func (s *InvoicesService) Create(accountCode string, invoice recurly.Invoice) (*
 // https://dev.recurly.com/docs/mark-an-invoice-as-paid-successfully
 func (s *InvoicesService) MarkPaid(invoiceNumber int) (*recurly.Response, *recurly.Invoice, error) {
 	action := fmt.Sprintf("invoices/%d/mark_successful", invoiceNumber)
-	req, err := s.client.newRequest("PUT", action, nil, nil)
+	req, err := s.client.NewRequest("PUT", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Invoice
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -147,13 +147,13 @@ func (s *InvoicesService) MarkPaid(invoiceNumber int) (*recurly.Response, *recur
 // https://dev.recurly.com/docs/mark-an-invoice-as-failed-collection
 func (s *InvoicesService) MarkFailed(invoiceNumber int) (*recurly.Response, *recurly.Invoice, error) {
 	action := fmt.Sprintf("invoices/%d/mark_failed", invoiceNumber)
-	req, err := s.client.newRequest("PUT", action, nil, nil)
+	req, err := s.client.NewRequest("PUT", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Invoice
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }

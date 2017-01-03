@@ -12,13 +12,13 @@ var _ recurly.PlansService = &PlansService{}
 // PlansService handles communication with the plans related methods
 // of the recurly API.
 type PlansService struct {
-	client *Client
+	client *recurly.Client
 }
 
 // List will retrieve all your active subscription plans.
 // https://docs.recurly.com/api/plans#list-plans
 func (s *PlansService) List(params recurly.Params) (*recurly.Response, []recurly.Plan, error) {
-	req, err := s.client.newRequest("GET", "plans", params, nil)
+	req, err := s.client.NewRequest("GET", "plans", params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -27,7 +27,7 @@ func (s *PlansService) List(params recurly.Params) (*recurly.Response, []recurly
 		XMLName xml.Name       `xml:"plans"`
 		Plans   []recurly.Plan `xml:"plan"`
 	}
-	resp, err := s.client.do(req, &p)
+	resp, err := s.client.Do(req, &p)
 
 	return resp, p.Plans, err
 }
@@ -36,13 +36,13 @@ func (s *PlansService) List(params recurly.Params) (*recurly.Response, []recurly
 // https://docs.recurly.com/api/plans#lookup-plan
 func (s *PlansService) Get(code string) (*recurly.Response, *recurly.Plan, error) {
 	action := fmt.Sprintf("plans/%s", code)
-	req, err := s.client.newRequest("GET", action, nil, nil)
+	req, err := s.client.NewRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Plan
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -50,13 +50,13 @@ func (s *PlansService) Get(code string) (*recurly.Response, *recurly.Plan, error
 // Create will create a new subscription plan.
 // https://docs.recurly.com/api/plans#create-plan
 func (s *PlansService) Create(p recurly.Plan) (*recurly.Response, *recurly.Plan, error) {
-	req, err := s.client.newRequest("POST", "plans", nil, p)
+	req, err := s.client.NewRequest("POST", "plans", nil, p)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Plan
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -66,13 +66,13 @@ func (s *PlansService) Create(p recurly.Plan) (*recurly.Response, *recurly.Plan,
 // https://docs.recurly.com/api/plans#update-plan
 func (s *PlansService) Update(code string, p recurly.Plan) (*recurly.Response, *recurly.Plan, error) {
 	action := fmt.Sprintf("plans/%s", code)
-	req, err := s.client.newRequest("PUT", action, nil, p)
+	req, err := s.client.NewRequest("PUT", action, nil, p)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Plan
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -81,10 +81,10 @@ func (s *PlansService) Update(code string, p recurly.Plan) (*recurly.Response, *
 // https://docs.recurly.com/api/plans#delete-plan
 func (s *PlansService) Delete(code string) (*recurly.Response, error) {
 	action := fmt.Sprintf("plans/%s", code)
-	req, err := s.client.newRequest("DELETE", action, nil, nil)
+	req, err := s.client.NewRequest("DELETE", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.client.do(req, nil)
+	return s.client.Do(req, nil)
 }

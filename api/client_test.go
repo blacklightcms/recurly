@@ -1,38 +1,50 @@
-package api
+package api_test
 
 import (
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/http/httptest"
 	"reflect"
 	"testing"
 
 	recurly "github.com/blacklightcms/go-recurly"
+	"github.com/blacklightcms/go-recurly/api"
 )
 
-func TestClient(t *testing.T) {
-	expected := &Client{
-		client:    http.DefaultClient,
-		subDomain: "foo",
-		apiKey:    "bar",
-		BaseURL:   "https://foo.recurly.com/",
-	}
+var (
+	// mux is the HTTP request multiplexer used with the test server
+	mux *http.ServeMux
 
-	given := NewClient("foo", "bar", nil)
-	if expected.subDomain != given.subDomain {
-		t.Fatalf("unexpected subdomain: %s", given.subDomain)
-	} else if expected.apiKey != given.apiKey {
-		t.Fatalf("unexpected api key: %s", given.apiKey)
-	} else if expected.BaseURL != given.BaseURL {
-		t.Fatalf("unexpected base url: %s", given.BaseURL)
-	}
+	// server is a test HTTP server used to provide mock API responses
+	server *httptest.Server
+
+	// client is the Recurly client being tested
+	client *recurly.Client
+)
+
+// setup sets up a test HTTP server along with a recurly.Client that is
+// configured to talk to that test server. Tests should register handlers on
+// mux which provide mock responses for the API method being tested
+func setup() {
+	// test server
+	mux = http.NewServeMux()
+	server = httptest.NewServer(mux)
+
+	client = api.NewClient("test", "abc", nil)
+	client.BaseURL = server.URL + "/"
+}
+
+func teardown() {
+	server.Close()
 }
 
 func TestClient_NewRequest(t *testing.T) {
-	client = NewClient("test", "abc", nil)
+	setup()
+	defer teardown()
 
-	req, err := client.newRequest("GET", "accounts/14579", recurly.Params{"foo": "bar"}, nil)
+	req, err := client.NewRequest("GET", "accounts/14579", recurly.Params{"foo": "bar"}, nil)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if req.URL.Path != "/v2/accounts/14579" {
@@ -53,7 +65,7 @@ func TestClient_NewRequest(t *testing.T) {
 		}
 	}
 
-	req, err = client.newRequest("PUT", "accounts/abc", nil, recurly.Account{Code: "abc"})
+	req, err = client.NewRequest("PUT", "accounts/abc", nil, recurly.Account{Code: "abc"})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if req.URL.Path != "/v2/accounts/abc" {
@@ -96,7 +108,7 @@ func TestClient_Error(t *testing.T) {
 		t.Fatalf("error creating request. err: %v", err)
 	}
 
-	resp, err := client.do(req, nil)
+	resp, err := client.Do(req, nil)
 	if err != nil {
 		t.Fatalf("error making request. err: %v", err)
 	} else if resp.IsOK() {
@@ -167,7 +179,7 @@ func TestClient_Unmarshal(t *testing.T) {
 	}
 
 	var a recurly.Account
-	resp, err := client.do(req, &a)
+	resp, err := client.Do(req, &a)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if resp.IsError() {

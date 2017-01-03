@@ -12,14 +12,14 @@ var _ recurly.AddOnsService = &AddOnsService{}
 // AddOnsService handles communication with the add ons related methods
 // of the recurly API.
 type AddOnsService struct {
-	client *Client
+	client *recurly.Client
 }
 
 // List returns a list of add ons for a plan.
 // https://docs.recurly.com/api/plans/add-ons#list-addons
 func (s *AddOnsService) List(planCode string, params recurly.Params) (*recurly.Response, []recurly.AddOn, error) {
 	action := fmt.Sprintf("plans/%s/add_ons", planCode)
-	req, err := s.client.newRequest("GET", action, params, nil)
+	req, err := s.client.NewRequest("GET", action, params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -28,7 +28,7 @@ func (s *AddOnsService) List(planCode string, params recurly.Params) (*recurly.R
 		XMLName xml.Name        `xml:"add_ons"`
 		AddOns  []recurly.AddOn `xml:"add_on"`
 	}
-	resp, err := s.client.do(req, &p)
+	resp, err := s.client.Do(req, &p)
 
 	return resp, p.AddOns, err
 }
@@ -37,13 +37,13 @@ func (s *AddOnsService) List(planCode string, params recurly.Params) (*recurly.R
 // https://docs.recurly.com/api/plans/add-ons#lookup-addon
 func (s *AddOnsService) Get(planCode string, code string) (*recurly.Response, *recurly.AddOn, error) {
 	action := fmt.Sprintf("plans/%s/add_ons/%s", planCode, code)
-	req, err := s.client.newRequest("GET", action, nil, nil)
+	req, err := s.client.NewRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.AddOn
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -52,13 +52,13 @@ func (s *AddOnsService) Get(planCode string, code string) (*recurly.Response, *r
 // https://docs.recurly.com/api/plans/add-ons#create-addon
 func (s *AddOnsService) Create(planCode string, a recurly.AddOn) (*recurly.Response, *recurly.AddOn, error) {
 	action := fmt.Sprintf("plans/%s/add_ons", planCode)
-	req, err := s.client.newRequest("POST", action, nil, a)
+	req, err := s.client.NewRequest("POST", action, nil, a)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.AddOn
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -68,13 +68,13 @@ func (s *AddOnsService) Create(planCode string, a recurly.AddOn) (*recurly.Respo
 // https://docs.recurly.com/api/plans/add-ons#update-addon
 func (s *AddOnsService) Update(planCode string, code string, a recurly.AddOn) (*recurly.Response, *recurly.AddOn, error) {
 	action := fmt.Sprintf("plans/%s/add_ons/%s", planCode, code)
-	req, err := s.client.newRequest("PUT", action, nil, a)
+	req, err := s.client.NewRequest("PUT", action, nil, a)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.AddOn
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -83,10 +83,10 @@ func (s *AddOnsService) Update(planCode string, code string, a recurly.AddOn) (*
 // https://docs.recurly.com/api/plans/add-ons#delete-addon
 func (s *AddOnsService) Delete(planCode string, code string) (*recurly.Response, error) {
 	action := fmt.Sprintf("plans/%s/add_ons/%s", planCode, code)
-	req, err := s.client.newRequest("DELETE", action, nil, nil)
+	req, err := s.client.NewRequest("DELETE", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.client.do(req, nil)
+	return s.client.Do(req, nil)
 }

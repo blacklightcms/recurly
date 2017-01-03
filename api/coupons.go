@@ -12,13 +12,13 @@ var _ recurly.CouponsService = &CouponsService{}
 // CouponsService handles communication with the coupons related methods
 // of the recurly API.
 type CouponsService struct {
-	client *Client
+	client *recurly.Client
 }
 
 // List returns a list of all the coupons on your site.
 // https://dev.recurly.com/docs/list-active-coupons
 func (s *CouponsService) List(params recurly.Params) (*recurly.Response, []recurly.Coupon, error) {
-	req, err := s.client.newRequest("GET", "coupons", params, nil)
+	req, err := s.client.NewRequest("GET", "coupons", params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -27,7 +27,7 @@ func (s *CouponsService) List(params recurly.Params) (*recurly.Response, []recur
 		XMLName xml.Name         `xml:"coupons"`
 		Coupons []recurly.Coupon `xml:"coupon"`
 	}
-	resp, err := s.client.do(req, &c)
+	resp, err := s.client.Do(req, &c)
 
 	return resp, c.Coupons, err
 }
@@ -36,13 +36,13 @@ func (s *CouponsService) List(params recurly.Params) (*recurly.Response, []recur
 // https://dev.recurly.com/docs/lookup-a-coupon
 func (s *CouponsService) Get(code string) (*recurly.Response, *recurly.Coupon, error) {
 	action := fmt.Sprintf("coupons/%s", code)
-	req, err := s.client.newRequest("GET", action, nil, nil)
+	req, err := s.client.NewRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Coupon
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -50,13 +50,13 @@ func (s *CouponsService) Get(code string) (*recurly.Response, *recurly.Coupon, e
 // Create a new coupon. Coupons cannot be updated after being created.
 // https://dev.recurly.com/docs/create-coupon
 func (s *CouponsService) Create(c recurly.Coupon) (*recurly.Response, *recurly.Coupon, error) {
-	req, err := s.client.newRequest("POST", "coupons", nil, c)
+	req, err := s.client.NewRequest("POST", "coupons", nil, c)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var dst recurly.Coupon
-	resp, err := s.client.do(req, &dst)
+	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
 }
@@ -65,10 +65,10 @@ func (s *CouponsService) Create(c recurly.Coupon) (*recurly.Response, *recurly.C
 // https://docs.recurly.com/api/plans/add-ons#delete-addon
 func (s *CouponsService) Delete(code string) (*recurly.Response, error) {
 	action := fmt.Sprintf("coupons/%s", code)
-	req, err := s.client.newRequest("DELETE", action, nil, nil)
+	req, err := s.client.NewRequest("DELETE", action, nil, nil)
 	if err != nil {
 		return nil, err
 	}
 
-	return s.client.do(req, nil)
+	return s.client.Do(req, nil)
 }

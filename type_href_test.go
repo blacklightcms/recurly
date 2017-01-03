@@ -10,8 +10,8 @@ import (
 func TestTypeHREFUnmarshal(t *testing.T) {
 	type h struct {
 		XMLName xml.Name   `xml:"foo"`
-		Account hrefString `xml:"account"`
-		Invoice hrefInt    `xml:"invoice"`
+		Account HrefString `xml:"account"`
+		Invoice HrefInt    `xml:"invoice"`
 	}
 
 	expected := h{
