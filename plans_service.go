@@ -1,31 +1,34 @@
-package api
+package recurly
 
 import (
 	"encoding/xml"
 	"fmt"
-
-	recurly "github.com/blacklightcms/go-recurly"
 )
 
-var _ recurly.PlansService = &PlansService{}
+var _ PlansService = &plansImpl{}
 
-// PlansService handles communication with the plans related methods
+// plansImpl handles communication with the plans related methods
 // of the recurly API.
-type PlansService struct {
-	client *recurly.Client
+type plansImpl struct {
+	client *Client
+}
+
+// NewPlansImpl returns a new instance of plansImpl.
+func NewPlansImpl(client *Client) *plansImpl {
+	return &plansImpl{client: client}
 }
 
 // List will retrieve all your active subscription plans.
 // https://docs.recurly.com/api/plans#list-plans
-func (s *PlansService) List(params recurly.Params) (*recurly.Response, []recurly.Plan, error) {
+func (s *plansImpl) List(params Params) (*Response, []Plan, error) {
 	req, err := s.client.NewRequest("GET", "plans", params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var p struct {
-		XMLName xml.Name       `xml:"plans"`
-		Plans   []recurly.Plan `xml:"plan"`
+		XMLName xml.Name `xml:"plans"`
+		Plans   []Plan   `xml:"plan"`
 	}
 	resp, err := s.client.Do(req, &p)
 
@@ -34,14 +37,14 @@ func (s *PlansService) List(params recurly.Params) (*recurly.Response, []recurly
 
 // Get will lookup a specific plan by code.
 // https://docs.recurly.com/api/plans#lookup-plan
-func (s *PlansService) Get(code string) (*recurly.Response, *recurly.Plan, error) {
+func (s *plansImpl) Get(code string) (*Response, *Plan, error) {
 	action := fmt.Sprintf("plans/%s", code)
 	req, err := s.client.NewRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var dst recurly.Plan
+	var dst Plan
 	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
@@ -49,13 +52,13 @@ func (s *PlansService) Get(code string) (*recurly.Response, *recurly.Plan, error
 
 // Create will create a new subscription plan.
 // https://docs.recurly.com/api/plans#create-plan
-func (s *PlansService) Create(p recurly.Plan) (*recurly.Response, *recurly.Plan, error) {
+func (s *plansImpl) Create(p Plan) (*Response, *Plan, error) {
 	req, err := s.client.NewRequest("POST", "plans", nil, p)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var dst recurly.Plan
+	var dst Plan
 	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
@@ -64,14 +67,14 @@ func (s *PlansService) Create(p recurly.Plan) (*recurly.Response, *recurly.Plan,
 // Update will update the pricing or details for a plan. Existing subscriptions
 // will remain at the previous renewal amounts.
 // https://docs.recurly.com/api/plans#update-plan
-func (s *PlansService) Update(code string, p recurly.Plan) (*recurly.Response, *recurly.Plan, error) {
+func (s *plansImpl) Update(code string, p Plan) (*Response, *Plan, error) {
 	action := fmt.Sprintf("plans/%s", code)
 	req, err := s.client.NewRequest("PUT", action, nil, p)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var dst recurly.Plan
+	var dst Plan
 	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
@@ -79,7 +82,7 @@ func (s *PlansService) Update(code string, p recurly.Plan) (*recurly.Response, *
 
 // Delete will make a plan inactive. New accounts cannot be created on the plan.
 // https://docs.recurly.com/api/plans#delete-plan
-func (s *PlansService) Delete(code string) (*recurly.Response, error) {
+func (s *plansImpl) Delete(code string) (*Response, error) {
 	action := fmt.Sprintf("plans/%s", code)
 	req, err := s.client.NewRequest("DELETE", action, nil, nil)
 	if err != nil {

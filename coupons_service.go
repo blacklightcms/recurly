@@ -1,31 +1,34 @@
-package api
+package recurly
 
 import (
 	"encoding/xml"
 	"fmt"
-
-	recurly "github.com/blacklightcms/go-recurly"
 )
 
-var _ recurly.CouponsService = &CouponsService{}
+var _ CouponsService = &couponsImpl{}
 
-// CouponsService handles communication with the coupons related methods
+// couponsImpl handles communication with the coupons related methods
 // of the recurly API.
-type CouponsService struct {
-	client *recurly.Client
+type couponsImpl struct {
+	client *Client
+}
+
+// NewCouponsImpl returns a new instance of couponsImpl.
+func NewCouponsImpl(client *Client) *couponsImpl {
+	return &couponsImpl{client: client}
 }
 
 // List returns a list of all the coupons on your site.
 // https://dev.recurly.com/docs/list-active-coupons
-func (s *CouponsService) List(params recurly.Params) (*recurly.Response, []recurly.Coupon, error) {
+func (s *couponsImpl) List(params Params) (*Response, []Coupon, error) {
 	req, err := s.client.NewRequest("GET", "coupons", params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var c struct {
-		XMLName xml.Name         `xml:"coupons"`
-		Coupons []recurly.Coupon `xml:"coupon"`
+		XMLName xml.Name `xml:"coupons"`
+		Coupons []Coupon `xml:"coupon"`
 	}
 	resp, err := s.client.Do(req, &c)
 
@@ -34,14 +37,14 @@ func (s *CouponsService) List(params recurly.Params) (*recurly.Response, []recur
 
 // Get returns information about an active coupon.
 // https://dev.recurly.com/docs/lookup-a-coupon
-func (s *CouponsService) Get(code string) (*recurly.Response, *recurly.Coupon, error) {
+func (s *couponsImpl) Get(code string) (*Response, *Coupon, error) {
 	action := fmt.Sprintf("coupons/%s", code)
 	req, err := s.client.NewRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var dst recurly.Coupon
+	var dst Coupon
 	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
@@ -49,13 +52,13 @@ func (s *CouponsService) Get(code string) (*recurly.Response, *recurly.Coupon, e
 
 // Create a new coupon. Coupons cannot be updated after being created.
 // https://dev.recurly.com/docs/create-coupon
-func (s *CouponsService) Create(c recurly.Coupon) (*recurly.Response, *recurly.Coupon, error) {
+func (s *couponsImpl) Create(c Coupon) (*Response, *Coupon, error) {
 	req, err := s.client.NewRequest("POST", "coupons", nil, c)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var dst recurly.Coupon
+	var dst Coupon
 	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
@@ -63,7 +66,7 @@ func (s *CouponsService) Create(c recurly.Coupon) (*recurly.Response, *recurly.C
 
 // Delete deactivates the coupon so it can no longer be redeemed.
 // https://docs.recurly.com/api/plans/add-ons#delete-addon
-func (s *CouponsService) Delete(code string) (*recurly.Response, error) {
+func (s *couponsImpl) Delete(code string) (*Response, error) {
 	action := fmt.Sprintf("coupons/%s", code)
 	req, err := s.client.NewRequest("DELETE", action, nil, nil)
 	if err != nil {

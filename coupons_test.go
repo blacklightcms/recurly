@@ -1,4 +1,4 @@
-package api_test
+package recurly_test
 
 import (
 	"bytes"

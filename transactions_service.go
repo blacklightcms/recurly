@@ -1,31 +1,34 @@
-package api
+package recurly
 
 import (
 	"encoding/xml"
 	"fmt"
-
-	recurly "github.com/blacklightcms/go-recurly"
 )
 
-var _ recurly.TransactionsService = &TransactionsService{}
+var _ TransactionsService = &transactionsImpl{}
 
-// TransactionsService handles communication with the transactions related methods
+// transactionsImpl handles communication with the transactions related methods
 // of the recurly API.
-type TransactionsService struct {
-	client *recurly.Client
+type transactionsImpl struct {
+	client *Client
+}
+
+// NewTransactionsImpl returns a new instance of transactionsImpl.
+func NewTransactionsImpl(client *Client) *transactionsImpl {
+	return &transactionsImpl{client: client}
 }
 
 // List returns a list of transactions
 // https://dev.recurly.com/docs/list-transactions
-func (s *TransactionsService) List(params recurly.Params) (*recurly.Response, []recurly.Transaction, error) {
+func (s *transactionsImpl) List(params Params) (*Response, []Transaction, error) {
 	req, err := s.client.NewRequest("GET", "transactions", params, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
 	var v struct {
-		XMLName      xml.Name              `xml:"transactions"`
-		Transactions []recurly.Transaction `xml:"transaction"`
+		XMLName      xml.Name      `xml:"transactions"`
+		Transactions []Transaction `xml:"transaction"`
 	}
 	resp, err := s.client.Do(req, &v)
 
@@ -34,7 +37,7 @@ func (s *TransactionsService) List(params recurly.Params) (*recurly.Response, []
 
 // ListAccount returns a list of transactions for an account
 // https://dev.recurly.com/docs/list-accounts-transactions
-func (s *TransactionsService) ListAccount(accountCode string, params recurly.Params) (*recurly.Response, []recurly.Transaction, error) {
+func (s *transactionsImpl) ListAccount(accountCode string, params Params) (*Response, []Transaction, error) {
 	action := fmt.Sprintf("accounts/%s/transactions", accountCode)
 	req, err := s.client.NewRequest("GET", action, params, nil)
 	if err != nil {
@@ -42,8 +45,8 @@ func (s *TransactionsService) ListAccount(accountCode string, params recurly.Par
 	}
 
 	var v struct {
-		XMLName      xml.Name              `xml:"transactions"`
-		Transactions []recurly.Transaction `xml:"transaction"`
+		XMLName      xml.Name      `xml:"transactions"`
+		Transactions []Transaction `xml:"transaction"`
 	}
 	resp, err := s.client.Do(req, &v)
 
@@ -55,14 +58,14 @@ func (s *TransactionsService) ListAccount(accountCode string, params recurly.Par
 // transaction_error section may be included if the transaction failed.
 // Please see transaction error codes for more details.
 // https://dev.recurly.com/docs/lookup-transaction
-func (s *TransactionsService) Get(uuid string) (*recurly.Response, *recurly.Transaction, error) {
+func (s *transactionsImpl) Get(uuid string) (*Response, *Transaction, error) {
 	action := fmt.Sprintf("transactions/%s", uuid)
 	req, err := s.client.NewRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var dst recurly.Transaction
+	var dst Transaction
 	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
@@ -76,13 +79,13 @@ func (s *TransactionsService) Get(uuid string) (*recurly.Response, *recurly.Tran
 //
 // See the documentation and Transaction.MarshalXML function for a detailed field list.
 // https://dev.recurly.com/docs/create-transaction
-func (s *TransactionsService) Create(t recurly.Transaction) (*recurly.Response, *recurly.Transaction, error) {
+func (s *transactionsImpl) Create(t Transaction) (*Response, *Transaction, error) {
 	req, err := s.client.NewRequest("POST", "transactions", nil, t)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var dst recurly.Transaction
+	var dst Transaction
 	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err

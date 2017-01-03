@@ -1,23 +1,26 @@
-package api
+package recurly
 
 import (
 	"encoding/xml"
 	"fmt"
-
-	"github.com/blacklightcms/go-recurly"
 )
 
-var _ recurly.AdjustmentsService = &AdjustmentsService{}
+var _ AdjustmentsService = &adjustmentsImpl{}
 
-// AdjustmentsService handles communication with the adjustments related methods
+// adjustmentsImpl handles communication with the adjustments related methods
 // of the recurly API.
-type AdjustmentsService struct {
-	client *recurly.Client
+type adjustmentsImpl struct {
+	client *Client
+}
+
+// NewAdjustmentsImpl returns a new instance of adjustmentsImpl.
+func NewAdjustmentsImpl(client *Client) *adjustmentsImpl {
+	return &adjustmentsImpl{client: client}
 }
 
 // List retrieves all charges and credits issued for an account
 // https://docs.recurly.com/api/adjustments#list-adjustments
-func (s *AdjustmentsService) List(accountCode string, params recurly.Params) (*recurly.Response, []recurly.Adjustment, error) {
+func (s *adjustmentsImpl) List(accountCode string, params Params) (*Response, []Adjustment, error) {
 	action := fmt.Sprintf("accounts/%s/adjustments", accountCode)
 	req, err := s.client.NewRequest("GET", action, params, nil)
 	if err != nil {
@@ -25,8 +28,8 @@ func (s *AdjustmentsService) List(accountCode string, params recurly.Params) (*r
 	}
 
 	var a struct {
-		XMLName     xml.Name             `xml:"adjustments"`
-		Adjustments []recurly.Adjustment `xml:"adjustment"`
+		XMLName     xml.Name     `xml:"adjustments"`
+		Adjustments []Adjustment `xml:"adjustment"`
 	}
 	resp, err := s.client.Do(req, &a)
 
@@ -35,14 +38,14 @@ func (s *AdjustmentsService) List(accountCode string, params recurly.Params) (*r
 
 // Get returns information about a single adjustment.
 // https://docs.recurly.com/api/adjustments#get-adjustments
-func (s *AdjustmentsService) Get(uuid string) (*recurly.Response, *recurly.Adjustment, error) {
+func (s *adjustmentsImpl) Get(uuid string) (*Response, *Adjustment, error) {
 	action := fmt.Sprintf("adjustments/%s", uuid)
 	req, err := s.client.NewRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var dst recurly.Adjustment
+	var dst Adjustment
 	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
@@ -54,14 +57,14 @@ func (s *AdjustmentsService) Get(uuid string) (*recurly.Response, *recurly.Adjus
 // posting an invoice. Charges may be removed from an account if they have
 // not been invoiced.
 // https://docs.recurly.com/api/adjustments#create-adjustment
-func (s *AdjustmentsService) Create(accountCode string, a recurly.Adjustment) (*recurly.Response, *recurly.Adjustment, error) {
+func (s *adjustmentsImpl) Create(accountCode string, a Adjustment) (*Response, *Adjustment, error) {
 	action := fmt.Sprintf("accounts/%s/adjustments", accountCode)
 	req, err := s.client.NewRequest("POST", action, nil, a)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var dst recurly.Adjustment
+	var dst Adjustment
 	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
@@ -69,7 +72,7 @@ func (s *AdjustmentsService) Create(accountCode string, a recurly.Adjustment) (*
 
 // Delete removes a non-invoiced adjustment from an account.
 // https://docs.recurly.com/api/adjustments#delete-adjustment
-func (s *AdjustmentsService) Delete(uuid string) (*recurly.Response, error) {
+func (s *adjustmentsImpl) Delete(uuid string) (*Response, error) {
 	action := fmt.Sprintf("adjustments/%s", uuid)
 	req, err := s.client.NewRequest("DELETE", action, nil, nil)
 	if err != nil {

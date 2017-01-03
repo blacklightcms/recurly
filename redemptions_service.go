@@ -1,31 +1,34 @@
-package api
+package recurly
 
 import (
 	"encoding/xml"
 	"fmt"
-
-	recurly "github.com/blacklightcms/go-recurly"
 )
 
-var _ recurly.RedemptionsService = &RedemptionsService{}
+var _ RedemptionsService = &redemptionsImpl{}
 
-// RedemptionsService handles communication with the coupon redemption
+// redemptionsImpl handles communication with the coupon redemption
 // related methods of the recurly API.
-type RedemptionsService struct {
-	client *recurly.Client
+type redemptionsImpl struct {
+	client *Client
+}
+
+// NewRedemptionsImpl returns a new instance of redemptionsImpl.
+func NewRedemptionsImpl(client *Client) *redemptionsImpl {
+	return &redemptionsImpl{client: client}
 }
 
 // GetForAccount looks up information about the 'active' coupon redemption on
 // an account
 // https://dev.recurly.com/docs/lookup-a-coupon-redemption-on-an-account
-func (s *RedemptionsService) GetForAccount(accountCode string) (*recurly.Response, *recurly.Redemption, error) {
+func (s *redemptionsImpl) GetForAccount(accountCode string) (*Response, *Redemption, error) {
 	action := fmt.Sprintf("accounts/%s/redemption", accountCode)
 	req, err := s.client.NewRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var dst recurly.Redemption
+	var dst Redemption
 	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
@@ -34,14 +37,14 @@ func (s *RedemptionsService) GetForAccount(accountCode string) (*recurly.Respons
 // GetForInvoice looks up information about a coupon redemption applied
 // to an invoice.
 // https://dev.recurly.com/docs/lookup-a-coupon-redemption-on-an-invoice
-func (s *RedemptionsService) GetForInvoice(invoiceNumber string) (*recurly.Response, *recurly.Redemption, error) {
+func (s *redemptionsImpl) GetForInvoice(invoiceNumber string) (*Response, *Redemption, error) {
 	action := fmt.Sprintf("invoices/%s/redemption", invoiceNumber)
 	req, err := s.client.NewRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var dst recurly.Redemption
+	var dst Redemption
 	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
@@ -54,7 +57,7 @@ func (s *RedemptionsService) GetForInvoice(invoiceNumber string) (*recurly.Respo
 // will be applied to the next subscription creation (new subscription),
 // modification (e.g. upgrade or downgrade), or renewal.
 // https://dev.recurly.com/docs/redeem-a-coupon-before-or-after-a-subscription
-func (s *RedemptionsService) Redeem(code string, accountCode string, currency string) (*recurly.Response, *recurly.Redemption, error) {
+func (s *redemptionsImpl) Redeem(code string, accountCode string, currency string) (*Response, *Redemption, error) {
 	action := fmt.Sprintf("coupons/%s/redeem", code)
 	data := struct {
 		XMLName     xml.Name `xml:"redemption"`
@@ -69,7 +72,7 @@ func (s *RedemptionsService) Redeem(code string, accountCode string, currency st
 		return nil, nil, err
 	}
 
-	var dst recurly.Redemption
+	var dst Redemption
 	resp, err := s.client.Do(req, &dst)
 
 	return resp, &dst, err
@@ -81,7 +84,7 @@ func (s *RedemptionsService) Redeem(code string, accountCode string, currency st
 // function. Please note: the coupon will still count towards the
 // "maximum redemption total" of a coupon.
 // https://dev.recurly.com/docs/remove-a-coupon-from-an-account
-func (s *RedemptionsService) Delete(accountCode string) (*recurly.Response, error) {
+func (s *redemptionsImpl) Delete(accountCode string) (*Response, error) {
 	action := fmt.Sprintf("accounts/%s/redemption", accountCode)
 	req, err := s.client.NewRequest("DELETE", action, nil, nil)
 	if err != nil {

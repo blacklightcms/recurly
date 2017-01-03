@@ -44,12 +44,26 @@ func NewClient(subDomain, apiKey string, httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
 	}
-	return &Client{
+
+	client := &Client{
 		Client:    httpClient,
 		subDomain: subDomain,
 		apiKey:    apiKey,
 		BaseURL:   fmt.Sprintf(defaultBaseURL, subDomain),
 	}
+
+	client.Accounts = NewAccountsImpl(client)
+	client.Adjustments = NewAdjustmentsImpl(client)
+	client.Billing = NewBillingImpl(client)
+	client.Coupons = NewCouponsImpl(client)
+	client.Redemptions = NewRedemptionsImpl(client)
+	client.Invoices = NewInvoicesImpl(client)
+	client.Plans = NewPlansImpl(client)
+	client.AddOns = NewAddOnsImpl(client)
+	client.Subscriptions = NewSubscriptionsImpl(client)
+	client.Transactions = NewTransactionsImpl(client)
+
+	return client
 }
 
 // NewRequest creates an authenticated API request that is ready to send.
