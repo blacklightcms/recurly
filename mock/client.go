@@ -6,7 +6,8 @@ import (
 	"github.com/blacklightcms/recurly"
 )
 
-// NewClient sets the unexported fields on the struct and returns a Client.
+// NewClient returns a new instance of *recury.Client with the
+// services assigned to mocks.
 func NewClient(httpClient *http.Client) *recurly.Client {
 	if httpClient == nil {
 		httpClient = http.DefaultClient

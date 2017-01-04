@@ -1,4 +1,4 @@
-# Go Recurly
+# Recurly
 Recurly is a Go (golang) API Client for the [Recurly](https://recurly.com/) API.
 
  [![Build Status](https://travis-ci.org/blacklightcms/recurly.svg?branch=master)](https://travis-ci.org/blacklightcms/recurly)  [![GoDoc](https://godoc.org/github.com/blacklightcms/recurly?status.svg)](https://godoc.org/github.com/blacklightcms/recurly)
@@ -296,8 +296,8 @@ retrieve invoice info.
 In addition to the Errors property in the recurly.Response, response also
 contains a TransactionError field for Transaction Errors.
 
-Be sure to check resp.TransactionError for any API calls that may return a transaction
-error for additional info. The TransactionError struct is defined like this:
+Be sure to check `resp.TransactionError` for any API calls that may return a transaction
+error for additional info. The `TransactionError` struct is defined like this:
 ```go
 TransactionError struct {
 	XMLName          xml.Name `xml:"transaction_error"`
@@ -311,8 +311,15 @@ TransactionError struct {
 
 [Link to transaction error documentation](https://recurly.readme.io/v2.0/page/transaction-errors).
 
-## Roadmap
- * [Webhook](https://dev.recurly.com/page/webhooks) support.
+## Using webhooks
+Initial webhook support is in place. The following webhooks are supported:
+ - `SuccessfulPaymentNotification`
+ - `FailedPaymentNotification`
+ - `PastDueInvoiceNotification`
+
+Webhooks can be used by passing an `io.Reader` to `webhooks.Parse`, then using a switch statement with type assertions to determine the webhook returned.
+
+PRs are welcome for additional webhooks.
 
 ## License
 recurly is available under the [MIT License](http://opensource.org/licenses/MIT).

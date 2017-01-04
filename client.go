@@ -39,7 +39,7 @@ type Client struct {
 	Transactions  TransactionsService
 }
 
-// NewClient sets the unexported fields on the struct and returns a Client.
+// NewClient returns a new instance of *Client.
 func NewClient(subDomain, apiKey string, httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = http.DefaultClient
@@ -113,11 +113,6 @@ func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-
-	// @todo pagination support.
-	// How do you make cursor calls for additional pages?
-	// log.Println(res.Header.Get("x-records"))
-	// log.Println(res.Header.Get("link"))
 
 	response := &Response{Response: resp}
 	decoder := xml.NewDecoder(resp.Body)
