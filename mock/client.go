@@ -3,7 +3,7 @@ package mock
 import (
 	"net/http"
 
-	recurly "github.com/blacklightcms/go-recurly"
+	"github.com/blacklightcms/recurly"
 )
 
 // NewClient sets the unexported fields on the struct and returns a Client.

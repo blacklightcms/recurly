@@ -3,7 +3,7 @@ package mock
 import (
 	"time"
 
-	"github.com/blacklightcms/go-recurly"
+	"github.com/blacklightcms/recurly"
 )
 
 var _ recurly.TransactionsService = &TransactionsService{}

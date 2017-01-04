@@ -1,10 +1,10 @@
 # Go Recurly
 Recurly is a Go (golang) API Client for the [Recurly](https://recurly.com/) API.
 
- [![Build Status](https://travis-ci.org/blacklightcms/go-recurly.svg?branch=master)](https://travis-ci.org/blacklightcms/go-recurly)  [![GoDoc](https://godoc.org/github.com/blacklightcms/go-recurly/recurly?status.svg)](https://godoc.org/github.com/blacklightcms/go-recurly/recurly)  
+ [![Build Status](https://travis-ci.org/blacklightcms/recurly.svg?branch=master)](https://travis-ci.org/blacklightcms/recurly)  [![GoDoc](https://godoc.org/github.com/blacklightcms/recurly?status.svg)](https://godoc.org/github.com/blacklightcms/recurly)
 
 ## References
- * [API Reference](http://godoc.org/github.com/blacklightcms/go-recurly/recurly)
+ * [API Reference](http://godoc.org/github.com/blacklightcms/recurly)
  * [Recurly API Documentation](https://dev.recurly.com/docs/)
  * [recurly.js Documentation](https://docs.recurly.com/js/)
  * Documentation and examples below. Unit tests also provide thorough examples.
@@ -12,13 +12,13 @@ Recurly is a Go (golang) API Client for the [Recurly](https://recurly.com/) API.
 ## Installation
 Install using the "go get" command:
 ```
-go get github.com/blacklightcms/go-recurly/recurly
+go get github.com/blacklightcms/recurly
 ```
 
 ### Example
 
 ```go
-import "github.com/blacklightcms/go-recurly/recurly"
+import "github.com/blacklightcms/recurly"
 ```
 
 Construct a new Recurly Client and then work off of that. For example, to list
@@ -58,16 +58,16 @@ The basic usage format is to create a client, and then operate directly off of e
 of the services.
 
 The services are (each link to the GoDoc documentation):
- * [Accounts](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#AccountsService)
- * [Adjustments](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#AdjustmentsService)
- * [Billing](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#BillingService)
- * [Coupons](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#CouponsService)
- * [Redemptions](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#RedemptionsService)
- * [Invoices](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#InvoicesService)
- * [Plans](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#PlansService)
- * [AddOns](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#AddOnsService)
- * [Subscriptions](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#SubscriptionsService)
- * [Transactions](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#TransactionsService)
+ * [Accounts](https://godoc.org/github.com/blacklightcms/recurly#AccountsService)
+ * [Adjustments](https://godoc.org/github.com/blacklightcms/recurly#AdjustmentsService)
+ * [Billing](https://godoc.org/github.com/blacklightcms/recurly#BillingService)
+ * [Coupons](https://godoc.org/github.com/blacklightcms/recurly#CouponsService)
+ * [Redemptions](https://godoc.org/github.com/blacklightcms/recurly#RedemptionsService)
+ * [Invoices](https://godoc.org/github.com/blacklightcms/recurly#InvoicesService)
+ * [Plans](https://godoc.org/github.com/blacklightcms/recurly#PlansService)
+ * [AddOns](https://godoc.org/github.com/blacklightcms/recurly#AddOnsService)
+ * [Subscriptions](https://godoc.org/github.com/blacklightcms/recurly#SubscriptionsService)
+ * [Transactions](https://godoc.org/github.com/blacklightcms/recurly#TransactionsService)
 
 Each of the services correspond to their respective sections in the
 [Recurly API Documentation](https://dev.recurly.com/docs/).
@@ -315,4 +315,4 @@ TransactionError struct {
  * [Webhook](https://dev.recurly.com/page/webhooks) support.
 
 ## License
-go-recurly is available under the [MIT License](http://opensource.org/licenses/MIT).
+recurly is available under the [MIT License](http://opensource.org/licenses/MIT).

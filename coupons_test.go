@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	recurly "github.com/blacklightcms/go-recurly"
+	"github.com/blacklightcms/recurly"
 )
 
 // TestCouponsEncoding ensures structs are encoded to XML properly.

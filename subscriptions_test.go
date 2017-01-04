@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	recurly "github.com/blacklightcms/go-recurly"
+	"github.com/blacklightcms/recurly"
 )
 
 // TestSubscriptionsEncoding ensures structs are encoded to XML properly.

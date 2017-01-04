@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	recurly "github.com/blacklightcms/go-recurly"
+	"github.com/blacklightcms/recurly"
 )
 
 func TestRedemptions_GetForAccount(t *testing.T) {

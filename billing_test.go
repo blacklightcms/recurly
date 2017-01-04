@@ -9,7 +9,7 @@ import (
 	"reflect"
 	"testing"
 
-	recurly "github.com/blacklightcms/go-recurly"
+	"github.com/blacklightcms/recurly"
 )
 
 // TestBillingEncoding ensures structs are encoded to XML properly.
