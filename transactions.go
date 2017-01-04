@@ -87,8 +87,8 @@ func (t Transaction) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 func (t *Transaction) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v struct {
 		XMLName          xml.Name   `xml:"transaction"`
-		InvoiceNumber    HrefInt    `xml:"invoice"`      // use hrefInt for parsing
-		SubscriptionUUID HrefString `xml:"subscription"` // use hrefString for parsing
+		InvoiceNumber    hrefInt    `xml:"invoice"`      // use hrefInt for parsing
+		SubscriptionUUID hrefString `xml:"subscription"` // use hrefString for parsing
 		UUID             string     `xml:"uuid,omitempty"`
 		Action           string     `xml:"action,omitempty"`
 		AmountInCents    int        `xml:"amount_in_cents"`

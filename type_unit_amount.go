@@ -2,19 +2,17 @@ package recurly
 
 import "encoding/xml"
 
-type (
-	// UnitAmount is used in plans where unit amounts are represented in cents
-	// in both EUR and USD.
-	UnitAmount struct {
-		USD int `xml:"USD,omitempty"`
-		EUR int `xml:"EUR,omitempty"`
-	}
+// UnitAmount is used in plans where unit amounts are represented in cents
+// in both EUR and USD.
+type UnitAmount struct {
+	USD int `xml:"USD,omitempty"`
+	EUR int `xml:"EUR,omitempty"`
+}
 
-	uaAlias struct {
-		USD int `xml:"USD,omitempty"`
-		EUR int `xml:"EUR,omitempty"`
-	}
-)
+type uaAlias struct {
+	USD int `xml:"USD,omitempty"`
+	EUR int `xml:"EUR,omitempty"`
+}
 
 // UnmarshalXML unmarshals an int properly, as well as marshaling an empty string to nil.
 func (u *UnitAmount) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {

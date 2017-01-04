@@ -5,15 +5,13 @@ import (
 	"strconv"
 )
 
-type (
-	// NullBool is used for properly handling bool types with the Recurly API.
-	// Without it, setting a false boolean value will be ignored when encoding
-	// xml requests to the Recurly API.
-	NullBool struct {
-		Bool  bool
-		Valid bool
-	}
-)
+// NullBool is used for properly handling bool types with the Recurly API.
+// Without it, setting a false boolean value will be ignored when encoding
+// xml requests to the Recurly API.
+type NullBool struct {
+	Bool  bool
+	Valid bool
+}
 
 // NewBool creates a new NullBool.
 func NewBool(b bool) NullBool {

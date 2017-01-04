@@ -18,8 +18,8 @@ type Redemption struct {
 func (r *Redemption) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v struct {
 		XMLName                xml.Name   `xml:"redemption"`
-		CouponCode             HrefString `xml:"coupon,omitempty"`
-		AccountCode            HrefString `xml:"account,omitempty"`
+		CouponCode             hrefString `xml:"coupon,omitempty"`
+		AccountCode            hrefString `xml:"account,omitempty"`
 		SingleUse              NullBool   `xml:"single_use,omitempty"`
 		TotalDiscountedInCents int        `xml:"total_discounted_in_cents,omitempty"`
 		Currency               string     `xml:"currency,omitempty"`

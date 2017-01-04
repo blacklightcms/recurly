@@ -5,9 +5,7 @@ import (
 	"time"
 )
 
-const (
-	datetimeFormat = "2006-01-02T15:04:05Z07:00"
-)
+const datetimeFormat = "2006-01-02T15:04:05Z07:00"
 
 // GetDateTimeFormat returns the datetimeFormat.
 func GetDateTimeFormat() string {

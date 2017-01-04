@@ -57,10 +57,10 @@ type Invoice struct {
 func (i *Invoice) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v struct {
 		XMLName               xml.Name      `xml:"invoice,omitempty"`
-		AccountCode           HrefString    `xml:"account,omitempty"` // Read only
+		AccountCode           hrefString    `xml:"account,omitempty"` // Read only
 		Address               Address       `xml:"address,omitempty"`
-		SubscriptionUUID      HrefString    `xml:"subscription,omitempty"`
-		OriginalInvoiceNumber HrefInt       `xml:"original_invoice,omitempty"` // Read only
+		SubscriptionUUID      hrefString    `xml:"subscription,omitempty"`
+		OriginalInvoiceNumber hrefInt       `xml:"original_invoice,omitempty"` // Read only
 		UUID                  string        `xml:"uuid,omitempty"`
 		State                 string        `xml:"state,omitempty"`
 		InvoiceNumberPrefix   string        `xml:"invoice_number_prefix,omitempty"`

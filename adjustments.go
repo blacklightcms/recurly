@@ -61,8 +61,8 @@ func (a Adjustment) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 func (a *Adjustment) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v struct {
 		XMLName                xml.Name    `xml:"adjustment"`
-		AccountCode            HrefString  `xml:"account,omitempty"` // Read only
-		InvoiceNumber          HrefInt     `xml:"invoice,omitempty"` // Read only
+		AccountCode            hrefString  `xml:"account,omitempty"` // Read only
+		InvoiceNumber          hrefInt     `xml:"invoice,omitempty"` // Read only
 		UUID                   string      `xml:"uuid,omitempty"`
 		State                  string      `xml:"state,omitempty"`
 		Description            string      `xml:"description,omitempty"`

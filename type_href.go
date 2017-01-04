@@ -8,10 +8,11 @@ import (
 
 var rxHREF = regexp.MustCompile(`([^/]+)$`)
 
-type HrefString string
+// unmarshals href types into strings.
+type hrefString string
 
 // UnmarshalXML unmarshals an int properly, as well as marshaling an empty string to nil.
-func (h *HrefString) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+func (h *hrefString) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v struct {
 		HREF string `xml:"href,attr"`
 	}
@@ -21,14 +22,15 @@ func (h *HrefString) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error 
 		return nil
 	}
 
-	*h = HrefString(rxHREF.FindString(v.HREF))
+	*h = hrefString(rxHREF.FindString(v.HREF))
 	return nil
 }
 
-type HrefInt int
+// unmarshals href types into integers.
+type hrefInt int
 
 // UnmarshalXML unmarshals an int properly, as well as marshaling an empty string to nil.
-func (h *HrefInt) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+func (h *hrefInt) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v struct {
 		HREF string `xml:"href,attr"`
 	}
@@ -43,6 +45,6 @@ func (h *HrefInt) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		return err
 	}
 
-	*h = HrefInt(i)
+	*h = hrefInt(i)
 	return nil
 }

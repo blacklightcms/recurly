@@ -2,13 +2,11 @@ package recurly
 
 import "encoding/xml"
 
-type (
-	// NullInt is used for properly handling int types that could be null.
-	NullInt struct {
-		Int   int
-		Valid bool
-	}
-)
+// NullInt is used for properly handling int types that could be null.
+type NullInt struct {
+	Int   int
+	Valid bool
+}
 
 // NewInt builds a new NullInt struct.
 func NewInt(i int) NullInt {

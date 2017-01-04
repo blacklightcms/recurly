@@ -63,8 +63,8 @@ func (s *Subscription) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 	var v struct {
 		XMLName                xml.Name            `xml:"subscription"`
 		Plan                   NestedPlan          `xml:"plan,omitempty"`
-		AccountCode            HrefString          `xml:"account"`
-		InvoiceNumber          HrefInt             `xml:"invoice"`
+		AccountCode            hrefString          `xml:"account"`
+		InvoiceNumber          hrefInt             `xml:"invoice"`
 		UUID                   string              `xml:"uuid,omitempty"`
 		State                  string              `xml:"state,omitempty"`
 		UnitAmountInCents      int                 `xml:"unit_amount_in_cents,omitempty"`
