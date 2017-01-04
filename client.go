@@ -119,10 +119,10 @@ func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 	if response.IsError() { // Parse validation errors
 		if response.StatusCode == 422 {
 			var ve struct {
-				XMLName          xml.Name         `xml:"errors"`
-				Errors           []Error          `xml:"error"`
-				Transaction      Transaction      `xml:"transaction,omitempty"`
-				TransactionError TransactionError `xml:"transaction_error,omitempty"`
+				XMLName          xml.Name          `xml:"errors"`
+				Errors           []Error           `xml:"error"`
+				Transaction      *Transaction      `xml:"transaction,omitempty"`
+				TransactionError *TransactionError `xml:"transaction_error,omitempty"`
 			}
 
 			if err = decoder.Decode(&ve); err != nil {
@@ -130,8 +130,8 @@ func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 			}
 
 			response.Errors = ve.Errors
-			response.Transaction = &ve.Transaction
-			response.TransactionError = &ve.TransactionError
+			response.Transaction = ve.Transaction
+			response.TransactionError = ve.TransactionError
 		} else if response.IsClientError() { // Parse possible individual error message
 			var ve struct {
 				XMLName     xml.Name `xml:"error"`
