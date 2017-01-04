@@ -106,7 +106,7 @@ func TestPlans_List(t *testing.T) {
 		t.Fatalf("expected per_page parameter of 1, given %s", r.Request.URL.Query().Get("per_page"))
 	}
 
-	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2015-05-29T17:38:15Z")
+	ts, _ := time.Parse(recurly.DateTimeFormat, "2015-05-29T17:38:15Z")
 	if !reflect.DeepEqual(plans, []recurly.Plan{
 		{
 			XMLName: xml.Name{Local: "plan"},
@@ -186,7 +186,7 @@ func TestPlans_Get(t *testing.T) {
 		t.Fatal("expected get plan to return OK")
 	}
 
-	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2015-05-29T17:38:15Z")
+	ts, _ := time.Parse(recurly.DateTimeFormat, "2015-05-29T17:38:15Z")
 	if !reflect.DeepEqual(plan, &recurly.Plan{
 		XMLName: xml.Name{Local: "plan"},
 		Code:    "gold",

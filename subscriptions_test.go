@@ -17,7 +17,7 @@ import (
 // fields are handled properly -- including types like booleans and integers which
 // have zero values that we want to send.
 func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
-	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2015-06-03T13:42:23.764061Z")
+	ts, _ := time.Parse(recurly.DateTimeFormat, "2015-06-03T13:42:23.764061Z")
 	tests := []struct {
 		v        recurly.NewSubscription
 		expected string
@@ -386,9 +386,9 @@ func TestSubscriptions_List(t *testing.T) {
 		t.Fatalf("unexpected per_page: %s", pp)
 	}
 
-	activated, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-05-27T07:00:00Z")
-	cpStartedAt, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-06-27T07:00:00Z")
-	cpEndsAt, _ := time.Parse(recurly.GetDateTimeFormat(), "2010-07-27T07:00:00Z")
+	activated, _ := time.Parse(recurly.DateTimeFormat, "2011-05-27T07:00:00Z")
+	cpStartedAt, _ := time.Parse(recurly.DateTimeFormat, "2011-06-27T07:00:00Z")
+	cpEndsAt, _ := time.Parse(recurly.DateTimeFormat, "2010-07-27T07:00:00Z")
 
 	if !reflect.DeepEqual(subscriptions, []recurly.Subscription{
 		{
@@ -481,9 +481,9 @@ func TestSubscriptions_ListAccount(t *testing.T) {
 		t.Fatalf("unexpected per_page: %s", pp)
 	}
 
-	activated, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-05-27T07:00:00Z")
-	cpStartedAt, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-06-27T07:00:00Z")
-	cpEndsAt, _ := time.Parse(recurly.GetDateTimeFormat(), "2010-07-27T07:00:00Z")
+	activated, _ := time.Parse(recurly.DateTimeFormat, "2011-05-27T07:00:00Z")
+	cpStartedAt, _ := time.Parse(recurly.DateTimeFormat, "2011-06-27T07:00:00Z")
+	cpEndsAt, _ := time.Parse(recurly.DateTimeFormat, "2010-07-27T07:00:00Z")
 
 	if !reflect.DeepEqual(subscriptions, []recurly.Subscription{
 		{
@@ -832,7 +832,7 @@ func TestSubscriptions_Postpone(t *testing.T) {
 	setup()
 	defer teardown()
 
-	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2015-08-27T07:00:00Z")
+	ts, _ := time.Parse(recurly.DateTimeFormat, "2015-08-27T07:00:00Z")
 	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/postpone", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "PUT" {
 			t.Fatalf("unexpected method: %s", r.Method)

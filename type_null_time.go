@@ -5,12 +5,8 @@ import (
 	"time"
 )
 
-const datetimeFormat = "2006-01-02T15:04:05Z07:00"
-
-// GetDateTimeFormat returns the datetimeFormat.
-func GetDateTimeFormat() string {
-	return datetimeFormat
-}
+// DateTimeFormat is the format Recurly uses to represent datetimes.
+const DateTimeFormat = "2006-01-02T15:04:05Z07:00"
 
 // NullTime is used for properly handling time.Time types that could be null.
 type NullTime struct {
@@ -25,10 +21,10 @@ func NewTime(t time.Time) NullTime {
 }
 
 // NewTimeFromString generates a new NullTime based on a
-// time string in the datetimeFormat format.
+// time string in the DateTimeFormat format.
 // This is primarily used in unit testing.
 func NewTimeFromString(str string) NullTime {
-	t, _ := time.Parse(datetimeFormat, str)
+	t, _ := time.Parse(DateTimeFormat, str)
 	return NullTime{Time: &t}
 }
 
@@ -37,7 +33,7 @@ func (t *NullTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v string
 	err := d.DecodeElement(&v, &start)
 	if err == nil && v != "" {
-		parsed, err := time.Parse(datetimeFormat, v)
+		parsed, err := time.Parse(DateTimeFormat, v)
 		if err != nil {
 			return err
 		}
@@ -59,10 +55,10 @@ func (t NullTime) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 }
 
 // String returns a string representation of the time in UTC using the
-// datetimeFormat constant as the format.
+// DateTimeFormat constant as the format.
 func (t NullTime) String() string {
 	if t.Time != nil {
-		return t.Time.UTC().Format(datetimeFormat)
+		return t.Time.UTC().Format(DateTimeFormat)
 	}
 
 	return ""

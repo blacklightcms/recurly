@@ -110,7 +110,7 @@ func TestAccounts_List(t *testing.T) {
 		t.Fatalf("unexpected cursor: %s", resp.Next())
 	}
 
-	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-10-25T12:00:00Z")
+	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-10-25T12:00:00Z")
 	if !reflect.DeepEqual(accounts, []recurly.Account{recurly.Account{
 		XMLName:   xml.Name{Local: "account"},
 		Code:      "1",
@@ -208,7 +208,7 @@ func TestAccounts_Get(t *testing.T) {
 		t.Fatal("Texpected get accounts to return OK")
 	}
 
-	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-10-25T12:00:00Z")
+	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-10-25T12:00:00Z")
 	if !reflect.DeepEqual(a, &recurly.Account{
 		XMLName:   xml.Name{Local: "account"},
 		Code:      "1",

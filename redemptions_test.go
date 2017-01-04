@@ -39,7 +39,7 @@ func TestRedemptions_GetForAccount(t *testing.T) {
 		t.Fatal("expected get redemption to return OK")
 	}
 
-	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-06-27T12:34:56Z")
+	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-06-27T12:34:56Z")
 	if !reflect.DeepEqual(redemption, &recurly.Redemption{
 		CouponCode:             "special",
 		AccountCode:            "1",
@@ -81,7 +81,7 @@ func TestRedemptions_GetForInvoice(t *testing.T) {
 		t.Fatal("expected get redemption to return OK")
 	}
 
-	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-06-27T12:34:56Z")
+	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-06-27T12:34:56Z")
 	if !reflect.DeepEqual(redemption, &recurly.Redemption{
 		CouponCode:             "special",
 		AccountCode:            "1",

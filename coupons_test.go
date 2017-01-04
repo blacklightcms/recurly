@@ -18,7 +18,7 @@ import (
 // fields are handled properly -- including types like booleans and integers which
 // have zero values that we want to send.
 func TestCoupons_Encoding(t *testing.T) {
-	redeem, _ := time.Parse(recurly.GetDateTimeFormat(), "2014-01-01T07:00:00Z")
+	redeem, _ := time.Parse(recurly.DateTimeFormat, "2014-01-01T07:00:00Z")
 	tests := []struct {
 		v        recurly.Coupon
 		expected string
@@ -183,8 +183,8 @@ func TestCoupons_List(t *testing.T) {
 		t.Fatalf("unexpected per_page: %s", pp)
 	}
 
-	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-04-10T07:00:00Z")
-	redeem, _ := time.Parse(recurly.GetDateTimeFormat(), "2014-01-01T07:00:00Z")
+	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-04-10T07:00:00Z")
+	redeem, _ := time.Parse(recurly.DateTimeFormat, "2014-01-01T07:00:00Z")
 	if !reflect.DeepEqual(coupons, []recurly.Coupon{
 		{
 			XMLName:           xml.Name{Local: "coupon"},
@@ -246,8 +246,8 @@ func TestCoupons_Get(t *testing.T) {
 		t.Fatal("expected get coupon to return OK")
 	}
 
-	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-04-10T07:00:00Z")
-	redeem, _ := time.Parse(recurly.GetDateTimeFormat(), "2014-01-01T07:00:00Z")
+	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-04-10T07:00:00Z")
+	redeem, _ := time.Parse(recurly.DateTimeFormat, "2014-01-01T07:00:00Z")
 	if !reflect.DeepEqual(coupon, &recurly.Coupon{
 		XMLName:           xml.Name{Local: "coupon"},
 		Code:              "special",

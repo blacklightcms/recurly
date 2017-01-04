@@ -80,7 +80,7 @@ func TestAddOns_List(t *testing.T) {
 		t.Fatalf("unexpected per_page: %s", pp)
 	}
 
-	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-06-28T12:34:56Z")
+	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-06-28T12:34:56Z")
 	if !reflect.DeepEqual(addOns, []recurly.AddOn{
 		{
 			XMLName:                     xml.Name{Local: "add_on"},
@@ -130,7 +130,7 @@ func TestAddOns_Get(t *testing.T) {
 		t.Fatal("expected get add_on to return OK")
 	}
 
-	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-06-28T12:34:56Z")
+	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-06-28T12:34:56Z")
 	if !reflect.DeepEqual(a, &recurly.AddOn{
 		XMLName:                     xml.Name{Local: "add_on"},
 		Code:                        "ipaddresses",

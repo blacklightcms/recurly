@@ -91,7 +91,7 @@ func TestAdjustments_List(t *testing.T) {
 		t.Fatalf("unexpected cursor: %s", resp.Next())
 	}
 
-	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-08-31T03:30:00Z")
+	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-08-31T03:30:00Z")
 	if !reflect.DeepEqual(adjustments, []recurly.Adjustment{
 		{
 			AccountCode:            "100",
@@ -187,7 +187,7 @@ func TestAdjustments_Get(t *testing.T) {
 		t.Fatal("expected get adjustment to return OK")
 	}
 
-	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2015-02-04T23:13:07Z")
+	ts, _ := time.Parse(recurly.DateTimeFormat, "2015-02-04T23:13:07Z")
 	if !reflect.DeepEqual(adjustment, &recurly.Adjustment{
 		AccountCode:            "100",
 		InvoiceNumber:          1108,

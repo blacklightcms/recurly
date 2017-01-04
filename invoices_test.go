@@ -407,7 +407,7 @@ func TestInvoices_Get(t *testing.T) {
 		t.Fatal("expected get invoice to return OK")
 	}
 
-	ts, _ := time.Parse(recurly.GetDateTimeFormat(), "2011-08-25T12:00:00Z")
+	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-08-25T12:00:00Z")
 	if !reflect.DeepEqual(invoice, &recurly.Invoice{
 		XMLName:     xml.Name{Local: "invoice"},
 		AccountCode: "1",
