@@ -686,3 +686,50 @@ func TestInvoices_MarkFailed(t *testing.T) {
 		t.Fatal("expected create invoice to return OK")
 	}
 }
+
+func TestInvoices_RefundVoidOpenAmount(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/invoices/1010/refund", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		w.WriteHeader(201)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
+	})
+
+	resp, _, err := client.Invoices.RefundVoidOpenAmount(1010, 100, "")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if resp.IsError() {
+		t.Fatal("expected create open amount refund to return OK")
+	}
+}
+
+func TestInvoices_RefundVoidOpenAmount_Params(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/invoices/1010/refund", func(w http.ResponseWriter, r *http.Request) {
+		b, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer r.Body.Close()
+		if !bytes.Equal(b, []byte("<invoice><amount_in_cents>100</amount_in_cents><refund_apply_order>credit</refund_apply_order></invoice>")) {
+			t.Fatalf("unexpected input: %s", string(b))
+		}
+		w.WriteHeader(201)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
+	})
+
+	// Fields ordered in same order as struct xml tags, XML above in same order
+	// for equality check.
+	resp, _, err := client.Invoices.RefundVoidOpenAmount(1010, 100, "credit")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if resp.IsError() {
+		t.Fatal("expected create open amount refund to return OK")
+	}
+}

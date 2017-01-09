@@ -64,6 +64,7 @@ type InvoicesService interface {
 	Create(accountCode string, invoice Invoice) (*Response, *Invoice, error)
 	MarkPaid(invoiceNumber int) (*Response, *Invoice, error)
 	MarkFailed(invoiceNumber int) (*Response, *Invoice, error)
+	RefundVoidOpenAmount(invoiceNumber int, amountInCents int, refundApplyOrder string) (*Response, *Invoice, error)
 }
 
 // PlansService represents the interactions available for plans.
