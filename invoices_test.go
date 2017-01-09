@@ -717,7 +717,7 @@ func TestInvoices_RefundVoidOpenAmount_Params(t *testing.T) {
 			t.Fatal(err)
 		}
 		defer r.Body.Close()
-		if !bytes.Equal(b, []byte("<invoice><amount_in_cents>100</amount_in_cents></invoice>")) {
+		if !bytes.Equal(b, []byte("<invoice><amount_in_cents>100</amount_in_cents><refund_apply_order>credit</refund_apply_order></invoice>")) {
 			t.Fatalf("unexpected input: %s", string(b))
 		}
 		w.WriteHeader(201)
@@ -726,7 +726,7 @@ func TestInvoices_RefundVoidOpenAmount_Params(t *testing.T) {
 
 	// Fields ordered in same order as struct xml tags, XML above in same order
 	// for equality check.
-	resp, _, err := client.Invoices.RefundVoidOpenAmount(1010, 100, "")
+	resp, _, err := client.Invoices.RefundVoidOpenAmount(1010, 100, "credit")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if resp.IsError() {

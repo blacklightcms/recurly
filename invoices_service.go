@@ -161,16 +161,21 @@ func (s *invoicesImpl) MarkFailed(invoiceNumber int) (*Response, *Invoice, error
 	return resp, &dst, err
 }
 
-// Allows custom invoice amounts to be refunded and generates a refund invoice.
+// RefundVoidOpenAmount allows custom invoice amounts to be refunded and generates a refund invoice.
 // Full open amount refunds of invoices with an unsettled transaction will void
 // the transaction and generate a void invoice.
 // https://dev.recurly.com/docs/line-item-refunds
 func (s *invoicesImpl) RefundVoidOpenAmount(invoiceNumber int, amountInCents int, refundApplyOrder string) (*Response, *Invoice, error) {
 	action := fmt.Sprintf("invoices/%d/refund", invoiceNumber)
-	req, err := s.client.newRequest("POST", action, nil, Invoice{
-		AmountInCents:    amountInCents,
-		RefundApplyOrder: refundApplyOrder,
-	})
+	data := struct {
+		XMLName          xml.Name `xml:"invoice"`
+		AmountInCents    int      `xml:"amount_in_cents,omitempty"`
+		RefundApplyOrder string   `xml:"refund_apply_order,omitempty"`
+	}{
+		AmountInCents:    amountInCents,    // Amount is required
+		RefundApplyOrder: refundApplyOrder, // Refund Apply Order defaults to "credit" (vs "transaction")
+	}
+	req, err := s.client.newRequest("POST", action, nil, data)
 	if err != nil {
 		return nil, nil, err
 	}

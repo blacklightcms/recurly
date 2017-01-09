@@ -50,9 +50,6 @@ type Invoice struct {
 	VatReverseChargeNotes string        `xml:"vat_reverse_charge_notes,omitempty"` // PostInvoice param
 	LineItems             []Adjustment  `xml:"-"`
 	Transactions          []Transaction `xml:"-"`
-
-	AmountInCents    int    `xml:"amount_in_cents,omitempty"`
-	RefundApplyOrder string `xml:"refund_apply_order,omitempty"`
 }
 
 // UnmarshalXML unmarshals invoices and handles intermediary state during unmarshaling
