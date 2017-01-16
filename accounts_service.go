@@ -63,6 +63,22 @@ func (s *accountsImpl) Get(code string) (*Response, *Account, error) {
 	return resp, &a, err
 }
 
+// LookupAccountBalance returns an account's balance.
+// https://dev.recurly.com/v2.5/docs/lookup-account-balance
+func (s *accountsImpl) LookupAccountBalance(code string) (*Response, *AccountBalance, error) {
+	action := fmt.Sprintf("accounts/%s/balance", code)
+	req, err := s.client.newRequest("GET", action, nil, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var b AccountBalance
+	resp, err := s.client.do(req, &b)
+	b.AccountCode = code
+
+	return resp, &b, err
+}
+
 // Create will create a new account. You may optionally include billing information.
 // https://docs.recurly.com/api/accounts#create-account
 func (s *accountsImpl) Create(a Account) (*Response, *Account, error) {

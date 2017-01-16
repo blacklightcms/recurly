@@ -24,6 +24,14 @@ type Account struct {
 	CreatedAt        NullTime `xml:"created_at,omitempty"`
 }
 
+// AccountBalance is used for getting the account balance.
+type AccountBalance struct {
+	XMLName     xml.Name `xml:"account_balance"`
+	AccountCode string   `xml:"-"`
+	PastDue     bool     `xml:"past_due"`
+	Balance     int      `xml:"balance_in_cents>USD"`
+}
+
 // Address is used for embedded addresses within other structs.
 type Address struct {
 	Address  string `xml:"address1,omitempty"`
