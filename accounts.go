@@ -26,21 +26,21 @@ type Account struct {
 
 // AccountBalance is used for getting the account balance.
 type AccountBalance struct {
-	XMLName     xml.Name `xml:"account"`
+	XMLName     xml.Name `xml:"account_balance"`
 	AccountCode string   `xml:"-"`
 	PastDue     bool     `xml:"past_due"`
 	Balance     int      `xml:"balance"`
 }
 
 type balanceInCents struct {
-	Balance int `xml:"usd"`
+	Balance int `xml:"USD"`
 }
 
 // UnmarshalXML unmarshals invoices and handles intermediary state during unmarshaling
 // for types like href.
 func (b *AccountBalance) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v struct {
-		XMLName        xml.Name       `xml:"account"`
+		XMLName        xml.Name       `xml:"account_balance"`
 		AccountCode    string         `xml:"-"`
 		PastDue        bool           `xml:"past_due"`
 		BalanceInCents balanceInCents `xml:"balance_in_cents"`

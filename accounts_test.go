@@ -263,7 +263,12 @@ func TestAccounts_LookupAccountBalance(t *testing.T) {
 		PastDue:     false,
 		Balance:     3000,
 	}) {
-		t.Fatalf("unexpected value: %v", b)
+		t.Fatalf("unexpected value: \n%+v \n%+v", b, &recurly.AccountBalance{
+			XMLName:     xml.Name{Local: "account_balance"},
+			AccountCode: "1",
+			PastDue:     false,
+			Balance:     3000,
+		})
 	}
 }
 
