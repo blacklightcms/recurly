@@ -17,6 +17,9 @@ type AccountsService struct {
 	OnGet      func(code string) (*recurly.Response, *recurly.Account, error)
 	GetInvoked bool
 
+	OnLookupAccountBalance      func(code string) (*recurly.Response, *recurly.AccountBalance, error)
+	LookupAccountBalanceInvoked bool
+
 	OnCreate      func(a recurly.Account) (*recurly.Response, *recurly.Account, error)
 	CreateInvoked bool
 
@@ -41,6 +44,11 @@ func (m *AccountsService) List(params recurly.Params) (*recurly.Response, []recu
 func (m *AccountsService) Get(code string) (*recurly.Response, *recurly.Account, error) {
 	m.GetInvoked = true
 	return m.OnGet(code)
+}
+
+func (m *AccountsService) LookupAccountBalance(code string) (*recurly.Response, *recurly.AccountBalance, error) {
+	m.LookupAccountBalanceInvoked = true
+	return m.OnLookupAccountBalance(code)
 }
 
 func (m *AccountsService) Create(a recurly.Account) (*recurly.Response, *recurly.Account, error) {

@@ -101,7 +101,7 @@ func TestAccounts_List(t *testing.T) {
 
 	resp, accounts, err := client.Accounts.List(nil)
 	if err != nil {
-		t.Fatalf("unxpected error: %v", err)
+		t.Fatalf("unexpected error: %v", err)
 	} else if resp.IsError() {
 		t.Fatal("expected list accounts to return OK")
 	} else if resp.Prev() != "" {
@@ -203,9 +203,9 @@ func TestAccounts_Get(t *testing.T) {
 
 	resp, a, err := client.Accounts.Get("1")
 	if err != nil {
-		t.Fatalf("unxpected error: %v", err)
+		t.Fatalf("unexpected error: %v", err)
 	} else if resp.IsError() {
-		t.Fatal("Texpected get accounts to return OK")
+		t.Fatal("expected get accounts to return OK")
 	}
 
 	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-10-25T12:00:00Z")
@@ -227,7 +227,43 @@ func TestAccounts_Get(t *testing.T) {
 		HostedLoginToken: "a92468579e9c4231a6c0031c4716c01d",
 		CreatedAt:        recurly.NewTime(ts),
 	}) {
-		t.Fatalf("unxpected value: %v", a)
+		t.Fatalf("unexpected value: %v", a)
+	}
+}
+
+func TestAccounts_LookupAccountBalance(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/accounts/1/balance", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<account_balance href="https://your-subdomain.recurly.com/v2/accounts/1/balance">
+						  <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
+						  <past_due type="boolean">false</past_due>
+						  <balance_in_cents>
+						    <USD type="integer">3000</USD>
+						    <EUR type="integer">0</EUR>
+						  </balance_in_cents>
+						</account_balance>`)
+	})
+
+	resp, b, err := client.Accounts.LookupAccountBalance("1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if resp.IsError() {
+		t.Fatal("expected get account balance to return OK")
+	}
+
+	if !reflect.DeepEqual(b, &recurly.AccountBalance{
+		XMLName:     xml.Name{Local: "account_balance"},
+		AccountCode: "1",
+		PastDue:     false,
+		Balance:     3000,
+	}) {
+		t.Fatalf("unexpected value: %v", b)
 	}
 }
 
@@ -245,7 +281,7 @@ func TestAccounts_Create(t *testing.T) {
 
 	resp, _, err := client.Accounts.Create(recurly.Account{})
 	if err != nil {
-		t.Fatalf("unxpected error: %v", err)
+		t.Fatalf("unexpected error: %v", err)
 	} else if resp.IsError() {
 		t.Fatal("expected create account to return OK")
 	}

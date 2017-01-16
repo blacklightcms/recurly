@@ -12,6 +12,7 @@ type Params map[string]interface{}
 type AccountsService interface {
 	List(params Params) (*Response, []Account, error)
 	Get(code string) (*Response, *Account, error)
+	LookupAccountBalance(code string) (*Response, *AccountBalance, error)
 	Create(a Account) (*Response, *Account, error)
 	Update(code string, a Account) (*Response, *Account, error)
 	Close(code string) (*Response, error)

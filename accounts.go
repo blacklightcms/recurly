@@ -24,6 +24,40 @@ type Account struct {
 	CreatedAt        NullTime `xml:"created_at,omitempty"`
 }
 
+// AccountBalance is used for getting the account balance.
+type AccountBalance struct {
+	XMLName     xml.Name `xml:"account"`
+	AccountCode string   `xml:"-"`
+	PastDue     bool     `xml:"past_due"`
+	Balance     int      `xml:"balance"`
+}
+
+type balanceInCents struct {
+	Balance int `xml:"usd"`
+}
+
+// UnmarshalXML unmarshals invoices and handles intermediary state during unmarshaling
+// for types like href.
+func (b *AccountBalance) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var v struct {
+		XMLName        xml.Name       `xml:"account"`
+		AccountCode    string         `xml:"-"`
+		PastDue        bool           `xml:"past_due"`
+		BalanceInCents balanceInCents `xml:"balance_in_cents"`
+	}
+	if err := d.DecodeElement(&v, &start); err != nil {
+		return err
+	}
+	*b = AccountBalance{
+		XMLName:     v.XMLName,
+		AccountCode: string(v.AccountCode),
+		PastDue:     v.PastDue,
+		Balance:     v.BalanceInCents.Balance,
+	}
+
+	return nil
+}
+
 // Address is used for embedded addresses within other structs.
 type Address struct {
 	Address  string `xml:"address1,omitempty"`
