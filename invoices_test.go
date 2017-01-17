@@ -513,6 +513,58 @@ func TestInvoices_Get(t *testing.T) {
 	}
 }
 
+// Ensures transactions are ordered by created at date.
+func TestInvoices_Get_TransactionsOrder(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/invoices/1402", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
+		<invoice href="https://your-subdomain.recurly.com/v2/invoices/1402">
+			<transactions type="array">
+				<transaction href="https://your-subdomain.recurly.com/v2/transactions/20150611" type="credit_card">
+					<uuid>20150611</uuid>
+					<created_at type="datetime">2015-06-11T15:25:06Z</created_at>
+				</transaction>
+				<transaction href="https://your-subdomain.recurly.com/v2/transactions/20160101" type="credit_card">
+					<uuid>20160101</uuid>
+					<created_at type="datetime">2016-01-01T15:25:06Z</created_at>
+				</transaction>
+				<transaction href="https://your-subdomain.recurly.com/v2/transactions/20150609" type="credit_card">
+					<uuid>20150609</uuid>
+					<created_at type="datetime">2015-06-09T15:25:06Z</created_at>
+				</transaction>
+				<transaction href="https://your-subdomain.recurly.com/v2/transactions/20150610" type="credit_card">
+					<uuid>20150610</uuid>
+					<created_at type="datetime">2015-06-10T15:25:06Z</created_at>
+				</transaction>
+			</transactions>
+		</invoice>`)
+	})
+
+	resp, invoice, err := client.Invoices.Get(1402)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if resp.IsError() {
+		t.Fatal("expected get invoice to return OK")
+	}
+
+	// Verify transactions are in the correct order.
+	if invoice.Transactions[0].UUID != "20150609" { // June 09 2015
+		t.Fatalf("unexpected uuid(0): %s", invoice.Transactions[0].UUID)
+	} else if invoice.Transactions[1].UUID != "20150610" { // June 10 2015
+		t.Fatalf("unexpected uuid(1): %s", invoice.Transactions[1].UUID)
+	} else if invoice.Transactions[2].UUID != "20150611" { // June 11 2015
+		t.Fatalf("unexpected uuid(2): %s", invoice.Transactions[2].UUID)
+	} else if invoice.Transactions[3].UUID != "20160101" { // Jan 01 2016
+		t.Fatalf("unexpected uuid(3): %s", invoice.Transactions[3].UUID)
+	}
+}
+
 func TestInvoices_GetPDF(t *testing.T) {
 	setup()
 	defer teardown()

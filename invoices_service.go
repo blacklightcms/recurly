@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
+	"sort"
 )
 
 var _ InvoicesService = &invoicesImpl{}
@@ -55,7 +56,8 @@ func (s *invoicesImpl) ListAccount(accountCode string, params Params) (*Response
 }
 
 // Get returns detailed information about an invoice including line items and
-// payments.
+// payments. Transactions returned with the invoice are sorted from oldest to
+// newest.
 // https://dev.recurly.com/docs/lookup-invoice-details
 func (s *invoicesImpl) Get(invoiceNumber int) (*Response, *Invoice, error) {
 	action := fmt.Sprintf("invoices/%d", invoiceNumber)
@@ -66,6 +68,9 @@ func (s *invoicesImpl) Get(invoiceNumber int) (*Response, *Invoice, error) {
 
 	var dst Invoice
 	resp, err := s.client.do(req, &dst)
+
+	// Sort transactions.
+	sort.Sort(Transactions(dst.Transactions))
 
 	return resp, &dst, err
 }

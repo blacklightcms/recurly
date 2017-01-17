@@ -184,3 +184,19 @@ func (c CVVResult) UnableToProcess() bool {
 type AVSResult struct {
 	TransactionResult
 }
+
+// Transactions is a sortable slice of Transaction.
+// It implements sort.Interface.
+type Transactions []Transaction
+
+func (s Transactions) Len() int {
+	return len(s)
+}
+
+func (s Transactions) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+func (s Transactions) Less(i, j int) bool {
+	return s[i].CreatedAt.Time.Before(*s[j].CreatedAt.Time)
+}
