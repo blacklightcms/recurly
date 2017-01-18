@@ -92,7 +92,7 @@ func (c *Client) newRequest(method string, action string, params Params, body in
 
 	req, err := http.NewRequest(method, endpoint, &buf)
 
-	req.SetBasicAuth(c.apiKey, "")
+	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", c.apiKey))
 	req.Header.Set("Accept", "application/xml")
 	req.Header.Set("X-Api-Version", "2.4")
 	if req.Method == "POST" || req.Method == "PUT" {
