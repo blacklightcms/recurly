@@ -40,6 +40,7 @@ type Client struct {
 }
 
 // NewClient returns a new instance of *Client.
+// apiKey should be everything after "Basic ".
 func NewClient(subDomain, apiKey string, httpClient *http.Client) *Client {
 	if httpClient == nil {
 		httpClient = http.DefaultClient

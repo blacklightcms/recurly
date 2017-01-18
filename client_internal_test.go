@@ -24,6 +24,8 @@ func TestClient_NewRequest(t *testing.T) {
 	} else if req.URL.Path != "/v2/accounts/14579" {
 		t.Fatalf("unexpected path: %s", req.URL.Path)
 	} else if req.Method != "GET" {
+	} else if req.Header.Get("Authorization") != "Basic abc" {
+		t.Fatalf("unexpected Authorization header: %s", req.Header.Get("Authorization"))
 		t.Fatalf("unexpected method: %s", req.Method)
 	} else if req.Header.Get("Accept") != "application/xml" {
 		t.Fatalf("unexpected Accept header: %s", req.Header.Get("Accept"))
