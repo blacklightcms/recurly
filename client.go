@@ -10,7 +10,7 @@ import (
 	"strings"
 )
 
-const defaultBaseURL = "https://%s.com/"
+const defaultBaseURL = "https://%s.recurly.com/"
 
 // Client manages communication with the Recurly API.
 type Client struct {
@@ -94,6 +94,7 @@ func (c *Client) newRequest(method string, action string, params Params, body in
 
 	req.SetBasicAuth(c.apiKey, "")
 	req.Header.Set("Accept", "application/xml")
+	req.Header.Set("X-Api-Version", "2.4")
 	if req.Method == "POST" || req.Method == "PUT" {
 		req.Header.Set("Content-Type", "application/xml; charset=utf-8")
 	}
