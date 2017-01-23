@@ -55,6 +55,7 @@ type Subscription struct {
 	PONumber               string              `xml:"po_number,omitempty"`
 	NetTerms               NullInt             `xml:"net_terms,omitempty"`
 	SubscriptionAddOns     []SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
+	PendingSubscription    PendingSubscription `xml:"pending_subscription,omitempty"`
 }
 
 // UnmarshalXML unmarshals transactions and handles intermediary state during unmarshaling
@@ -84,6 +85,7 @@ func (s *Subscription) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 		PONumber               string              `xml:"po_number,omitempty"`
 		NetTerms               NullInt             `xml:"net_terms,omitempty"`
 		SubscriptionAddOns     []SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
+		PendingSubscription    PendingSubscription `xml:"pending_subscription,omitempty"`
 	}
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err
@@ -112,6 +114,7 @@ func (s *Subscription) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 		PONumber:               v.PONumber,
 		NetTerms:               v.NetTerms,
 		SubscriptionAddOns:     v.SubscriptionAddOns,
+		PendingSubscription:    v.PendingSubscription,
 	}
 
 	return nil
@@ -143,6 +146,15 @@ type SubscriptionAddOn struct {
 	Code              string   `xml:"add_on_code"`
 	UnitAmountInCents int      `xml:"unit_amount_in_cents"`
 	Quantity          int      `xml:"quantity,omitempty"`
+}
+
+// PendingSubscription are updates to the subscription or subscription add ons that
+// will be made on the next renewal.
+type PendingSubscription struct {
+	XMLName            xml.Name            `xml:"pending_subscription"`
+	Plan               NestedPlan          `xml:"plan,omitempty"`
+	Quantity           int                 `xml:"quantity,omitempty"` // Quantity of subscriptions
+	SubscriptionAddOns []SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
 }
 
 // NewSubscription is used to create new subscriptions.
