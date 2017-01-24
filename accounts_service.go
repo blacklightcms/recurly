@@ -3,6 +3,7 @@ package recurly
 import (
 	"encoding/xml"
 	"fmt"
+	"net/http"
 )
 
 const (
@@ -58,6 +59,10 @@ func (s *accountsImpl) Get(code string) (*Response, *Account, error) {
 
 	var a Account
 	resp, err := s.client.do(req, &a)
+	if err != nil || resp.StatusCode >= http.StatusBadRequest {
+		return resp, nil, err
+	}
+
 	a.BillingInfo = nil
 
 	return resp, &a, err

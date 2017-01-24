@@ -269,6 +269,26 @@ func TestCoupons_Get(t *testing.T) {
 	}
 }
 
+func TestCoupons_Get_ErrNotFound(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var invoked bool
+	mux.HandleFunc("/v2/coupons/special", func(w http.ResponseWriter, r *http.Request) {
+		invoked = true
+		w.WriteHeader(http.StatusNotFound)
+	})
+
+	_, coupon, err := client.Coupons.Get("special")
+	if !invoked {
+		t.Fatal("handler not invoked")
+	} else if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if coupon != nil {
+		t.Fatalf("expected coupon to be nil: %#v", coupon)
+	}
+}
+
 func TestCoupons_Create(t *testing.T) {
 	setup()
 	defer teardown()

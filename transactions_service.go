@@ -3,6 +3,7 @@ package recurly
 import (
 	"encoding/xml"
 	"fmt"
+	"net/http"
 )
 
 var _ TransactionsService = &transactionsImpl{}
@@ -67,6 +68,9 @@ func (s *transactionsImpl) Get(uuid string) (*Response, *Transaction, error) {
 
 	var dst Transaction
 	resp, err := s.client.do(req, &dst)
+	if err != nil || resp.StatusCode >= http.StatusBadRequest {
+		return resp, nil, err
+	}
 
 	return resp, &dst, err
 }

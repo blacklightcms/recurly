@@ -3,6 +3,7 @@ package recurly
 import (
 	"encoding/xml"
 	"fmt"
+	"net/http"
 )
 
 var _ AddOnsService = &addOnsImpl{}
@@ -47,6 +48,9 @@ func (s *addOnsImpl) Get(planCode string, code string) (*Response, *AddOn, error
 
 	var dst AddOn
 	resp, err := s.client.do(req, &dst)
+	if err != nil || resp.StatusCode >= http.StatusBadRequest {
+		return resp, nil, err
+	}
 
 	return resp, &dst, err
 }

@@ -3,6 +3,7 @@ package recurly
 import (
 	"encoding/xml"
 	"fmt"
+	"net/http"
 )
 
 var _ CouponsService = &couponsImpl{}
@@ -46,6 +47,9 @@ func (s *couponsImpl) Get(code string) (*Response, *Coupon, error) {
 
 	var dst Coupon
 	resp, err := s.client.do(req, &dst)
+	if err != nil || resp.StatusCode >= http.StatusBadRequest {
+		return resp, nil, err
+	}
 
 	return resp, &dst, err
 }

@@ -1,6 +1,9 @@
 package recurly
 
-import "fmt"
+import (
+	"fmt"
+	"net/http"
+)
 
 var _ BillingService = &billingImpl{}
 
@@ -26,6 +29,9 @@ func (s *billingImpl) Get(accountCode string) (*Response, *Billing, error) {
 
 	var dst Billing
 	resp, err := s.client.do(req, &dst)
+	if err != nil || resp.StatusCode >= http.StatusBadRequest {
+		return resp, nil, err
+	}
 
 	return resp, &dst, err
 }

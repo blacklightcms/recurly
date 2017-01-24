@@ -132,6 +132,26 @@ func TestBilling_Get(t *testing.T) {
 	}
 }
 
+func TestBilling_Get_ErrNotFound(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var invoked bool
+	mux.HandleFunc("/v2/accounts/1/billing_info", func(w http.ResponseWriter, r *http.Request) {
+		invoked = true
+		w.WriteHeader(http.StatusNotFound)
+	})
+
+	_, billing, err := client.Billing.Get("1")
+	if !invoked {
+		t.Fatal("handler not invoked")
+	} else if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if billing != nil {
+		t.Fatalf("expected billing to be nil: %#v", billing)
+	}
+}
+
 func TestBilling_Create_WithToken(t *testing.T) {
 	setup()
 	defer teardown()

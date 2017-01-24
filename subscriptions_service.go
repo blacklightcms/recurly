@@ -3,6 +3,7 @@ package recurly
 import (
 	"encoding/xml"
 	"fmt"
+	"net/http"
 	"time"
 )
 
@@ -65,6 +66,9 @@ func (s *subscriptionsImpl) Get(uuid string) (*Response, *Subscription, error) {
 
 	var dst Subscription
 	resp, err := s.client.do(req, &dst)
+	if err != nil || resp.StatusCode >= http.StatusBadRequest {
+		return resp, nil, err
+	}
 
 	return resp, &dst, err
 }

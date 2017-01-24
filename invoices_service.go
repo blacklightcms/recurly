@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
+	"net/http"
 	"sort"
 )
 
@@ -68,6 +69,9 @@ func (s *invoicesImpl) Get(invoiceNumber int) (*Response, *Invoice, error) {
 
 	var dst Invoice
 	resp, err := s.client.do(req, &dst)
+	if err != nil || resp.StatusCode >= http.StatusBadRequest {
+		return resp, nil, err
+	}
 
 	// Sort transactions.
 	sort.Sort(Transactions(dst.Transactions))

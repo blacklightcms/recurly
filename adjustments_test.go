@@ -243,6 +243,26 @@ func TestAdjustments_Get(t *testing.T) {
 	}
 }
 
+func TestAdjustments_Get_ErrNotFound(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var invoked bool
+	mux.HandleFunc("/v2/adjustments/626db120a84102b1809909071c701c60", func(w http.ResponseWriter, r *http.Request) {
+		invoked = true
+		w.WriteHeader(http.StatusNotFound)
+	})
+
+	_, adjustment, err := client.Adjustments.Get("626db120a84102b1809909071c701c60")
+	if !invoked {
+		t.Fatal("handler not invoked")
+	} else if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if adjustment != nil {
+		t.Fatalf("expected adjustment to be nil: %#v", adjustment)
+	}
+}
+
 func TestAdjustments_Create(t *testing.T) {
 	setup()
 	defer teardown()
