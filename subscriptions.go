@@ -32,58 +32,60 @@ const (
 
 // Subscription represents an individual subscription.
 type Subscription struct {
-	XMLName                xml.Name            `xml:"subscription"`
-	Plan                   NestedPlan          `xml:"plan,omitempty"`
-	AccountCode            string              `xml:"-"`
-	InvoiceNumber          int                 `xml:"-"`
-	UUID                   string              `xml:"uuid,omitempty"`
-	State                  string              `xml:"state,omitempty"`
-	UnitAmountInCents      int                 `xml:"unit_amount_in_cents,omitempty"`
-	Currency               string              `xml:"currency,omitempty"`
-	Quantity               int                 `xml:"quantity,omitempty"`
-	ActivatedAt            NullTime            `xml:"activated_at,omitempty"`
-	CanceledAt             NullTime            `xml:"canceled_at,omitempty"`
-	ExpiresAt              NullTime            `xml:"expires_at,omitempty"`
-	CurrentPeriodStartedAt NullTime            `xml:"current_period_started_at,omitempty"`
-	CurrentPeriodEndsAt    NullTime            `xml:"current_period_ends_at,omitempty"`
-	TrialStartedAt         NullTime            `xml:"trial_started_at,omitempty"`
-	TrialEndsAt            NullTime            `xml:"trial_ends_at,omitempty"`
-	TaxInCents             int                 `xml:"tax_in_cents,omitempty"`
-	TaxType                string              `xml:"tax_type,omitempty"`
-	TaxRegion              string              `xml:"tax_region,omitempty"`
-	TaxRate                float64             `xml:"tax_rate,omitempty"`
-	PONumber               string              `xml:"po_number,omitempty"`
-	NetTerms               NullInt             `xml:"net_terms,omitempty"`
-	SubscriptionAddOns     []SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
+	XMLName                xml.Name             `xml:"subscription"`
+	Plan                   NestedPlan           `xml:"plan,omitempty"`
+	AccountCode            string               `xml:"-"`
+	InvoiceNumber          int                  `xml:"-"`
+	UUID                   string               `xml:"uuid,omitempty"`
+	State                  string               `xml:"state,omitempty"`
+	UnitAmountInCents      int                  `xml:"unit_amount_in_cents,omitempty"`
+	Currency               string               `xml:"currency,omitempty"`
+	Quantity               int                  `xml:"quantity,omitempty"`
+	ActivatedAt            NullTime             `xml:"activated_at,omitempty"`
+	CanceledAt             NullTime             `xml:"canceled_at,omitempty"`
+	ExpiresAt              NullTime             `xml:"expires_at,omitempty"`
+	CurrentPeriodStartedAt NullTime             `xml:"current_period_started_at,omitempty"`
+	CurrentPeriodEndsAt    NullTime             `xml:"current_period_ends_at,omitempty"`
+	TrialStartedAt         NullTime             `xml:"trial_started_at,omitempty"`
+	TrialEndsAt            NullTime             `xml:"trial_ends_at,omitempty"`
+	TaxInCents             int                  `xml:"tax_in_cents,omitempty"`
+	TaxType                string               `xml:"tax_type,omitempty"`
+	TaxRegion              string               `xml:"tax_region,omitempty"`
+	TaxRate                float64              `xml:"tax_rate,omitempty"`
+	PONumber               string               `xml:"po_number,omitempty"`
+	NetTerms               NullInt              `xml:"net_terms,omitempty"`
+	SubscriptionAddOns     []SubscriptionAddOn  `xml:"subscription_add_ons>subscription_add_on,omitempty"`
+	PendingSubscription    *PendingSubscription `xml:"pending_subscription,omitempty"`
 }
 
 // UnmarshalXML unmarshals transactions and handles intermediary state during unmarshaling
 // for types like href.
 func (s *Subscription) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v struct {
-		XMLName                xml.Name            `xml:"subscription"`
-		Plan                   NestedPlan          `xml:"plan,omitempty"`
-		AccountCode            hrefString          `xml:"account"`
-		InvoiceNumber          hrefInt             `xml:"invoice"`
-		UUID                   string              `xml:"uuid,omitempty"`
-		State                  string              `xml:"state,omitempty"`
-		UnitAmountInCents      int                 `xml:"unit_amount_in_cents,omitempty"`
-		Currency               string              `xml:"currency,omitempty"`
-		Quantity               int                 `xml:"quantity,omitempty"`
-		ActivatedAt            NullTime            `xml:"activated_at,omitempty"`
-		CanceledAt             NullTime            `xml:"canceled_at,omitempty"`
-		ExpiresAt              NullTime            `xml:"expires_at,omitempty"`
-		CurrentPeriodStartedAt NullTime            `xml:"current_period_started_at,omitempty"`
-		CurrentPeriodEndsAt    NullTime            `xml:"current_period_ends_at,omitempty"`
-		TrialStartedAt         NullTime            `xml:"trial_started_at,omitempty"`
-		TrialEndsAt            NullTime            `xml:"trial_ends_at,omitempty"`
-		TaxInCents             int                 `xml:"tax_in_cents,omitempty"`
-		TaxType                string              `xml:"tax_type,omitempty"`
-		TaxRegion              string              `xml:"tax_region,omitempty"`
-		TaxRate                float64             `xml:"tax_rate,omitempty"`
-		PONumber               string              `xml:"po_number,omitempty"`
-		NetTerms               NullInt             `xml:"net_terms,omitempty"`
-		SubscriptionAddOns     []SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
+		XMLName                xml.Name             `xml:"subscription"`
+		Plan                   NestedPlan           `xml:"plan,omitempty"`
+		AccountCode            hrefString           `xml:"account"`
+		InvoiceNumber          hrefInt              `xml:"invoice"`
+		UUID                   string               `xml:"uuid,omitempty"`
+		State                  string               `xml:"state,omitempty"`
+		UnitAmountInCents      int                  `xml:"unit_amount_in_cents,omitempty"`
+		Currency               string               `xml:"currency,omitempty"`
+		Quantity               int                  `xml:"quantity,omitempty"`
+		ActivatedAt            NullTime             `xml:"activated_at,omitempty"`
+		CanceledAt             NullTime             `xml:"canceled_at,omitempty"`
+		ExpiresAt              NullTime             `xml:"expires_at,omitempty"`
+		CurrentPeriodStartedAt NullTime             `xml:"current_period_started_at,omitempty"`
+		CurrentPeriodEndsAt    NullTime             `xml:"current_period_ends_at,omitempty"`
+		TrialStartedAt         NullTime             `xml:"trial_started_at,omitempty"`
+		TrialEndsAt            NullTime             `xml:"trial_ends_at,omitempty"`
+		TaxInCents             int                  `xml:"tax_in_cents,omitempty"`
+		TaxType                string               `xml:"tax_type,omitempty"`
+		TaxRegion              string               `xml:"tax_region,omitempty"`
+		TaxRate                float64              `xml:"tax_rate,omitempty"`
+		PONumber               string               `xml:"po_number,omitempty"`
+		NetTerms               NullInt              `xml:"net_terms,omitempty"`
+		SubscriptionAddOns     []SubscriptionAddOn  `xml:"subscription_add_ons>subscription_add_on,omitempty"`
+		PendingSubscription    *PendingSubscription `xml:"pending_subscription,omitempty"`
 	}
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err
@@ -112,6 +114,7 @@ func (s *Subscription) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 		PONumber:               v.PONumber,
 		NetTerms:               v.NetTerms,
 		SubscriptionAddOns:     v.SubscriptionAddOns,
+		PendingSubscription:    v.PendingSubscription,
 	}
 
 	return nil
@@ -143,6 +146,15 @@ type SubscriptionAddOn struct {
 	Code              string   `xml:"add_on_code"`
 	UnitAmountInCents int      `xml:"unit_amount_in_cents"`
 	Quantity          int      `xml:"quantity,omitempty"`
+}
+
+// PendingSubscription are updates to the subscription or subscription add ons that
+// will be made on the next renewal.
+type PendingSubscription struct {
+	XMLName            xml.Name            `xml:"pending_subscription"`
+	Plan               NestedPlan          `xml:"plan,omitempty"`
+	Quantity           int                 `xml:"quantity,omitempty"` // Quantity of subscriptions
+	SubscriptionAddOns []SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
 }
 
 // NewSubscription is used to create new subscriptions.
