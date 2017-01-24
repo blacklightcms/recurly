@@ -682,7 +682,7 @@ func TestSubscriptions_Get_PendingSubscription(t *testing.T) {
 		TaxRegion:              "CA",
 		TaxRate:                0.0875,
 		NetTerms:               recurly.NewInt(0),
-		PendingSubscription: recurly.PendingSubscription{
+		PendingSubscription: &recurly.PendingSubscription{
 			XMLName: xml.Name{Local: "pending_subscription"},
 			Plan: recurly.NestedPlan{
 				Code: "gold",
