@@ -1,6 +1,7 @@
 package recurly
 
 import (
+	"encoding/base64"
 	"encoding/xml"
 	"fmt"
 	"io/ioutil"
@@ -18,6 +19,9 @@ func TestClient_NewRequest(t *testing.T) {
 	client.BaseURL = server.URL + "/"
 	defer server.Close()
 
+	// API key should be base64 encoded.
+	encoded := base64.StdEncoding.EncodeToString([]byte("abc"))
+
 	req, err := client.newRequest("GET", "accounts/14579", Params{"foo": "bar"}, nil)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -25,7 +29,7 @@ func TestClient_NewRequest(t *testing.T) {
 		t.Fatalf("unexpected path: %s", req.URL.Path)
 	} else if req.Method != "GET" {
 		t.Fatalf("unexpected method: %s", req.Method)
-	} else if req.Header.Get("Authorization") != "Basic abc" {
+	} else if req.Header.Get("Authorization") != fmt.Sprintf("Basic %s", encoded) { // API key should be base64 encoded
 		t.Fatalf("unexpected Authorization header: %s", req.Header.Get("Authorization"))
 	} else if req.Header.Get("Accept") != "application/xml" {
 		t.Fatalf("unexpected Accept header: %s", req.Header.Get("Accept"))

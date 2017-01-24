@@ -2,6 +2,7 @@ package recurly
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/xml"
 	"fmt"
 	"io"
@@ -49,7 +50,7 @@ func NewClient(subDomain, apiKey string, httpClient *http.Client) *Client {
 	client := &Client{
 		client:    httpClient,
 		subDomain: subDomain,
-		apiKey:    apiKey,
+		apiKey:    base64.StdEncoding.EncodeToString([]byte(apiKey)),
 		BaseURL:   fmt.Sprintf(defaultBaseURL, subDomain),
 	}
 
