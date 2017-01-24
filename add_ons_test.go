@@ -146,6 +146,26 @@ func TestAddOns_Get(t *testing.T) {
 	}
 }
 
+func TestAddOns_Get_ErrNotFound(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var invoked bool
+	mux.HandleFunc("/v2/plans/gold/add_ons/ipaddresses", func(w http.ResponseWriter, r *http.Request) {
+		invoked = true
+		w.WriteHeader(http.StatusNotFound)
+	})
+
+	_, addons, err := client.AddOns.Get("gold", "ipaddresses")
+	if !invoked {
+		t.Fatal("handler not invoked")
+	} else if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if addons != nil {
+		t.Fatalf("expected addons to be nil: %#v", addons)
+	}
+}
+
 func TestAddOns_Create(t *testing.T) {
 	setup()
 	defer teardown()

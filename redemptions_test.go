@@ -53,6 +53,26 @@ func TestRedemptions_GetForAccount(t *testing.T) {
 	}
 }
 
+func TestRedemptions_GetForAccount_ErrNotFound(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var invoked bool
+	mux.HandleFunc("/v2/accounts/1/redemption", func(w http.ResponseWriter, r *http.Request) {
+		invoked = true
+		w.WriteHeader(http.StatusNotFound)
+	})
+
+	_, redemption, err := client.Redemptions.GetForAccount("1")
+	if !invoked {
+		t.Fatal("handler not invoked")
+	} else if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if redemption != nil {
+		t.Fatalf("expected redemption to be nil: %#v", redemption)
+	}
+}
+
 func TestRedemptions_GetForInvoice(t *testing.T) {
 	setup()
 	defer teardown()
@@ -92,6 +112,26 @@ func TestRedemptions_GetForInvoice(t *testing.T) {
 		CreatedAt:              recurly.NewTime(ts),
 	}) {
 		t.Fatalf("unexpected redemption: %v", redemption)
+	}
+}
+
+func TestRedemptions_GetForInvoice_ErrNotFound(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var invoked bool
+	mux.HandleFunc("/v2/invoices/1108/redemption", func(w http.ResponseWriter, r *http.Request) {
+		invoked = true
+		w.WriteHeader(http.StatusNotFound)
+	})
+
+	_, redemption, err := client.Redemptions.GetForInvoice("1108")
+	if !invoked {
+		t.Fatal("handler not invoked")
+	} else if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if redemption != nil {
+		t.Fatalf("expected redemption to be nil: %#v", redemption)
 	}
 }
 

@@ -589,6 +589,26 @@ func TestSubscriptions_Get(t *testing.T) {
 	}
 }
 
+func TestSubscriptions_Get_ErrNotFound(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var invoked bool
+	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96", func(w http.ResponseWriter, r *http.Request) {
+		invoked = true
+		w.WriteHeader(http.StatusNotFound)
+	})
+
+	_, subscription, err := client.Subscriptions.Get("44f83d7cba354d5b84812419f923ea96")
+	if !invoked {
+		t.Fatal("handler not invoked")
+	} else if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if subscription != nil {
+		t.Fatalf("expected subscription to be nil: %#v", subscription)
+	}
+}
+
 func TestSubscriptions_Get_PendingSubscription(t *testing.T) {
 	setup()
 	defer teardown()

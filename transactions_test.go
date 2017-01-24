@@ -422,6 +422,26 @@ func TestTransactions_Get(t *testing.T) {
 	}
 }
 
+func TestTransactions_Get_ErrNotFound(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var invoked bool
+	mux.HandleFunc("/v2/transactions/a13acd8fe4294916b79aec87b7ea441f", func(w http.ResponseWriter, r *http.Request) {
+		invoked = true
+		w.WriteHeader(http.StatusNotFound)
+	})
+
+	_, transaction, err := client.Transactions.Get("a13acd8fe4294916b79aec87b7ea441f")
+	if !invoked {
+		t.Fatal("handler not invoked")
+	} else if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if transaction != nil {
+		t.Fatalf("expected transaction to be nil: %#v", transaction)
+	}
+}
+
 func TestTransactions_New(t *testing.T) {
 	setup()
 	defer teardown()

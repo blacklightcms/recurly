@@ -3,6 +3,7 @@ package recurly
 import (
 	"encoding/xml"
 	"fmt"
+	"net/http"
 )
 
 var _ AdjustmentsService = &adjustmentsImpl{}
@@ -47,6 +48,9 @@ func (s *adjustmentsImpl) Get(uuid string) (*Response, *Adjustment, error) {
 
 	var dst Adjustment
 	resp, err := s.client.do(req, &dst)
+	if err != nil || resp.StatusCode >= http.StatusBadRequest {
+		return resp, nil, err
+	}
 
 	return resp, &dst, err
 }

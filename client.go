@@ -120,7 +120,7 @@ func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 	response := &Response{Response: resp}
 	decoder := xml.NewDecoder(resp.Body)
 	if response.IsError() { // Parse validation errors
-		if response.StatusCode == 422 {
+		if response.StatusCode == http.StatusUnprocessableEntity {
 			var ve struct {
 				XMLName          xml.Name          `xml:"errors"`
 				Errors           []Error           `xml:"error"`
@@ -141,7 +141,9 @@ func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 				Symbol      string   `xml:"symbol"`
 				Description string   `xml:"description"`
 			}
-			if err = decoder.Decode(&ve); err != nil {
+			if err = decoder.Decode(&ve); err == io.EOF {
+				return response, nil
+			} else if err != nil {
 				return response, err
 			}
 

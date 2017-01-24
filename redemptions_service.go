@@ -3,6 +3,7 @@ package recurly
 import (
 	"encoding/xml"
 	"fmt"
+	"net/http"
 )
 
 var _ RedemptionsService = &redemptionsImpl{}
@@ -30,6 +31,9 @@ func (s *redemptionsImpl) GetForAccount(accountCode string) (*Response, *Redempt
 
 	var dst Redemption
 	resp, err := s.client.do(req, &dst)
+	if err != nil || resp.StatusCode >= http.StatusBadRequest {
+		return resp, nil, err
+	}
 
 	return resp, &dst, err
 }
@@ -46,6 +50,9 @@ func (s *redemptionsImpl) GetForInvoice(invoiceNumber string) (*Response, *Redem
 
 	var dst Redemption
 	resp, err := s.client.do(req, &dst)
+	if err != nil || resp.StatusCode >= http.StatusBadRequest {
+		return resp, nil, err
+	}
 
 	return resp, &dst, err
 }

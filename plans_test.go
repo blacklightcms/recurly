@@ -214,6 +214,26 @@ func TestPlans_Get(t *testing.T) {
 	}
 }
 
+func TestPlans_Get_ErrNotFound(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var invoked bool
+	mux.HandleFunc("/v2/plans/gold", func(w http.ResponseWriter, r *http.Request) {
+		invoked = true
+		w.WriteHeader(http.StatusNotFound)
+	})
+
+	_, plan, err := client.Plans.Get("gold")
+	if !invoked {
+		t.Fatal("handler not invoked")
+	} else if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if plan != nil {
+		t.Fatalf("expected plan to be nil: %#v", plan)
+	}
+}
+
 func TestPlans_Create(t *testing.T) {
 	setup()
 	defer teardown()
