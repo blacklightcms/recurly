@@ -155,6 +155,9 @@ func (s *invoicesImpl) Collect(invoiceNumber int) (*Response, *Invoice, error) {
 
 	var dst Invoice
 	resp, err := s.client.do(req, &dst)
+	if err != nil || resp.StatusCode >= http.StatusBadRequest {
+		return resp, nil, err
+	}
 
 	return resp, &dst, err
 }

@@ -270,6 +270,9 @@ type InvoicesService struct {
 	OnCreate      func(accountCode string, invoice recurly.Invoice) (*recurly.Response, *recurly.Invoice, error)
 	CreateInvoked bool
 
+	OnCollect      func(invoiceNumber int) (*recurly.Response, *recurly.Invoice, error)
+	CollectInvoked bool
+
 	OnMarkPaid      func(invoiceNumber int) (*recurly.Response, *recurly.Invoice, error)
 	MarkPaidInvoked bool
 
@@ -308,6 +311,11 @@ func (m *InvoicesService) Preview(accountCode string) (*recurly.Response, *recur
 func (m *InvoicesService) Create(accountCode string, invoice recurly.Invoice) (*recurly.Response, *recurly.Invoice, error) {
 	m.CreateInvoked = true
 	return m.OnCreate(accountCode, invoice)
+}
+
+func (m *InvoicesService) Collect(invoiceNumber int) (*recurly.Response, *recurly.Invoice, error) {
+	m.CollectInvoked = true
+	return m.OnCollect(invoiceNumber)
 }
 
 func (m *InvoicesService) MarkPaid(invoiceNumber int) (*recurly.Response, *recurly.Invoice, error) {
