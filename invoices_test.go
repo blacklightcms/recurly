@@ -719,6 +719,26 @@ func TestInvoices_Create_Params(t *testing.T) {
 	}
 }
 
+func TestInvoices_Collect(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/invoices/1010/collect", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		w.WriteHeader(201)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
+	})
+
+	resp, _, err := client.Invoices.Collect(1010)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if resp.IsError() {
+		t.Fatal("expected create invoice to return OK")
+	}
+}
+
 func TestInvoices_MarkPaid(t *testing.T) {
 	setup()
 	defer teardown()
