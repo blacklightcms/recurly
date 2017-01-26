@@ -140,6 +140,28 @@ func (s *invoicesImpl) Create(accountCode string, invoice Invoice) (*Response, *
 	return resp, &dst, err
 }
 
+// Collect force retries the card on file for the invoice.
+// Allows to collect a past-due or pending invoice. This API is rate limited
+// and only one collection attempt per account is allowed within an hour.
+// Will return status code 400 if rate limit hit or if invoice not in the
+// correct state.
+// https://dev.recurly.com/v2.5/docs/collect-an-invoice
+func (s *invoicesImpl) Collect(invoiceNumber int) (*Response, *Invoice, error) {
+	action := fmt.Sprintf("invoices/%d/collect", invoiceNumber)
+	req, err := s.client.newRequest("PUT", action, nil, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var dst Invoice
+	resp, err := s.client.do(req, &dst)
+	if err != nil || resp.StatusCode >= http.StatusBadRequest {
+		return resp, nil, err
+	}
+
+	return resp, &dst, err
+}
+
 // MarkPaid marks an invoice as paid successfully.
 // https://dev.recurly.com/docs/mark-an-invoice-as-paid-successfully
 func (s *invoicesImpl) MarkPaid(invoiceNumber int) (*Response, *Invoice, error) {

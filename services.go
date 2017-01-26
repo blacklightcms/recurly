@@ -63,6 +63,7 @@ type InvoicesService interface {
 	GetPDF(invoiceNumber int, language string) (*Response, *bytes.Buffer, error)
 	Preview(accountCode string) (*Response, *Invoice, error)
 	Create(accountCode string, invoice Invoice) (*Response, *Invoice, error)
+	Collect(invoiceNumber int) (*Response, *Invoice, error)
 	MarkPaid(invoiceNumber int) (*Response, *Invoice, error)
 	MarkFailed(invoiceNumber int) (*Response, *Invoice, error)
 	RefundVoidOpenAmount(invoiceNumber int, amountInCents int, refundApplyOrder string) (*Response, *Invoice, error)
