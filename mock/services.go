@@ -281,6 +281,9 @@ type InvoicesService struct {
 
 	OnRefundVoidOpenAmount      func(invoiceNumber int, amountInCents int, refundApplyOrder string) (*recurly.Response, *recurly.Invoice, error)
 	RefundVoidOpenAmountInvoked bool
+
+	OnRecordPayment      func(pmt recurly.OfflinePayment) (*recurly.Response, *recurly.Transaction, error)
+	RecordPaymentInvoked bool
 }
 
 func (m *InvoicesService) List(params recurly.Params) (*recurly.Response, []recurly.Invoice, error) {
@@ -331,6 +334,11 @@ func (m *InvoicesService) MarkFailed(invoiceNumber int) (*recurly.Response, *rec
 func (m *InvoicesService) RefundVoidOpenAmount(invoiceNumber int, amountInCents int, refundApplyOrder string) (*recurly.Response, *recurly.Invoice, error) {
 	m.RefundVoidOpenAmountInvoked = true
 	return m.OnRefundVoidOpenAmount(invoiceNumber, amountInCents, refundApplyOrder)
+}
+
+func (m *InvoicesService) RecordPayment(pmt recurly.OfflinePayment) (*recurly.Response, *recurly.Transaction, error) {
+	m.RecordPaymentInvoked = true
+	return m.OnRecordPayment(pmt)
 }
 
 // PlansService represents the interactions available for plans.

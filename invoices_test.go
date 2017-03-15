@@ -846,3 +846,26 @@ func TestInvoices_RefundVoidOpenAmount_Params(t *testing.T) {
 		t.Fatal("expected create open amount refund to return OK")
 	}
 }
+
+func TestInvoices_RecordPayment(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/invoices/1402/transactions", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><transaction></transaction>`)
+	})
+
+	resp, _, err := client.Invoices.RecordPayment(recurly.OfflinePayment{
+		InvoiceNumber: 1402,
+		PaymentMethod: recurly.PaymentMethodCheck,
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if resp.IsError() {
+		t.Fatal("expected create invoice to return OK")
+	}
+}

@@ -216,3 +216,18 @@ func (s *invoicesImpl) RefundVoidOpenAmount(invoiceNumber int, amountInCents int
 
 	return resp, &dst, err
 }
+
+// RecordPayment records an offline payment for a manual invoice.
+// https://dev.recurly.com/v2.5/docs/enter-an-offline-payment-for-a-manual-invoice-beta
+func (s *invoicesImpl) RecordPayment(offlinePayment OfflinePayment) (*Response, *Transaction, error) {
+	action := fmt.Sprintf("invoices/%d/transactions", offlinePayment.InvoiceNumber)
+	req, err := s.client.newRequest("POST", action, nil, offlinePayment)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var dst Transaction
+	resp, err := s.client.do(req, &dst)
+
+	return resp, &dst, err
+}
