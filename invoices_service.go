@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"sort"
-	"time"
 )
 
 var _ InvoicesService = &invoicesImpl{}
@@ -222,19 +221,7 @@ func (s *invoicesImpl) RefundVoidOpenAmount(invoiceNumber int, amountInCents int
 // https://dev.recurly.com/v2.5/docs/enter-an-offline-payment-for-a-manual-invoice-beta
 func (s *invoicesImpl) RecordPayment(offlinePayment OfflinePayment) (*Response, *Transaction, error) {
 	action := fmt.Sprintf("invoices/%d/transactions", offlinePayment.InvoiceNumber)
-	data := struct {
-		XMLName       xml.Name   `xml:"transaction"`
-		PaymentMethod string     `xml:"payment_method"`
-		CollectedAt   *time.Time `xml:"collected_at,omitempty"`
-		Amount        int        `xml:"amount_in_cents,omitempty"`
-		Description   string     `xml:"description,omitempty"`
-	}{
-		PaymentMethod: offlinePayment.PaymentMethod,
-		CollectedAt:   offlinePayment.CollectedAt,
-		Amount:        offlinePayment.Amount,
-		Description:   offlinePayment.Description,
-	}
-	req, err := s.client.newRequest("POST", action, nil, data)
+	req, err := s.client.newRequest("POST", action, nil, offlinePayment)
 	if err != nil {
 		return nil, nil, err
 	}

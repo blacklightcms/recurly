@@ -130,9 +130,10 @@ const (
 
 // OfflinePayment is a payment received outside the system to be recorded in Recurly.
 type OfflinePayment struct {
+	XMLName       xml.Name   `xml:"transaction"`
 	InvoiceNumber int        `xml:"-"`
-	PaymentMethod string     `xml:"payment_method"`  // Enter Offline Payment param
-	Amount        int        `xml:"amount_in_cents"` // Enter Offline Payment param
-	CollectedAt   *time.Time `xml:"collected_at"`    // Enter Offline Payment param
-	Description   string     `xml:"description"`     // Enter Offline Payment param
+	PaymentMethod string     `xml:"payment_method"`
+	CollectedAt   *time.Time `xml:"collected_at,omitempty"`
+	Amount        int        `xml:"amount_in_cents,omitempty"`
+	Description   string     `xml:"description,omitempty"`
 }
