@@ -846,3 +846,42 @@ func TestInvoices_RefundVoidOpenAmount_Params(t *testing.T) {
 		t.Fatal("expected create open amount refund to return OK")
 	}
 }
+
+func TestInvoices_RecordPayment(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var invoked bool
+	mux.HandleFunc("/v2/invoices/1402/transactions", func(w http.ResponseWriter, r *http.Request) {
+		invoked = true
+		if r.Method != "POST" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		b, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer r.Body.Close()
+		if !bytes.Equal(b, []byte("<transaction><payment_method>check</payment_method><collected_at>2017-01-03T00:00:00Z</collected_at><amount_in_cents>1000</amount_in_cents><description>Paid with a check</description></transaction>")) {
+			t.Fatalf("unexpected input: %s", string(b))
+		}
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><transaction></transaction>`)
+	})
+
+	date := time.Date(2017, 1, 3, 0, 0, 0, 0, time.UTC)
+	resp, _, err := client.Invoices.RecordPayment(recurly.OfflinePayment{
+		InvoiceNumber: 1402,
+		PaymentMethod: recurly.PaymentMethodCheck,
+		Amount:        1000,
+		CollectedAt:   &date,
+		Description:   "Paid with a check",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if resp.IsError() {
+		t.Fatal("expected create invoice to return OK")
+	} else if !invoked {
+		t.Fatal("handler not invoked")
+	}
+}

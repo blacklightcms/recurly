@@ -1,6 +1,9 @@
 package recurly
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+	"time"
+)
 
 const (
 	// InvoiceStateOpen is an invoice state for invoices that are open, pending
@@ -112,4 +115,25 @@ func (i *Invoice) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	}
 
 	return nil
+}
+
+// Payment method constants.
+const (
+	PaymentMethodCreditCard   = "credit_card"
+	PaymentMethodPayPal       = "paypal"
+	PaymentMethodEFT          = "eft"
+	PaymentMethodWireTransfer = "wire_transfer"
+	PaymentMethodMoneyOrder   = "money_order"
+	PaymentMethodCheck        = "check"
+	PaymentMethodOther        = "other"
+)
+
+// OfflinePayment is a payment received outside the system to be recorded in Recurly.
+type OfflinePayment struct {
+	XMLName       xml.Name   `xml:"transaction"`
+	InvoiceNumber int        `xml:"-"`
+	PaymentMethod string     `xml:"payment_method"`
+	CollectedAt   *time.Time `xml:"collected_at,omitempty"`
+	Amount        int        `xml:"amount_in_cents,omitempty"`
+	Description   string     `xml:"description,omitempty"`
 }
