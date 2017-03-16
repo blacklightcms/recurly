@@ -20,6 +20,25 @@ const (
 	// InvoiceStatePastDue is an invoice state for invoices where initial collection
 	// failed, but Recurly is still attempting collection.
 	InvoiceStatePastDue = "past_due"
+
+	// CollectionMethodAutomatic is a collection method where the customer's
+	// credit card is charged.
+	CollectionMethodAutomatic = "automatic"
+
+	// CollectionMethodManual is a collection method where the customer pays via
+	// an accepted payment method outside of Recurly.
+	CollectionMethodManual = "manual"
+)
+
+// Payment method constants.
+const (
+	PaymentMethodCreditCard   = "credit_card"
+	PaymentMethodPayPal       = "paypal"
+	PaymentMethodEFT          = "eft"
+	PaymentMethodWireTransfer = "wire_transfer"
+	PaymentMethodMoneyOrder   = "money_order"
+	PaymentMethodCheck        = "check"
+	PaymentMethodOther        = "other"
 )
 
 // Invoice is an individual invoice for an account.
@@ -116,17 +135,6 @@ func (i *Invoice) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 
 	return nil
 }
-
-// Payment method constants.
-const (
-	PaymentMethodCreditCard   = "credit_card"
-	PaymentMethodPayPal       = "paypal"
-	PaymentMethodEFT          = "eft"
-	PaymentMethodWireTransfer = "wire_transfer"
-	PaymentMethodMoneyOrder   = "money_order"
-	PaymentMethodCheck        = "check"
-	PaymentMethodOther        = "other"
-)
 
 // OfflinePayment is a payment received outside the system to be recorded in Recurly.
 type OfflinePayment struct {
