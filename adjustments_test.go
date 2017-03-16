@@ -288,7 +288,9 @@ func TestAdjustments_Credit(t *testing.T) {
 	setup()
 	defer teardown()
 
+	var invoked bool
 	mux.HandleFunc("/v2/accounts/1/adjustments", func(w http.ResponseWriter, r *http.Request) {
+		invoked = true
 		if r.Method != "POST" {
 			t.Fatalf("unexpected method: %s", r.Method)
 		}
@@ -305,7 +307,9 @@ func TestAdjustments_Credit(t *testing.T) {
 	})
 
 	resp, _, err := client.Adjustments.Create("1", recurly.Adjustment{UnitAmountInCents: -100, Description: "Description", Currency: "USD"})
-	if err != nil {
+	if !invoked {
+		t.Fatal("handler not invoked")
+	} else if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if resp.StatusCode != 201 {
 		t.Fatalf("unexpected status code: %d", resp.StatusCode)
