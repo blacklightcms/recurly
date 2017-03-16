@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"reflect"
 	"testing"
@@ -277,6 +278,38 @@ func TestAdjustments_Create(t *testing.T) {
 
 	resp, _, err := client.Adjustments.Create("1", recurly.Adjustment{})
 	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if resp.StatusCode != 201 {
+		t.Fatalf("unexpected status code: %d", resp.StatusCode)
+	}
+}
+
+func TestAdjustments_Credit(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var invoked bool
+	mux.HandleFunc("/v2/accounts/1/adjustments", func(w http.ResponseWriter, r *http.Request) {
+		invoked = true
+		if r.Method != "POST" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		b, err := ioutil.ReadAll(r.Body)
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer r.Body.Close()
+		if !bytes.Equal(b, []byte("<adjustment><description>Description</description><unit_amount_in_cents>-100</unit_amount_in_cents><currency>USD</currency></adjustment>")) {
+			t.Fatalf("unexpected input: %s", string(b))
+		}
+		w.WriteHeader(201)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><adjustment></adjustment>`)
+	})
+
+	resp, _, err := client.Adjustments.Create("1", recurly.Adjustment{UnitAmountInCents: -100, Description: "Description", Currency: "USD"})
+	if !invoked {
+		t.Fatal("handler not invoked")
+	} else if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if resp.StatusCode != 201 {
 		t.Fatalf("unexpected status code: %d", resp.StatusCode)
