@@ -11,9 +11,10 @@ import (
 
 // Webhook notification constants.
 const (
-	SuccessfulPayment = "successful_payment_notification"
-	FailedPayment     = "failed_payment_notification"
-	PastDueInvoice    = "past_due_invoice_notification"
+	SuccessfulPayment   = "successful_payment_notification"
+	FailedPayment       = "failed_payment_notification"
+	PastDueInvoice      = "past_due_invoice_notification"
+	ExpiredSubscription = "expired_subscription_notification"
 )
 
 type notificationName struct {
@@ -22,21 +23,31 @@ type notificationName struct {
 
 type (
 	// SuccessfulPaymentNotification is sent when a payment is successful.
+	// https://dev.recurly.com/v2.4/page/webhooks#section-successful-payment
 	SuccessfulPaymentNotification struct {
 		Account     recurly.Account     `xml:"account"`
 		Transaction recurly.Transaction `xml:"transaction"`
 	}
 
 	// FailedPaymentNotification is sent when a payment fails.
+	// https://dev.recurly.com/v2.4/page/webhooks#section-failed-payment
 	FailedPaymentNotification struct {
 		Account     recurly.Account     `xml:"account"`
 		Transaction recurly.Transaction `xml:"transaction"`
 	}
 
 	// PastDueInvoiceNotification is sent when an invoice is past due.
+	// https://dev.recurly.com/v2.4/page/webhooks#section-past-due-invoice
 	PastDueInvoiceNotification struct {
 		Account recurly.Account `xml:"account"`
 		Invoice recurly.Invoice `xml:"invoice"`
+	}
+
+	// ExpiredSubscriptionNotification is sent when a subscription is no longer valid.
+	// https://dev.recurly.com/v2.4/page/webhooks#section-expired-subscription
+	ExpiredSubscriptionNotification struct {
+		Account      recurly.Account      `xml:"account"`
+		Subscription recurly.Subscription `xml:"subscription"`
 	}
 )
 
@@ -105,6 +116,8 @@ func Parse(r io.Reader) (interface{}, error) {
 		dst = &FailedPaymentNotification{}
 	case PastDueInvoice:
 		dst = &PastDueInvoiceNotification{}
+	case ExpiredSubscription:
+		dst = &ExpiredSubscriptionNotification{}
 	default:
 		return nil, ErrUnknownNotification{name: n.XMLName.Local}
 	}

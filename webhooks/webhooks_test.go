@@ -5,6 +5,7 @@ import (
 	"os"
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/blacklightcms/recurly"
 	"github.com/blacklightcms/recurly/webhooks"
@@ -110,6 +111,47 @@ func TestParse_PastDueInvoiceNotification(t *testing.T) {
 		},
 	}) {
 		t.Fatalf("unexpected notification: %v", n)
+	}
+}
+
+func TestParse_ExpiredSubscriptionNotification(t *testing.T) {
+	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:03Z")
+	canceledTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:43Z")
+	expiresTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-24T22:05:03Z")
+	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:03Z")
+	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-24T22:05:03Z")
+
+	xmlFile := MustOpenFile("testdata/expired_subscription_notification.xml")
+	result, err := webhooks.Parse(xmlFile)
+	if err != nil {
+		t.Fatal(err)
+	} else if n, ok := result.(*webhooks.ExpiredSubscriptionNotification); !ok {
+		t.Fatalf("unexpected type: %T, result")
+	} else if !reflect.DeepEqual(n, &webhooks.ExpiredSubscriptionNotification{
+		Account: recurly.Account{
+			XMLName:   xml.Name{Local: "account"},
+			Code:      "1",
+			Email:     "verena@example.com",
+			FirstName: "Verena",
+			LastName:  "Example",
+		},
+		Subscription: recurly.Subscription{
+			XMLName: xml.Name{Local: "subscription"},
+			Plan: recurly.NestedPlan{
+				Code: "1dpt",
+				Name: "Subscription One",
+			},
+			UUID:                   "d1b6d359a01ded71caed78eaa0fedf8e",
+			State:                  "expired",
+			Quantity:               1,
+			ActivatedAt:            recurly.NewTime(activatedTs),
+			CanceledAt:             recurly.NewTime(canceledTs),
+			ExpiresAt:              recurly.NewTime(expiresTs),
+			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
+			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+		},
+	}) {
+		t.Fatalf("unexpected notification: %#v", n)
 	}
 }
 
