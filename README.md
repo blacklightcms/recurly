@@ -313,9 +313,17 @@ TransactionError struct {
 
 ## Using webhooks
 Initial webhook support is in place. The following webhooks are supported:
+
+Subscription Notifications
+ - `ExpiredSubscriptionNotification`
+
+ Invoice Notifications
+ - `NewInvoiceNotification`
+ - `PastDueInvoiceNotification`
+
+Payment Notifications
  - `SuccessfulPaymentNotification`
  - `FailedPaymentNotification`
- - `PastDueInvoiceNotification`
 
 Webhooks can be used by passing an `io.Reader` to `webhooks.Parse`, then using a switch statement with type assertions to determine the webhook returned.
 
