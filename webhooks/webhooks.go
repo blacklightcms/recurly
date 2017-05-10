@@ -11,16 +11,50 @@ import (
 
 // Webhook notification constants.
 const (
-	SuccessfulPayment   = "successful_payment_notification"
-	FailedPayment       = "failed_payment_notification"
-	PastDueInvoice      = "past_due_invoice_notification"
+	// Subscription notifications.
 	ExpiredSubscription = "expired_subscription_notification"
+
+	// Invoice notifications.
+	NewInvoice     = "new_invoice_notification"
+	PastDueInvoice = "past_due_invoice_notification"
+
+	// Payment notifications.
+	SuccessfulPayment = "successful_payment_notification"
+	FailedPayment     = "failed_payment_notification"
 )
 
 type notificationName struct {
 	XMLName xml.Name
 }
 
+// Subscription types.
+type (
+	// ExpiredSubscriptionNotification is sent when a subscription is no longer valid.
+	// https://dev.recurly.com/v2.4/page/webhooks#section-expired-subscription
+	ExpiredSubscriptionNotification struct {
+		Account      recurly.Account      `xml:"account"`
+		Subscription recurly.Subscription `xml:"subscription"`
+	}
+)
+
+// Invoice types.
+type (
+	// NewInvoiceNotification is sent when an invoice generated.
+	// https://dev.recurly.com/page/webhooks#section-new-invoice
+	NewInvoiceNotification struct {
+		Account recurly.Account `xml:"account"`
+		Invoice recurly.Invoice `xml:"invoice"`
+	}
+
+	// PastDueInvoiceNotification is sent when an invoice is past due.
+	// https://dev.recurly.com/v2.4/page/webhooks#section-past-due-invoice
+	PastDueInvoiceNotification struct {
+		Account recurly.Account `xml:"account"`
+		Invoice recurly.Invoice `xml:"invoice"`
+	}
+)
+
+// Payment types.
 type (
 	// SuccessfulPaymentNotification is sent when a payment is successful.
 	// https://dev.recurly.com/v2.4/page/webhooks#section-successful-payment
@@ -34,20 +68,6 @@ type (
 	FailedPaymentNotification struct {
 		Account     recurly.Account     `xml:"account"`
 		Transaction recurly.Transaction `xml:"transaction"`
-	}
-
-	// PastDueInvoiceNotification is sent when an invoice is past due.
-	// https://dev.recurly.com/v2.4/page/webhooks#section-past-due-invoice
-	PastDueInvoiceNotification struct {
-		Account recurly.Account `xml:"account"`
-		Invoice recurly.Invoice `xml:"invoice"`
-	}
-
-	// ExpiredSubscriptionNotification is sent when a subscription is no longer valid.
-	// https://dev.recurly.com/v2.4/page/webhooks#section-expired-subscription
-	ExpiredSubscriptionNotification struct {
-		Account      recurly.Account      `xml:"account"`
-		Subscription recurly.Subscription `xml:"subscription"`
 	}
 )
 
@@ -110,14 +130,16 @@ func Parse(r io.Reader) (interface{}, error) {
 
 	var dst interface{}
 	switch n.XMLName.Local {
+	case ExpiredSubscription:
+		dst = &ExpiredSubscriptionNotification{}
+	case NewInvoice:
+		dst = &NewInvoiceNotification{}
+	case PastDueInvoice:
+		dst = &PastDueInvoiceNotification{}
 	case SuccessfulPayment:
 		dst = &SuccessfulPaymentNotification{}
 	case FailedPayment:
 		dst = &FailedPaymentNotification{}
-	case PastDueInvoice:
-		dst = &PastDueInvoiceNotification{}
-	case ExpiredSubscription:
-		dst = &ExpiredSubscriptionNotification{}
 	default:
 		return nil, ErrUnknownNotification{name: n.XMLName.Local}
 	}
