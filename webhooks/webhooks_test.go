@@ -19,6 +19,129 @@ func MustOpenFile(name string) *os.File {
 	return file
 }
 
+func TestParse_NewSubscriptionNotification(t *testing.T) {
+	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:03Z")
+	canceledTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:43Z")
+	expiresTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-24T22:05:03Z")
+	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:03Z")
+	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-24T22:05:03Z")
+
+	xmlFile := MustOpenFile("testdata/new_subscription_notification.xml")
+	result, err := webhooks.Parse(xmlFile)
+	if err != nil {
+		t.Fatal(err)
+	} else if n, ok := result.(*webhooks.NewSubscriptionNotification); !ok {
+		t.Fatalf("unexpected type: %T, result")
+	} else if !reflect.DeepEqual(n, &webhooks.NewSubscriptionNotification{
+		Account: recurly.Account{
+			XMLName:   xml.Name{Local: "account"},
+			Code:      "1",
+			Email:     "verena@example.com",
+			FirstName: "Verena",
+			LastName:  "Example",
+		},
+		Subscription: recurly.Subscription{
+			XMLName: xml.Name{Local: "subscription"},
+			Plan: recurly.NestedPlan{
+				Code: "bronze",
+				Name: "Bronze Plan",
+			},
+			UUID:                   "d1b6d359a01ded71caed78eaa0fedf8e",
+			State:                  "active",
+			Quantity:               2,
+			TotalAmountInCents:     17000,
+			ActivatedAt:            recurly.NewTime(activatedTs),
+			CanceledAt:             recurly.NewTime(canceledTs),
+			ExpiresAt:              recurly.NewTime(expiresTs),
+			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
+			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+		},
+	}) {
+		t.Fatalf("unexpected notification: %#v", n)
+	}
+}
+
+func TestParse_UpdatedSubscriptionNotification(t *testing.T) {
+	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:03Z")
+	canceledTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:43Z")
+	expiresTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-24T22:05:03Z")
+	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:03Z")
+	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-24T22:05:03Z")
+
+	xmlFile := MustOpenFile("testdata/updated_subscription_notification.xml")
+	result, err := webhooks.Parse(xmlFile)
+	if err != nil {
+		t.Fatal(err)
+	} else if n, ok := result.(*webhooks.UpdatedSubscriptionNotification); !ok {
+		t.Fatalf("unexpected type: %T, result")
+	} else if !reflect.DeepEqual(n, &webhooks.UpdatedSubscriptionNotification{
+		Account: recurly.Account{
+			XMLName:   xml.Name{Local: "account"},
+			Code:      "1",
+			Email:     "verena@example.com",
+			FirstName: "Verena",
+			LastName:  "Example",
+		},
+		Subscription: recurly.Subscription{
+			XMLName: xml.Name{Local: "subscription"},
+			Plan: recurly.NestedPlan{
+				Code: "1dpt",
+				Name: "Subscription One",
+			},
+			UUID:                   "292332928954ca62fa48048be5ac98ec",
+			State:                  "active",
+			Quantity:               1,
+			TotalAmountInCents:     200,
+			ActivatedAt:            recurly.NewTime(activatedTs),
+			CanceledAt:             recurly.NewTime(canceledTs),
+			ExpiresAt:              recurly.NewTime(expiresTs),
+			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
+			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+		},
+	}) {
+		t.Fatalf("unexpected notification: %#v", n)
+	}
+}
+
+func TestParse_RenewedSubscriptionNotification(t *testing.T) {
+	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-07-22T20:42:05Z")
+	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-22T20:42:05Z")
+	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2010-10-22T20:42:05Z")
+
+	xmlFile := MustOpenFile("testdata/renewed_subscription_notification.xml")
+	result, err := webhooks.Parse(xmlFile)
+	if err != nil {
+		t.Fatal(err)
+	} else if n, ok := result.(*webhooks.RenewedSubscriptionNotification); !ok {
+		t.Fatalf("unexpected type: %T, result")
+	} else if !reflect.DeepEqual(n, &webhooks.RenewedSubscriptionNotification{
+		Account: recurly.Account{
+			XMLName:     xml.Name{Local: "account"},
+			Code:        "1",
+			Email:       "verena@example.com",
+			FirstName:   "Verena",
+			LastName:    "Example",
+			CompanyName: "Company, Inc.",
+		},
+		Subscription: recurly.Subscription{
+			XMLName: xml.Name{Local: "subscription"},
+			Plan: recurly.NestedPlan{
+				Code: "bootstrap",
+				Name: "Bootstrap",
+			},
+			UUID:                   "6ab458a887d38070807ebb3bed7ac1e5",
+			State:                  "active",
+			Quantity:               1,
+			TotalAmountInCents:     9900,
+			ActivatedAt:            recurly.NewTime(activatedTs),
+			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
+			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+		},
+	}) {
+		t.Fatalf("unexpected notification: %#v", n)
+	}
+}
+
 func TestParse_ExpiredSubscriptionNotification(t *testing.T) {
 	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:03Z")
 	canceledTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:43Z")
@@ -49,6 +172,49 @@ func TestParse_ExpiredSubscriptionNotification(t *testing.T) {
 			UUID:                   "d1b6d359a01ded71caed78eaa0fedf8e",
 			State:                  "expired",
 			Quantity:               1,
+			TotalAmountInCents:     200,
+			ActivatedAt:            recurly.NewTime(activatedTs),
+			CanceledAt:             recurly.NewTime(canceledTs),
+			ExpiresAt:              recurly.NewTime(expiresTs),
+			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
+			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+		},
+	}) {
+		t.Fatalf("unexpected notification: %#v", n)
+	}
+}
+
+func TestParse_CanceledSubscriptionNotification(t *testing.T) {
+	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:03Z")
+	canceledTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:43Z")
+	expiresTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-24T22:05:03Z")
+	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:03Z")
+	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-24T22:05:03Z")
+
+	xmlFile := MustOpenFile("testdata/canceled_subscription_notification.xml")
+	result, err := webhooks.Parse(xmlFile)
+	if err != nil {
+		t.Fatal(err)
+	} else if n, ok := result.(*webhooks.CanceledSubscriptionNotification); !ok {
+		t.Fatalf("unexpected type: %T, result")
+	} else if !reflect.DeepEqual(n, &webhooks.CanceledSubscriptionNotification{
+		Account: recurly.Account{
+			XMLName:   xml.Name{Local: "account"},
+			Code:      "1",
+			Email:     "verena@example.com",
+			FirstName: "Verena",
+			LastName:  "Example",
+		},
+		Subscription: recurly.Subscription{
+			XMLName: xml.Name{Local: "subscription"},
+			Plan: recurly.NestedPlan{
+				Code: "1dpt",
+				Name: "Subscription One",
+			},
+			UUID:                   "dccd742f4710e78515714d275839f891",
+			State:                  "canceled",
+			Quantity:               1,
+			TotalAmountInCents:     200,
 			ActivatedAt:            recurly.NewTime(activatedTs),
 			CanceledAt:             recurly.NewTime(canceledTs),
 			ExpiresAt:              recurly.NewTime(expiresTs),
@@ -179,6 +345,72 @@ func TestParse_FailedPaymentNotification(t *testing.T) {
 			Test:          true,
 			Voidable:      recurly.NullBool{Bool: false, Valid: true},
 			Refundable:    recurly.NullBool{Bool: false, Valid: true},
+		},
+	}) {
+		t.Fatalf("unexpected notification: %#v", n)
+	}
+}
+
+func TestParse_VoidPaymentNotification(t *testing.T) {
+	xmlFile := MustOpenFile("testdata/void_payment_notification.xml")
+	if result, err := webhooks.Parse(xmlFile); err != nil {
+		t.Fatal(err)
+	} else if n, ok := result.(*webhooks.VoidPaymentNotification); !ok {
+		t.Fatalf("unexpected type: %T, result")
+	} else if !reflect.DeepEqual(n, &webhooks.VoidPaymentNotification{
+		Account: recurly.Account{
+			XMLName:     xml.Name{Local: "account"},
+			Code:        "1",
+			Username:    "verena",
+			Email:       "verena@example.com",
+			FirstName:   "Verena",
+			LastName:    "Example",
+			CompanyName: "Company, Inc.",
+		},
+		Transaction: recurly.Transaction{
+			UUID:          "a5143c1d3a6f4a8287d0e2cc1d4c0427",
+			InvoiceNumber: 2059,
+			Action:        "purchase",
+			AmountInCents: 1000,
+			Status:        "void",
+			Reference:     "reference",
+			Source:        "subscription",
+			Test:          true,
+			Voidable:      recurly.NullBool{Bool: true, Valid: true},
+			Refundable:    recurly.NullBool{Bool: true, Valid: true},
+		},
+	}) {
+		t.Fatalf("unexpected notification: %#v", n)
+	}
+}
+
+func TestParse_SuccessfulRefundNotification(t *testing.T) {
+	xmlFile := MustOpenFile("testdata/successful_refund_notification.xml")
+	if result, err := webhooks.Parse(xmlFile); err != nil {
+		t.Fatal(err)
+	} else if n, ok := result.(*webhooks.SuccessfulRefundNotification); !ok {
+		t.Fatalf("unexpected type: %T, result")
+	} else if !reflect.DeepEqual(n, &webhooks.SuccessfulRefundNotification{
+		Account: recurly.Account{
+			XMLName:     xml.Name{Local: "account"},
+			Code:        "1",
+			Username:    "verena",
+			Email:       "verena@example.com",
+			FirstName:   "Verena",
+			LastName:    "Example",
+			CompanyName: "Company, Inc.",
+		},
+		Transaction: recurly.Transaction{
+			UUID:          "a5143c1d3a6f4a8287d0e2cc1d4c0427",
+			InvoiceNumber: 2059,
+			Action:        "credit",
+			AmountInCents: 1000,
+			Status:        "success",
+			Reference:     "reference",
+			Source:        "subscription",
+			Test:          true,
+			Voidable:      recurly.NullBool{Bool: true, Valid: true},
+			Refundable:    recurly.NullBool{Bool: true, Valid: true},
 		},
 	}) {
 		t.Fatalf("unexpected notification: %#v", n)
