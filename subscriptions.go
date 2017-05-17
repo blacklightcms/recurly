@@ -41,6 +41,7 @@ type Subscription struct {
 	UnitAmountInCents      int                  `xml:"unit_amount_in_cents,omitempty"`
 	Currency               string               `xml:"currency,omitempty"`
 	Quantity               int                  `xml:"quantity,omitempty"`
+	TotalAmountInCents     int                  `xml:"total_amount_in_cents,omitempty"`
 	ActivatedAt            NullTime             `xml:"activated_at,omitempty"`
 	CanceledAt             NullTime             `xml:"canceled_at,omitempty"`
 	ExpiresAt              NullTime             `xml:"expires_at,omitempty"`
@@ -71,6 +72,7 @@ func (s *Subscription) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 		UnitAmountInCents      int                  `xml:"unit_amount_in_cents,omitempty"`
 		Currency               string               `xml:"currency,omitempty"`
 		Quantity               int                  `xml:"quantity,omitempty"`
+		TotalAmountInCents     int                  `xml:"total_amount_in_cents,omitempty"`
 		ActivatedAt            NullTime             `xml:"activated_at,omitempty"`
 		CanceledAt             NullTime             `xml:"canceled_at,omitempty"`
 		ExpiresAt              NullTime             `xml:"expires_at,omitempty"`
@@ -100,6 +102,7 @@ func (s *Subscription) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 		UnitAmountInCents:      v.UnitAmountInCents,
 		Currency:               v.Currency,
 		Quantity:               v.Quantity,
+		TotalAmountInCents:     v.TotalAmountInCents,
 		ActivatedAt:            v.ActivatedAt,
 		CanceledAt:             v.CanceledAt,
 		ExpiresAt:              v.ExpiresAt,
