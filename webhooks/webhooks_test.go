@@ -311,9 +311,9 @@ func TestParse_SuccessfulPaymentNotification(t *testing.T) {
 			Message:       "Bogus Gateway: Forced success",
 			Reference:     "reference",
 			Source:        "subscription",
-			Test:          true,
-			Voidable:      true,
-			Refundable:    true,
+			Test:          recurly.NullBool{Valid: true, Bool: true},
+			Voidable:      recurly.NullBool{Valid: true, Bool: true},
+			Refundable:    recurly.NullBool{Valid: true, Bool: true},
 		},
 	}) {
 		t.Fatalf("unexpected notification: %#v", n)
@@ -348,9 +348,9 @@ func TestParse_FailedPaymentNotification(t *testing.T) {
 			FailureType:      "Declined by the gateway",
 			Reference:        "reference",
 			Source:           "subscription",
-			Test:             true,
-			Voidable:         false,
-			Refundable:       false,
+			Test:             recurly.NullBool{Valid: true, Bool: true},
+			Voidable:         recurly.NullBool{Valid: true, Bool: false},
+			Refundable:       recurly.NullBool{Valid: true, Bool: false},
 		},
 	}) {
 		t.Fatalf("unexpected notification: %#v", n)
@@ -384,9 +384,9 @@ func TestParse_VoidPaymentNotification(t *testing.T) {
 			Message:          "Test Gateway: Successful test transaction",
 			Reference:        "reference",
 			Source:           "subscription",
-			Test:             true,
-			Voidable:         true,
-			Refundable:       true,
+			Test:             recurly.NullBool{Valid: true, Bool: true},
+			Voidable:         recurly.NullBool{Valid: true, Bool: true},
+			Refundable:       recurly.NullBool{Valid: true, Bool: true},
 		},
 	}) {
 		t.Fatalf("unexpected notification: %#v", n)
@@ -420,9 +420,9 @@ func TestParse_SuccessfulRefundNotification(t *testing.T) {
 			Message:          "Bogus Gateway: Forced success",
 			Reference:        "reference",
 			Source:           "subscription",
-			Test:             true,
-			Voidable:         true,
-			Refundable:       true,
+			Test:             recurly.NullBool{Valid: true, Bool: true},
+			Voidable:         recurly.NullBool{Valid: true, Bool: true},
+			Refundable:       recurly.NullBool{Valid: true, Bool: true},
 		},
 	}) {
 		t.Fatalf("unexpected notification: %#v", n)
