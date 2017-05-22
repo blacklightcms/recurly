@@ -33,6 +33,37 @@ type notificationName struct {
 	XMLName xml.Name
 }
 
+// Account represents the account object sent in webhooks.
+type Account struct {
+	XMLName     xml.Name `xml:"account"`
+	Code        string   `xml:"account_code,omitempty"`
+	Username    string   `xml:"username,omitempty"`
+	Email       string   `xml:"email,omitempty"`
+	FirstName   string   `xml:"first_name,omitempty"`
+	LastName    string   `xml:"last_name,omitempty"`
+	CompanyName string   `xml:"company_name,omitempty"`
+	Phone       string   `xml:"phone,omitempty"`
+}
+
+// Transaction represents the transaction object sent in webhooks.
+type Transaction struct {
+	XMLName           xml.Name `xml:"transaction"`
+	UUID              string   `xml:"id,omitempty"`
+	InvoiceNumber     int      `xml:"invoice_number,omitempty"`
+	SubscriptionUUID  string   `xml:"subscription_id,omitempty"`
+	Action            string   `xml:"action,omitempty"`
+	AmountInCents     int      `xml:"amount_in_cents,omitempty"`
+	Status            string   `xml:"status,omitempty"`
+	Message           string   `xml:"message,omitempty"`
+	GatewayErrorCodes string   `xml:"gateway_error_codes,omitempty"`
+	FailureType       string   `xml:"failure_type,omitempty"`
+	Reference         string   `xml:"reference,omitempty"`
+	Source            string   `xml:"source,omitempty"`
+	Test              bool     `xml:"test,omitempty"`
+	Voidable          bool     `xml:"voidable,omitempty"`
+	Refundable        bool     `xml:"refundable,omitempty"`
+}
+
 // Subscription types.
 type (
 	// NewSubscriptionNotification is sent when a new subscription is created.
@@ -93,66 +124,31 @@ type (
 	// SuccessfulPaymentNotification is sent when a payment is successful.
 	// https://dev.recurly.com/v2.4/page/webhooks#section-successful-payment
 	SuccessfulPaymentNotification struct {
-		Account     recurly.Account     `xml:"account"`
-		Transaction recurly.Transaction `xml:"transaction"`
+		Account     Account     `xml:"account"`
+		Transaction Transaction `xml:"transaction"`
 	}
 
 	// FailedPaymentNotification is sent when a payment fails.
 	// https://dev.recurly.com/v2.4/page/webhooks#section-failed-payment
 	FailedPaymentNotification struct {
-		Account     recurly.Account     `xml:"account"`
-		Transaction recurly.Transaction `xml:"transaction"`
+		Account     Account     `xml:"account"`
+		Transaction Transaction `xml:"transaction"`
 	}
 
 	// VoidPaymentNotification is sent when a successful payment is voided.
 	// https://dev.recurly.com/page/webhooks#section-void-payment
 	VoidPaymentNotification struct {
-		Account     recurly.Account     `xml:"account"`
-		Transaction recurly.Transaction `xml:"transaction"`
+		Account     Account     `xml:"account"`
+		Transaction Transaction `xml:"transaction"`
 	}
 
 	// SuccessfulRefundNotification is sent when an amount is refunded.
 	// https://dev.recurly.com/page/webhooks#section-successful-refund
 	SuccessfulRefundNotification struct {
-		Account     recurly.Account     `xml:"account"`
-		Transaction recurly.Transaction `xml:"transaction"`
+		Account     Account     `xml:"account"`
+		Transaction Transaction `xml:"transaction"`
 	}
 )
-
-// transactionHolder allows the uuid and invoice number fields to be set.
-// The UUID field is labeled id in notifications and the invoice number
-// is not included on the existing transaction struct.
-type transactionHolder interface {
-	setTransactionFields(id string, in int)
-}
-
-// setTransactionFields sets fields on the transaction struct.
-func (n *SuccessfulPaymentNotification) setTransactionFields(id string, invoiceNumber int) {
-	n.Transaction.UUID = id
-	n.Transaction.InvoiceNumber = invoiceNumber
-}
-
-func (n *FailedPaymentNotification) setTransactionFields(id string, invoiceNumber int) {
-	n.Transaction.UUID = id
-	n.Transaction.InvoiceNumber = invoiceNumber
-}
-
-func (n *VoidPaymentNotification) setTransactionFields(id string, invoiceNumber int) {
-	n.Transaction.UUID = id
-	n.Transaction.InvoiceNumber = invoiceNumber
-}
-
-func (n *SuccessfulRefundNotification) setTransactionFields(id string, invoiceNumber int) {
-	n.Transaction.UUID = id
-	n.Transaction.InvoiceNumber = invoiceNumber
-}
-
-// transaction allows the transaction id and invoice number to be unmarshalled
-// so they can be set on the notification struct.
-type transaction struct {
-	ID            string `xml:"transaction>id"`
-	InvoiceNumber int    `xml:"transaction>invoice_number,omitempty"`
-}
 
 // ErrUnknownNotification is used when the incoming webhook does not match a
 // predefined notification type. It implements the error interface.
@@ -216,14 +212,6 @@ func Parse(r io.Reader) (interface{}, error) {
 
 	if err := xml.Unmarshal(notification, dst); err != nil {
 		return nil, err
-	}
-
-	if th, ok := dst.(transactionHolder); ok {
-		var t transaction
-		if err := xml.Unmarshal(notification, &t); err != nil {
-			return nil, err
-		}
-		th.setTransactionFields(t.ID, t.InvoiceNumber)
 	}
 
 	return dst, nil

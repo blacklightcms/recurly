@@ -292,7 +292,7 @@ func TestParse_SuccessfulPaymentNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.SuccessfulPaymentNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.SuccessfulPaymentNotification{
-		Account: recurly.Account{
+		Account: webhooks.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
 			Username:    "verena",
@@ -301,17 +301,19 @@ func TestParse_SuccessfulPaymentNotification(t *testing.T) {
 			LastName:    "Example",
 			CompanyName: "Company, Inc.",
 		},
-		Transaction: recurly.Transaction{
+		Transaction: webhooks.Transaction{
+			XMLName:       xml.Name{Local: "transaction"},
 			UUID:          "a5143c1d3a6f4a8287d0e2cc1d4c0427",
 			InvoiceNumber: 2059,
 			Action:        "purchase",
 			AmountInCents: 1000,
 			Status:        "success",
+			Message:       "Bogus Gateway: Forced success",
 			Reference:     "reference",
 			Source:        "subscription",
 			Test:          true,
-			Voidable:      recurly.NullBool{Bool: true, Valid: true},
-			Refundable:    recurly.NullBool{Bool: true, Valid: true},
+			Voidable:      true,
+			Refundable:    true,
 		},
 	}) {
 		t.Fatalf("unexpected notification: %#v", n)
@@ -325,7 +327,7 @@ func TestParse_FailedPaymentNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.FailedPaymentNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.FailedPaymentNotification{
-		Account: recurly.Account{
+		Account: webhooks.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
 			Username:    "verena",
@@ -334,17 +336,21 @@ func TestParse_FailedPaymentNotification(t *testing.T) {
 			LastName:    "Example",
 			CompanyName: "Company, Inc.",
 		},
-		Transaction: recurly.Transaction{
-			UUID:          "a5143c1d3a6f4a8287d0e2cc1d4c0427",
-			InvoiceNumber: 2059,
-			Action:        "purchase",
-			AmountInCents: 1000,
-			Status:        "Declined",
-			Reference:     "reference",
-			Source:        "subscription",
-			Test:          true,
-			Voidable:      recurly.NullBool{Bool: false, Valid: true},
-			Refundable:    recurly.NullBool{Bool: false, Valid: true},
+		Transaction: webhooks.Transaction{
+			XMLName:          xml.Name{Local: "transaction"},
+			UUID:             "a5143c1d3a6f4a8287d0e2cc1d4c0427",
+			InvoiceNumber:    2059,
+			SubscriptionUUID: "1974a098jhlkjasdfljkha898326881c",
+			Action:           "purchase",
+			AmountInCents:    1000,
+			Status:           "Declined",
+			Message:          "This transaction has been declined",
+			FailureType:      "Declined by the gateway",
+			Reference:        "reference",
+			Source:           "subscription",
+			Test:             true,
+			Voidable:         false,
+			Refundable:       false,
 		},
 	}) {
 		t.Fatalf("unexpected notification: %#v", n)
@@ -358,7 +364,7 @@ func TestParse_VoidPaymentNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.VoidPaymentNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.VoidPaymentNotification{
-		Account: recurly.Account{
+		Account: webhooks.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
 			Username:    "verena",
@@ -367,17 +373,20 @@ func TestParse_VoidPaymentNotification(t *testing.T) {
 			LastName:    "Example",
 			CompanyName: "Company, Inc.",
 		},
-		Transaction: recurly.Transaction{
-			UUID:          "a5143c1d3a6f4a8287d0e2cc1d4c0427",
-			InvoiceNumber: 2059,
-			Action:        "purchase",
-			AmountInCents: 1000,
-			Status:        "void",
-			Reference:     "reference",
-			Source:        "subscription",
-			Test:          true,
-			Voidable:      recurly.NullBool{Bool: true, Valid: true},
-			Refundable:    recurly.NullBool{Bool: true, Valid: true},
+		Transaction: webhooks.Transaction{
+			XMLName:          xml.Name{Local: "transaction"},
+			UUID:             "a5143c1d3a6f4a8287d0e2cc1d4c0427",
+			InvoiceNumber:    2059,
+			SubscriptionUUID: "1974a098jhlkjasdfljkha898326881c",
+			Action:           "purchase",
+			AmountInCents:    1000,
+			Status:           "void",
+			Message:          "Test Gateway: Successful test transaction",
+			Reference:        "reference",
+			Source:           "subscription",
+			Test:             true,
+			Voidable:         true,
+			Refundable:       true,
 		},
 	}) {
 		t.Fatalf("unexpected notification: %#v", n)
@@ -391,7 +400,7 @@ func TestParse_SuccessfulRefundNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.SuccessfulRefundNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.SuccessfulRefundNotification{
-		Account: recurly.Account{
+		Account: webhooks.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
 			Username:    "verena",
@@ -400,17 +409,20 @@ func TestParse_SuccessfulRefundNotification(t *testing.T) {
 			LastName:    "Example",
 			CompanyName: "Company, Inc.",
 		},
-		Transaction: recurly.Transaction{
-			UUID:          "a5143c1d3a6f4a8287d0e2cc1d4c0427",
-			InvoiceNumber: 2059,
-			Action:        "credit",
-			AmountInCents: 1000,
-			Status:        "success",
-			Reference:     "reference",
-			Source:        "subscription",
-			Test:          true,
-			Voidable:      recurly.NullBool{Bool: true, Valid: true},
-			Refundable:    recurly.NullBool{Bool: true, Valid: true},
+		Transaction: webhooks.Transaction{
+			XMLName:          xml.Name{Local: "transaction"},
+			UUID:             "a5143c1d3a6f4a8287d0e2cc1d4c0427",
+			InvoiceNumber:    2059,
+			SubscriptionUUID: "1974a098jhlkjasdfljkha898326881c",
+			Action:           "credit",
+			AmountInCents:    1000,
+			Status:           "success",
+			Message:          "Bogus Gateway: Forced success",
+			Reference:        "reference",
+			Source:           "subscription",
+			Test:             true,
+			Voidable:         true,
+			Refundable:       true,
 		},
 	}) {
 		t.Fatalf("unexpected notification: %#v", n)
