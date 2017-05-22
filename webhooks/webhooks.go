@@ -64,6 +64,12 @@ type Transaction struct {
 	Refundable        bool     `xml:"refundable,omitempty"`
 }
 
+// Transaction constants.
+const (
+	TransactionFailureTypeDeclined  = "declined"
+	TransactionFailureTypeDuplicate = "duplicate_transaction"
+)
+
 // Subscription types.
 type (
 	// NewSubscriptionNotification is sent when a new subscription is created.
