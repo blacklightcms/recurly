@@ -33,7 +33,7 @@ func TestParse_NewSubscriptionNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.NewSubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.NewSubscriptionNotification{
-		Account: recurly.Account{
+		Account: webhooks.Account{
 			XMLName:   xml.Name{Local: "account"},
 			Code:      "1",
 			Email:     "verena@example.com",
@@ -75,7 +75,7 @@ func TestParse_UpdatedSubscriptionNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.UpdatedSubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.UpdatedSubscriptionNotification{
-		Account: recurly.Account{
+		Account: webhooks.Account{
 			XMLName:   xml.Name{Local: "account"},
 			Code:      "1",
 			Email:     "verena@example.com",
@@ -115,7 +115,7 @@ func TestParse_RenewedSubscriptionNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.RenewedSubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.RenewedSubscriptionNotification{
-		Account: recurly.Account{
+		Account: webhooks.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
 			Email:       "verena@example.com",
@@ -156,7 +156,7 @@ func TestParse_ExpiredSubscriptionNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.ExpiredSubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.ExpiredSubscriptionNotification{
-		Account: recurly.Account{
+		Account: webhooks.Account{
 			XMLName:   xml.Name{Local: "account"},
 			Code:      "1",
 			Email:     "verena@example.com",
@@ -198,7 +198,7 @@ func TestParse_CanceledSubscriptionNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.CanceledSubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.CanceledSubscriptionNotification{
-		Account: recurly.Account{
+		Account: webhooks.Account{
 			XMLName:   xml.Name{Local: "account"},
 			Code:      "1",
 			Email:     "verena@example.com",
@@ -234,7 +234,7 @@ func TestParse_NewInvoiceNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.NewInvoiceNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.NewInvoiceNotification{
-		Account: recurly.Account{
+		Account: webhooks.Account{
 			XMLName:   xml.Name{Local: "account"},
 			Code:      "1",
 			Email:     "verena@example.com",
@@ -264,7 +264,7 @@ func TestParse_PastDueInvoiceNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.PastDueInvoiceNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.PastDueInvoiceNotification{
-		Account: recurly.Account{
+		Account: webhooks.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
 			Username:    "verena",
