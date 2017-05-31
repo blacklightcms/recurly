@@ -75,35 +75,35 @@ type (
 	// NewSubscriptionNotification is sent when a new subscription is created.
 	// https://dev.recurly.com/page/webhooks#section-new-subscription
 	NewSubscriptionNotification struct {
-		Account      recurly.Account      `xml:"account"`
+		Account      Account              `xml:"account"`
 		Subscription recurly.Subscription `xml:"subscription"`
 	}
 
 	// UpdatedSubscriptionNotification is sent when a subscription is upgraded or downgraded.
 	// https://dev.recurly.com/page/webhooks#section-updated-subscription
 	UpdatedSubscriptionNotification struct {
-		Account      recurly.Account      `xml:"account"`
+		Account      Account              `xml:"account"`
 		Subscription recurly.Subscription `xml:"subscription"`
 	}
 
 	// RenewedSubscriptionNotification is sent when a subscription renew.
 	// https://dev.recurly.com/page/webhooks#section-renewed-subscription
 	RenewedSubscriptionNotification struct {
-		Account      recurly.Account      `xml:"account"`
+		Account      Account              `xml:"account"`
 		Subscription recurly.Subscription `xml:"subscription"`
 	}
 
 	// ExpiredSubscriptionNotification is sent when a subscription is no longer valid.
 	// https://dev.recurly.com/v2.4/page/webhooks#section-expired-subscription
 	ExpiredSubscriptionNotification struct {
-		Account      recurly.Account      `xml:"account"`
+		Account      Account              `xml:"account"`
 		Subscription recurly.Subscription `xml:"subscription"`
 	}
 
 	// CanceledSubscriptionNotification is sent when a subscription is canceled.
 	// https://dev.recurly.com/page/webhooks#section-canceled-subscription
 	CanceledSubscriptionNotification struct {
-		Account      recurly.Account      `xml:"account"`
+		Account      Account              `xml:"account"`
 		Subscription recurly.Subscription `xml:"subscription"`
 	}
 )
@@ -113,14 +113,14 @@ type (
 	// NewInvoiceNotification is sent when an invoice generated.
 	// https://dev.recurly.com/page/webhooks#section-new-invoice
 	NewInvoiceNotification struct {
-		Account recurly.Account `xml:"account"`
+		Account Account         `xml:"account"`
 		Invoice recurly.Invoice `xml:"invoice"`
 	}
 
 	// PastDueInvoiceNotification is sent when an invoice is past due.
 	// https://dev.recurly.com/v2.4/page/webhooks#section-past-due-invoice
 	PastDueInvoiceNotification struct {
-		Account recurly.Account `xml:"account"`
+		Account Account         `xml:"account"`
 		Invoice recurly.Invoice `xml:"invoice"`
 	}
 )
