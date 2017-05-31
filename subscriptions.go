@@ -1,6 +1,14 @@
 package recurly
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+	"strings"
+)
+
+// SanitizeUUID returns the uuid without dashes.
+func SanitizeUUID(id string) string {
+	return strings.TrimSpace(strings.Replace(id, "-", "", -1))
+}
 
 const (
 	// SubscriptionStateActive represents subscriptions that are valid for the

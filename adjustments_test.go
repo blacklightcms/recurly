@@ -181,7 +181,7 @@ func TestAdjustments_Get(t *testing.T) {
 			</adjustment>`)
 	})
 
-	resp, adjustment, err := client.Adjustments.Get("626db120a84102b1809909071c701c60")
+	resp, adjustment, err := client.Adjustments.Get("626db12-0a84102b180990-9071c701c60") // UUID has dashes
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if resp.IsError() {
@@ -192,7 +192,7 @@ func TestAdjustments_Get(t *testing.T) {
 	if !reflect.DeepEqual(adjustment, &recurly.Adjustment{
 		AccountCode:            "100",
 		InvoiceNumber:          1108,
-		UUID:                   "626db120a84102b1809909071c701c60",
+		UUID:                   "626db120a84102b1809909071c701c60", // UUID has been sanitizzed
 		State:                  "invoiced",
 		Description:            "One-time Charged Fee",
 		ProductCode:            "basic",
@@ -327,7 +327,7 @@ func TestAdjustments_Delete(t *testing.T) {
 		w.WriteHeader(204)
 	})
 
-	resp, err := client.Adjustments.Delete("945a4cb9afd64300b97b138407a51aef")
+	resp, err := client.Adjustments.Delete("945a4cb9afd-64300b97b1384-07a51aef") // UUID has dashes and should be sanitized
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if resp.StatusCode != 204 {

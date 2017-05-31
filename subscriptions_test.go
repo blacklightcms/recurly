@@ -556,7 +556,7 @@ func TestSubscriptions_Get(t *testing.T) {
 		</subscription>`)
 	})
 
-	r, subscription, err := client.Subscriptions.Get("44f83d7cba354d5b84812419f923ea96")
+	r, subscription, err := client.Subscriptions.Get("44f83d7cb-a354d5b848-12419f923ea96") // UUID has dashes
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
@@ -571,7 +571,7 @@ func TestSubscriptions_Get(t *testing.T) {
 		},
 		AccountCode:            "1",
 		InvoiceNumber:          1108,
-		UUID:                   "44f83d7cba354d5b84812419f923ea96",
+		UUID:                   "44f83d7cba354d5b84812419f923ea96", // UUID has been sanitized
 		State:                  "active",
 		UnitAmountInCents:      800,
 		Currency:               "EUR",
@@ -816,7 +816,7 @@ func TestSubscriptions_Update(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
 	})
 
-	r, _, err := client.Subscriptions.Update("44f83d7cba354d5b84812419f923ea96", recurly.UpdateSubscription{})
+	r, _, err := client.Subscriptions.Update("44f83d7cba-354d5b84812419-f923ea96", recurly.UpdateSubscription{}) // UUID has dashes and should be sanitized
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
@@ -836,7 +836,7 @@ func TestSubscriptions_Notes(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
 	})
 
-	r, _, err := client.Subscriptions.UpdateNotes("44f83d7cba354d5b84812419f923ea96", recurly.SubscriptionNotes{})
+	r, _, err := client.Subscriptions.UpdateNotes("44f83d7cba354d5-b8481241-9f923ea96", recurly.SubscriptionNotes{}) // UUID has dashes and should be sanitized
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
@@ -856,7 +856,7 @@ func TestSubscriptions_Change(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
 	})
 
-	r, _, err := client.Subscriptions.PreviewChange("44f83d7cba354d5b84812419f923ea96", recurly.UpdateSubscription{})
+	r, _, err := client.Subscriptions.PreviewChange("44f83d7cba-354d5b84812-419f923ea96", recurly.UpdateSubscription{}) // UUID has dashes and should be sanitized
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
@@ -876,7 +876,7 @@ func TestSubscriptions_Cancel(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
 	})
 
-	r, _, err := client.Subscriptions.Cancel("44f83d7cba354d5b84812419f923ea96")
+	r, _, err := client.Subscriptions.Cancel("44f83d7cba-354d5b848124-19f923ea96") // UUID has dashes and should be sanitized
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
@@ -896,7 +896,7 @@ func TestSubscriptions_Reactivate(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
 	})
 
-	r, _, err := client.Subscriptions.Reactivate("44f83d7cba354d5b84812419f923ea96")
+	r, _, err := client.Subscriptions.Reactivate("44f83d7cba35-4d5b8481241-9f923ea96") // UUID has dashes and should be sanitized
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
@@ -918,7 +918,7 @@ func TestSubscriptions_Terminate_PartialRefund(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
 	})
 
-	r, _, err := client.Subscriptions.TerminateWithPartialRefund("44f83d7cba354d5b84812419f923ea96")
+	r, _, err := client.Subscriptions.TerminateWithPartialRefund("44f83d7c-ba354d5b84812419f923ea96") // UUID has dashes and should be sanitized
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
@@ -940,7 +940,7 @@ func TestSubscriptions_Terminate_FullRefund(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
 	})
 
-	r, _, err := client.Subscriptions.TerminateWithFullRefund("44f83d7cba354d5b84812419f923ea96")
+	r, _, err := client.Subscriptions.TerminateWithFullRefund("44f83d7cba354d5b84-812419f923ea96") // UUID has dashes and should be sanitized
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
@@ -962,7 +962,7 @@ func TestSubscriptions_Terminate_WithoutRefund(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
 	})
 
-	r, _, err := client.Subscriptions.TerminateWithoutRefund("44f83d7cba354d5b84812419f923ea96")
+	r, _, err := client.Subscriptions.TerminateWithoutRefund("44f83d7c-ba354d5b84812419f923ea96") // UUID has dashes and should be sanitized
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
@@ -987,7 +987,7 @@ func TestSubscriptions_Postpone(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
 	})
 
-	r, _, err := client.Subscriptions.Postpone("44f83d7cba354d5b84812419f923ea96", ts, false)
+	r, _, err := client.Subscriptions.Postpone("44f83d7cba354d5b8481-2419f923ea96", ts, false) // UUID has dashes and should be sanitized
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {

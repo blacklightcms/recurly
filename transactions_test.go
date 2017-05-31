@@ -358,7 +358,7 @@ func TestTransactions_Get(t *testing.T) {
     	</transaction>`)
 	})
 
-	r, transaction, err := client.Transactions.Get("a13acd8fe4294916b79aec87b7ea441f")
+	r, transaction, err := client.Transactions.Get("a13acd8f-e4294916b79aec87-b7ea441f") // UUID contains dashes
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
@@ -368,7 +368,7 @@ func TestTransactions_Get(t *testing.T) {
 	if !reflect.DeepEqual(transaction, &recurly.Transaction{
 		InvoiceNumber:    1108,
 		SubscriptionUUID: "17caaca1716f33572edc8146e0aaefde",
-		UUID:             "a13acd8fe4294916b79aec87b7ea441f",
+		UUID:             "a13acd8fe4294916b79aec87b7ea441f", // UUID has been sanitized
 		Action:           "purchase",
 		AmountInCents:    1000,
 		TaxInCents:       0,
