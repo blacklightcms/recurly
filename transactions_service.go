@@ -60,7 +60,7 @@ func (s *transactionsImpl) ListAccount(accountCode string, params Params) (*Resp
 // Please see transaction error codes for more details.
 // https://dev.recurly.com/docs/lookup-transaction
 func (s *transactionsImpl) Get(uuid string) (*Response, *Transaction, error) {
-	action := fmt.Sprintf("transactions/%s", uuid)
+	action := fmt.Sprintf("transactions/%s", SanitizeUUID(uuid))
 	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err

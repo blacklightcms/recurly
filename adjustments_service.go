@@ -40,7 +40,7 @@ func (s *adjustmentsImpl) List(accountCode string, params Params) (*Response, []
 // Get returns information about a single adjustment.
 // https://docs.recurly.com/api/adjustments#get-adjustments
 func (s *adjustmentsImpl) Get(uuid string) (*Response, *Adjustment, error) {
-	action := fmt.Sprintf("adjustments/%s", uuid)
+	action := fmt.Sprintf("adjustments/%s", SanitizeUUID(uuid))
 	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
@@ -77,7 +77,7 @@ func (s *adjustmentsImpl) Create(accountCode string, a Adjustment) (*Response, *
 // Delete removes a non-invoiced adjustment from an account.
 // https://docs.recurly.com/api/adjustments#delete-adjustment
 func (s *adjustmentsImpl) Delete(uuid string) (*Response, error) {
-	action := fmt.Sprintf("adjustments/%s", uuid)
+	action := fmt.Sprintf("adjustments/%s", SanitizeUUID(uuid))
 	req, err := s.client.newRequest("DELETE", action, nil, nil)
 	if err != nil {
 		return nil, err

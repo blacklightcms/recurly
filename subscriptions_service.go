@@ -58,7 +58,7 @@ func (s *subscriptionsImpl) ListAccount(accountCode string, params Params) (*Res
 // Get returns a subscription by uuid
 // https://docs.recurly.com/api/subscriptions#lookup-subscription
 func (s *subscriptionsImpl) Get(uuid string) (*Response, *Subscription, error) {
-	action := fmt.Sprintf("subscriptions/%s", uuid)
+	action := fmt.Sprintf("subscriptions/%s", SanitizeUUID(uuid))
 	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
@@ -108,7 +108,7 @@ func (s *subscriptionsImpl) Preview(sub NewSubscription) (*Response, *Subscripti
 // value. See recurly documentation for more info.
 // https://docs.recurly.com/api/subscriptions#update-subscription
 func (s *subscriptionsImpl) Update(uuid string, sub UpdateSubscription) (*Response, *Subscription, error) {
-	action := fmt.Sprintf("subscriptions/%s", uuid)
+	action := fmt.Sprintf("subscriptions/%s", SanitizeUUID(uuid))
 	req, err := s.client.newRequest("PUT", action, nil, sub)
 	if err != nil {
 		return nil, nil, err
@@ -124,7 +124,7 @@ func (s *subscriptionsImpl) Update(uuid string, sub UpdateSubscription) (*Respon
 // Updating notes will not trigger the renewal.
 // https://docs.recurly.com/api/subscriptions#update-subscription-notes
 func (s *subscriptionsImpl) UpdateNotes(uuid string, n SubscriptionNotes) (*Response, *Subscription, error) {
-	action := fmt.Sprintf("subscriptions/%s/notes", uuid)
+	action := fmt.Sprintf("subscriptions/%s/notes", SanitizeUUID(uuid))
 	req, err := s.client.newRequest("PUT", action, nil, n)
 	if err != nil {
 		return nil, nil, err
@@ -140,7 +140,7 @@ func (s *subscriptionsImpl) UpdateNotes(uuid string, n SubscriptionNotes) (*Resp
 // account without committing a subscription change or posting an invoice.
 // https://docs.recurly.com/api/subscriptions#sub-change-preview
 func (s *subscriptionsImpl) PreviewChange(uuid string, sub UpdateSubscription) (*Response, *Subscription, error) {
-	action := fmt.Sprintf("subscriptions/%s/preview", uuid)
+	action := fmt.Sprintf("subscriptions/%s/preview", SanitizeUUID(uuid))
 	req, err := s.client.newRequest("POST", action, nil, sub)
 	if err != nil {
 		return nil, nil, err
@@ -156,7 +156,7 @@ func (s *subscriptionsImpl) PreviewChange(uuid string, sub UpdateSubscription) (
 // end of the current bill cycle.
 // https://docs.recurly.com/api/subscriptions#cancel-subscription
 func (s *subscriptionsImpl) Cancel(uuid string) (*Response, *Subscription, error) {
-	action := fmt.Sprintf("subscriptions/%s/cancel", uuid)
+	action := fmt.Sprintf("subscriptions/%s/cancel", SanitizeUUID(uuid))
 	req, err := s.client.newRequest("PUT", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
@@ -172,7 +172,7 @@ func (s *subscriptionsImpl) Cancel(uuid string) (*Response, *Subscription, error
 // of the current bill cycle.
 // https://docs.recurly.com/api/subscriptions#reactivate-subscription
 func (s *subscriptionsImpl) Reactivate(uuid string) (*Response, *Subscription, error) {
-	action := fmt.Sprintf("subscriptions/%s/reactivate", uuid)
+	action := fmt.Sprintf("subscriptions/%s/reactivate", SanitizeUUID(uuid))
 	req, err := s.client.newRequest("PUT", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
@@ -188,7 +188,7 @@ func (s *subscriptionsImpl) Reactivate(uuid string) (*Response, *Subscription, e
 // immediately with a full refund.
 // https://docs.recurly.com/api/subscriptions#terminate-subscription
 func (s *subscriptionsImpl) TerminateWithPartialRefund(uuid string) (*Response, *Subscription, error) {
-	action := fmt.Sprintf("subscriptions/%s/terminate", uuid)
+	action := fmt.Sprintf("subscriptions/%s/terminate", SanitizeUUID(uuid))
 	req, err := s.client.newRequest("PUT", action, Params{"refund_type": "partial"}, nil)
 	if err != nil {
 		return nil, nil, err
@@ -204,7 +204,7 @@ func (s *subscriptionsImpl) TerminateWithPartialRefund(uuid string) (*Response, 
 // immediately with a full refund.
 // https://docs.recurly.com/api/subscriptions#terminate-subscription
 func (s *subscriptionsImpl) TerminateWithFullRefund(uuid string) (*Response, *Subscription, error) {
-	action := fmt.Sprintf("subscriptions/%s/terminate", uuid)
+	action := fmt.Sprintf("subscriptions/%s/terminate", SanitizeUUID(uuid))
 	req, err := s.client.newRequest("PUT", action, Params{"refund_type": "full"}, nil)
 	if err != nil {
 		return nil, nil, err
@@ -220,7 +220,7 @@ func (s *subscriptionsImpl) TerminateWithFullRefund(uuid string) (*Response, *Su
 // immediately with no refund.
 // https://docs.recurly.com/api/subscriptions#terminate-subscription
 func (s *subscriptionsImpl) TerminateWithoutRefund(uuid string) (*Response, *Subscription, error) {
-	action := fmt.Sprintf("subscriptions/%s/terminate", uuid)
+	action := fmt.Sprintf("subscriptions/%s/terminate", SanitizeUUID(uuid))
 	req, err := s.client.newRequest("PUT", action, Params{"refund_type": "none"}, nil)
 	if err != nil {
 		return nil, nil, err
@@ -237,7 +237,7 @@ func (s *subscriptionsImpl) TerminateWithoutRefund(uuid string) (*Response, *Sub
 // modifying the renewal date will modify when the trial expires.
 // https://docs.recurly.com/api/subscriptions#postpone-subscription
 func (s *subscriptionsImpl) Postpone(uuid string, dt time.Time, bulk bool) (*Response, *Subscription, error) {
-	action := fmt.Sprintf("subscriptions/%s/postpone", uuid)
+	action := fmt.Sprintf("subscriptions/%s/postpone", SanitizeUUID(uuid))
 	req, err := s.client.newRequest("PUT", action, Params{
 		"bulk":              bulk,
 		"next_renewal_date": dt.Format(time.RFC3339),
