@@ -64,6 +64,24 @@ type Transaction struct {
 	Refundable        recurly.NullBool `xml:"refundable,omitempty"`
 }
 
+// Invoice represents the invoice object sent in webhooks.
+type Invoice struct {
+	XMLName             xml.Name         `xml:"invoice,omitempty"`
+	SubscriptionUUID    string           `xml:"subscription_id,omitempty"`
+	UUID                string           `xml:"uuid,omitempty"`
+	State               string           `xml:"state,omitempty"`
+	InvoiceNumberPrefix string           `xml:"invoice_number_prefix,omitempty"`
+	InvoiceNumber       int              `xml:"invoice_number,omitempty"`
+	PONumber            string           `xml:"po_number,omitempty"`
+	VATNumber           string           `xml:"vat_number,omitempty"`
+	TotalInCents        int              `xml:"total_in_cents,omitempty"`
+	Currency            string           `xml:"currency,omitempty"`
+	CreatedAt           recurly.NullTime `xml:"date,omitempty"`
+	ClosedAt            recurly.NullTime `xml:"closed_at,omitempty"`
+	NetTerms            recurly.NullInt  `xml:"net_terms,omitempty"`
+	CollectionMethod    string           `xml:"collection_method,omitempty"`
+}
+
 // Transaction constants.
 const (
 	TransactionFailureTypeDeclined  = "declined"
@@ -113,15 +131,15 @@ type (
 	// NewInvoiceNotification is sent when an invoice generated.
 	// https://dev.recurly.com/page/webhooks#section-new-invoice
 	NewInvoiceNotification struct {
-		Account Account         `xml:"account"`
-		Invoice recurly.Invoice `xml:"invoice"`
+		Account Account `xml:"account"`
+		Invoice Invoice `xml:"invoice"`
 	}
 
 	// PastDueInvoiceNotification is sent when an invoice is past due.
 	// https://dev.recurly.com/v2.4/page/webhooks#section-past-due-invoice
 	PastDueInvoiceNotification struct {
-		Account Account         `xml:"account"`
-		Invoice recurly.Invoice `xml:"invoice"`
+		Account Account `xml:"account"`
+		Invoice Invoice `xml:"invoice"`
 	}
 )
 

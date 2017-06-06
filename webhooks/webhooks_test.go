@@ -228,6 +228,7 @@ func TestParse_CanceledSubscriptionNotification(t *testing.T) {
 
 func TestParse_NewInvoiceNotification(t *testing.T) {
 	xmlFile := MustOpenFile("testdata/new_invoice_notification.xml")
+	createdAt := time.Date(2014, 1, 1, 20, 21, 44, 0, time.UTC)
 	result, err := webhooks.Parse(xmlFile)
 	if err != nil {
 		t.Fatal(err)
@@ -241,11 +242,12 @@ func TestParse_NewInvoiceNotification(t *testing.T) {
 			FirstName: "Verena",
 			LastName:  "Example",
 		},
-		Invoice: recurly.Invoice{
+		Invoice: webhooks.Invoice{
 			XMLName:          xml.Name{Local: "invoice"},
 			UUID:             "ffc64d71d4b5404e93f13aac9c63b007",
 			State:            "open",
 			Currency:         "USD",
+			CreatedAt:        recurly.NullTime{Time: &createdAt},
 			InvoiceNumber:    1000,
 			TotalInCents:     1000,
 			NetTerms:         recurly.NullInt{Valid: true, Int: 0},
@@ -258,6 +260,7 @@ func TestParse_NewInvoiceNotification(t *testing.T) {
 
 func TestParse_PastDueInvoiceNotification(t *testing.T) {
 	xmlFile := MustOpenFile("testdata/past_due_invoice_notification.xml")
+	createdAt := time.Date(2014, 1, 1, 20, 21, 44, 0, time.UTC)
 	result, err := webhooks.Parse(xmlFile)
 	if err != nil {
 		t.Fatal(err)
@@ -273,10 +276,11 @@ func TestParse_PastDueInvoiceNotification(t *testing.T) {
 			LastName:    "Example",
 			CompanyName: "Company, Inc.",
 		},
-		Invoice: recurly.Invoice{
+		Invoice: webhooks.Invoice{
 			XMLName:       xml.Name{Local: "invoice"},
 			UUID:          "ffc64d71d4b5404e93f13aac9c63b007",
 			State:         "past_due",
+			CreatedAt:     recurly.NullTime{Time: &createdAt},
 			InvoiceNumber: 1000,
 			TotalInCents:  1100,
 		},
