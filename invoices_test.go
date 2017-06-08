@@ -363,13 +363,13 @@ func TestInvoices_Get(t *testing.T) {
                     <voidable type="boolean">true</voidable>
                     <refundable type="boolean">true</refundable>
                     <ip_address>127.0.0.1</ip_address>
-					<transaction_error>
-						<error_code>declined</error_code>
-						<error_category>soft</error_category>
-						<merchant_message>The customer's bank has declined their card. The customer will need to contact their bank to learn the cause.</merchant_message>
-						<customer_message>Your transaction was declined. Please use a different card or contact your bank.</customer_message>
-						<gateway_error_code>2</gateway_error_code>
-					</transaction_error>
+                    <transaction_error>
+                    	<error_code>declined</error_code>
+                    	<error_category>soft</error_category>
+                    	<merchant_message>The customer's bank has declined their card. The customer will need to contact their bank to learn the cause.</merchant_message>
+                    	<customer_message>Your transaction was declined. Please use a different card or contact your bank.</customer_message>
+                    	<gateway_error_code>2</gateway_error_code>
+                    </transaction_error>
                     <cvv_result code="M">Match</cvv_result>
                     <avs_result code="D">Street address and postal code match.</avs_result>
                     <avs_result_street nil="nil"/>
