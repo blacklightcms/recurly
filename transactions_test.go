@@ -158,7 +158,6 @@ func TestTransactions_List(t *testing.T) {
 			},
 		},
 	}) {
-		fmt.Printf("%v", transactions[0].TransactionError)
 		t.Fatalf("unexpected transaction: %v", transactions)
 	}
 }

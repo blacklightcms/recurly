@@ -136,7 +136,7 @@ func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 			// If the response object includes a TransactionError, set the
 			// transaction field on the response object and the TransactionError field.
 			if ve.Transaction != nil {
-				response.Transaction = ve.Transaction
+				response.transaction = ve.Transaction
 
 			}
 		} else if response.IsClientError() { // Parse possible individual error message

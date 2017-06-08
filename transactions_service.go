@@ -95,8 +95,8 @@ func (s *transactionsImpl) Create(t Transaction) (*Response, *Transaction, error
 	// If there is an error set the response transaction as the returned transaction
 	// so that the caller has access to TransactionError.
 	if resp.IsError() {
-		if resp.Transaction != nil {
-			dst = *resp.Transaction
+		if resp.transaction != nil {
+			dst = *resp.transaction
 		}
 	}
 

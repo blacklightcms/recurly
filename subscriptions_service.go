@@ -87,8 +87,8 @@ func (s *subscriptionsImpl) Create(sub NewSubscription) (*Response, *NewSubscrip
 	if subscription.UUID != "" { // If subscription not present, dst.Subscription should be nil
 		dst.Subscription = &subscription
 	}
-	if resp.Transaction != nil {
-		dst.Transaction = resp.Transaction
+	if resp.transaction != nil {
+		dst.Transaction = resp.transaction
 	}
 
 	return resp, &dst, err
