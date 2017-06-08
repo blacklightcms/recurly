@@ -99,10 +99,8 @@ func TestClient_Error(t *testing.T) {
 		t.Fatalf("expected response to not be ok")
 	}
 
-	// TransactionError should be nil
-	if resp.TransactionError != nil {
-		t.Fatal("expected transaction error to be nil")
-	} else if resp.Transaction != nil {
+	// Transaction should be nil
+	if resp.transaction != nil {
 		t.Fatal("expected transaction to be nil")
 	}
 

@@ -471,7 +471,7 @@ type SubscriptionsService struct {
 	OnGet      func(uuid string) (*recurly.Response, *recurly.Subscription, error)
 	GetInvoked bool
 
-	OnCreate      func(sub recurly.NewSubscription) (*recurly.Response, *recurly.Subscription, error)
+	OnCreate      func(sub recurly.NewSubscription) (*recurly.Response, *recurly.NewSubscriptionResponse, error)
 	CreateInvoked bool
 
 	OnPreview      func(sub recurly.NewSubscription) (*recurly.Response, *recurly.Subscription, error)
@@ -520,7 +520,7 @@ func (m *SubscriptionsService) Get(uuid string) (*recurly.Response, *recurly.Sub
 	return m.OnGet(uuid)
 }
 
-func (m *SubscriptionsService) Create(sub recurly.NewSubscription) (*recurly.Response, *recurly.Subscription, error) {
+func (m *SubscriptionsService) Create(sub recurly.NewSubscription) (*recurly.Response, *recurly.NewSubscriptionResponse, error) {
 	m.CreateInvoked = true
 	return m.OnCreate(sub)
 }

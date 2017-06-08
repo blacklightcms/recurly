@@ -92,7 +92,7 @@ type SubscriptionsService interface {
 	List(params Params) (*Response, []Subscription, error)
 	ListAccount(accountCode string, params Params) (*Response, []Subscription, error)
 	Get(uuid string) (*Response, *Subscription, error)
-	Create(sub NewSubscription) (*Response, *Subscription, error)
+	Create(sub NewSubscription) (*Response, *NewSubscriptionResponse, error)
 	Preview(sub NewSubscription) (*Response, *Subscription, error)
 	Update(uuid string, sub UpdateSubscription) (*Response, *Subscription, error)
 	UpdateNotes(uuid string, n SubscriptionNotes) (*Response, *Subscription, error)

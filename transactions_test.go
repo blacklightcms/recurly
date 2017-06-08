@@ -506,13 +506,6 @@ func TestTransactions_Err_FraudCard(t *testing.T) {
 			    <currency>USD</currency>
 			    <status>declined</status>
 			    <payment_method>credit_card</payment_method>
-			    <reference>6223543</reference>
-			    <source>transaction</source>
-			    <recurring type="boolean">false</recurring>
-			    <test type="boolean">true</test>
-			    <voidable type="boolean">false</voidable>
-			    <refundable type="boolean">false</refundable>
-			    <ip_address>184.23.184.210</ip_address>
 			    <transaction_error>
 			      <error_code>fraud_gateway</error_code>
 			      <error_category>fraud</error_category>
@@ -520,42 +513,13 @@ func TestTransactions_Err_FraudCard(t *testing.T) {
 			      <customer_message>The transaction was declined. Please use a different card, contact your bank, or contact support.</customer_message>
 			      <gateway_error_code nil="nil"></gateway_error_code>
 			    </transaction_error>
-			    <cvv_result code="" nil="nil"></cvv_result>
-			    <avs_result code="" nil="nil"></avs_result>
-			    <avs_result_street nil="nil"></avs_result_street>
-			    <avs_result_postal nil="nil"></avs_result_postal>
-			    <created_at type="datetime">2015-07-31T20:45:01Z</created_at>
 			    <details>
-			      <account>
-			        <account_code>1</account_code>
-			        <first_name>Verena</first_name>
-			        <last_name>Example</last_name>
-			        <company></company>
-			        <email></email>
-			        <billing_info type="credit_card">
-			          <first_name>Verena</first_name>
-			          <last_name>Example</last_name>
-			          <address1>123 Main St.</address1>
-			          <address2></address2>
-			          <city>San Francisco</city>
-			          <state>CA</state>
-			          <zip>94133</zip>
-			          <country>US</country>
-			          <phone nil="nil"></phone>
-			          <vat_number nil="nil"></vat_number>
-			          <card_type>Visa</card_type>
-			          <year type="integer">2020</year>
-			          <month type="integer">10</month>
-			          <first_six>400000</first_six>
-			          <last_four>0085</last_four>
-			        </billing_info>
-			      </account>
 			    </details>
 			  </transaction>
 			</errors>`)
 	})
 
-	r, _, err := client.Transactions.Create(recurly.Transaction{
+	r, transaction, err := client.Transactions.Create(recurly.Transaction{
 		AmountInCents: 100,
 		Currency:      "USD",
 		Account: recurly.Account{
@@ -573,14 +537,22 @@ func TestTransactions_Err_FraudCard(t *testing.T) {
 		t.Fatalf("error occurred making API call. Err: %s", err)
 	} else if r.IsOK() {
 		t.Fatal("expected create fraudulent transaction to return error")
-	} else if !reflect.DeepEqual(r.TransactionError, &recurly.TransactionError{
-		XMLName:         xml.Name{Local: "transaction_error"},
-		ErrorCode:       "fraud_gateway",
-		ErrorCategory:   "fraud",
-		MerchantMessage: "The payment gateway declined the transaction due to fraud filters enabled in your gateway.",
-		CustomerMessage: "The transaction was declined. Please use a different card, contact your bank, or contact support.",
+	} else if !reflect.DeepEqual(transaction, &recurly.Transaction{
+		UUID:          "3054a79e4c3ab4699f95be455f8653bb",
+		Action:        "purchase",
+		AmountInCents: 100,
+		Currency:      "USD",
+		Status:        "declined",
+		PaymentMethod: "credit_card",
+		TransactionError: &recurly.TransactionError{
+			XMLName:         xml.Name{Local: "transaction_error"},
+			ErrorCode:       "fraud_gateway",
+			ErrorCategory:   "fraud",
+			MerchantMessage: "The payment gateway declined the transaction due to fraud filters enabled in your gateway.",
+			CustomerMessage: "The transaction was declined. Please use a different card, contact your bank, or contact support.",
+		},
 	}) {
-		t.Fatalf("error did not match: %v", r.TransactionError)
+		t.Fatalf("unexpected transaction: %#v", transaction)
 	}
 }
 

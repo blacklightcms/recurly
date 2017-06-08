@@ -354,7 +354,7 @@ func TestInvoices_Get(t *testing.T) {
                     <amount_in_cents type="integer">1000</amount_in_cents>
                     <tax_in_cents type="integer">0</tax_in_cents>
                     <currency>USD</currency>
-                    <status>success</status>
+                    <status>declined</status>
                     <payment_method>credit_card</payment_method>
                     <reference>5416477</reference>
                     <source>subscription</source>
@@ -363,6 +363,13 @@ func TestInvoices_Get(t *testing.T) {
                     <voidable type="boolean">true</voidable>
                     <refundable type="boolean">true</refundable>
                     <ip_address>127.0.0.1</ip_address>
+                    <transaction_error>
+                    	<error_code>declined</error_code>
+                    	<error_category>soft</error_category>
+                    	<merchant_message>The customer's bank has declined their card. The customer will need to contact their bank to learn the cause.</merchant_message>
+                    	<customer_message>Your transaction was declined. Please use a different card or contact your bank.</customer_message>
+                    	<gateway_error_code>2</gateway_error_code>
+                    </transaction_error>
                     <cvv_result code="M">Match</cvv_result>
                     <avs_result code="D">Street address and postal code match.</avs_result>
                     <avs_result_street nil="nil"/>
@@ -462,7 +469,7 @@ func TestInvoices_Get(t *testing.T) {
 				AmountInCents:    1000,
 				TaxInCents:       0,
 				Currency:         "USD",
-				Status:           "success",
+				Status:           "declined",
 				PaymentMethod:    "credit_card",
 				Reference:        "5416477",
 				Source:           "subscription",
@@ -471,6 +478,14 @@ func TestInvoices_Get(t *testing.T) {
 				Voidable:         recurly.NewBool(true),
 				Refundable:       recurly.NewBool(true),
 				IPAddress:        net.ParseIP("127.0.0.1"),
+				TransactionError: &recurly.TransactionError{
+					XMLName:          xml.Name{Local: "transaction_error"},
+					ErrorCode:        "declined",
+					ErrorCategory:    "soft",
+					MerchantMessage:  "The customer's bank has declined their card. The customer will need to contact their bank to learn the cause.",
+					CustomerMessage:  "Your transaction was declined. Please use a different card or contact your bank.",
+					GatewayErrorCode: "2",
+				},
 				CVVResult: recurly.CVVResult{
 					recurly.TransactionResult{
 						Code:    "M",

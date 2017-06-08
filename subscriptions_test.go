@@ -759,28 +759,65 @@ func TestSubscriptions_Create_TransactionError(t *testing.T) {
 		if r.Method != "POST" {
 			t.Fatalf("unexpected method: %s", r.Method)
 		}
-		w.WriteHeader(422)
+		w.WriteHeader(http.StatusUnprocessableEntity)
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
 			<errors>
 			  <transaction_error>
-			    <error_code>fraud_security_code</error_code>
+			    <error_code>declined_saveable</error_code>
+			    <error_category>soft</error_category>
+			    <merchant_message>The transaction was declined without specific information.  Please contact your payment gateway for more details or ask the customer to contact their bank.</merchant_message>
+			    <customer_message>The transaction was declined. Please use a different card or contact your bank.</customer_message>
+			    <gateway_error_code nil="nil"/>
 			  </transaction_error>
-			  <error field="transaction.account.billing_info.verification_value" symbol="declined_bad">did not match</error>
-			  <transaction href="https://your-subdomain.recurly.com/v2/transactions/3d1c6aa86e3d447eb0f3b4a6e3e074d9" type="credit_card">
-			    <uuid>3d1c6aa86e3d447eb0f3b4a6e3e074d9</uuid>
+			  <error field="subscription.account.base" symbol="declined_saveable">The transaction was declined. Please use a different card or contact your bank.</error>
+			  <transaction href="https://your-subdomain.recurly.com/v2/transactions/3c42a3ecc46a7aa602602e4033b9c2e6" type="credit_card">
+			    <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
+			    <subscription href="https://your-subdomain.recurly.com/v2/subscriptions/3c42a3ebabdc022739d5a646408291a6"/>
+			    <uuid>3c42a3ecc46a7aa602602e4033b9c2e6</uuid>
+			    <action>purchase</action>
+			    <amount_in_cents type="integer">5274</amount_in_cents>
+			    <currency>USD</currency>
+			    <status>declined</status>
+			    <payment_method>credit_card</payment_method>
+			    <transaction_error>
+			      <error_code>declined_saveable</error_code>
+			      <error_category>soft</error_category>
+			      <merchant_message>The transaction was declined without specific information.  Please contact your payment gateway for more details or ask the customer to contact their bank.</merchant_message>
+			      <customer_message>The transaction was declined. Please use a different card or contact your bank.</customer_message>
+			      <gateway_error_code nil="nil"/>
+			    </transaction_error>
+				<details>
+			    </details>
 			  </transaction>
 			</errors>`)
 	})
 
-	r, _, err := client.Subscriptions.Create(recurly.NewSubscription{})
+	r, newSubscription, err := client.Subscriptions.Create(recurly.NewSubscription{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if !r.IsError() {
 		t.Fatal("expected create subscription to return OK")
-	} else if r.Transaction.UUID != "3d1c6aa86e3d447eb0f3b4a6e3e074d9" {
-		t.Fatalf("unexpected transaction uuid: %s", r.Transaction.UUID)
-	} else if r.TransactionError.ErrorCode != "fraud_security_code" {
-		t.Fatalf("unexpected transaction error code: %s", r.TransactionError.ErrorCode)
+	} else if newSubscription.Transaction == nil {
+		t.Fatal("expected transaction to be set")
+	} else if !reflect.DeepEqual(newSubscription.Transaction, &recurly.Transaction{
+		UUID:             "3c42a3ecc46a7aa602602e4033b9c2e6",
+		SubscriptionUUID: "3c42a3ebabdc022739d5a646408291a6",
+		Action:           "purchase",
+		AmountInCents:    5274,
+		Currency:         "USD",
+		Status:           "declined",
+		PaymentMethod:    "credit_card",
+		TransactionError: &recurly.TransactionError{
+			XMLName:         xml.Name{Local: "transaction_error"},
+			ErrorCode:       "declined_saveable",
+			ErrorCategory:   "soft",
+			MerchantMessage: "The transaction was declined without specific information.  Please contact your payment gateway for more details or ask the customer to contact their bank.",
+			CustomerMessage: "The transaction was declined. Please use a different card or contact your bank.",
+		},
+	}) {
+		t.Fatalf("unexpected transaction error: %v", newSubscription.Transaction.TransactionError)
+	} else if newSubscription.Subscription != nil {
+		t.Fatalf("unexpected subscription: %v", newSubscription.Subscription)
 	}
 }
 
