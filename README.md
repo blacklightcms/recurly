@@ -52,7 +52,6 @@ if resp.StatusCode == 422 {
     // ...
 }
 ```
-recurly.Response embeds a Transaction when present. 
 
 ## Usage
 The basic usage format is to create a client, and then operate directly off of each
