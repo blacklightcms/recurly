@@ -122,10 +122,9 @@ func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 	if response.IsError() { // Parse validation errors
 		if response.StatusCode == http.StatusUnprocessableEntity {
 			var ve struct {
-				XMLName          xml.Name          `xml:"errors"`
-				Errors           []Error           `xml:"error"`
-				Transaction      *Transaction      `xml:"transaction,omitempty"`
-				TransactionError *TransactionError `xml:"transaction_error,omitempty"`
+				XMLName     xml.Name     `xml:"errors"`
+				Errors      []Error      `xml:"error"`
+				Transaction *Transaction `xml:"transaction,omitempty"`
 			}
 
 			if err = decoder.Decode(&ve); err != nil {
@@ -136,8 +135,8 @@ func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 
 			// If the response object includes a TransactionError, set the
 			// transaction field on the response object and the TransactionError field.
-			if ve.TransactionError != nil {
-				response.transaction = &Transaction{TransactionError: ve.TransactionError}
+			if ve.Transaction != nil {
+				response.Transaction = ve.Transaction
 
 			}
 		} else if response.IsClientError() { // Parse possible individual error message

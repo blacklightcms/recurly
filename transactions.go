@@ -99,30 +99,30 @@ func (t Transaction) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 // for types like href.
 func (t *Transaction) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v struct {
-		XMLName          xml.Name         `xml:"transaction"`
-		InvoiceNumber    hrefInt          `xml:"invoice"`      // use hrefInt for parsing
-		SubscriptionUUID hrefString       `xml:"subscription"` // use hrefString for parsing
-		UUID             string           `xml:"uuid,omitempty"`
-		Action           string           `xml:"action,omitempty"`
-		AmountInCents    int              `xml:"amount_in_cents"`
-		TaxInCents       int              `xml:"tax_in_cents,omitempty"`
-		Currency         string           `xml:"currency"`
-		Status           string           `xml:"status,omitempty"`
-		PaymentMethod    string           `xml:"payment_method,omitempty"`
-		Reference        string           `xml:"reference,omitempty"`
-		Source           string           `xml:"source,omitempty"`
-		Recurring        NullBool         `xml:"recurring,omitempty"`
-		Test             bool             `xml:"test,omitempty"`
-		Voidable         NullBool         `xml:"voidable,omitempty"`
-		Refundable       NullBool         `xml:"refundable,omitempty"`
-		IPAddress        net.IP           `xml:"ip_address,omitempty"`
-		TransactionError TransactionError `xml:"transaction_error,omitempty"`
-		CVVResult        CVVResult        `xml:"cvv_result"`
-		AVSResult        AVSResult        `xml:"avs_result"`
-		AVSResultStreet  string           `xml:"avs_result_street,omitempty"`
-		AVSResultPostal  string           `xml:"avs_result_postal,omitempty"`
-		CreatedAt        NullTime         `xml:"created_at,omitempty"`
-		Account          Account          `xml:"details>account"`
+		XMLName          xml.Name          `xml:"transaction"`
+		InvoiceNumber    hrefInt           `xml:"invoice"`      // use hrefInt for parsing
+		SubscriptionUUID hrefString        `xml:"subscription"` // use hrefString for parsing
+		UUID             string            `xml:"uuid,omitempty"`
+		Action           string            `xml:"action,omitempty"`
+		AmountInCents    int               `xml:"amount_in_cents"`
+		TaxInCents       int               `xml:"tax_in_cents,omitempty"`
+		Currency         string            `xml:"currency"`
+		Status           string            `xml:"status,omitempty"`
+		PaymentMethod    string            `xml:"payment_method,omitempty"`
+		Reference        string            `xml:"reference,omitempty"`
+		Source           string            `xml:"source,omitempty"`
+		Recurring        NullBool          `xml:"recurring,omitempty"`
+		Test             bool              `xml:"test,omitempty"`
+		Voidable         NullBool          `xml:"voidable,omitempty"`
+		Refundable       NullBool          `xml:"refundable,omitempty"`
+		IPAddress        net.IP            `xml:"ip_address,omitempty"`
+		TransactionError *TransactionError `xml:"transaction_error,omitempty"`
+		CVVResult        CVVResult         `xml:"cvv_result"`
+		AVSResult        AVSResult         `xml:"avs_result"`
+		AVSResultStreet  string            `xml:"avs_result_street,omitempty"`
+		AVSResultPostal  string            `xml:"avs_result_postal,omitempty"`
+		CreatedAt        NullTime          `xml:"created_at,omitempty"`
+		Account          Account           `xml:"details>account"`
 	}
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err
@@ -144,13 +144,16 @@ func (t *Transaction) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 		Voidable:         v.Voidable,
 		Refundable:       v.Refundable,
 		IPAddress:        v.IPAddress,
-		TransactionError: &v.TransactionError,
 		CVVResult:        v.CVVResult,
 		AVSResult:        v.AVSResult,
 		AVSResultStreet:  v.AVSResultStreet,
 		AVSResultPostal:  v.AVSResultPostal,
 		CreatedAt:        v.CreatedAt,
 		Account:          v.Account,
+	}
+
+	if v.TransactionError != nil {
+		t.TransactionError = v.TransactionError
 	}
 
 	return nil

@@ -15,9 +15,9 @@ type Response struct {
 	// Errors holds an array of validation errors if any occurred.
 	Errors []Error
 
-	// transaction holds the transaction returned with a transaction error.
+	// Transaction holds the transaction returned with a transaction error.
 	// This will be populated when creating a new subscription if the payment fails.
-	transaction *Transaction
+	Transaction *Transaction
 }
 
 var (

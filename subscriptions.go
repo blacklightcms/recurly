@@ -194,8 +194,8 @@ type NewSubscription struct {
 
 // NewSubscriptionResponse is used to unmarshal either the subscription or the transaction.
 type NewSubscriptionResponse struct {
-	Subscription *Subscription `xml:"subscription,omitempty"`
-	Transaction  *Transaction  `xml:"errors>transaction,omitempty"` // UnprocessableEntity errors return only the transaction
+	Subscription *Subscription
+	Transaction  *Transaction // UnprocessableEntity errors return only the transaction
 }
 
 // UpdateSubscription is used to update subscriptions

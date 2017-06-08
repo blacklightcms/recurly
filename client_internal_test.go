@@ -100,7 +100,7 @@ func TestClient_Error(t *testing.T) {
 	}
 
 	// Transaction should be nil
-	if resp.transaction != nil {
+	if resp.Transaction != nil {
 		t.Fatal("expected transaction to be nil")
 	}
 
