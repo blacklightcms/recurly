@@ -75,14 +75,19 @@ func (s *subscriptionsImpl) Get(uuid string) (*Response, *Subscription, error) {
 
 // Create creates a new subscription.
 // https://docs.recurly.com/api/subscriptions#create-subscription
-func (s *subscriptionsImpl) Create(sub NewSubscription) (*Response, *Subscription, error) {
+func (s *subscriptionsImpl) Create(sub NewSubscription) (*Response, *NewSubscriptionResponse, error) {
 	req, err := s.client.newRequest("POST", "subscriptions", nil, sub)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var dst Subscription
-	resp, err := s.client.do(req, &dst)
+	var dst NewSubscriptionResponse
+	var subscription Subscription
+	resp, err := s.client.do(req, &subscription)
+	dst.Subscription = &subscription
+	if resp.transaction != nil {
+		dst.Transaction = resp.transaction
+	}
 
 	return resp, &dst, err
 }

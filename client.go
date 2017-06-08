@@ -133,8 +133,13 @@ func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 			}
 
 			response.Errors = ve.Errors
-			response.Transaction = ve.Transaction
-			response.TransactionError = ve.TransactionError
+
+			// If the response object includes a TransactionError, set the
+			// transaction field on the response object and the TransactionError field.
+			if ve.TransactionError != nil {
+				response.transaction = &Transaction{TransactionError: ve.TransactionError}
+
+			}
 		} else if response.IsClientError() { // Parse possible individual error message
 			var ve struct {
 				XMLName     xml.Name `xml:"error"`

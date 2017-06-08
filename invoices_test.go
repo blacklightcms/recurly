@@ -478,7 +478,7 @@ func TestInvoices_Get(t *testing.T) {
 				Voidable:         recurly.NewBool(true),
 				Refundable:       recurly.NewBool(true),
 				IPAddress:        net.ParseIP("127.0.0.1"),
-				TransactionError: recurly.TransactionError{
+				TransactionError: &recurly.TransactionError{
 					XMLName:          xml.Name{Local: "transaction_error"},
 					ErrorCode:        "declined",
 					ErrorCategory:    "soft",

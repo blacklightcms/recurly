@@ -121,6 +121,7 @@ func TestTransactions_List(t *testing.T) {
 			Voidable:         recurly.NewBool(true),
 			Refundable:       recurly.NewBool(true),
 			IPAddress:        net.ParseIP("127.0.0.1"),
+			TransactionError: &recurly.TransactionError{},
 			CVVResult: recurly.CVVResult{
 				recurly.TransactionResult{
 					Code:    "M",
@@ -254,6 +255,7 @@ func TestTransactions_ListAccount(t *testing.T) {
 			Voidable:         recurly.NewBool(true),
 			Refundable:       recurly.NewBool(true),
 			IPAddress:        net.ParseIP("127.0.0.1"),
+			TransactionError: &recurly.TransactionError{},
 			CVVResult: recurly.CVVResult{
 				recurly.TransactionResult{
 					Code:    "M",
@@ -382,6 +384,7 @@ func TestTransactions_Get(t *testing.T) {
 		Voidable:         recurly.NewBool(true),
 		Refundable:       recurly.NewBool(true),
 		IPAddress:        net.ParseIP("127.0.0.1"),
+		TransactionError: &recurly.TransactionError{},
 		CVVResult: recurly.CVVResult{
 			recurly.TransactionResult{
 				Code:    "M",
@@ -555,7 +558,7 @@ func TestTransactions_Err_FraudCard(t *testing.T) {
 			</errors>`)
 	})
 
-	r, _, err := client.Transactions.Create(recurly.Transaction{
+	r, transaction, err := client.Transactions.Create(recurly.Transaction{
 		AmountInCents: 100,
 		Currency:      "USD",
 		Account: recurly.Account{
@@ -573,14 +576,14 @@ func TestTransactions_Err_FraudCard(t *testing.T) {
 		t.Fatalf("error occurred making API call. Err: %s", err)
 	} else if r.IsOK() {
 		t.Fatal("expected create fraudulent transaction to return error")
-	} else if !reflect.DeepEqual(r.TransactionError, &recurly.TransactionError{
+	} else if !reflect.DeepEqual(transaction.TransactionError, &recurly.TransactionError{
 		XMLName:         xml.Name{Local: "transaction_error"},
 		ErrorCode:       "fraud_gateway",
 		ErrorCategory:   "fraud",
 		MerchantMessage: "The payment gateway declined the transaction due to fraud filters enabled in your gateway.",
 		CustomerMessage: "The transaction was declined. Please use a different card, contact your bank, or contact support.",
 	}) {
-		t.Fatalf("error did not match: %v", r.TransactionError)
+		t.Fatalf("error did not match: %v", transaction.TransactionError)
 	}
 }
 

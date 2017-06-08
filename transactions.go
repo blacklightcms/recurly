@@ -34,12 +34,12 @@ type Transaction struct {
 	Voidable         NullBool
 	Refundable       NullBool
 	IPAddress        net.IP
-	TransactionError TransactionError // Read only
-	CVVResult        CVVResult        // Read only
-	AVSResult        AVSResult        // Read only
-	AVSResultStreet  string           // Read only
-	AVSResultPostal  string           // Read only
-	CreatedAt        NullTime         // Read only
+	TransactionError *TransactionError // Read only
+	CVVResult        CVVResult         // Read only
+	AVSResult        AVSResult         // Read only
+	AVSResultStreet  string            // Read only
+	AVSResultPostal  string            // Read only
+	CreatedAt        NullTime          // Read only
 	Account          Account
 }
 
@@ -144,7 +144,7 @@ func (t *Transaction) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 		Voidable:         v.Voidable,
 		Refundable:       v.Refundable,
 		IPAddress:        v.IPAddress,
-		TransactionError: v.TransactionError,
+		TransactionError: &v.TransactionError,
 		CVVResult:        v.CVVResult,
 		AVSResult:        v.AVSResult,
 		AVSResultStreet:  v.AVSResultStreet,

@@ -192,6 +192,12 @@ type NewSubscription struct {
 	BankAccountAuthorizedAt NullTime             `xml:"bank_account_authorized_at,omitempty"`
 }
 
+// NewSubscriptionResponse is used to unmarshal either the subscription or the transaction.
+type NewSubscriptionResponse struct {
+	Subscription *Subscription `xml:"subscription,omitempty"`
+	Transaction  *Transaction  `xml:"errors>transaction,omitempty"` // UnprocessableEntity errors return only the transaction
+}
+
 // UpdateSubscription is used to update subscriptions
 type UpdateSubscription struct {
 	XMLName            xml.Name             `xml:"subscription"`
