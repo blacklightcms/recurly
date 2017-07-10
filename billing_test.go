@@ -132,6 +132,49 @@ func TestBilling_Get(t *testing.T) {
 	}
 }
 
+// ACH customers may not have billing info. This asserts that nil values for
+// many of the fields are safely ignored without parse errors.
+func TestBilling_Get_ACH(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/accounts/1/billing_info", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
+            <billing_info type="ach">
+                <first_name>Verena</first_name>
+                <last_name>Example</last_name>
+                <address1 nil="nil"></address1>
+                <address2 nil="nil"></address2>
+                <city nil="nil"></city>
+                <state nil="nil"></state>
+                <zip nil="nil"></zip>
+                <country nil="nil"></country>
+                <phone nil="nil"></phone>
+                <vat_number nil="nil"></vat_number>
+                <account_type nil="nil"></account_type>
+                <last_four nil="nil"></last_four>
+                <routing_number nil="nil"></routing_number>
+            </billing_info>`)
+	})
+
+	resp, b, err := client.Billing.Get("1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if resp.IsError() {
+		t.Fatal("expected get billing info to return OK")
+	} else if !reflect.DeepEqual(b, &recurly.Billing{
+		XMLName:   xml.Name{Local: "billing_info"},
+		FirstName: "Verena",
+		LastName:  "Example",
+	}) {
+		t.Fatalf("unexpected billing: %v", b)
+	}
+}
+
 func TestBilling_Get_ErrNotFound(t *testing.T) {
 	setup()
 	defer teardown()
