@@ -314,6 +314,9 @@ TransactionError struct {
 ## Using webhooks
 Initial webhook support is in place. The following webhooks are supported:
 
+Account Notifications
+ - `BillingInfoUpdatedNotification`
+
 Subscription Notifications
  - `NewSubscriptionNotification`
  - `UpdatedSubscriptionNotification`
