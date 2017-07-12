@@ -11,12 +11,24 @@ import (
 	"github.com/blacklightcms/recurly/webhooks"
 )
 
-func MustOpenFile(name string) *os.File {
-	file, err := os.Open(name)
+func TestParse_BillingInfoUpdatedNotification(t *testing.T) {
+	xmlFile := MustOpenFile("testdata/billing_info_updated_notification.xml")
+	result, err := webhooks.Parse(xmlFile)
 	if err != nil {
-		panic(err)
+		t.Fatal(err)
+	} else if n, ok := result.(*webhooks.BillingInfoUpdatedNotification); !ok {
+		t.Fatalf("unexpected type: %T, result")
+	} else if !reflect.DeepEqual(n, &webhooks.BillingInfoUpdatedNotification{
+		Account: webhooks.Account{
+			XMLName:   xml.Name{Local: "account"},
+			Code:      "1",
+			Email:     "verena@example.com",
+			FirstName: "Verena",
+			LastName:  "Example",
+		},
+	}) {
+		t.Fatalf("unexpected notification: %#v", n)
 	}
-	return file
 }
 
 func TestParse_NewSubscriptionNotification(t *testing.T) {
@@ -445,4 +457,12 @@ func TestParse_ErrUnknownNotification(t *testing.T) {
 	} else if e.Name() != "unknown_notification" {
 		t.Fatalf("unexpected notification name: %s", e.Name())
 	}
+}
+
+func MustOpenFile(name string) *os.File {
+	file, err := os.Open(name)
+	if err != nil {
+		panic(err)
+	}
+	return file
 }

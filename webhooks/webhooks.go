@@ -11,6 +11,9 @@ import (
 
 // Webhook notification constants.
 const (
+	// Account notifications.
+	BillingInfoUpdated = "billing_info_updated_notification"
+
 	// Subscription notifications.
 	NewSubscription      = "new_subscription_notification"
 	UpdatedSubscription  = "updated_subscription_notification"
@@ -86,6 +89,15 @@ type Invoice struct {
 const (
 	TransactionFailureTypeDeclined  = "declined"
 	TransactionFailureTypeDuplicate = "duplicate_transaction"
+)
+
+// Account types.
+type (
+	// BillingInfoUpdatedNotification is sent when a customer updates or adds billing information.
+	// https://dev.recurly.com/page/webhooks#section-updated-billing-information
+	BillingInfoUpdatedNotification struct {
+		Account Account `xml:"account"`
+	}
 )
 
 // Subscription types.
@@ -208,6 +220,8 @@ func Parse(r io.Reader) (interface{}, error) {
 
 	var dst interface{}
 	switch n.XMLName.Local {
+	case BillingInfoUpdated:
+		dst = &BillingInfoUpdatedNotification{}
 	case NewSubscription:
 		dst = &NewSubscriptionNotification{}
 	case UpdatedSubscription:
