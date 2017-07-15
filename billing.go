@@ -24,7 +24,7 @@ type Billing struct {
 
 	// Credit Card Info
 	FirstSix int    `xml:"first_six,omitempty"`
-	LastFour int    `xml:"last_four,omitempty"`
+	LastFour string `xml:"last_four,omitempty"` // String not int so that leading zeros are present
 	CardType string `xml:"card_type,omitempty"`
 	Number   int    `xml:"number,omitempty"`
 	Month    int    `xml:"month,omitempty"`
@@ -73,7 +73,7 @@ func (b *Billing) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 
 		// Credit Card Info
 		FirstSix NullInt `xml:"first_six,omitempty"`
-		LastFour NullInt `xml:"last_four,omitempty"`
+		LastFour string  `xml:"last_four,omitempty"`
 		CardType string  `xml:"card_type,omitempty"`
 		Number   int     `xml:"number,omitempty"`
 		Month    NullInt `xml:"month,omitempty"`
@@ -113,7 +113,7 @@ func (b *Billing) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		IPAddressCountry: v.IPAddressCountry,
 
 		FirstSix: v.FirstSix.Int,
-		LastFour: v.LastFour.Int,
+		LastFour: v.LastFour,
 		CardType: v.CardType,
 		Number:   v.Number,
 		Month:    v.Month.Int,
@@ -132,7 +132,7 @@ func (b *Billing) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 
 // Type returns the billing info type. Currently options: card, bank, ""
 func (b Billing) Type() string {
-	if b.FirstSix > 0 && b.LastFour > 0 && b.Month > 0 && b.Year > 0 {
+	if b.FirstSix > 0 && b.LastFour != "" && b.Month > 0 && b.Year > 0 {
 		return "card"
 	} else if b.NameOnAccount != "" && b.RoutingNumber != "" && b.AccountNumber != "" {
 		return "bank"
