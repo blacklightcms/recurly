@@ -50,7 +50,7 @@ func TestBilling_Encoding(t *testing.T) {
 func TestBilling_Type(t *testing.T) {
 	b0 := recurly.Billing{
 		FirstSix: 411111,
-		LastFour: 1111,
+		LastFour: "1111",
 		Month:    11,
 		Year:     2020,
 	}
@@ -126,7 +126,7 @@ func TestBilling_Get(t *testing.T) {
 		Year:             2015,
 		Month:            11,
 		FirstSix:         411111,
-		LastFour:         1111,
+		LastFour:         "1111",
 	}) {
 		t.Fatalf("unexpected billing: %v", b)
 	}
@@ -259,7 +259,7 @@ func TestBilling_Create_WithToken(t *testing.T) {
 		Year:             2015,
 		Month:            11,
 		FirstSix:         411111,
-		LastFour:         1111,
+		LastFour:         "1111",
 	}) {
 		t.Fatalf("unexpected billing: %v", b)
 	}
@@ -438,7 +438,7 @@ func TestBilling_Update_WithCC(t *testing.T) {
 		Token:             "abc",
 		IPAddressCountry:  "US",
 		FirstSix:          411111,
-		LastFour:          1111,
+		LastFour:          "1111",
 		CardType:          "visa",
 		PaypalAgreementID: "ppl",
 		AmazonAgreementID: "asdfb",
@@ -487,7 +487,7 @@ func TestBilling_Update_WithBankAccount(t *testing.T) {
 		Token:             "abc",
 		IPAddressCountry:  "US",
 		FirstSix:          111111,
-		LastFour:          1111,
+		LastFour:          "1111",
 		CardType:          "visa",
 		PaypalAgreementID: "ppl",
 		AmazonAgreementID: "asdfb",

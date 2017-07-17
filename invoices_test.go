@@ -518,7 +518,7 @@ func TestInvoices_Get(t *testing.T) {
 						Year:      2017,
 						Month:     11,
 						FirstSix:  411111,
-						LastFour:  1111,
+						LastFour:  "1111",
 					},
 				},
 			},
