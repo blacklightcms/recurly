@@ -197,7 +197,14 @@ func TestAccounts_Get(t *testing.T) {
 			  </address>
 			  <accept_language nil="nil"></accept_language>
 			  <hosted_login_token>a92468579e9c4231a6c0031c4716c01d</hosted_login_token>
+			  <has_live_subscription type="boolean">true</has_live_subscription>
+			  <has_active_subscription type="boolean">true</has_active_subscription>
+			  <has_future_subscription type="boolean">false</has_future_subscription>
+			  <has_canceled_subscription type="boolean">false</has_canceled_subscription>
+			  <has_past_due_invoice type="boolean">false</has_past_due_invoice>
 			  <created_at type="datetime">2011-10-25T12:00:00Z</created_at>
+			  <updated_at type="datetime">2016-07-11T17:56:24Z</updated_at>
+			  <closed_at nil="nil"/> 
 			</account>`)
 	})
 
@@ -208,7 +215,8 @@ func TestAccounts_Get(t *testing.T) {
 		t.Fatal("expected get accounts to return OK")
 	}
 
-	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-10-25T12:00:00Z")
+	tsCreated, _ := time.Parse(recurly.DateTimeFormat, "2011-10-25T12:00:00Z")
+	tsUpdated, _ := time.Parse(recurly.DateTimeFormat, "2016-07-11T17:56:24Z")
 	if !reflect.DeepEqual(a, &recurly.Account{
 		XMLName:   xml.Name{Local: "account"},
 		Code:      "1",
@@ -224,11 +232,18 @@ func TestAccounts_Get(t *testing.T) {
 			Zip:     "94105",
 			Country: "US",
 		},
-		HostedLoginToken: "a92468579e9c4231a6c0031c4716c01d",
-		CreatedAt:        recurly.NewTime(ts),
+		HostedLoginToken:        "a92468579e9c4231a6c0031c4716c01d",
+		CreatedAt:               recurly.NewTime(tsCreated),
+		UpdatedAt:               recurly.NewTime(tsUpdated),
+		HasLiveSubscription:     recurly.NewBool(true),
+		HasActiveSubscription:   recurly.NewBool(true),
+		HasFutureSubscription:   recurly.NewBool(false),
+		HasCanceledSubscription: recurly.NewBool(false),
+		HasPastDueInvoice:       recurly.NewBool(false),
 	}) {
 		t.Fatalf("unexpected value: %v", a)
 	}
+
 }
 
 func TestAccounts_Get_ErrNotFound(t *testing.T) {
