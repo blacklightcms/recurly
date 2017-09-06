@@ -24,8 +24,8 @@ import "github.com/blacklightcms/recurly"
 Construct a new Recurly Client and then work off of that. For example, to list
 accounts:
 ```go
-client, err := recurly.NewClient("subdomain", "apiKey", nil)
-resp, accounts, err := client.Accounts.List({"per_page": 20})
+client := recurly.NewClient("subdomain", "apiKey", nil)
+resp, accounts, err := client.Accounts.List(recurly.Params{"per_page": 20})
 ```
 
 recurly.Response embeds http.Response and provides some convenience methods:
@@ -36,7 +36,7 @@ if resp.IsOK() {
     fmt.Println("Response was NOT a 200-299 status code")
 
     // Loop through errors (422 status code only)
-    for _, e := range resp.Errors() {
+    for _, e := range resp.Errors {
         fmt.Printf("Message: %s; Field: %s; Symbol: %s\n", e.Message, e.Field, e.Symbol)
     }
 }
@@ -80,7 +80,7 @@ resp, a, err := client.Accounts.Create(recurly.Account{
     Code: "1",
     FirstName: "Verena",
     LastName: "Example",
-    Email: "verena@example.com"
+    Email: "verena@example.com",
 })
 
 if resp.IsOK() {
@@ -117,7 +117,7 @@ if next == "" {
 }
 
 // Retrieve next page
-resp, accounts, err := client.Accounts.Get(recurly.Params{
+resp, accounts, err := client.Accounts.List(recurly.Params{
     "per_page": 10,
     "cursor": next,
 })
@@ -129,7 +129,7 @@ if prev == "" {
 }
 
 // Retrieve prev page
-resp, accounts, err := client.Accounts.Get(recurly.Params{
+resp, accounts, err := client.Accounts.List(recurly.Params{
     "per_page": 10,
     "cursor": prev,
 })
@@ -159,7 +159,7 @@ resp, b, err := client.Billing.UpdateWithToken("1", token)
 
 ### Create Billing with Credit Card
 ```go
-resp, b, err := client.Billing.Create("1", Billing{
+resp, b, err := client.Billing.Create("1", recurly.Billing{
     FirstName: "Verena",
     LastName:  "Example",
     Address:   "123 Main St.",
@@ -175,7 +175,7 @@ resp, b, err := client.Billing.Create("1", Billing{
 
 ### Create Billing With Bank account
 ```go
-resp, b, err := client.Billing.Create("134", Billing{
+resp, b, err := client.Billing.Create("134", recurly.Billing{
     FirstName:     "Verena",
     LastName:      "Example",
     Address:       "123 Main St.",
@@ -202,24 +202,24 @@ All other creates/updates throughout use the same struct to create/update as to 
 // s will return a Subscription struct after creating using the
 // NewSubscription struct.
 resp, s, err := client.Subscriptions.Create(recurly.NewSubscription{
-    Code: "gold",
+    PlanCode: "gold",
     Currency: "EUR",
     Account: recurly.Account{
-        Code: "b6f5783",
-        Email: "verena@example.com",
+        Code:      "b6f5783",
+        Email:     "verena@example.com",
         FirstName: "Verena",
-        LastName: "Example",
+        LastName:  "Example",
         BillingInfo: &recurly.Billing{
-            Number: 4111111111111111,
-            Month: 12,
-            Year: 2017,
+            Number:            4111111111111111,
+            Month:             12,
+            Year:              2017,
             VerificationValue: 123,
-            Address: "400 Alabama St",
-            City: "San Francisco",
-            State: "CA",
-            Zip: "94110",
-        }
-    }
+            Address:           "400 Alabama St",
+            City:              "San Francisco",
+            State:             "CA",
+            Zip:               "94110",
+        },
+    },
 })
 ```
 
