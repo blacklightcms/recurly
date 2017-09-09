@@ -1,3 +1,5 @@
+// +build go1.7,!go1.9
+
 package recurly
 
 import "encoding/xml"
