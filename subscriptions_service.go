@@ -15,11 +15,6 @@ type subscriptionsImpl struct {
 	client *Client
 }
 
-// NewSubscriptionsImpl returns a new instance of subscriptionsImpl.
-func NewSubscriptionsImpl(client *Client) *subscriptionsImpl {
-	return &subscriptionsImpl{client: client}
-}
-
 // List returns a list of all the subscriptions.
 // https://docs.recurly.com/api/subscriptions#list-subscriptions
 func (s *subscriptionsImpl) List(params Params) (*Response, []Subscription, error) {

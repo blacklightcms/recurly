@@ -14,11 +14,6 @@ type transactionsImpl struct {
 	client *Client
 }
 
-// NewTransactionsImpl returns a new instance of transactionsImpl.
-func NewTransactionsImpl(client *Client) *transactionsImpl {
-	return &transactionsImpl{client: client}
-}
-
 // List returns a list of transactions
 // https://dev.recurly.com/docs/list-transactions
 func (s *transactionsImpl) List(params Params) (*Response, []Transaction, error) {

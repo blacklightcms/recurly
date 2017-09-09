@@ -22,11 +22,6 @@ type accountsImpl struct {
 	client *Client
 }
 
-// NewAccountsImpl returns a new instance of accountsImpl.
-func NewAccountsImpl(client *Client) *accountsImpl {
-	return &accountsImpl{client: client}
-}
-
 // List returns a list of the accounts on your site.
 // https://docs.recurly.com/api/accounts#list-accounts
 func (s *accountsImpl) List(params Params) (*Response, []Account, error) {

@@ -14,11 +14,6 @@ type adjustmentsImpl struct {
 	client *Client
 }
 
-// NewAdjustmentsImpl returns a new instance of adjustmentsImpl.
-func NewAdjustmentsImpl(client *Client) *adjustmentsImpl {
-	return &adjustmentsImpl{client: client}
-}
-
 // List retrieves all charges and credits issued for an account
 // https://docs.recurly.com/api/adjustments#list-adjustments
 func (s *adjustmentsImpl) List(accountCode string, params Params) (*Response, []Adjustment, error) {

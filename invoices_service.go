@@ -10,15 +10,10 @@ import (
 
 var _ InvoicesService = &invoicesImpl{}
 
-// invoicesImpl handles communication with theinvoices related methods
+// invoicesImpl handles communication with the invoice related methods
 // of the recurly API.
 type invoicesImpl struct {
 	client *Client
-}
-
-// NewInvoicesImpl returns a new instance of invoicesImpl.
-func NewInvoicesImpl(client *Client) *invoicesImpl {
-	return &invoicesImpl{client: client}
 }
 
 // List returns a list of all invoices.

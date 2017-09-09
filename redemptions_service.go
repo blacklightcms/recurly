@@ -14,11 +14,6 @@ type redemptionsImpl struct {
 	client *Client
 }
 
-// NewRedemptionsImpl returns a new instance of redemptionsImpl.
-func NewRedemptionsImpl(client *Client) *redemptionsImpl {
-	return &redemptionsImpl{client: client}
-}
-
 // GetForAccount looks up information about the 'active' coupon redemption on
 // an account
 // https://dev.recurly.com/docs/lookup-a-coupon-redemption-on-an-account

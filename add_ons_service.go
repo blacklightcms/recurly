@@ -14,11 +14,6 @@ type addOnsImpl struct {
 	client *Client
 }
 
-// NewAddOnsImpl returns a new instance of AccountsService.
-func NewAddOnsImpl(client *Client) *addOnsImpl {
-	return &addOnsImpl{client: client}
-}
-
 // List returns a list of add ons for a plan.
 // https://docs.recurly.com/api/plans/add-ons#list-addons
 func (s *addOnsImpl) List(planCode string, params Params) (*Response, []AddOn, error) {
