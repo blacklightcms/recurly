@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"runtime"
 	"strings"
 )
 
@@ -93,7 +94,19 @@ func (c *Client) newRequest(method string, action string, params Params, body in
 	}
 
 	req, err := http.NewRequest(method, endpoint, &buf)
+	if err != nil {
+		return nil, err
+	}
 
+	// Add User-Agent tracking for Recurly statistics and potentially
+	// identifying bugs or updates needed in the library.
+	// https://github.com/blacklightcms/recurly/issues/41
+	req.Header.Set("User-Agent", fmt.Sprintf(
+		"Blacklight/2017-09-09; Go (%s) [%s-%s]",
+		runtime.Version(),
+		runtime.GOARCH,
+		runtime.GOOS,
+	))
 	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", c.apiKey))
 	req.Header.Set("Accept", "application/xml")
 	req.Header.Set("X-Api-Version", "2.5")
