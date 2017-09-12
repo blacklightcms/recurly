@@ -135,16 +135,29 @@ func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 	if response.IsError() { // Parse validation errors
 		if response.StatusCode == http.StatusUnprocessableEntity {
 			var ve struct {
-				XMLName     xml.Name     `xml:"errors"`
 				Errors      []Error      `xml:"error"`
 				Transaction *Transaction `xml:"transaction,omitempty"`
+
+				// At least one 422 response can return a single error instead of an array.
+				// https://dev.recurly.com/docs/welcome#section-422-unprocessable-entity-responses
+				Symbol      string `xml:"symbol"`
+				Description string `xml:"description"`
 			}
 
 			if err = decoder.Decode(&ve); err != nil {
 				return response, err
 			}
 
-			response.Errors = ve.Errors
+			if ve.Errors == nil {
+				// If the response returned single error, set error as the first error in array.
+				response.Errors = []Error{{
+					XMLName:     xml.Name{Local: "error"},
+					Symbol:      ve.Symbol,
+					Description: ve.Description,
+				}}
+			} else {
+				response.Errors = ve.Errors
+			}
 
 			// If the response object includes a TransactionError, set the
 			// transaction field on the response object and the TransactionError field.

@@ -95,8 +95,9 @@ func (r *Response) Next() string {
 
 // Error is an individual validation error
 type Error struct {
-	XMLName xml.Name `xml:"error"`
-	Message string   `xml:",innerxml"`
-	Field   string   `xml:"field,attr"`
-	Symbol  string   `xml:"symbol,attr"`
+	XMLName     xml.Name `xml:"error"`
+	Message     string   `xml:",innerxml"`
+	Field       string   `xml:"field,attr"`
+	Symbol      string   `xml:"symbol,attr"`
+	Description string   `xml:"-"`
 }
