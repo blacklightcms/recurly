@@ -70,8 +70,9 @@ func TestClient_NewRequest(t *testing.T) {
 	}
 }
 
-// TestClient_Error tests the internals of recurly.client.
-func TestClient_Error(t *testing.T) {
+// TestClient_Errors tests the internals of recurly.client returning a 422
+// repsonse with an array of errors.
+func TestClient_Errors(t *testing.T) {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
 	client := NewClient("test", "abc", nil)
@@ -116,6 +117,54 @@ func TestClient_Error(t *testing.T) {
 			Message: "is not good",
 			Field:   "foo.bar",
 			Symbol:  "not_good",
+		},
+	}
+
+	if !reflect.DeepEqual(expected, resp.Errors) {
+		t.Fatalf("unexpected error: %v", resp.Errors)
+	}
+}
+
+// TestClient_Error tests the internals of recurly.client with a 422
+// response with a single error.
+func TestClient_Error(t *testing.T) {
+	mux := http.NewServeMux()
+	server := httptest.NewServer(mux)
+	client := NewClient("test", "abc", nil)
+	client.BaseURL = server.URL + "/"
+	defer server.Close()
+
+	mux.HandleFunc("/error", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(422)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
+			<error>
+				<symbol>simultaneous_request</symbol>
+				<description>A change for subscription 3cf89f0c3fcda0b15c50134f63856d4e is already in progress.</description>
+			</error>`)
+	})
+
+	req, err := http.NewRequest("GET", client.BaseURL+"error", nil)
+	if err != nil {
+		t.Fatalf("error creating request. err: %v", err)
+	}
+
+	resp, err := client.do(req, nil)
+	if err != nil {
+		t.Fatalf("error making request. err: %v", err)
+	} else if resp.IsOK() {
+		t.Fatalf("expected response to not be ok")
+	}
+
+	// Transaction should be nil
+	if resp.transaction != nil {
+		t.Fatal("expected transaction to be nil")
+	}
+
+	expected := []Error{
+		{
+			XMLName:     xml.Name{Local: "error"},
+			Symbol:      "simultaneous_request",
+			Description: "A change for subscription 3cf89f0c3fcda0b15c50134f63856d4e is already in progress.",
 		},
 	}
 
