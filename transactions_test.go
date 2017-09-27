@@ -315,6 +315,7 @@ func TestTransactions_Get(t *testing.T) {
     		<tax_in_cents type="integer">0</tax_in_cents>
     		<currency>USD</currency>
     		<status>success</status>
+    		<description>Order #717</description>
     		<payment_method>credit_card</payment_method>
     		<reference>5416477</reference>
     		<source>subscription</source>
@@ -374,6 +375,7 @@ func TestTransactions_Get(t *testing.T) {
 		TaxInCents:       0,
 		Currency:         "USD",
 		Status:           "success",
+		Description:      "Order #717",
 		PaymentMethod:    "credit_card",
 		Reference:        "5416477",
 		Source:           "subscription",
@@ -451,7 +453,7 @@ func TestTransactions_New(t *testing.T) {
 			t.Fatalf("unexpected method: %s", r.Method)
 		}
 		defer r.Body.Close()
-		expected := `<transaction><amount_in_cents>100</amount_in_cents><currency>USD</currency><account><account_code>25</account_code></account></transaction>`
+		expected := `<transaction><amount_in_cents>100</amount_in_cents><currency>USD</currency><description>description</description><product_code>code</product_code><account><account_code>25</account_code></account></transaction>`
 		var given bytes.Buffer
 		given.ReadFrom(r.Body)
 		if expected != given.String() {
@@ -469,6 +471,8 @@ func TestTransactions_New(t *testing.T) {
 			Account: recurly.Account{
 				Code: "25",
 			},
+			Description: "description",
+			ProductCode: "code",
 		})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
