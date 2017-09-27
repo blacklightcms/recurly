@@ -26,6 +26,8 @@ type Transaction struct {
 	TaxInCents       int
 	Currency         string
 	Status           string
+	Description      string
+	ProductCode      string // Write only field, is saved on the invoice line item but not the transaction
 	PaymentMethod    string
 	Reference        string
 	Source           string
@@ -66,6 +68,8 @@ func (t Transaction) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		TaxInCents    int      `xml:"tax_in_cents,omitempty"`
 		Currency      string   `xml:"currency"`
 		Status        string   `xml:"status,omitempty"`
+		Description   string   `xml:"description,omitempty"`
+		ProductCode   string   `xml:"product_code,omitempty"`
 		PaymentMethod string   `xml:"payment_method,omitempty"`
 		Reference     string   `xml:"reference,omitempty"`
 		Source        string   `xml:"source,omitempty"`
@@ -81,6 +85,8 @@ func (t Transaction) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		TaxInCents:    t.TaxInCents,
 		Currency:      t.Currency,
 		Status:        t.Status,
+		Description:   t.Description,
+		ProductCode:   t.ProductCode,
 		PaymentMethod: t.PaymentMethod,
 		Reference:     t.Reference,
 		Source:        t.Source,
@@ -108,6 +114,7 @@ func (t *Transaction) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 		TaxInCents       int               `xml:"tax_in_cents,omitempty"`
 		Currency         string            `xml:"currency"`
 		Status           string            `xml:"status,omitempty"`
+		Description      string            `xml:"description,omitempty"`
 		PaymentMethod    string            `xml:"payment_method,omitempty"`
 		Reference        string            `xml:"reference,omitempty"`
 		Source           string            `xml:"source,omitempty"`
@@ -136,6 +143,7 @@ func (t *Transaction) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 		TaxInCents:       v.TaxInCents,
 		Currency:         v.Currency,
 		Status:           v.Status,
+		Description:      v.Description,
 		PaymentMethod:    v.PaymentMethod,
 		Reference:        v.Reference,
 		Source:           v.Source,
