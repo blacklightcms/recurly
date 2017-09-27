@@ -38,6 +38,7 @@ func (a Adjustment) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		XMLName           xml.Name `xml:"adjustment"`
 		Description       string   `xml:"description,omitempty"`
 		AccountingCode    string   `xml:"accounting_code,omitempty"`
+		ProductCode       string   `xml:"product_code,omitempty"`
 		UnitAmountInCents int      `xml:"unit_amount_in_cents"`
 		Quantity          int      `xml:"quantity,omitempty"`
 		Currency          string   `xml:"currency"`
@@ -46,6 +47,7 @@ func (a Adjustment) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	}{
 		Description:       a.Description,
 		AccountingCode:    a.AccountingCode,
+		ProductCode:       a.ProductCode,
 		UnitAmountInCents: a.UnitAmountInCents,
 		Quantity:          a.Quantity,
 		Currency:          a.Currency,
