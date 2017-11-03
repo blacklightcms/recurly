@@ -386,9 +386,11 @@ func TestBilling_Update_InvalidToken(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><error><symbol>token_invalid</symbol><description>Token is either invalid or expired</description></error>`)
 	})
 
-	resp, _, err := client.Billing.UpdateWithToken("abceasf", token)
+	resp, billing, err := client.Billing.UpdateWithToken("abceasf", token)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	} else if billing != nil {
+		t.Fatalf("unexpected billing to be nil: %#v", billing)
 	}
 
 	if resp.IsOK() {

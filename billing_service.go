@@ -119,6 +119,9 @@ func (s *billingImpl) UpdateWithToken(accountCode string, token string) (*Respon
 
 	var dst Billing
 	resp, err := s.client.do(req, &dst)
+	if err != nil || resp.StatusCode >= http.StatusBadRequest {
+		return resp, nil, err
+	}
 
 	return resp, &dst, err
 }

@@ -7,7 +7,7 @@ import (
 
 // Billing represents billing info for a single account on your site
 type Billing struct {
-	XMLName          xml.Name `xml:"billing_info"`
+	XMLName          xml.Name `xml:"billing_info,omitempty"`
 	FirstName        string   `xml:"first_name,omitempty"`
 	LastName         string   `xml:"last_name,omitempty"`
 	Company          string   `xml:"company,omitempty"`
