@@ -18,6 +18,7 @@ import (
 // fields are handled properly -- including types like booleans and integers which
 // have zero values that we want to send.
 func TestAdjustments_Encoding(t *testing.T) {
+	now := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
 	tests := []struct {
 		v        recurly.Adjustment
 		expected string
@@ -30,6 +31,8 @@ func TestAdjustments_Encoding(t *testing.T) {
 		{v: recurly.Adjustment{AccountingCode: "bandwidth", UnitAmountInCents: 2000, Currency: "CAD"}, expected: "<adjustment><accounting_code>bandwidth</accounting_code><unit_amount_in_cents>2000</unit_amount_in_cents><currency>CAD</currency></adjustment>"},
 		{v: recurly.Adjustment{TaxExempt: recurly.NewBool(false), UnitAmountInCents: 2000, Currency: "USD"}, expected: "<adjustment><unit_amount_in_cents>2000</unit_amount_in_cents><currency>USD</currency><tax_exempt>false</tax_exempt></adjustment>"},
 		{v: recurly.Adjustment{TaxCode: "digital", UnitAmountInCents: 2000, Currency: "USD"}, expected: "<adjustment><unit_amount_in_cents>2000</unit_amount_in_cents><currency>USD</currency><tax_code>digital</tax_code></adjustment>"},
+		{v: recurly.Adjustment{StartDate: recurly.NullTime{Time: &now}, UnitAmountInCents: 2000, Currency: "USD"}, expected: "<adjustment><unit_amount_in_cents>2000</unit_amount_in_cents><currency>USD</currency><start_date>2000-01-01T00:00:00Z</start_date></adjustment>"},
+		{v: recurly.Adjustment{StartDate: recurly.NullTime{Time: &now}, EndDate: recurly.NullTime{Time: &now}, UnitAmountInCents: 2000, Currency: "USD"}, expected: "<adjustment><unit_amount_in_cents>2000</unit_amount_in_cents><currency>USD</currency><start_date>2000-01-01T00:00:00Z</start_date><end_date>2000-01-01T00:00:00Z</end_date></adjustment>"},
 	}
 
 	for _, tt := range tests {
