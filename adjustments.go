@@ -44,6 +44,8 @@ func (a Adjustment) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		Currency          string   `xml:"currency"`
 		TaxCode           string   `xml:"tax_code,omitempty"`
 		TaxExempt         NullBool `xml:"tax_exempt,omitempty"`
+		StartDate         NullTime `xml:"start_date,omitempty"`
+		EndDate           NullTime `xml:"end_date,omitempty"`
 	}{
 		Description:       a.Description,
 		AccountingCode:    a.AccountingCode,
@@ -53,6 +55,8 @@ func (a Adjustment) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		Currency:          a.Currency,
 		TaxCode:           a.TaxCode,
 		TaxExempt:         a.TaxExempt,
+		StartDate:         a.StartDate,
+		EndDate:           a.EndDate,
 	}
 
 	return e.Encode(v)
