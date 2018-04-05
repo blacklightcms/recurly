@@ -19,6 +19,7 @@ func TestParse_BillingInfoUpdatedNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.BillingInfoUpdatedNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.BillingInfoUpdatedNotification{
+		ID: "b3ec5b439c26e8edb8b3d773d41998a9",
 		Account: webhooks.Account{
 			XMLName:   xml.Name{Local: "account"},
 			Code:      "1",
@@ -45,6 +46,7 @@ func TestParse_NewSubscriptionNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.NewSubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.NewSubscriptionNotification{
+		ID: "06030b0dbbd031b5f6c2665745b8ee04",
 		Account: webhooks.Account{
 			XMLName:   xml.Name{Local: "account"},
 			Code:      "1",
@@ -87,6 +89,7 @@ func TestParse_UpdatedSubscriptionNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.UpdatedSubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.UpdatedSubscriptionNotification{
+		ID: "6865b710b7247411d45b037fb1070510",
 		Account: webhooks.Account{
 			XMLName:   xml.Name{Local: "account"},
 			Code:      "1",
@@ -127,6 +130,7 @@ func TestParse_RenewedSubscriptionNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.RenewedSubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.RenewedSubscriptionNotification{
+		ID: "6b12716bf975bb602aa1e619fb48359c",
 		Account: webhooks.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
@@ -168,6 +172,7 @@ func TestParse_ExpiredSubscriptionNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.ExpiredSubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.ExpiredSubscriptionNotification{
+		ID: "c310b1649a1ad48d2007810e56955486",
 		Account: webhooks.Account{
 			XMLName:   xml.Name{Local: "account"},
 			Code:      "1",
@@ -210,6 +215,7 @@ func TestParse_CanceledSubscriptionNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.CanceledSubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.CanceledSubscriptionNotification{
+		ID: "5c67e49cfdf725e2d128dcca3bbdb6ee",
 		Account: webhooks.Account{
 			XMLName:   xml.Name{Local: "account"},
 			Code:      "1",
@@ -247,6 +253,7 @@ func TestParse_NewInvoiceNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.NewInvoiceNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.NewInvoiceNotification{
+		ID: "0719fe17b0d1f0ca3fa3771a3d8dbe70",
 		Account: webhooks.Account{
 			XMLName:   xml.Name{Local: "account"},
 			Code:      "1",
@@ -279,6 +286,7 @@ func TestParse_PastDueInvoiceNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.PastDueInvoiceNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.PastDueInvoiceNotification{
+		ID: "79ece23b6e5bd3277e6e80f46d39e986",
 		Account: webhooks.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
@@ -308,6 +316,7 @@ func TestParse_SuccessfulPaymentNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.SuccessfulPaymentNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.SuccessfulPaymentNotification{
+		ID: "aa865461fd0c3651973480cc436dc44e",
 		Account: webhooks.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
@@ -343,6 +352,7 @@ func TestParse_FailedPaymentNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.FailedPaymentNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.FailedPaymentNotification{
+		ID: "6f1ec2b71749f91ee132903484bcb3db",
 		Account: webhooks.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
@@ -380,6 +390,7 @@ func TestParse_VoidPaymentNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.VoidPaymentNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.VoidPaymentNotification{
+		ID: "1e6655b57178841c43862e15bb17f6c0",
 		Account: webhooks.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
@@ -416,6 +427,7 @@ func TestParse_SuccessfulRefundNotification(t *testing.T) {
 	} else if n, ok := result.(*webhooks.SuccessfulRefundNotification); !ok {
 		t.Fatalf("unexpected type: %T, result")
 	} else if !reflect.DeepEqual(n, &webhooks.SuccessfulRefundNotification{
+		ID: "84ed50bc7cb62c6c1ca729ae35970539",
 		Account: webhooks.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",

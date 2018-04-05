@@ -1,6 +1,7 @@
 package webhooks
 
 import (
+	"crypto/md5"
 	"encoding/xml"
 	"fmt"
 	"io"
@@ -96,6 +97,7 @@ type (
 	// BillingInfoUpdatedNotification is sent when a customer updates or adds billing information.
 	// https://dev.recurly.com/page/webhooks#section-updated-billing-information
 	BillingInfoUpdatedNotification struct {
+		ID      string
 		Account Account `xml:"account"`
 	}
 )
@@ -105,6 +107,7 @@ type (
 	// NewSubscriptionNotification is sent when a new subscription is created.
 	// https://dev.recurly.com/page/webhooks#section-new-subscription
 	NewSubscriptionNotification struct {
+		ID           string
 		Account      Account              `xml:"account"`
 		Subscription recurly.Subscription `xml:"subscription"`
 	}
@@ -112,6 +115,7 @@ type (
 	// UpdatedSubscriptionNotification is sent when a subscription is upgraded or downgraded.
 	// https://dev.recurly.com/page/webhooks#section-updated-subscription
 	UpdatedSubscriptionNotification struct {
+		ID           string
 		Account      Account              `xml:"account"`
 		Subscription recurly.Subscription `xml:"subscription"`
 	}
@@ -119,6 +123,7 @@ type (
 	// RenewedSubscriptionNotification is sent when a subscription renew.
 	// https://dev.recurly.com/page/webhooks#section-renewed-subscription
 	RenewedSubscriptionNotification struct {
+		ID           string
 		Account      Account              `xml:"account"`
 		Subscription recurly.Subscription `xml:"subscription"`
 	}
@@ -126,6 +131,7 @@ type (
 	// ExpiredSubscriptionNotification is sent when a subscription is no longer valid.
 	// https://dev.recurly.com/v2.4/page/webhooks#section-expired-subscription
 	ExpiredSubscriptionNotification struct {
+		ID           string
 		Account      Account              `xml:"account"`
 		Subscription recurly.Subscription `xml:"subscription"`
 	}
@@ -133,6 +139,7 @@ type (
 	// CanceledSubscriptionNotification is sent when a subscription is canceled.
 	// https://dev.recurly.com/page/webhooks#section-canceled-subscription
 	CanceledSubscriptionNotification struct {
+		ID           string
 		Account      Account              `xml:"account"`
 		Subscription recurly.Subscription `xml:"subscription"`
 	}
@@ -143,6 +150,7 @@ type (
 	// NewInvoiceNotification is sent when an invoice generated.
 	// https://dev.recurly.com/page/webhooks#section-new-invoice
 	NewInvoiceNotification struct {
+		ID      string
 		Account Account `xml:"account"`
 		Invoice Invoice `xml:"invoice"`
 	}
@@ -150,6 +158,7 @@ type (
 	// PastDueInvoiceNotification is sent when an invoice is past due.
 	// https://dev.recurly.com/v2.4/page/webhooks#section-past-due-invoice
 	PastDueInvoiceNotification struct {
+		ID      string
 		Account Account `xml:"account"`
 		Invoice Invoice `xml:"invoice"`
 	}
@@ -160,6 +169,7 @@ type (
 	// SuccessfulPaymentNotification is sent when a payment is successful.
 	// https://dev.recurly.com/v2.4/page/webhooks#section-successful-payment
 	SuccessfulPaymentNotification struct {
+		ID          string
 		Account     Account     `xml:"account"`
 		Transaction Transaction `xml:"transaction"`
 	}
@@ -167,6 +177,7 @@ type (
 	// FailedPaymentNotification is sent when a payment fails.
 	// https://dev.recurly.com/v2.4/page/webhooks#section-failed-payment
 	FailedPaymentNotification struct {
+		ID          string
 		Account     Account     `xml:"account"`
 		Transaction Transaction `xml:"transaction"`
 	}
@@ -174,6 +185,7 @@ type (
 	// VoidPaymentNotification is sent when a successful payment is voided.
 	// https://dev.recurly.com/page/webhooks#section-void-payment
 	VoidPaymentNotification struct {
+		ID          string
 		Account     Account     `xml:"account"`
 		Transaction Transaction `xml:"transaction"`
 	}
@@ -181,6 +193,7 @@ type (
 	// SuccessfulRefundNotification is sent when an amount is refunded.
 	// https://dev.recurly.com/page/webhooks#section-successful-refund
 	SuccessfulRefundNotification struct {
+		ID          string
 		Account     Account     `xml:"account"`
 		Transaction Transaction `xml:"transaction"`
 	}
@@ -218,32 +231,38 @@ func Parse(r io.Reader) (interface{}, error) {
 		return nil, err
 	}
 
+	// Generate unique id from notification.
+	// Recurly does not identify their webhooks with a unique identifier
+	// for idempotency tracking, so this generates one from the notification
+	// body.
+	id := fmt.Sprintf("%x", md5.Sum(notification))
+
 	var dst interface{}
 	switch n.XMLName.Local {
 	case BillingInfoUpdated:
-		dst = &BillingInfoUpdatedNotification{}
+		dst = &BillingInfoUpdatedNotification{ID: id}
 	case NewSubscription:
-		dst = &NewSubscriptionNotification{}
+		dst = &NewSubscriptionNotification{ID: id}
 	case UpdatedSubscription:
-		dst = &UpdatedSubscriptionNotification{}
+		dst = &UpdatedSubscriptionNotification{ID: id}
 	case RenewedSubscription:
-		dst = &RenewedSubscriptionNotification{}
+		dst = &RenewedSubscriptionNotification{ID: id}
 	case ExpiredSubscription:
-		dst = &ExpiredSubscriptionNotification{}
+		dst = &ExpiredSubscriptionNotification{ID: id}
 	case CanceledSubscription:
-		dst = &CanceledSubscriptionNotification{}
+		dst = &CanceledSubscriptionNotification{ID: id}
 	case NewInvoice:
-		dst = &NewInvoiceNotification{}
+		dst = &NewInvoiceNotification{ID: id}
 	case PastDueInvoice:
-		dst = &PastDueInvoiceNotification{}
+		dst = &PastDueInvoiceNotification{ID: id}
 	case SuccessfulPayment:
-		dst = &SuccessfulPaymentNotification{}
+		dst = &SuccessfulPaymentNotification{ID: id}
 	case FailedPayment:
-		dst = &FailedPaymentNotification{}
+		dst = &FailedPaymentNotification{ID: id}
 	case VoidPayment:
-		dst = &VoidPaymentNotification{}
+		dst = &VoidPaymentNotification{ID: id}
 	case SuccessfulRefund:
-		dst = &SuccessfulRefundNotification{}
+		dst = &SuccessfulRefundNotification{ID: id}
 	default:
 		return nil, ErrUnknownNotification{name: n.XMLName.Local}
 	}
