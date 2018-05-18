@@ -1031,3 +1031,43 @@ func TestSubscriptions_Postpone(t *testing.T) {
 		t.Fatal("expected postpone subscription change to return OK")
 	}
 }
+
+func TestSubscriptions_Pause(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/pause", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
+	})
+
+	r, _, err := client.Subscriptions.Pause("44f83d7cba354d5b8481-2419f923ea96", 1) // UUID has dashes and should be sanitized
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected pause subscription change to return OK")
+	}
+}
+
+func TestSubscriptions_Resume(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/resume", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
+	})
+
+	r, _, err := client.Subscriptions.Resume("44f83d7cba354d5b8481-2419f923ea96") // UUID has dashes and should be sanitized
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected pause subscription change to return OK")
+	}
+}

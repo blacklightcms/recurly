@@ -109,7 +109,7 @@ func (c *Client) newRequest(method string, action string, params Params, body in
 	))
 	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", c.apiKey))
 	req.Header.Set("Accept", "application/xml")
-	req.Header.Set("X-Api-Version", "2.5")
+	req.Header.Set("X-Api-Version", "2.11")
 	if req.Method == "POST" || req.Method == "PUT" {
 		req.Header.Set("Content-Type", "application/xml; charset=utf-8")
 	}
