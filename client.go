@@ -29,16 +29,17 @@ type Client struct {
 	BaseURL string
 
 	// Services used for talking with different parts of the Recurly API
-	Accounts      AccountsService
-	Adjustments   AdjustmentsService
-	Billing       BillingService
-	Coupons       CouponsService
-	Redemptions   RedemptionsService
-	Invoices      InvoicesService
-	Plans         PlansService
-	AddOns        AddOnsService
-	Subscriptions SubscriptionsService
-	Transactions  TransactionsService
+	Accounts       AccountsService
+	Adjustments    AdjustmentsService
+	Billing        BillingService
+	Coupons        CouponsService
+	Redemptions    RedemptionsService
+	Invoices       InvoicesService
+	Plans          PlansService
+	AddOns         AddOnsService
+	Subscriptions  SubscriptionsService
+	Transactions   TransactionsService
+	CreditPayments CreditPaymentsService
 }
 
 // NewClient returns a new instance of *Client.
@@ -65,6 +66,7 @@ func NewClient(subDomain, apiKey string, httpClient *http.Client) *Client {
 	client.AddOns = &addOnsImpl{client: client}
 	client.Subscriptions = &subscriptionsImpl{client: client}
 	client.Transactions = &transactionsImpl{client: client}
+	client.CreditPayments = &creditInvoicesImpl{client: client}
 
 	return client
 }
@@ -109,7 +111,7 @@ func (c *Client) newRequest(method string, action string, params Params, body in
 	))
 	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", c.apiKey))
 	req.Header.Set("Accept", "application/xml")
-	req.Header.Set("X-Api-Version", "2.5")
+	req.Header.Set("X-Api-Version", "2.12")
 	if req.Method == "POST" || req.Method == "PUT" {
 		req.Header.Set("Content-Type", "application/xml; charset=utf-8")
 	}
