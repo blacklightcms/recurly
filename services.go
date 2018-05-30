@@ -112,3 +112,10 @@ type TransactionsService interface {
 	Get(uuid string) (*Response, *Transaction, error)
 	Create(t Transaction) (*Response, *Transaction, error)
 }
+
+// CreditPaymentsService represents the interactions available for credit payments.
+type CreditPaymentsService interface {
+	List(params Params) (*Response, []CreditPayment, error)
+	ListAccount(accountCode string, params Params) (*Response, []CreditPayment, error)
+	Get(uuid string) (*Response, *CreditPayment, error)
+}
