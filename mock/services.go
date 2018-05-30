@@ -634,3 +634,32 @@ func (m *SubscriptionsService) Resume(uuid string) (*recurly.Response, *recurly.
 	m.ResumeInvoked = true
 	return m.OnResume(uuid)
 }
+
+var _ recurly.CreditPaymentsService = &CreditPaymentsService{}
+
+// CreditPaymentsService represents the interactions available for credit payments.
+type CreditPaymentsService struct {
+	OnList      func(params recurly.Params) (*recurly.Response, []recurly.CreditPayment, error)
+	ListInvoked bool
+
+	OnListAccount      func(code string, params recurly.Params) (*recurly.Response, []recurly.CreditPayment, error)
+	ListAccountInvoked bool
+
+	OnGet      func(uuid string) (*recurly.Response, *recurly.CreditPayment, error)
+	GetInvoked bool
+}
+
+func (m *CreditPaymentsService) List(params recurly.Params) (*recurly.Response, []recurly.CreditPayment, error) {
+	m.ListInvoked = true
+	return m.OnList(params)
+}
+
+func (m *CreditPaymentsService) ListAccount(code string, params recurly.Params) (*recurly.Response, []recurly.CreditPayment, error) {
+	m.ListAccountInvoked = true
+	return m.OnListAccount(code, params)
+}
+
+func (m *CreditPaymentsService) Get(uuid string) (*recurly.Response, *recurly.CreditPayment, error) {
+	m.GetInvoked = true
+	return m.OnGet(uuid)
+}
