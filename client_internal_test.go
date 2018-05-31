@@ -7,8 +7,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 // TestClient_NewRequest tests the internals of recurly.client.
@@ -60,8 +61,8 @@ func TestClient_NewRequest(t *testing.T) {
 
 	expected := []byte("<account><account_code>abc</account_code></account>")
 	given, _ := ioutil.ReadAll(req.Body)
-	if !reflect.DeepEqual(expected, given) {
-		t.Fatalf("expected string body equal to %s, given %s", expected, given)
+	if diff := cmp.Diff(expected, given); diff != "" {
+		t.Fatal(diff)
 	}
 
 	query = req.URL.Query()
@@ -120,8 +121,8 @@ func TestClient_Errors(t *testing.T) {
 		},
 	}
 
-	if !reflect.DeepEqual(expected, resp.Errors) {
-		t.Fatalf("unexpected error: %v", resp.Errors)
+	if diff := cmp.Diff(expected, resp.Errors); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -168,7 +169,7 @@ func TestClient_Error(t *testing.T) {
 		},
 	}
 
-	if !reflect.DeepEqual(expected, resp.Errors) {
-		t.Fatalf("unexpected error: %v", resp.Errors)
+	if diff := cmp.Diff(expected, resp.Errors); diff != "" {
+		t.Fatal(diff)
 	}
 }

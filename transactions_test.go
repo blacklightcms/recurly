@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"reflect"
 	"testing"
 	"time"
 
 	"github.com/blacklightcms/recurly"
+	"github.com/google/go-cmp/cmp"
 )
 
 // TestTransactionEncoding ensures structs are encoded to XML properly.
@@ -103,7 +103,7 @@ func TestTransactions_List(t *testing.T) {
 		t.Fatalf("unexpected per_page: %s", pp)
 	}
 
-	if !reflect.DeepEqual(transactions, []recurly.Transaction{
+	if diff := cmp.Diff(transactions, []recurly.Transaction{
 		{
 			InvoiceNumber:    1108,
 			SubscriptionUUID: "17caaca1716f33572edc8146e0aaefde",
@@ -157,8 +157,8 @@ func TestTransactions_List(t *testing.T) {
 				},
 			},
 		},
-	}) {
-		t.Fatalf("unexpected transaction: %v", transactions)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -236,7 +236,7 @@ func TestTransactions_ListAccount(t *testing.T) {
 		t.Fatalf("unexpected per_page: %s", pp)
 	}
 
-	if !reflect.DeepEqual(transactions, []recurly.Transaction{
+	if diff := cmp.Diff(transactions, []recurly.Transaction{
 		{
 			InvoiceNumber:    1108,
 			SubscriptionUUID: "17caaca1716f33572edc8146e0aaefde",
@@ -290,8 +290,8 @@ func TestTransactions_ListAccount(t *testing.T) {
 				},
 			},
 		},
-	}) {
-		t.Fatalf("unexpected transactions: %v", transactions)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -366,7 +366,7 @@ func TestTransactions_Get(t *testing.T) {
 		t.Fatal("expected get transaction to return OK")
 	}
 
-	if !reflect.DeepEqual(transaction, &recurly.Transaction{
+	if diff := cmp.Diff(transaction, &recurly.Transaction{
 		InvoiceNumber:    1108,
 		SubscriptionUUID: "17caaca1716f33572edc8146e0aaefde",
 		UUID:             "a13acd8fe4294916b79aec87b7ea441f", // UUID has been sanitized
@@ -419,8 +419,8 @@ func TestTransactions_Get(t *testing.T) {
 				LastFour:  "1111",
 			},
 		},
-	}) {
-		t.Fatalf("unexpected transaction: %+v", transaction)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -541,7 +541,7 @@ func TestTransactions_Err_FraudCard(t *testing.T) {
 		t.Fatalf("error occurred making API call. Err: %s", err)
 	} else if r.IsOK() {
 		t.Fatal("expected create fraudulent transaction to return error")
-	} else if !reflect.DeepEqual(transaction, &recurly.Transaction{
+	} else if diff := cmp.Diff(transaction, &recurly.Transaction{
 		UUID:          "3054a79e4c3ab4699f95be455f8653bb",
 		Action:        "purchase",
 		AmountInCents: 100,
@@ -555,8 +555,8 @@ func TestTransactions_Err_FraudCard(t *testing.T) {
 			MerchantMessage: "The payment gateway declined the transaction due to fraud filters enabled in your gateway.",
 			CustomerMessage: "The transaction was declined. Please use a different card, contact your bank, or contact support.",
 		},
-	}) {
-		t.Fatalf("unexpected transaction: %#v", transaction)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 

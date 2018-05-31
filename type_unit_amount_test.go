@@ -3,8 +3,9 @@ package recurly
 import (
 	"bytes"
 	"encoding/xml"
-	"reflect"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestUnitAmount(t *testing.T) {
@@ -33,8 +34,8 @@ func TestUnitAmount(t *testing.T) {
 		var dst s
 		if err := xml.NewDecoder(buf).Decode(&dst); err != nil {
 			t.Fatalf("unexpected error: %v", err)
-		} else if !reflect.DeepEqual(tt.v, dst) {
-			t.Fatalf("unexpected value: %T %v", dst, dst)
+		} else if diff := cmp.Diff(tt.v, dst); diff != "" {
+			t.Fatal(diff)
 		}
 	}
 }

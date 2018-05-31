@@ -5,11 +5,11 @@ import (
 	"encoding/xml"
 	"fmt"
 	"net/http"
-	"reflect"
 	"testing"
 	"time"
 
 	"github.com/blacklightcms/recurly"
+	"github.com/google/go-cmp/cmp"
 )
 
 // TestAccountEncoding ensures structs are encoded to XML properly.
@@ -111,7 +111,7 @@ func TestAccounts_List(t *testing.T) {
 	}
 
 	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-10-25T12:00:00Z")
-	if !reflect.DeepEqual(accounts, []recurly.Account{recurly.Account{
+	if diff := cmp.Diff(accounts, []recurly.Account{recurly.Account{
 		XMLName:   xml.Name{Local: "account"},
 		Code:      "1",
 		State:     "active",
@@ -128,8 +128,8 @@ func TestAccounts_List(t *testing.T) {
 		},
 		HostedLoginToken: "a92468579e9c4231a6c0031c4716c01d",
 		CreatedAt:        recurly.NewTime(ts),
-	}}) {
-		t.Fatalf("unexpected account: %v", accounts)
+	}}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -209,7 +209,7 @@ func TestAccounts_Get(t *testing.T) {
 	}
 
 	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-10-25T12:00:00Z")
-	if !reflect.DeepEqual(a, &recurly.Account{
+	if diff := cmp.Diff(a, &recurly.Account{
 		XMLName:   xml.Name{Local: "account"},
 		Code:      "1",
 		State:     "active",
@@ -226,8 +226,8 @@ func TestAccounts_Get(t *testing.T) {
 		},
 		HostedLoginToken: "a92468579e9c4231a6c0031c4716c01d",
 		CreatedAt:        recurly.NewTime(ts),
-	}) {
-		t.Fatalf("unexpected value: %v", a)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -277,18 +277,13 @@ func TestAccounts_LookupAccountBalance(t *testing.T) {
 		t.Fatal("expected get account balance to return OK")
 	}
 
-	if !reflect.DeepEqual(b, &recurly.AccountBalance{
+	if diff := cmp.Diff(b, &recurly.AccountBalance{
 		XMLName:     xml.Name{Local: "account_balance"},
 		AccountCode: "1",
 		PastDue:     false,
 		Balance:     3000,
-	}) {
-		t.Fatalf("unexpected value: \n%+v \n%+v", b, &recurly.AccountBalance{
-			XMLName:     xml.Name{Local: "account_balance"},
-			AccountCode: "1",
-			PastDue:     false,
-			Balance:     3000,
-		})
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -399,7 +394,7 @@ func TestAccounts_ListNotes(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	} else if resp.IsError() {
 		t.Fatal("expected list notes to return OK")
-	} else if !reflect.DeepEqual(notes, []recurly.Note{
+	} else if diff := cmp.Diff(notes, []recurly.Note{
 		{
 			XMLName:   xml.Name{Local: "note"},
 			Message:   "This is my second note",
@@ -410,7 +405,7 @@ func TestAccounts_ListNotes(t *testing.T) {
 			Message:   "This is my first note",
 			CreatedAt: time.Date(2013, time.May, 14, 18, 52, 50, 0, time.UTC),
 		},
-	}) {
-		t.Fatalf("unexpected notes: %v", notes)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }

@@ -7,11 +7,11 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"reflect"
 	"testing"
 	"time"
 
 	"github.com/blacklightcms/recurly"
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestInvoices_List(t *testing.T) {
@@ -95,7 +95,7 @@ func TestInvoices_List(t *testing.T) {
 		t.Fatal("expected list invoices to return OK")
 	} else if resp.Request.URL.Query().Get("per_page") != "1" {
 		t.Fatalf("expected per_page parameter of 1, given %s", resp.Request.URL.Query().Get("per_page"))
-	} else if !reflect.DeepEqual(invoices, []recurly.Invoice{{
+	} else if diff := cmp.Diff(invoices, []recurly.Invoice{{
 		XMLName:     xml.Name{Local: "invoice"},
 		AccountCode: "1",
 		Address: recurly.Address{
@@ -141,8 +141,8 @@ func TestInvoices_List(t *testing.T) {
 				CreatedAt:              recurly.NewTimeFromString("2011-08-31T03:30:00Z"),
 			},
 		},
-	}}) {
-		t.Fatalf("unexpected invoices: %v", invoices)
+	}}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -226,7 +226,7 @@ func TestInvoices_ListAccount(t *testing.T) {
 		t.Fatal("expected list invoices to return OK")
 	} else if pp := resp.Request.URL.Query().Get("per_page"); pp != "1" {
 		t.Fatalf("unexpected per_page: %s", pp)
-	} else if !reflect.DeepEqual(invoices, []recurly.Invoice{
+	} else if diff := cmp.Diff(invoices, []recurly.Invoice{
 		{
 			XMLName:     xml.Name{Local: "invoice"},
 			AccountCode: "1",
@@ -273,8 +273,8 @@ func TestInvoices_ListAccount(t *testing.T) {
 				},
 			},
 		},
-	}) {
-		t.Fatalf("unexpected invoices: %v", invoices)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -415,7 +415,7 @@ func TestInvoices_Get(t *testing.T) {
 	}
 
 	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-08-25T12:00:00Z")
-	if !reflect.DeepEqual(invoice, &recurly.Invoice{
+	if diff := cmp.Diff(invoice, &recurly.Invoice{
 		XMLName:     xml.Name{Local: "invoice"},
 		AccountCode: "1",
 		Address: recurly.Address{
@@ -523,8 +523,8 @@ func TestInvoices_Get(t *testing.T) {
 				},
 			},
 		},
-	}) {
-		t.Fatalf("unexpected invoice: %v", invoice)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -625,8 +625,8 @@ func TestInvoices_GetPDF(t *testing.T) {
 	}
 
 	expected := bytes.NewBufferString("binary pdf text")
-	if !reflect.DeepEqual(expected, pdf) {
-		t.Fatalf("unexpected pdf invoice: %s", pdf)
+	if !bytes.EqualFold(expected.Bytes(), pdf.Bytes()) {
+		t.Fatalf("unexpected bytes: have=%v want %v", expected, pdf)
 	}
 }
 
@@ -655,8 +655,8 @@ func TestInvoices_GetPDFLanguage(t *testing.T) {
 	}
 
 	expected := bytes.NewBufferString("binary pdf text")
-	if !reflect.DeepEqual(expected, pdf) {
-		t.Fatalf("unexpected pdf: %v", pdf)
+	if !bytes.EqualFold(expected.Bytes(), pdf.Bytes()) {
+		t.Fatalf("unexpected bytes: have=%v want %v", expected, pdf)
 	}
 }
 

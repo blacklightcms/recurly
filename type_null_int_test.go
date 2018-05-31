@@ -3,15 +3,16 @@ package recurly
 import (
 	"bytes"
 	"encoding/xml"
-	"reflect"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestNullInt(t *testing.T) {
-	if !reflect.DeepEqual(NewInt(1), NullInt{Int: 1, Valid: true}) {
-		t.Fatalf("unexpected value: %v", NewInt(1))
-	} else if !reflect.DeepEqual(NewInt(0), NullInt{Int: 0, Valid: true}) {
-		t.Fatalf("unexpected value: %v", NewInt(0))
+	if diff := cmp.Diff(NewInt(1), NullInt{Int: 1, Valid: true}); diff != "" {
+		t.Fatal(diff)
+	} else if diff := cmp.Diff(NewInt(0), NullInt{Int: 0, Valid: true}); diff != "" {
+		t.Fatal(diff)
 	}
 
 	type s struct {
@@ -40,8 +41,8 @@ func TestNullInt(t *testing.T) {
 		var dst s
 		if err := xml.NewDecoder(bytes.NewBufferString(tt.expected)).Decode(&dst); err != nil {
 			t.Errorf("(%d) unexpected error: %s", i, err)
-		} else if !reflect.DeepEqual(tt.s, dst) {
-			t.Errorf("(%d): unexpected value: %v", i, dst)
+		} else if diff := cmp.Diff(tt.s, dst); diff != "" {
+			t.Errorf("(%d): %s", i, diff)
 		}
 	}
 }

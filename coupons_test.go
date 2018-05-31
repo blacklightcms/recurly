@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"reflect"
 	"testing"
 	"time"
 
 	"github.com/blacklightcms/recurly"
+	"github.com/google/go-cmp/cmp"
 )
 
 // TestCouponsEncoding ensures structs are encoded to XML properly.
@@ -185,7 +185,7 @@ func TestCoupons_List(t *testing.T) {
 
 	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-04-10T07:00:00Z")
 	redeem, _ := time.Parse(recurly.DateTimeFormat, "2014-01-01T07:00:00Z")
-	if !reflect.DeepEqual(coupons, []recurly.Coupon{
+	if diff := cmp.Diff(coupons, []recurly.Coupon{
 		{
 			XMLName:           xml.Name{Local: "coupon"},
 			Code:              "special",
@@ -203,8 +203,8 @@ func TestCoupons_List(t *testing.T) {
 				{Code: "platinum"},
 			},
 		},
-	}) {
-		t.Fatalf("unexpected coupons: %v", coupons)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -248,7 +248,7 @@ func TestCoupons_Get(t *testing.T) {
 
 	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-04-10T07:00:00Z")
 	redeem, _ := time.Parse(recurly.DateTimeFormat, "2014-01-01T07:00:00Z")
-	if !reflect.DeepEqual(coupon, &recurly.Coupon{
+	if diff := cmp.Diff(coupon, &recurly.Coupon{
 		XMLName:           xml.Name{Local: "coupon"},
 		Code:              "special",
 		Name:              "Special 10% off",
@@ -264,8 +264,8 @@ func TestCoupons_Get(t *testing.T) {
 			{Code: "gold"},
 			{Code: "platinum"},
 		},
-	}) {
-		t.Fatalf("unexpected coupon: %v", coupon)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
