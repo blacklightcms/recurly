@@ -36,6 +36,10 @@ const (
 	// SubscriptionStatePastDue are subscriptions that are active or canceled
 	// and have a past-due invoice
 	SubscriptionStatePastDue = "past_due"
+
+	// SubscriptionStatePaused are subscriptions that are in a paused state
+	// and will not be billed for the set RemainingPauseCycles
+	SubscriptionStatePaused = "paused"
 )
 
 // Subscription represents an individual subscription.

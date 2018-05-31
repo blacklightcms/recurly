@@ -8,7 +8,6 @@ import (
 	"reflect"
 	"testing"
 	"time"
-
 	"github.com/blacklightcms/recurly"
 )
 
