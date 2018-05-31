@@ -669,7 +669,12 @@ func TestInvoices_Preview(t *testing.T) {
 			t.Fatalf("unexpected method: %s", r.Method)
 		}
 		w.WriteHeader(201)
-		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice_collection>
+			<charge_invoice href="">
+			</charge_invoice>
+			<credit_invoices type="array">
+			</credit_invoices>
+		</invoice_collection>`)
 	})
 
 	resp, _, err := client.Invoices.Preview("1")
@@ -689,14 +694,89 @@ func TestInvoices_Create(t *testing.T) {
 			t.Fatalf("unexpected method: %s", r.Method)
 		}
 		w.WriteHeader(201)
-		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice_collection>
+			<charge_invoice href="https://your-subdomain.recurly.com/v2/invoices/1016">
+				<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
+				<address>
+				<address1>123 Main St.</address1>
+				<address2 nil="nil"/>
+				<city>San Francisco</city>
+				<state>CA</state>
+				<zip>94105</zip>
+				<country>US</country>
+				<phone nil="nil"/>
+				</address>
+				<uuid>43adb97640cc05dee0b10042e596307f</uuid>
+				<state>pending</state>
+				<invoice_number_prefix/>
+				<invoice_number type="integer">1016</invoice_number>
+				<vat_number nil="nil"/>
+				<tax_in_cents type="integer">425</tax_in_cents>
+				<total_in_cents type="integer">3425</total_in_cents>
+				<currency>USD</currency>
+				<created_at type="datetime">2018-03-19T15:43:41Z</created_at>
+				<updated_at type="datetime">2018-03-19T15:43:41Z</updated_at>
+				<attempt_next_collection_at type="datetime">2018-03-20T15:43:41Z</attempt_next_collection_at>
+				<closed_at nil="nil"/>
+				<customer_notes nil="nil"/>
+				<recovery_reason nil="nil"/>
+				<subtotal_before_discount_in_cents type="integer">5000</subtotal_before_discount_in_cents>
+				<subtotal_in_cents type="integer">3000</subtotal_in_cents>
+				<discount_in_cents type="integer">0</discount_in_cents>
+				<due_on type="datetime">2018-03-20T15:43:41Z</due_on>
+				<net_terms type="integer">0</net_terms>
+				<collection_method>manual</collection_method>
+				<po_number nil="nil"/>
+				<terms_and_conditions nil="nil"/>
+				<tax_type>usst</tax_type>
+				<tax_region>CA</tax_region>
+				<line_items type="array">
+				<adjustment href="https://your-subdomain.recurly.com/v2/adjustments/43adb5a639dc950ff620de42e6be4141" type="charge">
+					<!-- Detail. -->
+				</adjustment>
+				</line_items>
+				<transactions type="array">
+				</transactions>
+				<a name="mark_successful" href="https://your-subdomain.recurly.com/v2/invoices/1016/mark_successful" method="put"/>
+				<a name="mark_failed" href="https://your-subdomain.recurly.com/v2/invoices/1016/mark_failed" method="put"/>
+			</charge_invoice>
+			<credit_invoices type="array">
+			</credit_invoices>
+			</invoice_collection>`)
 	})
 
-	resp, _, err := client.Invoices.Create("10", recurly.Invoice{})
+	resp, invoice, err := client.Invoices.Create("10", recurly.Invoice{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if resp.IsError() {
 		t.Fatal("expected create invoice to return OK")
+	} else if diff := cmp.Diff(invoice, &recurly.Invoice{
+		XMLName:     xml.Name{Local: "invoice"},
+		AccountCode: "1",
+		Address: recurly.Address{
+			Address: "123 Main St.",
+			City:    "San Francisco",
+			State:   "CA",
+			Zip:     "94105",
+			Country: "US",
+		},
+		UUID:                    "43adb97640cc05dee0b10042e596307f",
+		State:                   recurly.InvoiceStatePending,
+		InvoiceNumber:           1016,
+		SubtotalInCents:         3000,
+		TaxInCents:              425,
+		TotalInCents:            3425,
+		Currency:                "USD",
+		CreatedAt:               recurly.NewTimeFromString("2018-03-19T15:43:41Z"),
+		UpdatedAt:               recurly.NewTimeFromString("2018-03-19T15:43:41Z"),
+		AttemptNextCollectionAt: recurly.NewTimeFromString("2018-03-20T15:43:41Z"),
+		TaxType:                 "usst",
+		TaxRegion:               "CA",
+		NetTerms:                recurly.NewInt(0),
+		CollectionMethod:        recurly.CollectionMethodManual,
+		LineItems:               []recurly.Adjustment{{}},
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -714,7 +794,15 @@ func TestInvoices_Create_Params(t *testing.T) {
 			t.Fatalf("unexpected input: %s", string(b))
 		}
 		w.WriteHeader(201)
-		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice_collection>
+			<charge_invoice href="">
+			<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
+			<uuid>43adfe52c21cbb221557a24940bcd7e5</uuid>
+			<state>pending</state>
+			</charge_invoice>
+			<credit_invoices type="array">
+			</credit_invoices>
+		</invoice_collection>`)
 	})
 
 	// Fields ordered in same order as struct xml tags, XML above in same order
@@ -804,7 +892,12 @@ func TestInvoices_MarkFailed(t *testing.T) {
 			t.Fatalf("unexpected method: %s", r.Method)
 		}
 		w.WriteHeader(200)
-		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice_collection>
+			<charge_invoice href="">
+			</charge_invoice>
+			<credit_invoices type="array">
+			</credit_invoices>
+		</invoice_collection>`)
 	})
 
 	resp, _, err := client.Invoices.MarkFailed(1402)

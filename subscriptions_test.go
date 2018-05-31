@@ -830,14 +830,34 @@ func TestSubscriptions_Preview(t *testing.T) {
 			t.Fatalf("unexpected method: %s", r.Method)
 		}
 		w.WriteHeader(201)
-		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription>
+			<invoice_collection>
+				<charge_invoice href="">
+				<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
+				<uuid>43adfe52c21cbb221557a24940bcd7e5</uuid>
+				<state>pending</state>
+				</charge_invoice>
+				<credit_invoices type="array">
+				</credit_invoices>
+			</invoice_collection>
+		</subscription>`)
 	})
 
-	r, _, err := client.Subscriptions.Preview(recurly.NewSubscription{})
+	r, sub, err := client.Subscriptions.Preview(recurly.NewSubscription{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
 		t.Fatal("expected preview subscription to return OK")
+	} else if diff := cmp.Diff(sub, &recurly.Subscription{
+		XMLName: xml.Name{Local: "subscription"},
+		Invoice: &recurly.Invoice{
+			XMLName:     xml.Name{Local: "invoice"},
+			AccountCode: "1",
+			UUID:        "43adfe52c21cbb221557a24940bcd7e5",
+			State:       recurly.InvoiceStatePending,
+		},
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
