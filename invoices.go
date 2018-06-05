@@ -39,7 +39,6 @@ type Invoice struct {
 	XMLName                 xml.Name      `xml:"invoice,omitempty"`
 	AccountCode             string        `xml:"-"`
 	Address                 Address       `xml:"-"`
-	SubscriptionUUID        string        `xml:"-"` // Deprecated
 	OriginalInvoiceNumber   int           `xml:"-"`
 	UUID                    string        `xml:"-"`
 	State                   string        `xml:"-"`
@@ -84,7 +83,6 @@ func (i *Invoice) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		XMLName:               v.XMLName,
 		AccountCode:           string(v.AccountCode),
 		Address:               v.Address,
-		SubscriptionUUID:      string(v.SubscriptionUUID),
 		OriginalInvoiceNumber: int(v.OriginalInvoiceNumber),
 		UUID:                    v.UUID,
 		State:                   v.State,
@@ -140,7 +138,6 @@ func (i *InvoiceCollection) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 		XMLName:               xml.Name{Local: "invoice"},
 		AccountCode:           string(v.ChargeInvoice.AccountCode),
 		Address:               v.ChargeInvoice.Address,
-		SubscriptionUUID:      string(v.ChargeInvoice.SubscriptionUUID),
 		OriginalInvoiceNumber: int(v.ChargeInvoice.OriginalInvoiceNumber),
 		UUID:                    v.ChargeInvoice.UUID,
 		State:                   v.ChargeInvoice.State,

@@ -100,6 +100,7 @@ func TestAdjustments_List(t *testing.T) {
 		{
 			AccountCode:            "100",
 			InvoiceNumber:          1108,
+			SubscriptionUUID:       "17caaca1716f33572edc8146e0aaefde",
 			UUID:                   "626db120a84102b1809909071c701c60",
 			State:                  "invoiced",
 			Description:            "One-time Charged Fee",

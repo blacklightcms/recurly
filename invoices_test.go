@@ -36,7 +36,7 @@ func TestInvoices_List(t *testing.T) {
         			<country>US</country>
         			<phone></phone>
         		</address>
-        		<subscription href="https://your-subdomain.recurly.com/v2/subscriptions/17caaca1716f33572edc8146e0aaefde"/>
+        		<subscription href="https://your-subdomain.recurly.com/v2/accounts/1/subscriptions"/>
         		<original_invoice href="https://your-subdomain.recurly.com/v2/invoices/938571" />
         		<uuid>421f7b7d414e4c6792938e7c49d552e9</uuid>
         		<state>open</state>
@@ -105,7 +105,6 @@ func TestInvoices_List(t *testing.T) {
 			Zip:     "94110",
 			Country: "US",
 		},
-		SubscriptionUUID:      "17caaca1716f33572edc8146e0aaefde",
 		OriginalInvoiceNumber: 938571,
 		UUID:             "421f7b7d414e4c6792938e7c49d552e9",
 		State:            recurly.InvoiceStateOpen,
@@ -124,6 +123,7 @@ func TestInvoices_List(t *testing.T) {
 			{
 				AccountCode:            "100",
 				InvoiceNumber:          1108,
+				SubscriptionUUID:       "17caaca1716f33572edc8146e0aaefde",
 				UUID:                   "626db120a84102b1809909071c701c60",
 				State:                  "invoiced",
 				Description:            "One-time Charged Fee",
@@ -168,7 +168,7 @@ func TestInvoices_ListAccount(t *testing.T) {
         			<country>US</country>
         			<phone></phone>
         		</address>
-        		<subscription href="https://your-subdomain.recurly.com/v2/subscriptions/17caaca1716f33572edc8146e0aaefde"/>
+        		<subscription href="https://your-subdomain.recurly.com/v2/accounts/1/subscriptions"/>
         		<uuid>421f7b7d414e4c6792938e7c49d552e9</uuid>
         		<state>open</state>
         		<invoice_number_prefix></invoice_number_prefix>
@@ -237,7 +237,6 @@ func TestInvoices_ListAccount(t *testing.T) {
 				Zip:     "94110",
 				Country: "US",
 			},
-			SubscriptionUUID: "17caaca1716f33572edc8146e0aaefde",
 			UUID:             "421f7b7d414e4c6792938e7c49d552e9",
 			State:            recurly.InvoiceStateOpen,
 			InvoiceNumber:    1005,
@@ -255,6 +254,7 @@ func TestInvoices_ListAccount(t *testing.T) {
 				{
 					AccountCode:            "100",
 					InvoiceNumber:          1108,
+					SubscriptionUUID:       "17caaca1716f33572edc8146e0aaefde",
 					UUID:                   "626db120a84102b1809909071c701c60",
 					State:                  "invoiced",
 					Description:            "One-time Charged Fee",
@@ -671,7 +671,7 @@ func TestInvoices_GetPDF(t *testing.T) {
 	}
 
 	expected := bytes.NewBufferString("binary pdf text")
-	if !bytes.EqualFold(expected.Bytes(), pdf.Bytes()) {
+	if !bytes.Equal(expected.Bytes(), pdf.Bytes()) {
 		t.Fatalf("unexpected bytes: have=%v want %v", expected, pdf)
 	}
 }
@@ -701,7 +701,7 @@ func TestInvoices_GetPDFLanguage(t *testing.T) {
 	}
 
 	expected := bytes.NewBufferString("binary pdf text")
-	if !bytes.EqualFold(expected.Bytes(), pdf.Bytes()) {
+	if !bytes.Equal(expected.Bytes(), pdf.Bytes()) {
 		t.Fatalf("unexpected bytes: have=%v want %v", expected, pdf)
 	}
 }
@@ -813,6 +813,7 @@ func TestInvoices_Create(t *testing.T) {
 		TaxInCents:              425,
 		TotalInCents:            3425,
 		Currency:                "USD",
+		DueOn:                   recurly.NewTimeFromString("2018-03-20T15:43:41Z"),
 		CreatedAt:               recurly.NewTimeFromString("2018-03-19T15:43:41Z"),
 		UpdatedAt:               recurly.NewTimeFromString("2018-03-19T15:43:41Z"),
 		AttemptNextCollectionAt: recurly.NewTimeFromString("2018-03-20T15:43:41Z"),
