@@ -39,7 +39,7 @@ type Invoice struct {
 	XMLName                 xml.Name      `xml:"invoice,omitempty"`
 	AccountCode             string        `xml:"-"`
 	Address                 Address       `xml:"-"`
-	SubscriptionUUID        string        `xml:"-"`
+	SubscriptionUUID        string        `xml:"-"` // Deprecated
 	OriginalInvoiceNumber   int           `xml:"-"`
 	UUID                    string        `xml:"-"`
 	State                   string        `xml:"-"`
@@ -51,10 +51,13 @@ type Invoice struct {
 	TaxInCents              int           `xml:"-"`
 	TotalInCents            int           `xml:"-"`
 	Currency                string        `xml:"-"`
+	DueOn                   NullTime      `xml:"-"`
 	CreatedAt               NullTime      `xml:"-"`
 	UpdatedAt               NullTime      `xml:"-"`
 	AttemptNextCollectionAt NullTime      `xml:"-"`
 	ClosedAt                NullTime      `xml:"-"`
+	Type                    string        `xml:"-"`
+	Origin                  string        `xml:"-"`
 	TaxType                 string        `xml:"-"`
 	TaxRegion               string        `xml:"-"`
 	TaxRate                 float64       `xml:"-"`
@@ -93,10 +96,13 @@ func (i *Invoice) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		TaxInCents:              v.TaxInCents,
 		TotalInCents:            v.TotalInCents,
 		Currency:                v.Currency,
+		DueOn:                   v.DueOn,
 		CreatedAt:               v.CreatedAt,
 		UpdatedAt:               v.UpdatedAt,
 		AttemptNextCollectionAt: v.AttemptNextCollectionAt,
 		ClosedAt:                v.ClosedAt,
+		Type:                    v.Type,
+		Origin:                  v.Origin,
 		TaxType:                 v.TaxType,
 		TaxRegion:               v.TaxRegion,
 		TaxRate:                 v.TaxRate,
@@ -146,10 +152,13 @@ func (i *InvoiceCollection) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 		TaxInCents:              v.ChargeInvoice.TaxInCents,
 		TotalInCents:            v.ChargeInvoice.TotalInCents,
 		Currency:                v.ChargeInvoice.Currency,
+		DueOn:                   v.ChargeInvoice.DueOn,
 		CreatedAt:               v.ChargeInvoice.CreatedAt,
 		UpdatedAt:               v.ChargeInvoice.UpdatedAt,
 		AttemptNextCollectionAt: v.ChargeInvoice.AttemptNextCollectionAt,
 		ClosedAt:                v.ChargeInvoice.ClosedAt,
+		Type:                    v.ChargeInvoice.Type,
+		Origin:                  v.ChargeInvoice.Origin,
 		TaxType:                 v.ChargeInvoice.TaxType,
 		TaxRegion:               v.ChargeInvoice.TaxRegion,
 		TaxRate:                 v.ChargeInvoice.TaxRate,
@@ -182,10 +191,13 @@ type invoiceFields struct {
 	TaxInCents              int           `xml:"tax_in_cents,omitempty"`
 	TotalInCents            int           `xml:"total_in_cents,omitempty"`
 	Currency                string        `xml:"currency,omitempty"`
+	DueOn                   NullTime      `xml:"due_on,omitempty"`
 	CreatedAt               NullTime      `xml:"created_at,omitempty"`
 	UpdatedAt               NullTime      `xml:"updated_at,omitempty"`
 	AttemptNextCollectionAt NullTime      `xml:"attempt_next_collection_at,omitempty"`
 	ClosedAt                NullTime      `xml:"closed_at,omitempty"`
+	Type                    string        `xml:"type,omitempty"`
+	Origin                  string        `xml:"origin,omitempty"`
 	TaxType                 string        `xml:"tax_type,omitempty"`
 	TaxRegion               string        `xml:"tax_region,omitempty"`
 	TaxRate                 float64       `xml:"tax_rate,omitempty"`

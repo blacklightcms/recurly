@@ -6,6 +6,7 @@ import "encoding/xml"
 type Adjustment struct {
 	AccountCode            string
 	InvoiceNumber          int
+	SubscriptionUUID       string
 	UUID                   string
 	State                  string
 	Description            string
@@ -29,6 +30,7 @@ type Adjustment struct {
 	StartDate              NullTime
 	EndDate                NullTime
 	CreatedAt              NullTime
+	UpdatedAt              NullTime
 }
 
 // MarshalXML marshals only the fields needed for creating/updating adjustments
@@ -67,8 +69,9 @@ func (a Adjustment) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 func (a *Adjustment) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v struct {
 		XMLName                xml.Name    `xml:"adjustment"`
-		AccountCode            hrefString  `xml:"account,omitempty"` // Read only
-		InvoiceNumber          hrefInt     `xml:"invoice,omitempty"` // Read only
+		AccountCode            hrefString  `xml:"account,omitempty"`      // Read only
+		InvoiceNumber          hrefInt     `xml:"invoice,omitempty"`      // Read only
+		SubscriptionUUID       hrefString  `xml:"subscription,omitempty"` // Read only
 		UUID                   string      `xml:"uuid,omitempty"`
 		State                  string      `xml:"state,omitempty"`
 		Description            string      `xml:"description,omitempty"`
@@ -92,6 +95,7 @@ func (a *Adjustment) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error 
 		StartDate              NullTime    `xml:"start_date,omitempty"`
 		EndDate                NullTime    `xml:"end_date,omitempty"`
 		CreatedAt              NullTime    `xml:"created_at,omitempty"`
+		UpdatedAt              NullTime    `xml:"updated_at,omitempty"`
 	}
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err
@@ -99,6 +103,7 @@ func (a *Adjustment) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error 
 	*a = Adjustment{
 		AccountCode:            string(v.AccountCode),
 		InvoiceNumber:          int(v.InvoiceNumber),
+		SubscriptionUUID:       string(v.SubscriptionUUID),
 		UUID:                   v.UUID,
 		State:                  v.State,
 		Description:            v.Description,
@@ -122,6 +127,7 @@ func (a *Adjustment) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error 
 		StartDate:              v.StartDate,
 		EndDate:                v.EndDate,
 		CreatedAt:              v.CreatedAt,
+		UpdatedAt:              v.UpdatedAt,
 	}
 
 	return nil

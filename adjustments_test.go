@@ -134,6 +134,7 @@ func TestAdjustments_Get(t *testing.T) {
 			<adjustment href="https://your-subdomain.recurly.com/v2/adjustments/626db120a84102b1809909071c701c60" type="charge">
 				<account href="https://your-subdomain.recurly.com/v2/accounts/100"/>
 				<invoice href="https://your-subdomain.recurly.com/v2/invoices/1108"/>
+				<subscription href="https://blacklighttest.recurly.com/v2/subscriptions/453f6aa0995e2d52c0d3e6453e9341da"/>
 				<uuid>626db120a84102b1809909071c701c60</uuid>
 				<state>invoiced</state>
 				<description>One-time Charged Fee</description>
@@ -195,6 +196,7 @@ func TestAdjustments_Get(t *testing.T) {
 	if diff := cmp.Diff(adjustment, &recurly.Adjustment{
 		AccountCode:            "100",
 		InvoiceNumber:          1108,
+		SubscriptionUUID:       "453f6aa0995e2d52c0d3e6453e9341da",
 		UUID:                   "626db120a84102b1809909071c701c60", // UUID has been sanitizzed
 		State:                  "invoiced",
 		Description:            "One-time Charged Fee",
