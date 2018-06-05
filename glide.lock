@@ -1,0 +1,11 @@
+hash: c0d2160cf2a67fa1545e09954ca323aaed003ca9d32f16cab4420564b7da3c60
+updated: 2018-05-30T22:19:34.596651-04:00
+imports: []
+testImports:
+- name: github.com/google/go-cmp
+  version: 3af367b6b30c263d47e8895973edcca9a49cf029
+  subpackages:
+  - cmp
+  - cmp/internal/diff
+  - cmp/internal/function
+  - cmp/internal/value

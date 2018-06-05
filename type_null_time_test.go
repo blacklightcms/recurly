@@ -4,9 +4,10 @@ import (
 	"bytes"
 	"encoding/xml"
 	"fmt"
-	"reflect"
 	"testing"
 	"time"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestNulTime(t *testing.T) {
@@ -24,10 +25,10 @@ func TestNulTime(t *testing.T) {
 
 	if given3.String() != "" {
 		t.Fatalf("expected nil time to print empty string, given %s", given3.String())
-	} else if !reflect.DeepEqual(expected1, given1) {
-		t.Fatalf("(1): Expected %#v, given %#v", expected1, given1)
-	} else if !reflect.DeepEqual(expected2, given2) {
-		t.Fatalf("(2): Expected %#v, given %#v", expected2, given2)
+	} else if diff := cmp.Diff(expected1, given1); diff != "" {
+		t.Fatal(diff)
+	} else if diff := cmp.Diff(expected2, given2); diff != "" {
+		t.Fatal(diff)
 	}
 
 	type s struct {
@@ -60,8 +61,8 @@ func TestNulTime(t *testing.T) {
 			t.Fatalf("(%d): Error decoding. Error: %s", i, err)
 		}
 
-		if !reflect.DeepEqual(str, dest) {
-			t.Fatalf("(%d): Expected unmarshal to be %#v, given %#v", i, str, dest)
+		if diff := cmp.Diff(str, dest); diff != "" {
+			t.Fatalf("(%d): %s", i, diff)
 		}
 	}
 

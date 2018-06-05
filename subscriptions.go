@@ -65,6 +65,7 @@ type Subscription struct {
 	NetTerms               NullInt              `xml:"net_terms,omitempty"`
 	SubscriptionAddOns     []SubscriptionAddOn  `xml:"subscription_add_ons>subscription_add_on,omitempty"`
 	PendingSubscription    *PendingSubscription `xml:"pending_subscription,omitempty"`
+	Invoice                *Invoice             `xml:"-"`
 }
 
 // UnmarshalXML unmarshals transactions and handles intermediary state during unmarshaling
@@ -96,6 +97,7 @@ func (s *Subscription) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 		NetTerms               NullInt              `xml:"net_terms,omitempty"`
 		SubscriptionAddOns     []SubscriptionAddOn  `xml:"subscription_add_ons>subscription_add_on,omitempty"`
 		PendingSubscription    *PendingSubscription `xml:"pending_subscription,omitempty"`
+		InvoiceCollection      *InvoiceCollection   `xml:"invoice_collection"`
 	}
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err
@@ -126,6 +128,9 @@ func (s *Subscription) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 		NetTerms:               v.NetTerms,
 		SubscriptionAddOns:     v.SubscriptionAddOns,
 		PendingSubscription:    v.PendingSubscription,
+	}
+	if v.InvoiceCollection != nil {
+		s.Invoice = v.InvoiceCollection.ChargeInvoice
 	}
 
 	return nil

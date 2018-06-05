@@ -5,11 +5,11 @@ import (
 	"encoding/xml"
 	"fmt"
 	"net/http"
-	"reflect"
 	"testing"
 	"time"
 
 	"github.com/blacklightcms/recurly"
+	"github.com/google/go-cmp/cmp"
 )
 
 // TestPlansEncoding ensures structs are encoded to XML properly.
@@ -107,7 +107,7 @@ func TestPlans_List(t *testing.T) {
 	}
 
 	ts, _ := time.Parse(recurly.DateTimeFormat, "2015-05-29T17:38:15Z")
-	if !reflect.DeepEqual(plans, []recurly.Plan{
+	if diff := cmp.Diff(plans, []recurly.Plan{
 		{
 			XMLName: xml.Name{Local: "plan"},
 			Code:    "gold",
@@ -131,8 +131,8 @@ func TestPlans_List(t *testing.T) {
 			},
 			CreatedAt: recurly.NewTime(ts),
 		},
-	}) {
-		t.Fatalf("unexpected plan: %v", plans)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -187,7 +187,7 @@ func TestPlans_Get(t *testing.T) {
 	}
 
 	ts, _ := time.Parse(recurly.DateTimeFormat, "2015-05-29T17:38:15Z")
-	if !reflect.DeepEqual(plan, &recurly.Plan{
+	if diff := cmp.Diff(plan, &recurly.Plan{
 		XMLName: xml.Name{Local: "plan"},
 		Code:    "gold",
 		Name:    "Gold plan",
@@ -209,8 +209,8 @@ func TestPlans_Get(t *testing.T) {
 			EUR: 800,
 		},
 		CreatedAt: recurly.NewTime(ts),
-	}) {
-		t.Fatalf("unexpected plan: %v", plan)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 

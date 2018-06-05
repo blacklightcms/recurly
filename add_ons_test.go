@@ -5,11 +5,11 @@ import (
 	"encoding/xml"
 	"fmt"
 	"net/http"
-	"reflect"
 	"testing"
 	"time"
 
 	"github.com/blacklightcms/recurly"
+	"github.com/google/go-cmp/cmp"
 )
 
 // TestAddOnEncoding ensures structs are encoded to XML properly.
@@ -81,7 +81,7 @@ func TestAddOns_List(t *testing.T) {
 	}
 
 	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-06-28T12:34:56Z")
-	if !reflect.DeepEqual(addOns, []recurly.AddOn{
+	if diff := cmp.Diff(addOns, []recurly.AddOn{
 		{
 			XMLName:                     xml.Name{Local: "add_on"},
 			Code:                        "ipaddresses",
@@ -93,8 +93,8 @@ func TestAddOns_List(t *testing.T) {
 			AccountingCode:              "abc123",
 			CreatedAt:                   recurly.NewTime(ts),
 		},
-	}) {
-		t.Fatalf("unexpected add ons: %v", addOns)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -131,7 +131,7 @@ func TestAddOns_Get(t *testing.T) {
 	}
 
 	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-06-28T12:34:56Z")
-	if !reflect.DeepEqual(a, &recurly.AddOn{
+	if diff := cmp.Diff(a, &recurly.AddOn{
 		XMLName:                     xml.Name{Local: "add_on"},
 		Code:                        "ipaddresses",
 		Name:                        "IP Addresses",
@@ -141,8 +141,8 @@ func TestAddOns_Get(t *testing.T) {
 		UnitAmountInCents:           recurly.UnitAmount{USD: 200},
 		AccountingCode:              "abc123",
 		CreatedAt:                   recurly.NewTime(ts),
-	}) {
-		t.Fatalf("unexpected add on: %v", a)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 

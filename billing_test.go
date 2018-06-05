@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"reflect"
 	"testing"
 
 	"github.com/blacklightcms/recurly"
+	"github.com/google/go-cmp/cmp"
 )
 
 // TestBillingEncoding ensures structs are encoded to XML properly.
@@ -110,7 +110,7 @@ func TestBilling_Get(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	} else if resp.IsError() {
 		t.Fatal("expected get billing info to return OK")
-	} else if !reflect.DeepEqual(b, &recurly.Billing{
+	} else if diff := cmp.Diff(b, &recurly.Billing{
 		XMLName:          xml.Name{Local: "billing_info"},
 		FirstName:        "Verena",
 		LastName:         "Example",
@@ -127,8 +127,8 @@ func TestBilling_Get(t *testing.T) {
 		Month:            11,
 		FirstSix:         411111,
 		LastFour:         "1111",
-	}) {
-		t.Fatalf("unexpected billing: %v", b)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -166,12 +166,12 @@ func TestBilling_Get_ACH(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	} else if resp.IsError() {
 		t.Fatal("expected get billing info to return OK")
-	} else if !reflect.DeepEqual(b, &recurly.Billing{
+	} else if diff := cmp.Diff(b, &recurly.Billing{
 		XMLName:   xml.Name{Local: "billing_info"},
 		FirstName: "Verena",
 		LastName:  "Example",
-	}) {
-		t.Fatalf("unexpected billing: %v", b)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -243,7 +243,7 @@ func TestBilling_Create_WithToken(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	} else if resp.IsError() {
 		t.Fatal("expected creating billing info to return OK")
-	} else if !reflect.DeepEqual(b, &recurly.Billing{
+	} else if diff := cmp.Diff(b, &recurly.Billing{
 		XMLName:          xml.Name{Local: "billing_info"},
 		FirstName:        "Verena",
 		LastName:         "Example",
@@ -260,8 +260,8 @@ func TestBilling_Create_WithToken(t *testing.T) {
 		Month:            11,
 		FirstSix:         411111,
 		LastFour:         "1111",
-	}) {
-		t.Fatalf("unexpected billing: %v", b)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -395,13 +395,13 @@ func TestBilling_Update_InvalidToken(t *testing.T) {
 
 	if resp.IsOK() {
 		t.Fatal("expected updating billing info with invalid token to return error")
-	} else if !reflect.DeepEqual(resp.Errors, []recurly.Error{
+	} else if diff := cmp.Diff(resp.Errors, []recurly.Error{
 		{
 			Symbol:  "token_invalid",
 			Message: "Token is either invalid or expired",
 		},
-	}) {
-		t.Fatalf("unexpected errors: %v", resp.Errors)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
