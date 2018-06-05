@@ -1,2 +1,5 @@
 package: github.com/blacklightcms/recurly
-import: []
+testImport:
+- package: github.com/google/go-cmp
+  subpackages:
+  - cmp
