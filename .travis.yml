@@ -4,10 +4,8 @@ go:
   - 1.8
   - 1.9
 install: 
-    - curl -L  https://github.com/Masterminds/glide/releases/download/v0.12.3/glide-v0.12.3-linux-amd64.tar.gz | tar -xz -C /tmp
-    - mv /tmp/linux-amd64/glide /usr/local/bin
-    - rm -rf /tmp/linux-amd64
-    - glide --version
+    - go get -v github.com/Masterminds/glide
+    - cd $GOPATH/src/github.com/Masterminds/glide && git checkout e73500c735917e39a8b782e0632418ab70250341 && go install && cd -
     - glide install
     - go get -v ./
 script:
