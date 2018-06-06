@@ -19,7 +19,6 @@ const (
 // Transaction represents an individual transaction.
 type Transaction struct {
 	InvoiceNumber    int    // Read only
-	SubscriptionUUID string // Read only
 	UUID             string // Read only
 	Action           string
 	AmountInCents    int
@@ -135,29 +134,28 @@ func (t *Transaction) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 		return err
 	}
 	*t = Transaction{
-		InvoiceNumber:    int(v.InvoiceNumber),
-		SubscriptionUUID: string(v.SubscriptionUUID),
-		UUID:             v.UUID,
-		Action:           v.Action,
-		AmountInCents:    v.AmountInCents,
-		TaxInCents:       v.TaxInCents,
-		Currency:         v.Currency,
-		Status:           v.Status,
-		Description:      v.Description,
-		PaymentMethod:    v.PaymentMethod,
-		Reference:        v.Reference,
-		Source:           v.Source,
-		Recurring:        v.Recurring,
-		Test:             v.Test,
-		Voidable:         v.Voidable,
-		Refundable:       v.Refundable,
-		IPAddress:        v.IPAddress,
-		CVVResult:        v.CVVResult,
-		AVSResult:        v.AVSResult,
-		AVSResultStreet:  v.AVSResultStreet,
-		AVSResultPostal:  v.AVSResultPostal,
-		CreatedAt:        v.CreatedAt,
-		Account:          v.Account,
+		InvoiceNumber:   int(v.InvoiceNumber),
+		UUID:            v.UUID,
+		Action:          v.Action,
+		AmountInCents:   v.AmountInCents,
+		TaxInCents:      v.TaxInCents,
+		Currency:        v.Currency,
+		Status:          v.Status,
+		Description:     v.Description,
+		PaymentMethod:   v.PaymentMethod,
+		Reference:       v.Reference,
+		Source:          v.Source,
+		Recurring:       v.Recurring,
+		Test:            v.Test,
+		Voidable:        v.Voidable,
+		Refundable:      v.Refundable,
+		IPAddress:       v.IPAddress,
+		CVVResult:       v.CVVResult,
+		AVSResult:       v.AVSResult,
+		AVSResultStreet: v.AVSResultStreet,
+		AVSResultPostal: v.AVSResultPostal,
+		CreatedAt:       v.CreatedAt,
+		Account:         v.Account,
 	}
 
 	if v.TransactionError != nil {

@@ -43,7 +43,7 @@ func TestTransactions_List(t *testing.T) {
         	<transaction href="https://your-subdomain.recurly.com/v2/transactions/a13acd8fe4294916b79aec87b7ea441f" type="credit_card">
         		<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
         		<invoice href="https://your-subdomain.recurly.com/v2/invoices/1108"/>
-        		<subscription href="https://your-subdomain.recurly.com/v2/subscriptions/17caaca1716f33572edc8146e0aaefde"/>
+        		<subscriptions href="https://your-subdomain.recurly.com/v2/transactions/a13acd8fe4294916b79aec87b7ea441f/subscriptions"/>
         		<uuid>a13acd8fe4294916b79aec87b7ea441f</uuid>
         		<action>purchase</action>
         		<amount_in_cents type="integer">1000</amount_in_cents>
@@ -105,22 +105,21 @@ func TestTransactions_List(t *testing.T) {
 
 	if diff := cmp.Diff(transactions, []recurly.Transaction{
 		{
-			InvoiceNumber:    1108,
-			SubscriptionUUID: "17caaca1716f33572edc8146e0aaefde",
-			UUID:             "a13acd8fe4294916b79aec87b7ea441f",
-			Action:           "purchase",
-			AmountInCents:    1000,
-			TaxInCents:       0,
-			Currency:         "USD",
-			Status:           "success",
-			PaymentMethod:    "credit_card",
-			Reference:        "5416477",
-			Source:           "subscription",
-			Recurring:        recurly.NewBool(true),
-			Test:             true,
-			Voidable:         recurly.NewBool(true),
-			Refundable:       recurly.NewBool(true),
-			IPAddress:        net.ParseIP("127.0.0.1"),
+			InvoiceNumber: 1108,
+			UUID:          "a13acd8fe4294916b79aec87b7ea441f",
+			Action:        "purchase",
+			AmountInCents: 1000,
+			TaxInCents:    0,
+			Currency:      "USD",
+			Status:        "success",
+			PaymentMethod: "credit_card",
+			Reference:     "5416477",
+			Source:        "subscription",
+			Recurring:     recurly.NewBool(true),
+			Test:          true,
+			Voidable:      recurly.NewBool(true),
+			Refundable:    recurly.NewBool(true),
+			IPAddress:     net.ParseIP("127.0.0.1"),
 			CVVResult: recurly.CVVResult{
 				recurly.TransactionResult{
 					Code:    "M",
@@ -238,22 +237,21 @@ func TestTransactions_ListAccount(t *testing.T) {
 
 	if diff := cmp.Diff(transactions, []recurly.Transaction{
 		{
-			InvoiceNumber:    1108,
-			SubscriptionUUID: "17caaca1716f33572edc8146e0aaefde",
-			UUID:             "a13acd8fe4294916b79aec87b7ea441f",
-			Action:           "purchase",
-			AmountInCents:    1000,
-			TaxInCents:       0,
-			Currency:         "USD",
-			Status:           "success",
-			PaymentMethod:    "credit_card",
-			Reference:        "5416477",
-			Source:           "subscription",
-			Recurring:        recurly.NewBool(true),
-			Test:             true,
-			Voidable:         recurly.NewBool(true),
-			Refundable:       recurly.NewBool(true),
-			IPAddress:        net.ParseIP("127.0.0.1"),
+			InvoiceNumber: 1108,
+			UUID:          "a13acd8fe4294916b79aec87b7ea441f",
+			Action:        "purchase",
+			AmountInCents: 1000,
+			TaxInCents:    0,
+			Currency:      "USD",
+			Status:        "success",
+			PaymentMethod: "credit_card",
+			Reference:     "5416477",
+			Source:        "subscription",
+			Recurring:     recurly.NewBool(true),
+			Test:          true,
+			Voidable:      recurly.NewBool(true),
+			Refundable:    recurly.NewBool(true),
+			IPAddress:     net.ParseIP("127.0.0.1"),
 			CVVResult: recurly.CVVResult{
 				recurly.TransactionResult{
 					Code:    "M",
@@ -367,23 +365,22 @@ func TestTransactions_Get(t *testing.T) {
 	}
 
 	if diff := cmp.Diff(transaction, &recurly.Transaction{
-		InvoiceNumber:    1108,
-		SubscriptionUUID: "17caaca1716f33572edc8146e0aaefde",
-		UUID:             "a13acd8fe4294916b79aec87b7ea441f", // UUID has been sanitized
-		Action:           "purchase",
-		AmountInCents:    1000,
-		TaxInCents:       0,
-		Currency:         "USD",
-		Status:           "success",
-		Description:      "Order #717",
-		PaymentMethod:    "credit_card",
-		Reference:        "5416477",
-		Source:           "subscription",
-		Recurring:        recurly.NewBool(true),
-		Test:             true,
-		Voidable:         recurly.NewBool(true),
-		Refundable:       recurly.NewBool(true),
-		IPAddress:        net.ParseIP("127.0.0.1"),
+		InvoiceNumber: 1108,
+		UUID:          "a13acd8fe4294916b79aec87b7ea441f", // UUID has been sanitized
+		Action:        "purchase",
+		AmountInCents: 1000,
+		TaxInCents:    0,
+		Currency:      "USD",
+		Status:        "success",
+		Description:   "Order #717",
+		PaymentMethod: "credit_card",
+		Reference:     "5416477",
+		Source:        "subscription",
+		Recurring:     recurly.NewBool(true),
+		Test:          true,
+		Voidable:      recurly.NewBool(true),
+		Refundable:    recurly.NewBool(true),
+		IPAddress:     net.ParseIP("127.0.0.1"),
 		CVVResult: recurly.CVVResult{
 			recurly.TransactionResult{
 				Code:    "M",
