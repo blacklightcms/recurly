@@ -3,8 +3,9 @@ package recurly
 import (
 	"bytes"
 	"encoding/xml"
-	"reflect"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestTypeHREFUnmarshal(t *testing.T) {
@@ -26,7 +27,7 @@ func TestTypeHREFUnmarshal(t *testing.T) {
 	var given h
 	if err := xml.NewDecoder(str).Decode(&given); err != nil {
 		t.Fatalf("unexpected error: %v", err)
-	} else if !reflect.DeepEqual(expected, given) {
-		t.Fatalf("unexpected result: %v", given)
+	} else if diff := cmp.Diff(expected, given); diff != "" {
+		t.Fatal(diff)
 	}
 }
