@@ -254,6 +254,33 @@ func (s *subscriptionsImpl) Postpone(uuid string, dt time.Time, bulk bool) (*Res
 	return resp, &dst, err
 }
 
+// Pause will pause an active subscription for the specified number of billing cycles.
+// The pause takes effect at the beginning of the next billing cycle.
+func (s *subscriptionsImpl) Pause(uuid string, cycles int) (*Response, *Subscription, error) {
+	action := fmt.Sprintf("subscriptions/%s/pause", SanitizeUUID(uuid))
+	type subscription struct {
+		RemainingPauseCycles int `xml:"remaining_pause_cycles"`
+	}
+	pauseCycles := subscription{cycles}
+	req, err := s.client.newRequest("PUT", action, nil, pauseCycles)
+
+	var dst Subscription
+	resp, err := s.client.do(req, &dst)
+
+	return resp, &dst, err
+}
+
+// Resume will immediately resume a paused subscription.
+func (s *subscriptionsImpl) Resume(uuid string) (*Response, *Subscription, error) {
+	action := fmt.Sprintf("subscriptions/%s/resume", SanitizeUUID(uuid))
+	req, err := s.client.newRequest("PUT", action, nil, nil)
+
+	var dst Subscription
+	resp, err := s.client.do(req, &dst)
+
+	return resp, &dst, err
+}
+
 // Note: Create/Update Subscription with AddOns and Create/Update manual invoice
 // are the same endpoint as Create. You just need to include additional parameters
 // for each method. See the documentation here:

@@ -503,6 +503,12 @@ type SubscriptionsService struct {
 
 	OnPostpone      func(uuid string, dt time.Time, bulk bool) (*recurly.Response, *recurly.Subscription, error)
 	PostponeInvoked bool
+
+	OnPause func(uuid string, cycles int) (*recurly.Response, *recurly.Subscription, error)
+	PauseInvoked bool
+
+	OnResume func(uuid string) (*recurly.Response, *recurly.Subscription, error)
+	ResumeInvoked bool
 }
 
 func (m *SubscriptionsService) List(params recurly.Params) (*recurly.Response, []recurly.Subscription, error) {
@@ -573,4 +579,14 @@ func (m *SubscriptionsService) TerminateWithoutRefund(uuid string) (*recurly.Res
 func (m *SubscriptionsService) Postpone(uuid string, dt time.Time, bulk bool) (*recurly.Response, *recurly.Subscription, error) {
 	m.PostponeInvoked = true
 	return m.OnPostpone(uuid, dt, bulk)
+}
+
+func (m *SubscriptionsService) Pause(uuid string, cycles int) (*recurly.Response, *recurly.Subscription, error) {
+	m.PauseInvoked = true
+	return m.OnPause(uuid, cycles)
+}
+
+func (m *SubscriptionsService) Resume(uuid string) (*recurly.Response, *recurly.Subscription, error) {
+	m.ResumeInvoked = true
+	return m.OnResume(uuid)
 }

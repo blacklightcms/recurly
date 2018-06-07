@@ -36,6 +36,10 @@ const (
 	// SubscriptionStatePastDue are subscriptions that are active or canceled
 	// and have a past-due invoice
 	SubscriptionStatePastDue = "past_due"
+
+	// SubscriptionStatePaused are subscriptions that are in a paused state
+	// and will not be billed for the set RemainingPauseCycles
+	SubscriptionStatePaused = "paused"
 )
 
 // Subscription represents an individual subscription.
@@ -66,6 +70,7 @@ type Subscription struct {
 	SubscriptionAddOns     []SubscriptionAddOn  `xml:"subscription_add_ons>subscription_add_on,omitempty"`
 	PendingSubscription    *PendingSubscription `xml:"pending_subscription,omitempty"`
 	Invoice                *Invoice             `xml:"-"`
+	RemainingPauseCycles   int                  `xml:"remaining_pause_cycles,omitempty"`
 }
 
 // UnmarshalXML unmarshals transactions and handles intermediary state during unmarshaling
@@ -98,6 +103,7 @@ func (s *Subscription) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 		SubscriptionAddOns     []SubscriptionAddOn  `xml:"subscription_add_ons>subscription_add_on,omitempty"`
 		PendingSubscription    *PendingSubscription `xml:"pending_subscription,omitempty"`
 		InvoiceCollection      *InvoiceCollection   `xml:"invoice_collection"`
+		RemainingPauseCycles   int                  `xml:"remaining_pause_cycles,omitempty"`
 	}
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err
@@ -128,6 +134,7 @@ func (s *Subscription) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 		NetTerms:               v.NetTerms,
 		SubscriptionAddOns:     v.SubscriptionAddOns,
 		PendingSubscription:    v.PendingSubscription,
+		RemainingPauseCycles:   v.RemainingPauseCycles,
 	}
 	if v.InvoiceCollection != nil {
 		s.Invoice = v.InvoiceCollection.ChargeInvoice

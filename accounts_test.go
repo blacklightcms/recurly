@@ -35,6 +35,7 @@ func TestAccounts_Encoding(t *testing.T) {
 		{v: recurly.Account{AcceptLanguage: "en_US"}, expected: "<account><accept_language>en_US</accept_language></account>"},
 		{v: recurly.Account{FirstName: "Larry", Address: recurly.Address{Address: "123 Main St.", City: "San Francisco", State: "CA", Zip: "94105", Country: "US"}}, expected: "<account><first_name>Larry</first_name><address><address1>123 Main St.</address1><city>San Francisco</city><state>CA</state><zip>94105</zip><country>US</country></address></account>"},
 		{v: recurly.Account{Code: "test@example.com", BillingInfo: &recurly.Billing{Token: "507c7f79bcf86cd7994f6c0e"}}, expected: "<account><account_code>test@example.com</account_code><billing_info><token_id>507c7f79bcf86cd7994f6c0e</token_id></billing_info></account>"},
+		{v: recurly.Account{HasPausedSubscription: true}, expected: "<account><has_paused_subscription>true</has_paused_subscription></account>"},
 		{v: recurly.Address{}, expected: ""},
 		{v: recurly.Address{Address: "123 Main St."}, expected: "<address><address1>123 Main St.</address1></address>"},
 		{v: recurly.Address{Address2: "Unit A"}, expected: "<address><address2>Unit A</address2></address>"},
