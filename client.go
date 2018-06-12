@@ -29,16 +29,17 @@ type Client struct {
 	BaseURL string
 
 	// Services used for talking with different parts of the Recurly API
-	Accounts      AccountsService
-	Adjustments   AdjustmentsService
-	Billing       BillingService
-	Coupons       CouponsService
-	Redemptions   RedemptionsService
-	Invoices      InvoicesService
-	Plans         PlansService
-	AddOns        AddOnsService
-	Subscriptions SubscriptionsService
-	Transactions  TransactionsService
+	Accounts          AccountsService
+	Adjustments       AdjustmentsService
+	Billing           BillingService
+	Coupons           CouponsService
+	Redemptions       RedemptionsService
+	Invoices          InvoicesService
+	Plans             PlansService
+	AddOns            AddOnsService
+	ShippingAddresses ShippingAddressesService
+	Subscriptions     SubscriptionsService
+	Transactions      TransactionsService
 }
 
 // NewClient returns a new instance of *Client.
