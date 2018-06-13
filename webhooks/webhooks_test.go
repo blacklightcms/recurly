@@ -11,6 +11,99 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
+func TestParse_ChargeInvoiceNotification(t *testing.T) {
+	created, _ := time.Parse(recurly.DateTimeFormat, "2018-02-13T16:00:04Z")
+	xmlFile := MustOpenFile("testdata/charge_invoice_notification.xml")
+	result, err := webhooks.Parse(xmlFile)
+	if err != nil {
+		t.Fatal(err)
+	} else if n, ok := result.(*webhooks.ChargeInvoiceNotification); !ok {
+		t.Fatalf("unexpected type: %T, result", n)
+	} else if diff := cmp.Diff(n, &webhooks.ChargeInvoiceNotification{
+		Type: webhooks.NewChargeInvoice,
+		Account: webhooks.Account{
+			XMLName: xml.Name{Local: "account"},
+			Code:    "1234",
+		},
+		Invoice: webhooks.ChargeInvoice{
+			XMLName:           xml.Name{Local: "invoice"},
+			UUID:              "42feb03ce368c0e1ead35d4bfa89b82e",
+			State:             recurly.InvoiceStatePending,
+			Origin:            recurly.InvoiceOriginRenewal,
+			SubscriptionUUIDs: []string{"40b8f5e99df03b8684b99d4993b6e089"},
+			InvoiceNumber:     2405,
+			Currency:          "USD",
+			BalanceInCents:    100000,
+			TotalInCents:      100000,
+			NetTerms:          recurly.NullInt{Int: 30, Valid: true},
+			CollectionMethod:  recurly.CollectionMethodManual,
+			CreatedAt:         recurly.NewTime(created),
+		},
+	}); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
+func TestParse_CreditInvoiceNotification(t *testing.T) {
+	d, _ := time.Parse(recurly.DateTimeFormat, "2018-02-13T00:56:22Z")
+	xmlFile := MustOpenFile("testdata/credit_invoice_notification.xml")
+	result, err := webhooks.Parse(xmlFile)
+	if err != nil {
+		t.Fatal(err)
+	} else if n, ok := result.(*webhooks.CreditInvoiceNotification); !ok {
+		t.Fatalf("unexpected type: %T, result", n)
+	} else if diff := cmp.Diff(n, &webhooks.CreditInvoiceNotification{
+		Type: webhooks.NewCreditInvoice,
+		Account: webhooks.Account{
+			XMLName: xml.Name{Local: "account"},
+			Code:    "1234",
+		},
+		Invoice: webhooks.CreditInvoice{
+			XMLName:           xml.Name{Local: "invoice"},
+			UUID:              "42fb74de65e9395eb004614144a7b91f",
+			State:             recurly.InvoiceStateClosed,
+			Origin:            recurly.InvoiceOriginWriteOff,
+			SubscriptionUUIDs: []string{"42fb74ba9efe4c6981c2064436a4e9cd"},
+			InvoiceNumber:     2404,
+			Currency:          "USD",
+			BalanceInCents:    0,
+			TotalInCents:      -4882,
+			CreatedAt:         recurly.NewTime(d),
+			ClosedAt:          recurly.NewTime(d),
+		},
+	}); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
+func TestParse_CreditPaymentNotification(t *testing.T) {
+	d, _ := time.Parse(recurly.DateTimeFormat, "2018-02-12T18:55:20Z")
+	xmlFile := MustOpenFile("testdata/credit_payment_notification.xml")
+	result, err := webhooks.Parse(xmlFile)
+	if err != nil {
+		t.Fatal(err)
+	} else if n, ok := result.(*webhooks.CreditPaymentNotification); !ok {
+		t.Fatalf("unexpected type: %T, result", n)
+	} else if diff := cmp.Diff(n, &webhooks.CreditPaymentNotification{
+		Type: webhooks.NewCreditPayment,
+		Account: webhooks.Account{
+			XMLName: xml.Name{Local: "account"},
+			Code:    "1234",
+		},
+		CreditPayment: webhooks.CreditPayment{
+			XMLName:                xml.Name{Local: "credit_payment"},
+			UUID:                   "42fa2a56dfeca2ace39b0e4a9198f835",
+			Action:                 "payment",
+			AmountInCents:          3579,
+			OriginalInvoiceNumber:  2389,
+			AppliedToInvoiceNumber: 2390,
+			CreatedAt:              recurly.NewTime(d),
+		},
+	}); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
 func TestParse_BillingInfoUpdatedNotification(t *testing.T) {
 	xmlFile := MustOpenFile("testdata/billing_info_updated_notification.xml")
 	result, err := webhooks.Parse(xmlFile)
