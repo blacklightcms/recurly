@@ -102,14 +102,14 @@ func (c *Client) newRequest(method string, action string, params Params, body in
 	// identifying bugs or updates needed in the library.
 	// https://github.com/blacklightcms/recurly/issues/41
 	req.Header.Set("User-Agent", fmt.Sprintf(
-		"Blacklight/2017-09-09; Go (%s) [%s-%s]",
+		"Blacklight/2018-06-05; Go (%s) [%s-%s]",
 		runtime.Version(),
 		runtime.GOARCH,
 		runtime.GOOS,
 	))
 	req.Header.Set("Authorization", fmt.Sprintf("Basic %s", c.apiKey))
 	req.Header.Set("Accept", "application/xml")
-	req.Header.Set("X-Api-Version", "2.5")
+	req.Header.Set("X-Api-Version", "2.12")
 	if req.Method == "POST" || req.Method == "PUT" {
 		req.Header.Set("Content-Type", "application/xml; charset=utf-8")
 	}

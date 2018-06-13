@@ -3,8 +3,9 @@ package recurly
 import (
 	"bytes"
 	"encoding/xml"
-	"reflect"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestNullBool(t *testing.T) {
@@ -16,12 +17,12 @@ func TestNullBool(t *testing.T) {
 
 	given2 := NullBool{Bool: false, Valid: false}
 
-	if !reflect.DeepEqual(expected0, given0) {
-		t.Fatalf("unexpected value: %v", given0)
+	if diff := cmp.Diff(expected0, given0); diff != "" {
+		t.Fatal(diff)
 	} else if !given0.Is(true) {
 		t.Fatalf("unexpected value")
-	} else if !reflect.DeepEqual(expected1, given1) {
-		t.Fatalf("unexpected value")
+	} else if diff := cmp.Diff(expected1, given1); diff != "" {
+		t.Fatal(diff)
 	} else if !given1.Is(false) {
 		t.Fatalf("unexpected value")
 	} else if given2.Is(false) {
@@ -57,8 +58,8 @@ func TestNullBool(t *testing.T) {
 			t.Fatalf("(%d): %v", i, err)
 		}
 
-		if !reflect.DeepEqual(tt.v, dest) {
-			t.Fatalf("(%d): %v", i, dest)
+		if diff := cmp.Diff(tt.v, dest); diff != "" {
+			t.Fatal(diff)
 		}
 	}
 }

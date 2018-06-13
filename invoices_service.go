@@ -109,10 +109,10 @@ func (s *invoicesImpl) Preview(accountCode string) (*Response, *Invoice, error) 
 		return nil, nil, err
 	}
 
-	var dst Invoice
+	var dst InvoiceCollection
 	resp, err := s.client.do(req, &dst)
 
-	return resp, &dst, err
+	return resp, dst.ChargeInvoice, err
 }
 
 // Create posts an accounts pending charges to a new invoice on that account.
@@ -129,10 +129,10 @@ func (s *invoicesImpl) Create(accountCode string, invoice Invoice) (*Response, *
 		return nil, nil, err
 	}
 
-	var dst Invoice
+	var dst InvoiceCollection
 	resp, err := s.client.do(req, &dst)
 
-	return resp, &dst, err
+	return resp, dst.ChargeInvoice, err
 }
 
 // Collect force retries the card on file for the invoice.
@@ -181,10 +181,10 @@ func (s *invoicesImpl) MarkFailed(invoiceNumber int) (*Response, *Invoice, error
 		return nil, nil, err
 	}
 
-	var dst Invoice
+	var dst InvoiceCollection
 	resp, err := s.client.do(req, &dst)
 
-	return resp, &dst, err
+	return resp, dst.ChargeInvoice, err
 }
 
 // RefundVoidOpenAmount allows custom invoice amounts to be refunded and generates a refund invoice.

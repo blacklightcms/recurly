@@ -103,6 +103,8 @@ type SubscriptionsService interface {
 	TerminateWithFullRefund(uuid string) (*Response, *Subscription, error)
 	TerminateWithoutRefund(uuid string) (*Response, *Subscription, error)
 	Postpone(uuid string, dt time.Time, bulk bool) (*Response, *Subscription, error)
+	Pause(uuid string, cycles int) (*Response, *Subscription, error)
+	Resume(uuid string) (*Response, *Subscription, error)
 }
 
 // TransactionsService represents the interactions available for transactions.

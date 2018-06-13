@@ -5,11 +5,10 @@ import (
 	"encoding/xml"
 	"fmt"
 	"net/http"
-	"reflect"
 	"testing"
 	"time"
-
 	"github.com/blacklightcms/recurly"
+	"github.com/google/go-cmp/cmp"
 )
 
 // TestSubscriptionsEncoding ensures structs are encoded to XML properly.
@@ -390,7 +389,7 @@ func TestSubscriptions_List(t *testing.T) {
 	cpStartedAt, _ := time.Parse(recurly.DateTimeFormat, "2011-06-27T07:00:00Z")
 	cpEndsAt, _ := time.Parse(recurly.DateTimeFormat, "2010-07-27T07:00:00Z")
 
-	if !reflect.DeepEqual(subscriptions, []recurly.Subscription{
+	if diff := cmp.Diff(subscriptions, []recurly.Subscription{
 		{
 			XMLName: xml.Name{Local: "subscription"},
 			Plan: recurly.NestedPlan{
@@ -422,8 +421,8 @@ func TestSubscriptions_List(t *testing.T) {
 				},
 			},
 		},
-	}) {
-		t.Fatalf("unexpected subscriptions: %v", subscriptions)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -485,7 +484,7 @@ func TestSubscriptions_ListAccount(t *testing.T) {
 	cpStartedAt, _ := time.Parse(recurly.DateTimeFormat, "2011-06-27T07:00:00Z")
 	cpEndsAt, _ := time.Parse(recurly.DateTimeFormat, "2010-07-27T07:00:00Z")
 
-	if !reflect.DeepEqual(subscriptions, []recurly.Subscription{
+	if diff := cmp.Diff(subscriptions, []recurly.Subscription{
 		{
 			XMLName: xml.Name{Local: "subscription"},
 			Plan: recurly.NestedPlan{
@@ -508,8 +507,8 @@ func TestSubscriptions_ListAccount(t *testing.T) {
 			TaxRate:                0.0875,
 			NetTerms:               recurly.NewInt(0),
 		},
-	}) {
-		t.Fatalf("unexpected subscriptions: %v", subscriptions)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -563,7 +562,7 @@ func TestSubscriptions_Get(t *testing.T) {
 		t.Fatal("expected list subcriptions to return OK")
 	}
 
-	if !reflect.DeepEqual(subscription, &recurly.Subscription{
+	if diff := cmp.Diff(subscription, &recurly.Subscription{
 		XMLName: xml.Name{Local: "subscription"},
 		Plan: recurly.NestedPlan{
 			Code: "gold",
@@ -584,8 +583,8 @@ func TestSubscriptions_Get(t *testing.T) {
 		TaxRegion:              "CA",
 		TaxRate:                0.0875,
 		NetTerms:               recurly.NewInt(0),
-	}) {
-		t.Fatalf("unexpected subscription: %v", subscription)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -681,7 +680,7 @@ func TestSubscriptions_Get_PendingSubscription(t *testing.T) {
 		t.Fatal("expected list subcriptions to return OK")
 	}
 
-	if !reflect.DeepEqual(subscription, &recurly.Subscription{
+	if diff := cmp.Diff(subscription, &recurly.Subscription{
 		XMLName: xml.Name{Local: "subscription"},
 		Plan: recurly.NestedPlan{
 			Code: "gold",
@@ -726,8 +725,8 @@ func TestSubscriptions_Get_PendingSubscription(t *testing.T) {
 				},
 			},
 		},
-	}) {
-		t.Fatalf("unexpected subscription: %#v", subscription)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -799,7 +798,7 @@ func TestSubscriptions_Create_TransactionError(t *testing.T) {
 		t.Fatal("expected create subscription to return OK")
 	} else if newSubscription.Transaction == nil {
 		t.Fatal("expected transaction to be set")
-	} else if !reflect.DeepEqual(newSubscription.Transaction, &recurly.Transaction{
+	} else if diff := cmp.Diff(newSubscription.Transaction, &recurly.Transaction{
 		UUID:             "3c42a3ecc46a7aa602602e4033b9c2e6",
 		SubscriptionUUID: "3c42a3ebabdc022739d5a646408291a6",
 		Action:           "purchase",
@@ -814,8 +813,8 @@ func TestSubscriptions_Create_TransactionError(t *testing.T) {
 			MerchantMessage: "The transaction was declined without specific information.  Please contact your payment gateway for more details or ask the customer to contact their bank.",
 			CustomerMessage: "The transaction was declined. Please use a different card or contact your bank.",
 		},
-	}) {
-		t.Fatalf("unexpected transaction error: %v", newSubscription.Transaction.TransactionError)
+	}); diff != "" {
+		t.Fatal(diff)
 	} else if newSubscription.Subscription != nil {
 		t.Fatalf("unexpected subscription: %v", newSubscription.Subscription)
 	}
@@ -830,14 +829,34 @@ func TestSubscriptions_Preview(t *testing.T) {
 			t.Fatalf("unexpected method: %s", r.Method)
 		}
 		w.WriteHeader(201)
-		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription>
+			<invoice_collection>
+				<charge_invoice href="">
+				<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
+				<uuid>43adfe52c21cbb221557a24940bcd7e5</uuid>
+				<state>pending</state>
+				</charge_invoice>
+				<credit_invoices type="array">
+				</credit_invoices>
+			</invoice_collection>
+		</subscription>`)
 	})
 
-	r, _, err := client.Subscriptions.Preview(recurly.NewSubscription{})
+	r, sub, err := client.Subscriptions.Preview(recurly.NewSubscription{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
 		t.Fatal("expected preview subscription to return OK")
+	} else if diff := cmp.Diff(sub, &recurly.Subscription{
+		XMLName: xml.Name{Local: "subscription"},
+		Invoice: &recurly.Invoice{
+			XMLName:     xml.Name{Local: "invoice"},
+			AccountCode: "1",
+			UUID:        "43adfe52c21cbb221557a24940bcd7e5",
+			State:       recurly.InvoiceStatePending,
+		},
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -1029,5 +1048,45 @@ func TestSubscriptions_Postpone(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
 		t.Fatal("expected postpone subscription change to return OK")
+	}
+}
+
+func TestSubscriptions_Pause(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/pause", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
+	})
+
+	r, _, err := client.Subscriptions.Pause("44f83d7cba354d5b8481-2419f923ea96", 1) // UUID has dashes and should be sanitized
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected pause subscription change to return OK")
+	}
+}
+
+func TestSubscriptions_Resume(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/resume", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
+	})
+
+	r, _, err := client.Subscriptions.Resume("44f83d7cba354d5b8481-2419f923ea96") // UUID has dashes and should be sanitized
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected pause subscription change to return OK")
 	}
 }
