@@ -9,6 +9,7 @@ import (
 	"github.com/blacklightcms/recurly"
 	"github.com/blacklightcms/recurly/webhooks"
 	"github.com/google/go-cmp/cmp"
+	"reflect"
 )
 
 func TestParse_NewAccountNotification(t *testing.T) {
