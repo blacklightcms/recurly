@@ -10,6 +10,7 @@ import (
 	"github.com/blacklightcms/recurly/webhooks"
 	"github.com/google/go-cmp/cmp"
 	"reflect"
+	"github.com/kr/pretty"
 )
 
 func TestParse_NewAccountNotification(t *testing.T) {
@@ -807,6 +808,83 @@ func TestParse_NewDunningEventNotification(t *testing.T) {
 			Refundable:        recurly.NullBool{Bool: false, Valid: true},
 		},
 	}) {
+		t.Fatalf("unexpected notification: %#v", n)
+	}
+}
+
+// Available after credit invoices have been turned on in your account. See https://docs.recurly.com/docs/credit-invoices-release#section-updates-to-the-api-and-sdks for more information.
+func TestParse_NewDunningEventNotificationPostCreditInvoice(t *testing.T) {
+	invoiceCreatedAt := time.Date(2018, 1, 9, 16, 47, 43, 0, time.UTC)
+	invoiceUpdatedAt := time.Date(2018, 2, 12, 16, 50, 23, 0, time.UTC)
+	subscriptionActivatedAt := time.Date(2017, 11, 9, 16, 47, 30, 0, time.UTC)
+	subscriptionPeriodStart := time.Date(2018, 2, 9, 16, 47, 30, 0, time.UTC)
+	subscriptionPeriodEnd := time.Date(2018, 3, 9, 16, 47, 30, 0, time.UTC)
+
+	xmlFile := MustOpenFile("testdata/new_dunning_event_notification_post_credit_invoice.xml")
+	if result, err := webhooks.Parse(xmlFile); err != nil {
+		t.Fatal(err)
+	} else if n, ok := result.(*webhooks.NewDunningEventNotification); !ok {
+		t.Fatalf("unexpected type: %T, result")
+	} else if !reflect.DeepEqual(n, &webhooks.NewDunningEventNotification{
+		Account: webhooks.Account{
+			XMLName:     xml.Name{Local: "account"},
+			Code:        "1234",
+			Username:    "",
+			Email:       "",
+			FirstName:   "",
+			LastName:    "",
+			CompanyName: "",
+			Phone:       "",
+		},
+		Invoice: webhooks.Invoice{
+			XMLName:             xml.Name{Local: "invoice"},
+			SubscriptionUUID:    "",
+			UUID:                "424a9d4a2174b4f39bc776426aa19c32",
+			State:               "past_due",
+			InvoiceNumberPrefix: "",
+			InvoiceNumber:       1813,
+			PONumber:            "",
+			VATNumber:           "",
+			TotalInCents:        4500,
+			Currency:            "USD",
+			CreatedAtNew:        recurly.NullTime{Time: &invoiceCreatedAt},
+			UpdatedAt:           recurly.NullTime{Time: &invoiceUpdatedAt},
+			ClosedAt:            recurly.NullTime{},
+			NetTerms:            recurly.NullInt{Int: 30, Valid: true},
+			CollectionMethod:    "manual",
+		},
+		Subscription: recurly.Subscription{
+			XMLName:                xml.Name{Local: "subscription"},
+			Plan:                   recurly.NestedPlan{Code: "gold", Name: "Gold"},
+			AccountCode:            "",
+			InvoiceNumber:          0,
+			UUID:                   "4110792b3b01967d854f674b7282f542",
+			State:                  "active",
+			UnitAmountInCents:      0,
+			Currency:               "",
+			Quantity:               1,
+			TotalAmountInCents:     4500,
+			ActivatedAt:            recurly.NullTime{Time: &subscriptionActivatedAt},
+			CanceledAt:             recurly.NullTime{},
+			ExpiresAt:              recurly.NullTime{},
+			CurrentPeriodStartedAt: recurly.NullTime{Time: &subscriptionPeriodStart},
+			CurrentPeriodEndsAt:    recurly.NullTime{Time: &subscriptionPeriodEnd},
+			TrialStartedAt:         recurly.NullTime{},
+			TrialEndsAt:            recurly.NullTime{},
+			TaxInCents:             0,
+			TaxType:                "",
+			TaxRegion:              "",
+			TaxRate:                0,
+			PONumber:               "",
+			NetTerms:               recurly.NullInt{},
+			SubscriptionAddOns:     nil,
+			PendingSubscription:    (*recurly.PendingSubscription)(nil),
+			Invoice:                (*recurly.Invoice)(nil),
+			RemainingPauseCycles:   0,
+		},
+		Transaction: webhooks.Transaction{},
+	}) {
+		pretty.Println(n)
 		t.Fatalf("unexpected notification: %#v", n)
 	}
 }

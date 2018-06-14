@@ -92,6 +92,8 @@ type Invoice struct {
 	TotalInCents        int              `xml:"total_in_cents,omitempty"`
 	Currency            string           `xml:"currency,omitempty"`
 	CreatedAt           recurly.NullTime `xml:"date,omitempty"`
+	CreatedAtNew        recurly.NullTime `xml:"created_at,omitempty"`
+	UpdatedAt           recurly.NullTime `xml:"updated_at,omitempty"`
 	ClosedAt            recurly.NullTime `xml:"closed_at,omitempty"`
 	NetTerms            recurly.NullInt  `xml:"net_terms,omitempty"`
 	CollectionMethod    string           `xml:"collection_method,omitempty"`
