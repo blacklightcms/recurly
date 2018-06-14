@@ -10,7 +10,6 @@ import (
 	"github.com/blacklightcms/recurly/webhooks"
 	"github.com/google/go-cmp/cmp"
 	"reflect"
-	"github.com/kr/pretty"
 )
 
 func TestParse_NewAccountNotification(t *testing.T) {
@@ -884,7 +883,6 @@ func TestParse_NewDunningEventNotificationPostCreditInvoice(t *testing.T) {
 		},
 		Transaction: webhooks.Transaction{},
 	}) {
-		pretty.Println(n)
 		t.Fatalf("unexpected notification: %#v", n)
 	}
 }
