@@ -2,6 +2,12 @@ package recurly
 
 import "encoding/xml"
 
+// Adjustment state constants
+const (
+	AdjustmentStatePending = "pending"
+	AdjustmentStateInvoied = "invoiced"
+)
+
 // Adjustment works with charges and credits on a given account.
 type Adjustment struct {
 	AccountCode            string

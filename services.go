@@ -66,7 +66,7 @@ type InvoicesService interface {
 	Collect(invoiceNumber int) (*Response, *Invoice, error)
 	MarkPaid(invoiceNumber int) (*Response, *Invoice, error)
 	MarkFailed(invoiceNumber int) (*Response, *Invoice, error)
-	RefundVoidOpenAmount(invoiceNumber int, amountInCents int, refundApplyOrder string) (*Response, *Invoice, error)
+	RefundVoidOpenAmount(invoiceNumber int, amountInCents int, refundMethod string) (*Response, *Invoice, error)
 	RecordPayment(offlinePayment OfflinePayment) (*Response, *Transaction, error)
 }
 

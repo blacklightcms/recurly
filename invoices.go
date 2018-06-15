@@ -62,6 +62,12 @@ const (
 	InvoiceTypeLegacy = "legacy" // all invoices prior to change have type legacy
 )
 
+// Refund constants.
+const (
+	VoidRefundMethodTransactionFirst = "transaction_first"
+	VoidRefundMethodCreditFirst      = "credit_first"
+)
+
 // Invoice is an individual invoice for an account.
 // The only fields annotated with XML tags are those for posting an invoice.
 // Unmarshaling an invoice is handled by the custom UnmarshalXML function.

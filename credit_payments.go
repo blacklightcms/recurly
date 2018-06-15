@@ -2,13 +2,14 @@ package recurly
 
 import "encoding/xml"
 
-// Credit payment action constants.
+// Credit payment action constants
+// https://docs.recurly.com/docs/credit-invoices-release#section-credit-payment-actions
 const (
-	CreditPaymentActionPayment   = "payment"
+	CreditPaymentActionPayment   = "payment" // applying the credit
 	CreditPaymentActionGiftCard  = "gift_card"
 	CreditPaymentActionRefund    = "refund"
-	CreditPaymentActionReduction = "reduction"
-	CreditPaymentActionWriteOff  = "write_off"
+	CreditPaymentActionReduction = "reduction" // reducing the amount of the credit without applying it
+	CreditPaymentActionWriteOff  = "write_off" // used for voiding invoices
 )
 
 // CreditPayment is a credit that has been applied to an invoice.

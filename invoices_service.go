@@ -191,15 +191,20 @@ func (s *invoicesImpl) MarkFailed(invoiceNumber int) (*Response, *Invoice, error
 // Full open amount refunds of invoices with an unsettled transaction will void
 // the transaction and generate a void invoice.
 // https://dev.recurly.com/docs/line-item-refunds
-func (s *invoicesImpl) RefundVoidOpenAmount(invoiceNumber int, amountInCents int, refundApplyOrder string) (*Response, *Invoice, error) {
+func (s *invoicesImpl) RefundVoidOpenAmount(invoiceNumber int, amountInCents int, refundMethod string) (*Response, *Invoice, error) {
+	switch refundMethod {
+	case VoidRefundMethodCreditFirst, VoidRefundMethodTransactionFirst: // continue
+	default:
+		refundMethod = ""
+	}
 	action := fmt.Sprintf("invoices/%d/refund", invoiceNumber)
 	data := struct {
-		XMLName          xml.Name `xml:"invoice"`
-		AmountInCents    int      `xml:"amount_in_cents,omitempty"`
-		RefundApplyOrder string   `xml:"refund_apply_order,omitempty"`
+		XMLName       xml.Name `xml:"invoice"`
+		AmountInCents int      `xml:"amount_in_cents,omitempty"`
+		RefundMethod  string   `xml:"refund_method,omitempty"`
 	}{
-		AmountInCents:    amountInCents,    // Amount is required
-		RefundApplyOrder: refundApplyOrder, // Refund Apply Order defaults to "credit" (vs "transaction")
+		AmountInCents: amountInCents, // Amount is required
+		RefundMethod:  refundMethod,  // Refund method defaults to "credit_first"
 	}
 	req, err := s.client.newRequest("POST", action, nil, data)
 	if err != nil {
