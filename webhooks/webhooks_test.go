@@ -16,15 +16,109 @@ func TestParse_BillingInfoUpdatedNotification(t *testing.T) {
 	result, err := webhooks.Parse(xmlFile)
 	if err != nil {
 		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.BillingInfoUpdatedNotification); !ok {
+	} else if n, ok := result.(*webhooks.AccountNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
-	} else if diff := cmp.Diff(n, &webhooks.BillingInfoUpdatedNotification{
+	} else if diff := cmp.Diff(n, &webhooks.AccountNotification{
+		Type: webhooks.BillingInfoUpdated,
 		Account: webhooks.Account{
 			XMLName:   xml.Name{Local: "account"},
 			Code:      "1",
 			Email:     "verena@example.com",
 			FirstName: "Verena",
 			LastName:  "Example",
+		},
+	}); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
+func TestParse_ChargeInvoiceNotification(t *testing.T) {
+	created, _ := time.Parse(recurly.DateTimeFormat, "2018-02-13T16:00:04Z")
+	xmlFile := MustOpenFile("testdata/charge_invoice_notification.xml")
+	result, err := webhooks.Parse(xmlFile)
+	if err != nil {
+		t.Fatal(err)
+	} else if n, ok := result.(*webhooks.ChargeInvoiceNotification); !ok {
+		t.Fatalf("unexpected type: %T, result", n)
+	} else if diff := cmp.Diff(n, &webhooks.ChargeInvoiceNotification{
+		Type: webhooks.NewChargeInvoice,
+		Account: webhooks.Account{
+			XMLName: xml.Name{Local: "account"},
+			Code:    "1234",
+		},
+		Invoice: webhooks.ChargeInvoice{
+			XMLName:           xml.Name{Local: "invoice"},
+			UUID:              "42feb03ce368c0e1ead35d4bfa89b82e",
+			State:             recurly.ChargeInvoiceStatePending,
+			Origin:            recurly.ChargeInvoiceOriginRenewal,
+			SubscriptionUUIDs: []string{"40b8f5e99df03b8684b99d4993b6e089"},
+			InvoiceNumber:     2405,
+			Currency:          "USD",
+			BalanceInCents:    100000,
+			TotalInCents:      100000,
+			NetTerms:          recurly.NullInt{Int: 30, Valid: true},
+			CollectionMethod:  recurly.CollectionMethodManual,
+			CreatedAt:         recurly.NewTime(created),
+		},
+	}); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
+func TestParse_CreditInvoiceNotification(t *testing.T) {
+	d, _ := time.Parse(recurly.DateTimeFormat, "2018-02-13T00:56:22Z")
+	xmlFile := MustOpenFile("testdata/credit_invoice_notification.xml")
+	result, err := webhooks.Parse(xmlFile)
+	if err != nil {
+		t.Fatal(err)
+	} else if n, ok := result.(*webhooks.CreditInvoiceNotification); !ok {
+		t.Fatalf("unexpected type: %T, result", n)
+	} else if diff := cmp.Diff(n, &webhooks.CreditInvoiceNotification{
+		Type: webhooks.NewCreditInvoice,
+		Account: webhooks.Account{
+			XMLName: xml.Name{Local: "account"},
+			Code:    "1234",
+		},
+		Invoice: webhooks.CreditInvoice{
+			XMLName:           xml.Name{Local: "invoice"},
+			UUID:              "42fb74de65e9395eb004614144a7b91f",
+			State:             recurly.CreditInvoiceStateClosed,
+			Origin:            recurly.CreditInvoiceOriginWriteOff,
+			SubscriptionUUIDs: []string{"42fb74ba9efe4c6981c2064436a4e9cd"},
+			InvoiceNumber:     2404,
+			Currency:          "USD",
+			BalanceInCents:    0,
+			TotalInCents:      -4882,
+			CreatedAt:         recurly.NewTime(d),
+			ClosedAt:          recurly.NewTime(d),
+		},
+	}); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
+func TestParse_CreditPaymentNotification(t *testing.T) {
+	d, _ := time.Parse(recurly.DateTimeFormat, "2018-02-12T18:55:20Z")
+	xmlFile := MustOpenFile("testdata/credit_payment_notification.xml")
+	result, err := webhooks.Parse(xmlFile)
+	if err != nil {
+		t.Fatal(err)
+	} else if n, ok := result.(*webhooks.CreditPaymentNotification); !ok {
+		t.Fatalf("unexpected type: %T, result", n)
+	} else if diff := cmp.Diff(n, &webhooks.CreditPaymentNotification{
+		Type: webhooks.NewCreditPayment,
+		Account: webhooks.Account{
+			XMLName: xml.Name{Local: "account"},
+			Code:    "1234",
+		},
+		CreditPayment: webhooks.CreditPayment{
+			XMLName:                xml.Name{Local: "credit_payment"},
+			UUID:                   "42fa2a56dfeca2ace39b0e4a9198f835",
+			Action:                 "payment",
+			AmountInCents:          3579,
+			OriginalInvoiceNumber:  2389,
+			AppliedToInvoiceNumber: 2390,
+			CreatedAt:              recurly.NewTime(d),
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -42,9 +136,10 @@ func TestParse_NewSubscriptionNotification(t *testing.T) {
 	result, err := webhooks.Parse(xmlFile)
 	if err != nil {
 		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.NewSubscriptionNotification); !ok {
+	} else if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
-	} else if diff := cmp.Diff(n, &webhooks.NewSubscriptionNotification{
+	} else if diff := cmp.Diff(n, &webhooks.SubscriptionNotification{
+		Type: webhooks.NewSubscription,
 		Account: webhooks.Account{
 			XMLName:   xml.Name{Local: "account"},
 			Code:      "1",
@@ -84,9 +179,10 @@ func TestParse_UpdatedSubscriptionNotification(t *testing.T) {
 	result, err := webhooks.Parse(xmlFile)
 	if err != nil {
 		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.UpdatedSubscriptionNotification); !ok {
+	} else if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
-	} else if diff := cmp.Diff(n, &webhooks.UpdatedSubscriptionNotification{
+	} else if diff := cmp.Diff(n, &webhooks.SubscriptionNotification{
+		Type: webhooks.UpdatedSubscription,
 		Account: webhooks.Account{
 			XMLName:   xml.Name{Local: "account"},
 			Code:      "1",
@@ -124,9 +220,10 @@ func TestParse_RenewedSubscriptionNotification(t *testing.T) {
 	result, err := webhooks.Parse(xmlFile)
 	if err != nil {
 		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.RenewedSubscriptionNotification); !ok {
+	} else if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
-	} else if diff := cmp.Diff(n, &webhooks.RenewedSubscriptionNotification{
+	} else if diff := cmp.Diff(n, &webhooks.SubscriptionNotification{
+		Type: webhooks.RenewedSubscription,
 		Account: webhooks.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
@@ -165,9 +262,10 @@ func TestParse_ExpiredSubscriptionNotification(t *testing.T) {
 	result, err := webhooks.Parse(xmlFile)
 	if err != nil {
 		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.ExpiredSubscriptionNotification); !ok {
+	} else if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
-	} else if diff := cmp.Diff(n, &webhooks.ExpiredSubscriptionNotification{
+	} else if diff := cmp.Diff(n, &webhooks.SubscriptionNotification{
+		Type: webhooks.ExpiredSubscription,
 		Account: webhooks.Account{
 			XMLName:   xml.Name{Local: "account"},
 			Code:      "1",
@@ -207,9 +305,10 @@ func TestParse_CanceledSubscriptionNotification(t *testing.T) {
 	result, err := webhooks.Parse(xmlFile)
 	if err != nil {
 		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.CanceledSubscriptionNotification); !ok {
+	} else if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
-	} else if diff := cmp.Diff(n, &webhooks.CanceledSubscriptionNotification{
+	} else if diff := cmp.Diff(n, &webhooks.SubscriptionNotification{
+		Type: webhooks.CanceledSubscription,
 		Account: webhooks.Account{
 			XMLName:   xml.Name{Local: "account"},
 			Code:      "1",
@@ -244,9 +343,10 @@ func TestParse_NewInvoiceNotification(t *testing.T) {
 	result, err := webhooks.Parse(xmlFile)
 	if err != nil {
 		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.NewInvoiceNotification); !ok {
+	} else if n, ok := result.(*webhooks.InvoiceNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
-	} else if diff := cmp.Diff(n, &webhooks.NewInvoiceNotification{
+	} else if diff := cmp.Diff(n, &webhooks.InvoiceNotification{
+		Type: webhooks.NewInvoice,
 		Account: webhooks.Account{
 			XMLName:   xml.Name{Local: "account"},
 			Code:      "1",
@@ -276,9 +376,10 @@ func TestParse_PastDueInvoiceNotification(t *testing.T) {
 	result, err := webhooks.Parse(xmlFile)
 	if err != nil {
 		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.PastDueInvoiceNotification); !ok {
+	} else if n, ok := result.(*webhooks.InvoiceNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
-	} else if diff := cmp.Diff(n, &webhooks.PastDueInvoiceNotification{
+	} else if diff := cmp.Diff(n, &webhooks.InvoiceNotification{
+		Type: webhooks.PastDueInvoice,
 		Account: webhooks.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
@@ -305,9 +406,10 @@ func TestParse_SuccessfulPaymentNotification(t *testing.T) {
 	xmlFile := MustOpenFile("testdata/successful_payment_notification.xml")
 	if result, err := webhooks.Parse(xmlFile); err != nil {
 		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.SuccessfulPaymentNotification); !ok {
+	} else if n, ok := result.(*webhooks.PaymentNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
-	} else if diff := cmp.Diff(n, &webhooks.SuccessfulPaymentNotification{
+	} else if diff := cmp.Diff(n, &webhooks.PaymentNotification{
+		Type: webhooks.SuccessfulPayment,
 		Account: webhooks.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
@@ -340,9 +442,10 @@ func TestParse_FailedPaymentNotification(t *testing.T) {
 	xmlFile := MustOpenFile("testdata/failed_payment_notification.xml")
 	if result, err := webhooks.Parse(xmlFile); err != nil {
 		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.FailedPaymentNotification); !ok {
+	} else if n, ok := result.(*webhooks.PaymentNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
-	} else if diff := cmp.Diff(n, &webhooks.FailedPaymentNotification{
+	} else if diff := cmp.Diff(n, &webhooks.PaymentNotification{
+		Type: webhooks.FailedPayment,
 		Account: webhooks.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
@@ -377,9 +480,10 @@ func TestParse_VoidPaymentNotification(t *testing.T) {
 	xmlFile := MustOpenFile("testdata/void_payment_notification.xml")
 	if result, err := webhooks.Parse(xmlFile); err != nil {
 		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.VoidPaymentNotification); !ok {
+	} else if n, ok := result.(*webhooks.PaymentNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
-	} else if diff := cmp.Diff(n, &webhooks.VoidPaymentNotification{
+	} else if diff := cmp.Diff(n, &webhooks.PaymentNotification{
+		Type: webhooks.VoidPayment,
 		Account: webhooks.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
@@ -413,9 +517,10 @@ func TestParse_SuccessfulRefundNotification(t *testing.T) {
 	xmlFile := MustOpenFile("testdata/successful_refund_notification.xml")
 	if result, err := webhooks.Parse(xmlFile); err != nil {
 		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.SuccessfulRefundNotification); !ok {
+	} else if n, ok := result.(*webhooks.PaymentNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
-	} else if diff := cmp.Diff(n, &webhooks.SuccessfulRefundNotification{
+	} else if diff := cmp.Diff(n, &webhooks.PaymentNotification{
+		Type: webhooks.SuccessfulRefund,
 		Account: webhooks.Account{
 			XMLName:     xml.Name{Local: "account"},
 			Code:        "1",
