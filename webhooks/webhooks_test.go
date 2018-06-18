@@ -28,7 +28,7 @@ func TestParse_ChargeInvoiceNotification(t *testing.T) {
 		Invoice: webhooks.ChargeInvoice{
 			XMLName:           xml.Name{Local: "invoice"},
 			UUID:              "42feb03ce368c0e1ead35d4bfa89b82e",
-			State:             recurly.InvoiceStatePending,
+			State:             recurly.ChargeInvoiceStatePending,
 			Origin:            recurly.InvoiceOriginRenewal,
 			SubscriptionUUIDs: []string{"40b8f5e99df03b8684b99d4993b6e089"},
 			InvoiceNumber:     2405,
@@ -61,7 +61,7 @@ func TestParse_CreditInvoiceNotification(t *testing.T) {
 		Invoice: webhooks.CreditInvoice{
 			XMLName:           xml.Name{Local: "invoice"},
 			UUID:              "42fb74de65e9395eb004614144a7b91f",
-			State:             recurly.InvoiceStateClosed,
+			State:             recurly.CreditInvoiceStateClosed,
 			Origin:            recurly.InvoiceOriginWriteOff,
 			SubscriptionUUIDs: []string{"42fb74ba9efe4c6981c2064436a4e9cd"},
 			InvoiceNumber:     2404,
