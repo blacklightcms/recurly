@@ -65,6 +65,7 @@ func NewClient(subDomain, apiKey string, httpClient *http.Client) *Client {
 	client.Plans = &plansImpl{client: client}
 	client.AddOns = &addOnsImpl{client: client}
 	client.Subscriptions = &subscriptionsImpl{client: client}
+	client.ShippingAddresses = &shippingAddressesImpl{client: client}
 	client.Transactions = &transactionsImpl{client: client}
 
 	return client

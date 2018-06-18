@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/blacklightcms/recurly"
 	"github.com/google/go-cmp/cmp"
+	"github.com/blacklightcms/recurly"
 )
 
 // TestAccountEncoding ensures structs are encoded to XML properly.
