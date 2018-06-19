@@ -245,7 +245,7 @@ type invoiceFields struct {
 	CollectionMethod        string          `xml:"collection_method,omitempty"`
 	LineItems               []Adjustment    `xml:"line_items>adjustment,omitempty"`
 	Transactions            []Transaction   `xml:"transactions>transaction,omitempty"`
-	CreditPayments          []CreditPayment `xml:"credit_payment,omitempty"`
+	CreditPayments          []CreditPayment `xml:"credit_payments>credit_payment,omitempty"`
 }
 
 // OfflinePayment is a payment received outside the system to be recorded in Recurly.
