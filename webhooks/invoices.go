@@ -10,8 +10,10 @@ import (
 // Will be deprecated after credit invoices feature is turned on.
 // https://dev.recurly.com/page/webhooks#invoice-notifications
 const (
-	NewInvoice     = "new_invoice_notification"
-	PastDueInvoice = "past_due_invoice_notification"
+	NewInvoice        = "new_invoice_notification"
+	PastDueInvoice    = "past_due_invoice_notification"
+	ProcessingInvoice = "processing_invoice_notification"
+	ClosedInvoice     = "closed_invoice_notification"
 )
 
 // InvoiceNotification is returned for all invoice notifications.

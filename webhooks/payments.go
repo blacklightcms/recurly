@@ -13,6 +13,8 @@ const (
 	FailedPayment     = "failed_payment_notification"
 	VoidPayment       = "void_payment_notification"
 	SuccessfulRefund  = "successful_refund_notification"
+	ScheduledPayment  = "scheduled_payment_notification"
+	ProcessingPayment = "processing_payment_notification"
 )
 
 // PaymentNotification is returned for all credit payment notifications.
