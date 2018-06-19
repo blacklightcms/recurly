@@ -167,6 +167,7 @@ func (t *Transaction) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error
 	return nil
 }
 
+// TransactionResult is included in CVV results.
 type TransactionResult struct {
 	NullMarshal
 	Code    string `xml:"code,attr"`

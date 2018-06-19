@@ -6,13 +6,22 @@ import (
 )
 
 // Invoice state constants.
+// https://docs.recurly.com/docs/credit-invoices-release#section-invoice-attribute-changes
 const (
-	InvoiceStateOpen      = "open"      // pending collection
-	InvoiceStatePending   = "pending"   // new status will replace "open"
-	InvoiceStateCollected = "collected" // successfully collected
-	InvoiceStatePaid      = "paid"      // new status will replace "collected"
-	InvoiceStatePastDue   = "past_due"  // initial collection failed, still attempting
-	InvoiceStateFailed    = "failed"    // failed to collect
+	ChargeInvoiceStatePending    = "pending"    // previously "open"
+	ChargeInvoiceStateProcessing = "processing" // ACH payments only
+	ChargeInvoiceStatePastDue    = "past_due"
+	ChargeInvoiceStatePaid       = "paid" // previously "collected"
+	ChargeInvoiceStateFailed     = "failed"
+
+	CreditInvoiceStateOpen       = "open"
+	CreditInvoiceStateProcessing = "processing" // ACH/bank refund processing
+	CreditInvoiceStateClosed     = "closed"
+	CreditInvoiceStateVoided     = "voided"
+
+	// Deprecated
+	InvoiceStateOpenDeprecated      = "open"
+	InvoiceStateCollectedDeprecated = "collected"
 )
 
 // Collection method constants.
@@ -30,6 +39,20 @@ const (
 	PaymentMethodMoneyOrder   = "money_order"
 	PaymentMethodCheck        = "check"
 	PaymentMethodOther        = "other"
+)
+
+// Invoice origin constants.
+const (
+	ChargeInvoiceOriginPurchase        = "purchase"
+	ChargeInvoiceOriginRenewal         = "renewal"
+	ChargeInvoiceOriginImmediateChange = "immediate_change"
+	ChargeInvoiceOriginTermination     = "termination"
+
+	CreditInvoiceOriginGiftCard       = "gift_card"
+	CreditInvoiceOriginRefund         = "refund"
+	CreditInvoiceOriginCredit         = "credit"
+	CreditInvoiceOriginWriteOff       = "write_off"
+	CreditInvoiceOriginExternalCredit = "external_credit"
 )
 
 // Invoice is an individual invoice for an account.
