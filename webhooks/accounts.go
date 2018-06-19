@@ -17,11 +17,11 @@ type AccountNotification struct {
 // Account represents the account object sent in webhooks.
 type Account struct {
 	XMLName     xml.Name `xml:"account"`
-	Code        string   `xml:"account_code,omitempty"`
-	Username    string   `xml:"username,omitempty"`
-	Email       string   `xml:"email,omitempty"`
-	FirstName   string   `xml:"first_name,omitempty"`
-	LastName    string   `xml:"last_name,omitempty"`
-	CompanyName string   `xml:"company_name,omitempty"`
-	Phone       string   `xml:"phone,omitempty"`
+	Code        string   `xml:"account_code"`
+	Username    string   `xml:"username"`
+	Email       string   `xml:"email"`
+	FirstName   string   `xml:"first_name"`
+	LastName    string   `xml:"last_name"`
+	CompanyName string   `xml:"company_name"`
+	Phone       string   `xml:"phone"`
 }

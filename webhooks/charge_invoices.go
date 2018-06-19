@@ -26,20 +26,20 @@ type ChargeInvoiceNotification struct {
 
 // ChargeInvoice represents the charge invoice object sent in webhooks.
 type ChargeInvoice struct {
-	XMLName             xml.Name         `xml:"invoice,omitempty"`
-	SubscriptionUUIDs   []string         `xml:"subscription_ids>subscription_id,omitempty"`
-	UUID                string           `xml:"uuid,omitempty"`
-	State               string           `xml:"state,omitempty"`
-	Origin              string           `xml:"origin,omitempty"`
-	InvoiceNumberPrefix string           `xml:"invoice_number_prefix,omitempty"`
-	InvoiceNumber       int              `xml:"invoice_number,omitempty"`
-	PONumber            string           `xml:"po_number,omitempty"`
-	VATNumber           string           `xml:"vat_number,omitempty"`
-	BalanceInCents      int              `xml:"balance_in_cents,omitempty"`
-	TotalInCents        int              `xml:"total_in_cents,omitempty"`
-	Currency            string           `xml:"currency,omitempty"`
-	CreatedAt           recurly.NullTime `xml:"created_at,omitempty"`
-	ClosedAt            recurly.NullTime `xml:"closed_at,omitempty"`
-	NetTerms            recurly.NullInt  `xml:"net_terms,omitempty"`
-	CollectionMethod    string           `xml:"collection_method,omitempty"`
+	XMLName             xml.Name         `xml:"invoice"`
+	SubscriptionUUIDs   []string         `xml:"subscription_ids>subscription_id"`
+	UUID                string           `xml:"uuid"`
+	State               string           `xml:"state"`
+	Origin              string           `xml:"origin"`
+	InvoiceNumberPrefix string           `xml:"invoice_number_prefix"`
+	InvoiceNumber       int              `xml:"invoice_number"`
+	PONumber            string           `xml:"po_number"`
+	VATNumber           string           `xml:"vat_number"`
+	BalanceInCents      int              `xml:"balance_in_cents"`
+	TotalInCents        int              `xml:"total_in_cents"`
+	Currency            string           `xml:"currency"`
+	CreatedAt           recurly.NullTime `xml:"created_at"`
+	ClosedAt            recurly.NullTime `xml:"closed_at"`
+	NetTerms            recurly.NullInt  `xml:"net_terms"`
+	CollectionMethod    string           `xml:"collection_method"`
 }

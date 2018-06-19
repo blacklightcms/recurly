@@ -22,14 +22,14 @@ type CreditPaymentNotification struct {
 
 // CreditPayment represents the credit payment object sent in webhooks.
 type CreditPayment struct {
-	XMLName                   xml.Name         `xml:"credit_payment,omitempty"`
-	UUID                      string           `xml:"uuid,omitempty"`
-	Action                    string           `xml:"action,omitempty"`
-	AmountInCents             int              `xml:"amount_in_cents,omitempty"`
-	OriginalInvoiceNumber     int              `xml:"original_nvoice_number,omitempty"`
-	AppliedToInvoiceNumber    int              `xml:"applied_to_invoice_number,omitempty"`
-	OriginalCreditPaymentUUID string           `xml:"original_credit_payment_uuid,omitempty"`
-	RefundTransactionUUID     string           `xml:"refund_transaction_uuid,omitempty"`
-	CreatedAt                 recurly.NullTime `xml:"created_at,omitempty"`
-	VoidedAt                  recurly.NullTime `xml:"voided_at,omitempty"`
+	XMLName                   xml.Name         `xml:"credit_payment"`
+	UUID                      string           `xml:"uuid"`
+	Action                    string           `xml:"action"`
+	AmountInCents             int              `xml:"amount_in_cents"`
+	OriginalInvoiceNumber     int              `xml:"original_invoice_number"`
+	AppliedToInvoiceNumber    int              `xml:"applied_to_invoice_number"`
+	OriginalCreditPaymentUUID string           `xml:"original_credit_payment_uuid"`
+	RefundTransactionUUID     string           `xml:"refund_transaction_uuid"`
+	CreatedAt                 recurly.NullTime `xml:"created_at"`
+	VoidedAt                  recurly.NullTime `xml:"voided_at"`
 }

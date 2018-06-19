@@ -13,14 +13,14 @@ type notificationName struct {
 
 // Parse parses an incoming webhook and returns the notification.
 func Parse(r io.Reader) (interface{}, error) {
-	return parse(r, dst)
+	return parse(r, nameToNotification)
 }
 
-// ParseOriginal parses an incoming webhook and returns the notification
+// ParseDeprecated parses an incoming webhook and returns the notification
 // for previous webhook notifications.
 // Will be deprecated after credit invoices feature is turned on.
-func ParseOriginal(r io.Reader) (interface{}, error) {
-	return parse(r, origdst)
+func ParseDeprecated(r io.Reader) (interface{}, error) {
+	return parse(r, nameToNotificationDeprecated)
 }
 
 // parse parses an incoming webhook and returns the notification.
@@ -51,45 +51,41 @@ func parse(r io.Reader, fn func(s string) (interface{}, error)) (interface{}, er
 	return dst, nil
 }
 
-// dst returns the notification interface.
-func dst(s string) (dst interface{}, err error) {
-	switch s {
+// nameToNotification returns the notification interface.
+func nameToNotification(name string) (interface{}, error) {
+	switch name {
 	case BillingInfoUpdated:
-		dst = &AccountNotification{Type: s}
+		return &AccountNotification{Type: name}, nil
 	case NewSubscription, UpdatedSubscription, RenewedSubscription, ExpiredSubscription, CanceledSubscription:
-		dst = &SubscriptionNotification{Type: s}
+		return &SubscriptionNotification{Type: name}, nil
 	case NewChargeInvoice, ProcessingChargeInvoice, PastDueChargeInvoice, PaidChargeInvoice, FailedChargeInvoice, ReopenedChargeInvoice:
-		dst = &ChargeInvoiceNotification{Type: s}
+		return &ChargeInvoiceNotification{Type: name}, nil
 	case NewCreditInvoice, ProcessingCreditInvoice, ClosedCreditInvoice, VoidedCreditInvoice, ReopenedCreditInvoice, OpenCreditInvoice:
-		dst = &CreditInvoiceNotification{Type: s}
+		return &CreditInvoiceNotification{Type: name}, nil
 	case NewCreditPayment, VoidedCreditPayment:
-		dst = &CreditPaymentNotification{Type: s}
+		return &CreditPaymentNotification{Type: name}, nil
 	case NewInvoice, PastDueInvoice:
-		dst = &InvoiceNotification{Type: s}
+		return &InvoiceNotification{Type: name}, nil
 	case SuccessfulPayment, FailedPayment, VoidPayment, SuccessfulRefund:
-		dst = &PaymentNotification{Type: s}
-	default:
-		return nil, ErrUnknownNotification{name: s}
+		return &PaymentNotification{Type: name}, nil
 	}
-	return dst, nil
+	return nil, ErrUnknownNotification{name: name}
 }
 
-// origdst returns interfaces for webhooks prior to
+// nameToNotificationDeprecated returns interfaces for webhooks prior to
 // the credit invoices feature.
-func origdst(s string) (dst interface{}, err error) {
-	switch s {
+func nameToNotificationDeprecated(name string) (interface{}, error) {
+	switch name {
 	case BillingInfoUpdated:
-		dst = &AccountNotification{Type: s}
+		return &AccountNotification{Type: name}, nil
 	case NewSubscription, UpdatedSubscription, RenewedSubscription, ExpiredSubscription, CanceledSubscription:
-		dst = &SubscriptionNotification{Type: s}
+		return &SubscriptionNotification{Type: name}, nil
 	case NewInvoice, PastDueInvoice:
-		dst = &InvoiceNotification{Type: s}
+		return &InvoiceNotification{Type: name}, nil
 	case SuccessfulPayment, FailedPayment, VoidPayment, SuccessfulRefund:
-		dst = &PaymentNotification{Type: s}
-	default:
-		return nil, ErrUnknownNotification{name: s}
+		return &PaymentNotification{Type: name}, nil
 	}
-	return dst, nil
+	return nil, ErrUnknownNotification{name: name}
 }
 
 // ErrUnknownNotification is used when the incoming webhook does not match a
