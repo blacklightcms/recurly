@@ -41,6 +41,7 @@ type Client struct {
 	Subscriptions     SubscriptionsService
 	Transactions      TransactionsService
 	CreditPayments    CreditPaymentsService
+	Purchases         PurchasesService
 }
 
 // NewClient returns a new instance of *Client.
@@ -69,6 +70,7 @@ func NewClient(subDomain, apiKey string, httpClient *http.Client) *Client {
 	client.ShippingAddresses = &shippingAddressesImpl{client: client}
 	client.Transactions = &transactionsImpl{client: client}
 	client.CreditPayments = &creditInvoicesImpl{client: client}
+	client.Purchases = &purchasesImpl{client: client}
 
 	return client
 }
