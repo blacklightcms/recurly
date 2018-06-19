@@ -65,7 +65,7 @@ func TestPurchases_Purchase_Encoding(t *testing.T) {
 				"<billing_info><first_name>Benjamin</first_name><last_name>Du Monde</last_name><address1>400 Alabama St</address1><city>San Francisco</city><state>CA</state><zip>94110</zip><country>US</country><number>4111111111111111</number><month>12</month><year>2019</year></billing_info>" +
 				"</account>" +
 				"<adjustments><adjustment>" +
-				"<description>Description of this adjustment</description><product_code>4549449c-5870-4845-b672-1d07f15e87dd</product_code><unit_amount_in_cents>1000</unit_amount_in_cents><quantity>1</quantity>" +
+				"<description>Description of this adjustment</description><product_code>4549449c-5870-4845-b672-1d07f15e87dd</product_code><unit_amount_in_cents>1000</unit_amount_in_cents><quantity>1</quantity><currency></currency>" +
 				// TODO: RevenueScheduleType not yet modeled
 				// "<revenue_schedule_type>at_invoice</revenue_schedule_type>"+
 				"</adjustment></adjustments>" +
