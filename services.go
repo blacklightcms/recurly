@@ -93,6 +93,7 @@ type ShippingAddressesService interface {
 	Create(accountCode string, address ShippingAddress) (*Response, *ShippingAddress, error)
 	Update(accountCode string, shippingAddressID string, address ShippingAddress) (*Response, *ShippingAddress, error)
 	Delete(accountCode string, shippingAddressID string) (*Response, error)
+	GetSubscriptions(accountCode string, shippingAddressID string) (*Response, []Subscription, error)
 }
 
 // SubscriptionsService represents the interactinos available for subscriptions.

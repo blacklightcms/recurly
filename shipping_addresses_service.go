@@ -59,7 +59,11 @@ func (s *shippingAddressesImpl) GetSubscriptions(accountCode string, shippingAdd
 	if err != nil {
 		return nil, nil, err
 	}
-	var subs []Subscription
-	resp, err := s.client.do(req, subs)
-	return resp, subs, err
+	var v struct {
+		XMLName       xml.Name       `xml:"subscriptions"`
+		Subscriptions []Subscription `xml:"subscription"`
+	}
+
+	resp, err := s.client.do(req, &v)
+	return resp, v.Subscriptions, err
 }
