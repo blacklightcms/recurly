@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"testing"
 	"time"
+
 	"github.com/blacklightcms/recurly"
 	"github.com/google/go-cmp/cmp"
 )
@@ -853,7 +854,7 @@ func TestSubscriptions_Preview(t *testing.T) {
 			XMLName:     xml.Name{Local: "invoice"},
 			AccountCode: "1",
 			UUID:        "43adfe52c21cbb221557a24940bcd7e5",
-			State:       recurly.InvoiceStatePending,
+			State:       recurly.ChargeInvoiceStatePending,
 		},
 	}); diff != "" {
 		t.Fatal(diff)
