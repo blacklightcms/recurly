@@ -5,6 +5,8 @@ import (
 	"fmt"
 )
 
+var _ ShippingAddressesService = &shippingAddressesImpl{}
+
 // shippingAddressessImpl handles communication with the shipping address
 // related methods of the recurly API.
 type shippingAddressesImpl struct {
@@ -15,6 +17,10 @@ type shippingAddressesImpl struct {
 func (s *shippingAddressesImpl) ListAccount(accountCode string, params Params) (*Response, []ShippingAddress, error) {
 	action := fmt.Sprintf("accounts/%s/shipping_addresses", accountCode)
 	req, err := s.client.newRequest("GET", action, params, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	var v struct {
 		XMLName           xml.Name          `xml:"shipping_addresses"`
 		ShippingAddresses []ShippingAddress `xml:"shipping_address"`
@@ -39,6 +45,10 @@ func (s *shippingAddressesImpl) Create(accountCode string, shippingAddress Shipp
 func (s *shippingAddressesImpl) Update(accountCode string, shippingAddressID string, shippingAddress ShippingAddress) (*Response, *ShippingAddress, error) {
 	action := fmt.Sprintf("accounts/%s/shipping_addresses/%s", accountCode, shippingAddressID)
 	req, err := s.client.newRequest("PUT", action, nil, shippingAddress)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	var sa ShippingAddress
 	resp, err := s.client.do(req, sa)
 	return resp, &sa, err
@@ -47,7 +57,10 @@ func (s *shippingAddressesImpl) Update(accountCode string, shippingAddressID str
 // Delete removes a shipping address from an account.
 func (s *shippingAddressesImpl) Delete(accountCode string, shippingAddressID string) (*Response, error) {
 	action := fmt.Sprintf("accounts/%s/shipping_addresses/%s", accountCode, shippingAddressID)
-	req, _ := s.client.newRequest("DELETE", action, nil, nil)
+	req, err := s.client.newRequest("DELETE", action, nil, nil)
+	if err != nil {
+		return nil, err
+	}
 	resp, err := s.client.do(req, nil)
 	return resp, err
 }
