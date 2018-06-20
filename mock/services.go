@@ -282,6 +282,9 @@ type InvoicesService struct {
 	OnRefundVoidOpenAmount      func(invoiceNumber int, amountInCents int, refundMethod string) (*recurly.Response, *recurly.Invoice, error)
 	RefundVoidOpenAmountInvoked bool
 
+	OnVoidCreditInvoice      func(invoiceNumber int) (*recurly.Response, *recurly.Invoice, error)
+	VoidCreditInvoiceInvoked bool
+
 	OnRecordPayment      func(pmt recurly.OfflinePayment) (*recurly.Response, *recurly.Transaction, error)
 	RecordPaymentInvoked bool
 }
@@ -334,6 +337,11 @@ func (m *InvoicesService) MarkFailed(invoiceNumber int) (*recurly.Response, *rec
 func (m *InvoicesService) RefundVoidOpenAmount(invoiceNumber int, amountInCents int, refundMethod string) (*recurly.Response, *recurly.Invoice, error) {
 	m.RefundVoidOpenAmountInvoked = true
 	return m.OnRefundVoidOpenAmount(invoiceNumber, amountInCents, refundMethod)
+}
+
+func (m *InvoicesService) VoidCreditInvoice(invoiceNumber int) (*recurly.Response, *recurly.Invoice, error) {
+	m.VoidCreditInvoiceInvoked = true
+	return m.OnVoidCreditInvoice(invoiceNumber)
 }
 
 func (m *InvoicesService) RecordPayment(pmt recurly.OfflinePayment) (*recurly.Response, *recurly.Transaction, error) {

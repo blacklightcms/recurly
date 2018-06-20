@@ -1001,6 +1001,26 @@ func TestInvoices_RefundVoidOpenAmount(t *testing.T) {
 	}
 }
 
+func TestInvoices_VoidCreditInvoice(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/invoices/1010/void", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		w.WriteHeader(201)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
+	})
+
+	resp, _, err := client.Invoices.VoidCreditInvoice(1010)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if resp.IsError() {
+		t.Fatal("expected void credit invoice to return OK")
+	}
+}
+
 func TestInvoices_RefundVoidOpenAmount_Params(t *testing.T) {
 	setup()
 	defer teardown()

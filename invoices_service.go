@@ -217,6 +217,21 @@ func (s *invoicesImpl) RefundVoidOpenAmount(invoiceNumber int, amountInCents int
 	return resp, &dst, err
 }
 
+// VoidCreditInvoice voids a credit invoice.
+// https://dev.recurly.com/docs/void-credit-invoice
+func (s *invoicesImpl) VoidCreditInvoice(invoiceNumber int) (*Response, *Invoice, error) {
+	action := fmt.Sprintf("invoices/%d/void", invoiceNumber)
+	req, err := s.client.newRequest("PUT", action, nil, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var dst Invoice
+	resp, err := s.client.do(req, &dst)
+
+	return resp, &dst, err
+}
+
 // RecordPayment records an offline payment for a manual invoice.
 // https://dev.recurly.com/v2.5/docs/enter-an-offline-payment-for-a-manual-invoice-beta
 func (s *invoicesImpl) RecordPayment(offlinePayment OfflinePayment) (*Response, *Transaction, error) {
