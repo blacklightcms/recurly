@@ -37,7 +37,7 @@ func (s *shippingAddressesImpl) Create(accountCode string, shippingAddress Shipp
 		return nil, nil, err
 	}
 	var sa ShippingAddress
-	resp, err := s.client.do(req, sa)
+	resp, err := s.client.do(req, &sa)
 	return resp, &sa, err
 }
 
@@ -50,7 +50,7 @@ func (s *shippingAddressesImpl) Update(accountCode string, shippingAddressID str
 	}
 
 	var sa ShippingAddress
-	resp, err := s.client.do(req, sa)
+	resp, err := s.client.do(req, &sa)
 	return resp, &sa, err
 }
 
