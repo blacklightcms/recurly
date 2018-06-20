@@ -236,24 +236,20 @@ func TestPurchases_Create(t *testing.T) {
 		</invoice_collection>`)
 	})
 
+	expectedInvoiceNumber := 2531
+	expectedTax := 111
+	expectedTotal := 1411
+
 	r, invs, err := client.Purchases.Create(recurly.Purchase{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
 		t.Fatal("expected preview subscription to return OK")
-	}
-
-	expectedInvoiceNumber := 2531
-	expectedTax := 111
-	expectedTotal := 1411
-
-	if invs.ChargeInvoice.InvoiceNumber != expectedInvoiceNumber {
-		t.Errorf("expected invoice number %d; got %d\n", expectedInvoiceNumber, invs.ChargeInvoice.InvoiceNumber)
-	}
-	if invs.ChargeInvoice.TaxInCents != expectedTax {
-		t.Errorf("expected tax %d; got %d\n", expectedTax, invs.ChargeInvoice.TaxInCents)
-	}
-	if invs.ChargeInvoice.TotalInCents != expectedTotal {
-		t.Errorf("expected total %d; got %d\n", expectedTotal, invs.ChargeInvoice.TotalInCents)
+	} else if invs.ChargeInvoice.InvoiceNumber != expectedInvoiceNumber {
+		t.Fatalf("expected invoice number %d; got %d\n", expectedInvoiceNumber, invs.ChargeInvoice.InvoiceNumber)
+	} else if invs.ChargeInvoice.TaxInCents != expectedTax {
+		t.Fatalf("expected tax %d; got %d\n", expectedTax, invs.ChargeInvoice.TaxInCents)
+	} else if invs.ChargeInvoice.TotalInCents != expectedTotal {
+		t.Fatalf("expected total %d; got %d\n", expectedTotal, invs.ChargeInvoice.TotalInCents)
 	}
 }
