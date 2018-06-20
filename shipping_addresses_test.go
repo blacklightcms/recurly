@@ -111,7 +111,6 @@ func TestShippingAddress_ListAccount(t *testing.T) {
 	}); diff != "" {
 		t.Fatal(diff)
 	}
-
 }
 
 func TestShippingAddress_Create(t *testing.T) {
