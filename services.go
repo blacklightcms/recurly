@@ -87,6 +87,15 @@ type RedemptionsService interface {
 	Delete(accountCode string) (*Response, error)
 }
 
+// ShippingAddressesService represents the interactions available for shipping addresses.
+type ShippingAddressesService interface {
+	ListAccount(accountCode string, params Params) (*Response, []ShippingAddress, error)
+	Create(accountCode string, address ShippingAddress) (*Response, *ShippingAddress, error)
+	Update(accountCode string, shippingAddressID string, address ShippingAddress) (*Response, *ShippingAddress, error)
+	Delete(accountCode string, shippingAddressID string) (*Response, error)
+	GetSubscriptions(accountCode string, shippingAddressID string) (*Response, []Subscription, error)
+}
+
 // SubscriptionsService represents the interactinos available for subscriptions.
 type SubscriptionsService interface {
 	List(params Params) (*Response, []Subscription, error)

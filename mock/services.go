@@ -421,6 +421,50 @@ func (m *RedemptionsService) Delete(accountCode string) (*recurly.Response, erro
 	return m.OnDelete(accountCode)
 }
 
+var _ recurly.ShippingAddressesService = &ShippingAddressesService{}
+
+type ShippingAddressesService struct {
+	OnListAccount      func(accountCode string, params recurly.Params) (*recurly.Response, []recurly.ShippingAddress, error)
+	ListAccountInvoked bool
+
+	OnCreate      func(accountCode string, address recurly.ShippingAddress) (*recurly.Response, *recurly.ShippingAddress, error)
+	CreateInvoked bool
+
+	OnUpdate      func(accountCode string, shippingAddressID string, address recurly.ShippingAddress) (*recurly.Response, *recurly.ShippingAddress, error)
+	UpdateInvoked bool
+
+	OnDelete      func(accountCode string, shippingAddressID string) (*recurly.Response, error)
+	DeleteInvoked bool
+
+	OnGetSubscriptions      func(accountCode string, shippingAddress string) (*recurly.Response, []recurly.Subscription, error)
+	GetSubscriptionsInvoked bool
+}
+
+func (s *ShippingAddressesService) ListAccount(accountCode string, params recurly.Params) (*recurly.Response, []recurly.ShippingAddress, error) {
+	s.ListAccountInvoked = true
+	return s.OnListAccount(accountCode, params)
+}
+
+func (s *ShippingAddressesService) Create(accountCode string, address recurly.ShippingAddress) (*recurly.Response, *recurly.ShippingAddress, error) {
+	s.CreateInvoked = true
+	return s.OnCreate(accountCode, address)
+}
+
+func (s *ShippingAddressesService) Update(accountCode string, shippingAddressID string, address recurly.ShippingAddress) (*recurly.Response, *recurly.ShippingAddress, error) {
+	s.UpdateInvoked = true
+	return s.OnUpdate(accountCode, shippingAddressID, address)
+}
+
+func (s *ShippingAddressesService) Delete(accountCode string, shippingAddressID string) (*recurly.Response, error) {
+	s.DeleteInvoked = true
+	return s.Delete(accountCode, shippingAddressID)
+}
+
+func (s *ShippingAddressesService) GetSubscriptions(accountCode string, shippingAddress string) (*recurly.Response, []recurly.Subscription, error) {
+	s.GetSubscriptionsInvoked = true
+	return s.GetSubscriptions(accountCode, shippingAddress)
+}
+
 var _ recurly.TransactionsService = &TransactionsService{}
 
 // TransactionsService mocks the transaction service.
@@ -504,10 +548,10 @@ type SubscriptionsService struct {
 	OnPostpone      func(uuid string, dt time.Time, bulk bool) (*recurly.Response, *recurly.Subscription, error)
 	PostponeInvoked bool
 
-	OnPause func(uuid string, cycles int) (*recurly.Response, *recurly.Subscription, error)
+	OnPause      func(uuid string, cycles int) (*recurly.Response, *recurly.Subscription, error)
 	PauseInvoked bool
 
-	OnResume func(uuid string) (*recurly.Response, *recurly.Subscription, error)
+	OnResume      func(uuid string) (*recurly.Response, *recurly.Subscription, error)
 	ResumeInvoked bool
 }
 
