@@ -2,8 +2,7 @@ package recurly
 
 import "encoding/xml"
 
-// Credit payment action constants
-// https://docs.recurly.com/docs/credit-invoices-release#section-credit-payment-actions
+// Credit payment action constants.
 const (
 	CreditPaymentActionPayment   = "payment" // applying the credit
 	CreditPaymentActionGiftCard  = "gift_card"
