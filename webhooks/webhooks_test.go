@@ -424,6 +424,7 @@ func TestParse_SuccessfulPaymentNotification(t *testing.T) {
 			UUID:          "a5143c1d3a6f4a8287d0e2cc1d4c0427",
 			InvoiceNumber: 2059,
 			Action:        "purchase",
+			PaymentMethod: "credit_card",
 			AmountInCents: 1000,
 			Status:        "success",
 			Message:       "Bogus Gateway: Forced success",
