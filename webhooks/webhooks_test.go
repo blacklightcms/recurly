@@ -462,6 +462,7 @@ func TestParse_FailedPaymentNotification(t *testing.T) {
 			InvoiceNumber:    2059,
 			SubscriptionUUID: "1974a098jhlkjasdfljkha898326881c",
 			Action:           "purchase",
+			PaymentMethod:    "credit_card",
 			AmountInCents:    1000,
 			Status:           "Declined",
 			Message:          "This transaction has been declined",
