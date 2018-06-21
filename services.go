@@ -66,7 +66,8 @@ type InvoicesService interface {
 	Collect(invoiceNumber int) (*Response, *Invoice, error)
 	MarkPaid(invoiceNumber int) (*Response, *Invoice, error)
 	MarkFailed(invoiceNumber int) (*Response, *Invoice, error)
-	RefundVoidOpenAmount(invoiceNumber int, amountInCents int, refundApplyOrder string) (*Response, *Invoice, error)
+	RefundVoidOpenAmount(invoiceNumber int, amountInCents int, refundMethod string) (*Response, *Invoice, error)
+	VoidCreditInvoice(invoiceNumber int) (*Response, *Invoice, error)
 	RecordPayment(offlinePayment OfflinePayment) (*Response, *Transaction, error)
 }
 
@@ -122,4 +123,11 @@ type TransactionsService interface {
 	ListAccount(accountCode string, params Params) (*Response, []Transaction, error)
 	Get(uuid string) (*Response, *Transaction, error)
 	Create(t Transaction) (*Response, *Transaction, error)
+}
+
+// CreditPaymentsService represents the interactions available for credit payments.
+type CreditPaymentsService interface {
+	List(params Params) (*Response, []CreditPayment, error)
+	ListAccount(accountCode string, params Params) (*Response, []CreditPayment, error)
+	Get(uuid string) (*Response, *CreditPayment, error)
 }

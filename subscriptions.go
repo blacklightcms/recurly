@@ -76,66 +76,22 @@ type Subscription struct {
 // UnmarshalXML unmarshals transactions and handles intermediary state during unmarshaling
 // for types like href.
 func (s *Subscription) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	type subscriptionAlias Subscription
 	var v struct {
-		XMLName                xml.Name             `xml:"subscription"`
-		Plan                   NestedPlan           `xml:"plan,omitempty"`
-		AccountCode            hrefString           `xml:"account"`
-		InvoiceNumber          hrefInt              `xml:"invoice"`
-		UUID                   string               `xml:"uuid,omitempty"`
-		State                  string               `xml:"state,omitempty"`
-		UnitAmountInCents      int                  `xml:"unit_amount_in_cents,omitempty"`
-		Currency               string               `xml:"currency,omitempty"`
-		Quantity               int                  `xml:"quantity,omitempty"`
-		TotalAmountInCents     int                  `xml:"total_amount_in_cents,omitempty"`
-		ActivatedAt            NullTime             `xml:"activated_at,omitempty"`
-		CanceledAt             NullTime             `xml:"canceled_at,omitempty"`
-		ExpiresAt              NullTime             `xml:"expires_at,omitempty"`
-		CurrentPeriodStartedAt NullTime             `xml:"current_period_started_at,omitempty"`
-		CurrentPeriodEndsAt    NullTime             `xml:"current_period_ends_at,omitempty"`
-		TrialStartedAt         NullTime             `xml:"trial_started_at,omitempty"`
-		TrialEndsAt            NullTime             `xml:"trial_ends_at,omitempty"`
-		TaxInCents             int                  `xml:"tax_in_cents,omitempty"`
-		TaxType                string               `xml:"tax_type,omitempty"`
-		TaxRegion              string               `xml:"tax_region,omitempty"`
-		TaxRate                float64              `xml:"tax_rate,omitempty"`
-		PONumber               string               `xml:"po_number,omitempty"`
-		NetTerms               NullInt              `xml:"net_terms,omitempty"`
-		SubscriptionAddOns     []SubscriptionAddOn  `xml:"subscription_add_ons>subscription_add_on,omitempty"`
-		PendingSubscription    *PendingSubscription `xml:"pending_subscription,omitempty"`
-		InvoiceCollection      *InvoiceCollection   `xml:"invoice_collection"`
-		RemainingPauseCycles   int                  `xml:"remaining_pause_cycles,omitempty"`
+		subscriptionAlias
+		XMLName           xml.Name           `xml:"subscription"`
+		AccountCode       hrefString         `xml:"account"`
+		InvoiceNumber     hrefInt            `xml:"invoice"`
+		InvoiceCollection *InvoiceCollection `xml:"invoice_collection"`
 	}
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err
 	}
-	*s = Subscription{
-		XMLName:                v.XMLName,
-		Plan:                   v.Plan,
-		AccountCode:            string(v.AccountCode),
-		InvoiceNumber:          int(v.InvoiceNumber),
-		UUID:                   v.UUID,
-		State:                  v.State,
-		UnitAmountInCents:      v.UnitAmountInCents,
-		Currency:               v.Currency,
-		Quantity:               v.Quantity,
-		TotalAmountInCents:     v.TotalAmountInCents,
-		ActivatedAt:            v.ActivatedAt,
-		CanceledAt:             v.CanceledAt,
-		ExpiresAt:              v.ExpiresAt,
-		CurrentPeriodStartedAt: v.CurrentPeriodStartedAt,
-		CurrentPeriodEndsAt:    v.CurrentPeriodEndsAt,
-		TrialStartedAt:         v.TrialStartedAt,
-		TrialEndsAt:            v.TrialEndsAt,
-		TaxInCents:             v.TaxInCents,
-		TaxType:                v.TaxType,
-		TaxRegion:              v.TaxRegion,
-		TaxRate:                v.TaxRate,
-		PONumber:               v.PONumber,
-		NetTerms:               v.NetTerms,
-		SubscriptionAddOns:     v.SubscriptionAddOns,
-		PendingSubscription:    v.PendingSubscription,
-		RemainingPauseCycles:   v.RemainingPauseCycles,
-	}
+	*s = Subscription(v.subscriptionAlias)
+	s.XMLName = v.XMLName
+	s.AccountCode = string(v.AccountCode)
+	s.InvoiceNumber = int(v.InvoiceNumber)
+
 	if v.InvoiceCollection != nil {
 		s.Invoice = v.InvoiceCollection.ChargeInvoice
 	}

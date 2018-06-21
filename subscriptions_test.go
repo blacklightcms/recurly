@@ -800,13 +800,12 @@ func TestSubscriptions_Create_TransactionError(t *testing.T) {
 	} else if newSubscription.Transaction == nil {
 		t.Fatal("expected transaction to be set")
 	} else if diff := cmp.Diff(newSubscription.Transaction, &recurly.Transaction{
-		UUID:             "3c42a3ecc46a7aa602602e4033b9c2e6",
-		SubscriptionUUID: "3c42a3ebabdc022739d5a646408291a6",
-		Action:           "purchase",
-		AmountInCents:    5274,
-		Currency:         "USD",
-		Status:           "declined",
-		PaymentMethod:    "credit_card",
+		UUID:          "3c42a3ecc46a7aa602602e4033b9c2e6",
+		Action:        "purchase",
+		AmountInCents: 5274,
+		Currency:      "USD",
+		Status:        "declined",
+		PaymentMethod: "credit_card",
 		TransactionError: &recurly.TransactionError{
 			XMLName:         xml.Name{Local: "transaction_error"},
 			ErrorCode:       "declined_saveable",

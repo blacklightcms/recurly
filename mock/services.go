@@ -279,8 +279,11 @@ type InvoicesService struct {
 	OnMarkFailed      func(invoiceNumber int) (*recurly.Response, *recurly.Invoice, error)
 	MarkFailedInvoked bool
 
-	OnRefundVoidOpenAmount      func(invoiceNumber int, amountInCents int, refundApplyOrder string) (*recurly.Response, *recurly.Invoice, error)
+	OnRefundVoidOpenAmount      func(invoiceNumber int, amountInCents int, refundMethod string) (*recurly.Response, *recurly.Invoice, error)
 	RefundVoidOpenAmountInvoked bool
+
+	OnVoidCreditInvoice      func(invoiceNumber int) (*recurly.Response, *recurly.Invoice, error)
+	VoidCreditInvoiceInvoked bool
 
 	OnRecordPayment      func(pmt recurly.OfflinePayment) (*recurly.Response, *recurly.Transaction, error)
 	RecordPaymentInvoked bool
@@ -331,9 +334,14 @@ func (m *InvoicesService) MarkFailed(invoiceNumber int) (*recurly.Response, *rec
 	return m.OnMarkFailed(invoiceNumber)
 }
 
-func (m *InvoicesService) RefundVoidOpenAmount(invoiceNumber int, amountInCents int, refundApplyOrder string) (*recurly.Response, *recurly.Invoice, error) {
+func (m *InvoicesService) RefundVoidOpenAmount(invoiceNumber int, amountInCents int, refundMethod string) (*recurly.Response, *recurly.Invoice, error) {
 	m.RefundVoidOpenAmountInvoked = true
-	return m.OnRefundVoidOpenAmount(invoiceNumber, amountInCents, refundApplyOrder)
+	return m.OnRefundVoidOpenAmount(invoiceNumber, amountInCents, refundMethod)
+}
+
+func (m *InvoicesService) VoidCreditInvoice(invoiceNumber int) (*recurly.Response, *recurly.Invoice, error) {
+	m.VoidCreditInvoiceInvoked = true
+	return m.OnVoidCreditInvoice(invoiceNumber)
 }
 
 func (m *InvoicesService) RecordPayment(pmt recurly.OfflinePayment) (*recurly.Response, *recurly.Transaction, error) {
@@ -633,4 +641,33 @@ func (m *SubscriptionsService) Pause(uuid string, cycles int) (*recurly.Response
 func (m *SubscriptionsService) Resume(uuid string) (*recurly.Response, *recurly.Subscription, error) {
 	m.ResumeInvoked = true
 	return m.OnResume(uuid)
+}
+
+var _ recurly.CreditPaymentsService = &CreditPaymentsService{}
+
+// CreditPaymentsService represents the interactions available for credit payments.
+type CreditPaymentsService struct {
+	OnList      func(params recurly.Params) (*recurly.Response, []recurly.CreditPayment, error)
+	ListInvoked bool
+
+	OnListAccount      func(code string, params recurly.Params) (*recurly.Response, []recurly.CreditPayment, error)
+	ListAccountInvoked bool
+
+	OnGet      func(uuid string) (*recurly.Response, *recurly.CreditPayment, error)
+	GetInvoked bool
+}
+
+func (m *CreditPaymentsService) List(params recurly.Params) (*recurly.Response, []recurly.CreditPayment, error) {
+	m.ListInvoked = true
+	return m.OnList(params)
+}
+
+func (m *CreditPaymentsService) ListAccount(code string, params recurly.Params) (*recurly.Response, []recurly.CreditPayment, error) {
+	m.ListAccountInvoked = true
+	return m.OnListAccount(code, params)
+}
+
+func (m *CreditPaymentsService) Get(uuid string) (*recurly.Response, *recurly.CreditPayment, error) {
+	m.GetInvoked = true
+	return m.OnGet(uuid)
 }
