@@ -53,9 +53,6 @@ func (c *CreditPayment) UnmarshalXML(d *xml.Decoder, start xml.StartElement) err
 	c.AppliedToInvoice = int(v.AppliedToInvoice)
 	c.OriginalCreditPaymentUUID = string(v.OriginalCreditPayment)
 	c.RefundTransactionUUID = string(v.RefundTransaction)
-	c.CreatedAt = v.CreatedAt
-	c.UpdatedAt = v.UpdatedAt
-	c.VoidedAt = v.VoidedAt
 
 	return nil
 }
