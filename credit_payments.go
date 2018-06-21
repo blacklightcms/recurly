@@ -17,55 +17,45 @@ const (
 type CreditPayment struct {
 	XMLName                   xml.Name `xml:"credit_payment"`
 	AccountCode               string   `xml:"-"`
-	UUID                      string   `xml:"-"`
-	Action                    string   `xml:"-"`
-	Currency                  string   `xml:"-"`
-	AmountInCents             int      `xml:"-"`
+	UUID                      string   `xml:"uuid"`
+	Action                    string   `xml:"action"`
+	Currency                  string   `xml:"currency"`
+	AmountInCents             int      `xml:"amount_in_cents"`
 	OriginalInvoiceNumber     int      `xml:"-"`
 	AppliedToInvoice          int      `xml:"-"`
 	OriginalCreditPaymentUUID string   `xml:"-"`
 	RefundTransactionUUID     string   `xml:"-"`
-	CreatedAt                 NullTime `xml:"-"`
-	UpdatedAt                 NullTime `xml:"-"`
-	VoidedAt                  NullTime `xml:"-"`
+	CreatedAt                 NullTime `xml:"created_at"`
+	UpdatedAt                 NullTime `xml:"updated_at,omitempty"`
+	VoidedAt                  NullTime `xml:"voided_at,omitempty"`
 }
 
 // UnmarshalXML unmarshals invoices and handles intermediary state during unmarshaling
 // for types like href.
 func (c *CreditPayment) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	type creditPaymentAlias CreditPayment
 	var v struct {
-		XMLName               xml.Name   `xml:"credit_payment"`
+		XMLName xml.Name `xml:"credit_payment"`
+		creditPaymentAlias
 		AccountCode           hrefString `xml:"account"`
-		UUID                  string     `xml:"uuid"`
-		Action                string     `xml:"action"`
-		Currency              string     `xml:"currency"`
-		AmountInCents         int        `xml:"amount_in_cents"`
 		OriginalInvoiceNumber hrefInt    `xml:"original_invoice"`
 		AppliedToInvoice      hrefInt    `xml:"applied_to_invoice"`
 		OriginalCreditPayment hrefString `xml:"original_credit_payment,omitempty"`
 		RefundTransaction     hrefString `xml:"refund_transaction,omitempty"`
-		CreatedAt             NullTime   `xml:"created_at"`
-		UpdatedAt             NullTime   `xml:"updated_at,omitempty"`
-		VoidedAt              NullTime   `xml:"voided_at,omitempty"`
 	}
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err
 	}
-	*c = CreditPayment{
-		XMLName:                   v.XMLName,
-		AccountCode:               string(v.AccountCode),
-		UUID:                      v.UUID,
-		Action:                    v.Action,
-		Currency:                  v.Currency,
-		AmountInCents:             v.AmountInCents,
-		OriginalInvoiceNumber:     int(v.OriginalInvoiceNumber),
-		AppliedToInvoice:          int(v.AppliedToInvoice),
-		OriginalCreditPaymentUUID: string(v.OriginalCreditPayment),
-		RefundTransactionUUID:     string(v.RefundTransaction),
-		CreatedAt:                 v.CreatedAt,
-		UpdatedAt:                 v.UpdatedAt,
-		VoidedAt:                  v.VoidedAt,
-	}
+	*c = CreditPayment(v.creditPaymentAlias)
+	c.XMLName = v.XMLName
+	c.AccountCode = string(v.AccountCode)
+	c.OriginalInvoiceNumber = int(v.OriginalInvoiceNumber)
+	c.AppliedToInvoice = int(v.AppliedToInvoice)
+	c.OriginalCreditPaymentUUID = string(v.OriginalCreditPayment)
+	c.RefundTransactionUUID = string(v.RefundTransaction)
+	c.CreatedAt = v.CreatedAt
+	c.UpdatedAt = v.UpdatedAt
+	c.VoidedAt = v.VoidedAt
 
 	return nil
 }
