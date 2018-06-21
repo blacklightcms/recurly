@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strconv"
 	"testing"
 	"time"
 
@@ -35,13 +36,15 @@ func TestAdjustments_Encoding(t *testing.T) {
 		{v: recurly.Adjustment{StartDate: recurly.NullTime{Time: &now}, EndDate: recurly.NullTime{Time: &now}, UnitAmountInCents: 2000, Currency: "USD"}, expected: "<adjustment><unit_amount_in_cents>2000</unit_amount_in_cents><currency>USD</currency><start_date>2000-01-01T00:00:00Z</start_date><end_date>2000-01-01T00:00:00Z</end_date></adjustment>"},
 	}
 
-	for _, tt := range tests {
-		var buf bytes.Buffer
-		if err := xml.NewEncoder(&buf).Encode(tt.v); err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		} else if buf.String() != tt.expected {
-			t.Fatalf("unexpected value: %s", buf.String())
-		}
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			var buf bytes.Buffer
+			if err := xml.NewEncoder(&buf).Encode(tt.v); err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			} else if buf.String() != tt.expected {
+				t.Fatalf("unexpected value: %s\nexpected: %s", buf.String(), tt.expected)
+			}
+		})
 	}
 }
 

@@ -28,6 +28,7 @@ func NewClient(httpClient *http.Client) *recurly.Client {
 	client.Subscriptions = &SubscriptionsService{}
 	client.Transactions = &TransactionsService{}
 	client.CreditPayments = &CreditPaymentsService{}
+	client.Purchases = &PurchasesService{}
 
 	return client
 }

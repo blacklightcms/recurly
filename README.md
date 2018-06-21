@@ -72,6 +72,7 @@ The services are (each link to the GoDoc documentation):
  * [Redemptions](https://godoc.org/github.com/blacklightcms/recurly#RedemptionsService)
  * [Subscriptions](https://godoc.org/github.com/blacklightcms/recurly#SubscriptionsService)
  * [Transactions](https://godoc.org/github.com/blacklightcms/recurly#TransactionsService)
+ * [Purchases](https://godoc.org/github.com/blacklightcms/recurly#PurchasesService)
 
 Each of the services correspond to their respective sections in the
 [Recurly API Documentation](https://dev.recurly.com/docs/).

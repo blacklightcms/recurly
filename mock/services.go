@@ -671,3 +671,15 @@ func (m *CreditPaymentsService) Get(uuid string) (*recurly.Response, *recurly.Cr
 	m.GetInvoked = true
 	return m.OnGet(uuid)
 }
+
+var _ recurly.PurchasesService = &PurchasesService{}
+
+type PurchasesService struct {
+	OnCreate      func(p recurly.Purchase) (*recurly.Response, *recurly.InvoiceCollection, error)
+	CreateInvoked bool
+}
+
+func (m *PurchasesService) Create(p recurly.Purchase) (*recurly.Response, *recurly.InvoiceCollection, error) {
+	m.CreateInvoked = true
+	return m.OnCreate(p)
+}

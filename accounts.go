@@ -7,22 +7,23 @@ import (
 
 // Account represents an individual account on your site
 type Account struct {
-	XMLName               xml.Name `xml:"account"`
-	Code                  string   `xml:"account_code,omitempty"`
-	State                 string   `xml:"state,omitempty"`
-	Username              string   `xml:"username,omitempty"`
-	Email                 string   `xml:"email,omitempty"`
-	FirstName             string   `xml:"first_name,omitempty"`
-	LastName              string   `xml:"last_name,omitempty"`
-	CompanyName           string   `xml:"company_name,omitempty"`
-	VATNumber             string   `xml:"vat_number,omitempty"`
-	TaxExempt             NullBool `xml:"tax_exempt,omitempty"`
-	BillingInfo           *Billing `xml:"billing_info,omitempty"`
-	Address               Address  `xml:"address,omitempty"`
-	AcceptLanguage        string   `xml:"accept_language,omitempty"`
-	HostedLoginToken      string   `xml:"hosted_login_token,omitempty"`
-	CreatedAt             NullTime `xml:"created_at,omitempty"`
-	HasPausedSubscription bool     `xml:"has_paused_subscription,omitempty"`
+	XMLName               xml.Name           `xml:"account"`
+	Code                  string             `xml:"account_code,omitempty"`
+	State                 string             `xml:"state,omitempty"`
+	Username              string             `xml:"username,omitempty"`
+	Email                 string             `xml:"email,omitempty"`
+	FirstName             string             `xml:"first_name,omitempty"`
+	LastName              string             `xml:"last_name,omitempty"`
+	CompanyName           string             `xml:"company_name,omitempty"`
+	VATNumber             string             `xml:"vat_number,omitempty"`
+	TaxExempt             NullBool           `xml:"tax_exempt,omitempty"`
+	BillingInfo           *Billing           `xml:"billing_info,omitempty"`
+	Address               Address            `xml:"address,omitempty"`
+	AcceptLanguage        string             `xml:"accept_language,omitempty"`
+	HostedLoginToken      string             `xml:"hosted_login_token,omitempty"`
+	CreatedAt             NullTime           `xml:"created_at,omitempty"`
+	HasPausedSubscription bool               `xml:"has_paused_subscription,omitempty"`
+	ShippingAddresses     *[]ShippingAddress `xml:"shipping_addresses>shipping_address,omitempty"`
 }
 
 // AccountBalance is used for getting the account balance.
