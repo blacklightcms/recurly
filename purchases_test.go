@@ -29,7 +29,17 @@ func TestPurchases_Purchase_Encoding(t *testing.T) {
 				VATReverseChargeNotes: "Vat reverse charge notes.",
 				Account: recurly.Account{
 					Code: "c442b36c-c64f-41d7-b8e1-9c04e7a6ff82",
-					// ShippingAddresses: []recurly.ShippingAddress{},
+					ShippingAddresses: &[]recurly.ShippingAddress{
+						recurly.ShippingAddress{
+							FirstName: "Lon",
+							LastName:  "Doner",
+							Address:   "221B Baker St.",
+							City:      "London",
+							Zip:       "W1K 6AH",
+							Country:   "GB",
+							Nickname:  "Home",
+						},
+					},
 					BillingInfo: &recurly.Billing{
 						Address:   "400 Alabama St",
 						City:      "San Francisco",
@@ -60,9 +70,8 @@ func TestPurchases_Purchase_Encoding(t *testing.T) {
 			},
 			expected: "<purchase>" +
 				"<account><account_code>c442b36c-c64f-41d7-b8e1-9c04e7a6ff82</account_code>" +
-				// TODO: ShippingAddresses not yet modeled
-				// "<shipping_addresses><shipping_address><name>Lon Doner</name><address1>221B Baker St.</address1><city>London</city><state></state><zip>W1K 6AH</zip><country>GB</country><nickname>Home</nickname></shipping_address></shipping_addresses>" +
 				"<billing_info><first_name>Benjamin</first_name><last_name>Du Monde</last_name><address1>400 Alabama St</address1><city>San Francisco</city><state>CA</state><zip>94110</zip><country>US</country><number>4111111111111111</number><month>12</month><year>2019</year></billing_info>" +
+				"<shipping_addresses><shipping_address><first_name>Lon</first_name><last_name>Doner</last_name><nickname>Home</nickname><address1>221B Baker St.</address1><address2></address2><city>London</city><state></state><zip>W1K 6AH</zip><country>GB</country></shipping_address></shipping_addresses>" +
 				"</account>" +
 				"<adjustments><adjustment>" +
 				"<description>Description of this adjustment</description><product_code>4549449c-5870-4845-b672-1d07f15e87dd</product_code><unit_amount_in_cents>1000</unit_amount_in_cents><quantity>1</quantity><currency></currency>" +
