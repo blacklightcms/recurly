@@ -71,6 +71,7 @@ type Subscription struct {
 	PendingSubscription    *PendingSubscription `xml:"pending_subscription,omitempty"`
 	Invoice                *Invoice             `xml:"-"`
 	RemainingPauseCycles   int                  `xml:"remaining_pause_cycles,omitempty"`
+	CollectionMethod       string               `xml:"collection_method"` 
 }
 
 // UnmarshalXML unmarshals transactions and handles intermediary state during unmarshaling
