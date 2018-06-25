@@ -18,5 +18,5 @@ type Purchase struct {
 	CustomerNotes         string            `xml:"customer_notes,omitempty"`
 	TermsAndConditions    string            `xml:"terms_and_conditions,omitempty"`
 	VATReverseChargeNotes string            `xml:"vat_reverse_charge_notes,omitempty"`
-	ShippingAddressID     int               `xml:"shipping_address_id,omitempty"`
+	ShippingAddressID     string            `xml:"shipping_address_id,omitempty"`
 }
