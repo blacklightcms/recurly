@@ -162,7 +162,7 @@ func TestParse_NewSubscriptionNotification(t *testing.T) {
 			ExpiresAt:              recurly.NewTime(expiresTs),
 			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
 			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
-			CollectionMethod:       "automatic",
+			CollectionMethod:       recurly.CollectionMethodAutomatic,
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -206,7 +206,7 @@ func TestParse_UpdatedSubscriptionNotification(t *testing.T) {
 			ExpiresAt:              recurly.NewTime(expiresTs),
 			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
 			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
-			CollectionMethod:       "automatic",
+			CollectionMethod:       recurly.CollectionMethodAutomatic,
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -247,7 +247,7 @@ func TestParse_RenewedSubscriptionNotification(t *testing.T) {
 			ActivatedAt:            recurly.NewTime(activatedTs),
 			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
 			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
-			CollectionMethod:       "automatic",
+			CollectionMethod:       recurly.CollectionMethodAutomatic,
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -291,7 +291,7 @@ func TestParse_ExpiredSubscriptionNotification(t *testing.T) {
 			ExpiresAt:              recurly.NewTime(expiresTs),
 			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
 			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
-			CollectionMethod:       "automatic",
+			CollectionMethod:       recurly.CollectionMethodAutomatic,
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -335,7 +335,7 @@ func TestParse_CanceledSubscriptionNotification(t *testing.T) {
 			ExpiresAt:              recurly.NewTime(expiresTs),
 			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
 			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
-			CollectionMethod:       "automatic",
+			CollectionMethod:       recurly.CollectionMethodAutomatic,
 		},
 	}); diff != "" {
 		t.Fatal(diff)
