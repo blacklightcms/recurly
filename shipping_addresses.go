@@ -8,7 +8,7 @@ import (
 type ShippingAddress struct {
 	XMLName     xml.Name `xml:"shipping_address"`
 	AccountCode string   `xml:"account,omitempty"`
-	ID          string   `xml:"id,omitempty"`
+	ID          int64    `xml:"id,omitempty"`
 	FirstName   string   `xml:"first_name"`
 	LastName    string   `xml:"last_name"`
 	Nickname    string   `xml:"nickname,omitempty"`

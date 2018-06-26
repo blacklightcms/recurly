@@ -438,13 +438,13 @@ type ShippingAddressesService struct {
 	OnCreate      func(accountCode string, address recurly.ShippingAddress) (*recurly.Response, *recurly.ShippingAddress, error)
 	CreateInvoked bool
 
-	OnUpdate      func(accountCode string, shippingAddressID string, address recurly.ShippingAddress) (*recurly.Response, *recurly.ShippingAddress, error)
+	OnUpdate      func(accountCode string, shippingAddressID int64, address recurly.ShippingAddress) (*recurly.Response, *recurly.ShippingAddress, error)
 	UpdateInvoked bool
 
-	OnDelete      func(accountCode string, shippingAddressID string) (*recurly.Response, error)
+	OnDelete      func(accountCode string, shippingAddressID int64) (*recurly.Response, error)
 	DeleteInvoked bool
 
-	OnGetSubscriptions      func(accountCode string, shippingAddress string) (*recurly.Response, []recurly.Subscription, error)
+	OnGetSubscriptions      func(accountCode string, shippingAddress int64) (*recurly.Response, []recurly.Subscription, error)
 	GetSubscriptionsInvoked bool
 }
 
@@ -458,17 +458,17 @@ func (s *ShippingAddressesService) Create(accountCode string, address recurly.Sh
 	return s.OnCreate(accountCode, address)
 }
 
-func (s *ShippingAddressesService) Update(accountCode string, shippingAddressID string, address recurly.ShippingAddress) (*recurly.Response, *recurly.ShippingAddress, error) {
+func (s *ShippingAddressesService) Update(accountCode string, shippingAddressID int64, address recurly.ShippingAddress) (*recurly.Response, *recurly.ShippingAddress, error) {
 	s.UpdateInvoked = true
 	return s.OnUpdate(accountCode, shippingAddressID, address)
 }
 
-func (s *ShippingAddressesService) Delete(accountCode string, shippingAddressID string) (*recurly.Response, error) {
+func (s *ShippingAddressesService) Delete(accountCode string, shippingAddressID int64) (*recurly.Response, error) {
 	s.DeleteInvoked = true
 	return s.Delete(accountCode, shippingAddressID)
 }
 
-func (s *ShippingAddressesService) GetSubscriptions(accountCode string, shippingAddress string) (*recurly.Response, []recurly.Subscription, error) {
+func (s *ShippingAddressesService) GetSubscriptions(accountCode string, shippingAddress int64) (*recurly.Response, []recurly.Subscription, error) {
 	s.GetSubscriptionsInvoked = true
 	return s.GetSubscriptions(accountCode, shippingAddress)
 }

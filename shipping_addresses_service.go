@@ -42,8 +42,8 @@ func (s *shippingAddressesImpl) Create(accountCode string, shippingAddress Shipp
 }
 
 // Update requests an update to an existing shipping address.
-func (s *shippingAddressesImpl) Update(accountCode string, shippingAddressID string, shippingAddress ShippingAddress) (*Response, *ShippingAddress, error) {
-	action := fmt.Sprintf("accounts/%s/shipping_addresses/%s", accountCode, shippingAddressID)
+func (s *shippingAddressesImpl) Update(accountCode string, shippingAddressID int64, shippingAddress ShippingAddress) (*Response, *ShippingAddress, error) {
+	action := fmt.Sprintf("accounts/%s/shipping_addresses/%d", accountCode, shippingAddressID)
 	req, err := s.client.newRequest("PUT", action, nil, shippingAddress)
 	if err != nil {
 		return nil, nil, err
@@ -55,8 +55,8 @@ func (s *shippingAddressesImpl) Update(accountCode string, shippingAddressID str
 }
 
 // Delete removes a shipping address from an account.
-func (s *shippingAddressesImpl) Delete(accountCode string, shippingAddressID string) (*Response, error) {
-	action := fmt.Sprintf("accounts/%s/shipping_addresses/%s", accountCode, shippingAddressID)
+func (s *shippingAddressesImpl) Delete(accountCode string, shippingAddressID int64) (*Response, error) {
+	action := fmt.Sprintf("accounts/%s/shipping_addresses/%d", accountCode, shippingAddressID)
 	req, err := s.client.newRequest("DELETE", action, nil, nil)
 	if err != nil {
 		return nil, err
@@ -66,8 +66,8 @@ func (s *shippingAddressesImpl) Delete(accountCode string, shippingAddressID str
 }
 
 // GetSubscriptions fetches the subscriptions associated with a shipping address.
-func (s *shippingAddressesImpl) GetSubscriptions(accountCode string, shippingAddressID string) (*Response, []Subscription, error) {
-	action := fmt.Sprintf("accounts/%s/shipping_addresses/%s/subscriptions", accountCode, shippingAddressID)
+func (s *shippingAddressesImpl) GetSubscriptions(accountCode string, shippingAddressID int64) (*Response, []Subscription, error) {
+	action := fmt.Sprintf("accounts/%s/shipping_addresses/%d/subscriptions", accountCode, shippingAddressID)
 	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err

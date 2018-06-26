@@ -88,6 +88,10 @@ func TestPurchases_Purchase_Encoding(t *testing.T) {
 				"<vat_reverse_charge_notes>Vat reverse charge notes.</vat_reverse_charge_notes>" +
 				"</purchase>",
 		},
+		{
+			v:        recurly.Purchase{ShippingAddressID: 2438622711411416831},
+			expected: "<purchase><account></account><adjustments></adjustments><currency></currency><gift_card></gift_card><coupon_codes></coupon_codes><subscriptions></subscriptions><shipping_address_id>2438622711411416831</shipping_address_id></purchase>",
+		},
 	}
 
 	for i, tt := range tests {
