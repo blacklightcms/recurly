@@ -25,7 +25,7 @@ func TestAdjustments_Encoding(t *testing.T) {
 		expected string
 	}{
 		// Unit amount in cents and currency are required fields. They should always be present.
-		{v: recurly.Adjustment{}, expected: "<adjustment><unit_amount_in_cents>0</unit_amount_in_cents><currency></currency></adjustment>"},
+		{v: recurly.Adjustment{}, expected: "<adjustment><unit_amount_in_cents>0</unit_amount_in_cents></adjustment>"},
 		{v: recurly.Adjustment{UnitAmountInCents: 2000, Currency: "USD"}, expected: "<adjustment><unit_amount_in_cents>2000</unit_amount_in_cents><currency>USD</currency></adjustment>"},
 		{v: recurly.Adjustment{Description: "Charge for extra bandwidth", ProductCode: "bandwidth", UnitAmountInCents: 2000, Currency: "USD"}, expected: "<adjustment><description>Charge for extra bandwidth</description><product_code>bandwidth</product_code><unit_amount_in_cents>2000</unit_amount_in_cents><currency>USD</currency></adjustment>"},
 		{v: recurly.Adjustment{Quantity: 1, UnitAmountInCents: 2000, Currency: "CAD"}, expected: "<adjustment><unit_amount_in_cents>2000</unit_amount_in_cents><quantity>1</quantity><currency>CAD</currency></adjustment>"},
