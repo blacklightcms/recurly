@@ -89,8 +89,8 @@ func TestPurchases_Purchase_Encoding(t *testing.T) {
 				"</purchase>",
 		},
 		{
-			v:        recurly.Purchase{ShippingAddressID: "1234"},
-			expected: "<purchase><account></account><adjustments></adjustments><currency></currency><gift_card></gift_card><coupon_codes></coupon_codes><subscriptions></subscriptions><shipping_address_id>1234</shipping_address_id></purchase>",
+			v:        recurly.Purchase{ShippingAddressID: 2438622711411416831},
+			expected: "<purchase><account></account><adjustments></adjustments><currency></currency><gift_card></gift_card><coupon_codes></coupon_codes><subscriptions></subscriptions><shipping_address_id>2438622711411416831</shipping_address_id></purchase>",
 		},
 	}
 
