@@ -708,7 +708,8 @@ func TestSubscriptions_Get_PendingSubscription(t *testing.T) {
 				Code: "gold",
 				Name: "Gold plan",
 			},
-			Quantity: 1,
+			Quantity:          1,
+			UnitAmountInCents: 50000,
 			SubscriptionAddOns: []recurly.SubscriptionAddOn{
 				{
 					XMLName:           xml.Name{Local: "subscription_add_on"},
