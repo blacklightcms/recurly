@@ -132,7 +132,7 @@ type SubscriptionAddOn struct {
 type PendingSubscription struct {
 	XMLName            xml.Name            `xml:"pending_subscription"`
 	Plan               NestedPlan          `xml:"plan,omitempty"`
-	UnitAmountInCents  int                 `xml:"unit_amount_in_cents"`
+	UnitAmountInCents  int                 `xml:"unit_amount_in_cents,omitempty"`
 	Quantity           int                 `xml:"quantity,omitempty"` // Quantity of subscriptions
 	SubscriptionAddOns []SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
 }
