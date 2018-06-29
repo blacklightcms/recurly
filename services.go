@@ -84,6 +84,7 @@ type PlansService interface {
 // involving at least one adjustment or one subscription.
 type PurchasesService interface {
 	Create(p Purchase) (*Response, *InvoiceCollection, error)
+	Preview(p Purchase) (*Response, *InvoiceCollection, error)
 }
 
 // RedemptionsService represents the interactions available for redemptions.

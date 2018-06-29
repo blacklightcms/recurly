@@ -677,9 +677,17 @@ var _ recurly.PurchasesService = &PurchasesService{}
 type PurchasesService struct {
 	OnCreate      func(p recurly.Purchase) (*recurly.Response, *recurly.InvoiceCollection, error)
 	CreateInvoked bool
+
+	OnPreview      func(p recurly.Purchase) (*recurly.Response, *recurly.InvoiceCollection, error)
+	PreviewInvoked bool
 }
 
 func (m *PurchasesService) Create(p recurly.Purchase) (*recurly.Response, *recurly.InvoiceCollection, error) {
 	m.CreateInvoked = true
 	return m.OnCreate(p)
+}
+
+func (m *PurchasesService) Preview(p recurly.Purchase) (*recurly.Response, *recurly.InvoiceCollection, error) {
+	m.PreviewInvoked = true
+	return m.OnPreview(p)
 }
