@@ -82,6 +82,7 @@ type Invoice struct {
 	InvoiceNumber           int             `xml:"-"`
 	PONumber                string          `xml:"po_number,omitempty"` // PostInvoice param
 	VATNumber               string          `xml:"-"`
+	DiscountInCents         int             `xml:"-"`
 	SubtotalInCents         int             `xml:"-"`
 	TaxInCents              int             `xml:"-"`
 	TotalInCents            int             `xml:"-"`
@@ -128,6 +129,7 @@ func (i *Invoice) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		InvoiceNumber:           v.InvoiceNumber,
 		PONumber:                v.PONumber,
 		VATNumber:               v.VATNumber,
+		DiscountInCents:         v.DiscountInCents,
 		SubtotalInCents:         v.SubtotalInCents,
 		TaxInCents:              v.TaxInCents,
 		TotalInCents:            v.TotalInCents,
@@ -185,6 +187,7 @@ func (i *InvoiceCollection) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 		InvoiceNumber:           v.ChargeInvoice.InvoiceNumber,
 		PONumber:                v.ChargeInvoice.PONumber,
 		VATNumber:               v.ChargeInvoice.VATNumber,
+		DiscountInCents:         v.ChargeInvoice.DiscountInCents,
 		SubtotalInCents:         v.ChargeInvoice.SubtotalInCents,
 		TaxInCents:              v.ChargeInvoice.TaxInCents,
 		TotalInCents:            v.ChargeInvoice.TotalInCents,
@@ -226,6 +229,7 @@ type invoiceFields struct {
 	InvoiceNumber           int             `xml:"invoice_number,omitempty"`
 	PONumber                string          `xml:"po_number,omitempty"`
 	VATNumber               string          `xml:"vat_number,omitempty"`
+	DiscountInCents         int             `xml:"discount_in_cents,omitempty"`
 	SubtotalInCents         int             `xml:"subtotal_in_cents,omitempty"`
 	TaxInCents              int             `xml:"tax_in_cents,omitempty"`
 	TotalInCents            int             `xml:"total_in_cents,omitempty"`
