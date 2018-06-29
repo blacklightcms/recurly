@@ -129,6 +129,7 @@ func (i *Invoice) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		InvoiceNumber:           v.InvoiceNumber,
 		PONumber:                v.PONumber,
 		VATNumber:               v.VATNumber,
+		DiscountInCents:         v.DiscountInCents,
 		SubtotalInCents:         v.SubtotalInCents,
 		TaxInCents:              v.TaxInCents,
 		TotalInCents:            v.TotalInCents,

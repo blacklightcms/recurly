@@ -44,7 +44,7 @@ func TestInvoices_List(t *testing.T) {
         		<invoice_number type="integer">1005</invoice_number>
         		<po_number nil="nil"></po_number>
         		<vat_number nil="nil"></vat_number>
-        		<discount_in_cents type="integer">0</discount_in_cents>
+        		<discount_in_cents type="integer">17</discount_in_cents>
         		<subtotal_in_cents type="integer">1200</subtotal_in_cents>
         		<tax_in_cents type="integer">0</tax_in_cents>
         		<total_in_cents type="integer">1200</total_in_cents>
@@ -124,7 +124,7 @@ func TestInvoices_List(t *testing.T) {
 		UUID:             "421f7b7d414e4c6792938e7c49d552e9",
 		State:            recurly.InvoiceStateOpenDeprecated,
 		InvoiceNumber:    1005,
-		DiscountInCents:  0,
+		DiscountInCents:  17,
 		SubtotalInCents:  1200,
 		TaxInCents:       0,
 		TotalInCents:     1200,
