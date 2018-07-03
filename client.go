@@ -29,16 +29,19 @@ type Client struct {
 	BaseURL string
 
 	// Services used for talking with different parts of the Recurly API
-	Accounts      AccountsService
-	Adjustments   AdjustmentsService
-	Billing       BillingService
-	Coupons       CouponsService
-	Redemptions   RedemptionsService
-	Invoices      InvoicesService
-	Plans         PlansService
-	AddOns        AddOnsService
-	Subscriptions SubscriptionsService
-	Transactions  TransactionsService
+	Accounts          AccountsService
+	Adjustments       AdjustmentsService
+	Billing           BillingService
+	Coupons           CouponsService
+	Redemptions       RedemptionsService
+	Invoices          InvoicesService
+	Plans             PlansService
+	AddOns            AddOnsService
+	ShippingAddresses ShippingAddressesService
+	Subscriptions     SubscriptionsService
+	Transactions      TransactionsService
+	CreditPayments    CreditPaymentsService
+	Purchases         PurchasesService
 }
 
 // NewClient returns a new instance of *Client.
@@ -64,7 +67,10 @@ func NewClient(subDomain, apiKey string, httpClient *http.Client) *Client {
 	client.Plans = &plansImpl{client: client}
 	client.AddOns = &addOnsImpl{client: client}
 	client.Subscriptions = &subscriptionsImpl{client: client}
+	client.ShippingAddresses = &shippingAddressesImpl{client: client}
 	client.Transactions = &transactionsImpl{client: client}
+	client.CreditPayments = &creditInvoicesImpl{client: client}
+	client.Purchases = &purchasesImpl{client: client}
 
 	return client
 }

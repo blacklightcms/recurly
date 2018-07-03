@@ -162,6 +162,7 @@ func TestParse_NewSubscriptionNotification(t *testing.T) {
 			ExpiresAt:              recurly.NewTime(expiresTs),
 			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
 			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+			CollectionMethod:       recurly.CollectionMethodAutomatic,
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -205,6 +206,7 @@ func TestParse_UpdatedSubscriptionNotification(t *testing.T) {
 			ExpiresAt:              recurly.NewTime(expiresTs),
 			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
 			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+			CollectionMethod:       recurly.CollectionMethodAutomatic,
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -245,6 +247,7 @@ func TestParse_RenewedSubscriptionNotification(t *testing.T) {
 			ActivatedAt:            recurly.NewTime(activatedTs),
 			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
 			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+			CollectionMethod:       recurly.CollectionMethodAutomatic,
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -288,6 +291,7 @@ func TestParse_ExpiredSubscriptionNotification(t *testing.T) {
 			ExpiresAt:              recurly.NewTime(expiresTs),
 			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
 			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+			CollectionMethod:       recurly.CollectionMethodAutomatic,
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -331,6 +335,7 @@ func TestParse_CanceledSubscriptionNotification(t *testing.T) {
 			ExpiresAt:              recurly.NewTime(expiresTs),
 			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
 			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+			CollectionMethod:       recurly.CollectionMethodAutomatic,
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -424,6 +429,7 @@ func TestParse_SuccessfulPaymentNotification(t *testing.T) {
 			UUID:          "a5143c1d3a6f4a8287d0e2cc1d4c0427",
 			InvoiceNumber: 2059,
 			Action:        "purchase",
+			PaymentMethod: "credit_card",
 			AmountInCents: 1000,
 			Status:        "success",
 			Message:       "Bogus Gateway: Forced success",
@@ -461,6 +467,7 @@ func TestParse_FailedPaymentNotification(t *testing.T) {
 			InvoiceNumber:    2059,
 			SubscriptionUUID: "1974a098jhlkjasdfljkha898326881c",
 			Action:           "purchase",
+			PaymentMethod:    "credit_card",
 			AmountInCents:    1000,
 			Status:           "Declined",
 			Message:          "This transaction has been declined",

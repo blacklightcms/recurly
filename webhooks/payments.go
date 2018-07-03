@@ -31,6 +31,7 @@ type Transaction struct {
 	InvoiceNumber     int              `xml:"invoice_number"`
 	SubscriptionUUID  string           `xml:"subscription_id"`
 	Action            string           `xml:"action"`
+	PaymentMethod     string           `xml:"payment_method"`
 	AmountInCents     int              `xml:"amount_in_cents"`
 	Status            string           `xml:"status"`
 	Message           string           `xml:"message"`

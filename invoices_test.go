@@ -44,6 +44,7 @@ func TestInvoices_List(t *testing.T) {
         		<invoice_number type="integer">1005</invoice_number>
         		<po_number nil="nil"></po_number>
         		<vat_number nil="nil"></vat_number>
+        		<discount_in_cents type="integer">17</discount_in_cents>
         		<subtotal_in_cents type="integer">1200</subtotal_in_cents>
         		<tax_in_cents type="integer">0</tax_in_cents>
         		<total_in_cents type="integer">1200</total_in_cents>
@@ -56,7 +57,21 @@ func TestInvoices_List(t *testing.T) {
         		<net_terms type="integer">0</net_terms>
         		<collection_method>automatic</collection_method>
         		<redemption href="https://your-subdomain.recurly.com/v2/invoices/e3f0a9e084a2468480d00ee61b090d4d/redemption"/>
-        		<line_items type="array">
+                <credit_payments type="array">
+                    <credit_payment href="https://your-subdomain.recurly.com/v2/credit_payments/451b7869bbb20d766b1604492d97a740">
+                        <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
+                        <uuid>451b7869bbb20d766b1604492d97a740</uuid>
+                        <action>payment</action>
+                        <currency>USD</currency>
+                        <amount_in_cents type="integer">10000</amount_in_cents>
+                        <original_invoice href="https://your-subdomain.recurly.com/v2/invoices/5397"/>
+                        <applied_to_invoice href="https://your-subdomain.recurly.com/v2/invoices/5404"/>
+                        <created_at type="datetime">2018-05-29T16:13:39Z</created_at>
+                        <updated_at type="datetime">2018-05-29T16:13:39Z</updated_at>
+                        <voided_at nil="nil"></voided_at>
+                    </credit_payment>
+                </credit_payments>
+                <line_items type="array">
                     <adjustment href="https://your-subdomain.recurly.com/v2/adjustments/626db120a84102b1809909071c701c60" type="charge">
                         <account href="https://your-subdomain.recurly.com/v2/accounts/100"/>
                         <invoice href="https://your-subdomain.recurly.com/v2/invoices/1108"/>
@@ -109,6 +124,7 @@ func TestInvoices_List(t *testing.T) {
 		UUID:             "421f7b7d414e4c6792938e7c49d552e9",
 		State:            recurly.InvoiceStateOpenDeprecated,
 		InvoiceNumber:    1005,
+		DiscountInCents:  17,
 		SubtotalInCents:  1200,
 		TaxInCents:       0,
 		TotalInCents:     1200,
@@ -119,6 +135,18 @@ func TestInvoices_List(t *testing.T) {
 		TaxRate:          float64(0),
 		NetTerms:         recurly.NewInt(0),
 		CollectionMethod: "automatic",
+		CreditPayments: []recurly.CreditPayment{{
+			XMLName:               xml.Name{Local: "credit_payment"},
+			AccountCode:           "1",
+			UUID:                  "451b7869bbb20d766b1604492d97a740",
+			Action:                "payment",
+			AmountInCents:         10000,
+			Currency:              "USD",
+			OriginalInvoiceNumber: 5397,
+			AppliedToInvoice:      5404,
+			CreatedAt:             recurly.NewTimeFromString("2018-05-29T16:13:39Z"),
+			UpdatedAt:             recurly.NewTimeFromString("2018-05-29T16:13:39Z"),
+		}},
 		LineItems: []recurly.Adjustment{
 			{
 				AccountCode:            "100",
@@ -768,7 +796,7 @@ func TestInvoices_Create(t *testing.T) {
 				<recovery_reason nil="nil"/>
 				<subtotal_before_discount_in_cents type="integer">5000</subtotal_before_discount_in_cents>
 				<subtotal_in_cents type="integer">3000</subtotal_in_cents>
-				<discount_in_cents type="integer">0</discount_in_cents>
+				<discount_in_cents type="integer">17</discount_in_cents>
 				<due_on type="datetime">2018-03-20T15:43:41Z</due_on>
 				<net_terms type="integer">0</net_terms>
 				<collection_method>manual</collection_method>
@@ -809,6 +837,7 @@ func TestInvoices_Create(t *testing.T) {
 		UUID:                    "43adb97640cc05dee0b10042e596307f",
 		State:                   recurly.ChargeInvoiceStatePending,
 		InvoiceNumber:           1016,
+		DiscountInCents:         17,
 		SubtotalInCents:         3000,
 		TaxInCents:              425,
 		TotalInCents:            3425,
@@ -975,6 +1004,26 @@ func TestInvoices_RefundVoidOpenAmount(t *testing.T) {
 	}
 }
 
+func TestInvoices_VoidCreditInvoice(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/invoices/1010/void", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "PUT" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		w.WriteHeader(201)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><invoice></invoice>`)
+	})
+
+	resp, _, err := client.Invoices.VoidCreditInvoice(1010)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if resp.IsError() {
+		t.Fatal("expected void credit invoice to return OK")
+	}
+}
+
 func TestInvoices_RefundVoidOpenAmount_Params(t *testing.T) {
 	setup()
 	defer teardown()
@@ -985,7 +1034,7 @@ func TestInvoices_RefundVoidOpenAmount_Params(t *testing.T) {
 			t.Fatal(err)
 		}
 		defer r.Body.Close()
-		if !bytes.Equal(b, []byte("<invoice><amount_in_cents>100</amount_in_cents><refund_apply_order>credit</refund_apply_order></invoice>")) {
+		if !bytes.Equal(b, []byte("<invoice><amount_in_cents>100</amount_in_cents><refund_method>credit_first</refund_method></invoice>")) {
 			t.Fatalf("unexpected input: %s", string(b))
 		}
 		w.WriteHeader(201)
@@ -994,7 +1043,7 @@ func TestInvoices_RefundVoidOpenAmount_Params(t *testing.T) {
 
 	// Fields ordered in same order as struct xml tags, XML above in same order
 	// for equality check.
-	resp, _, err := client.Invoices.RefundVoidOpenAmount(1010, 100, "credit")
+	resp, _, err := client.Invoices.RefundVoidOpenAmount(1010, 100, recurly.VoidRefundMethodCreditFirst)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if resp.IsError() {
