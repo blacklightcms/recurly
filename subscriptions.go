@@ -71,7 +71,8 @@ type Subscription struct {
 	PendingSubscription    *PendingSubscription `xml:"pending_subscription,omitempty"`
 	Invoice                *Invoice             `xml:"-"`
 	RemainingPauseCycles   int                  `xml:"remaining_pause_cycles,omitempty"`
-	CollectionMethod       string               `xml:"collection_method"` 
+	CollectionMethod       string               `xml:"collection_method"`
+	CustomFields           []CustomField        `xml:"custom_fields>custom_field,omitempty"`
 }
 
 // UnmarshalXML unmarshals transactions and handles intermediary state during unmarshaling
@@ -160,6 +161,7 @@ type NewSubscription struct {
 	CustomerNotes           string               `xml:"customer_notes,omitempty"`
 	VATReverseChargeNotes   string               `xml:"vat_reverse_charge_notes,omitempty"`
 	BankAccountAuthorizedAt NullTime             `xml:"bank_account_authorized_at,omitempty"`
+	CustomFields            *[]CustomField       `xml:"custom_fields>custom_field,omitempty"`
 }
 
 // NewSubscriptionResponse is used to unmarshal either the subscription or the transaction.
@@ -187,4 +189,10 @@ type SubscriptionNotes struct {
 	TermsAndConditions    string   `xml:"terms_and_conditions,omitempty"`
 	CustomerNotes         string   `xml:"customer_notes,omitempty"`
 	VATReverseChargeNotes string   `xml:"vat_reverse_charge_notes,omitempty"`
+}
+
+// CustomField is used for creating name - value pair.
+type CustomField struct {
+	Name  string `xml:"name,omitempty"`
+	Value string `xml:"value,omitempty"`
 }

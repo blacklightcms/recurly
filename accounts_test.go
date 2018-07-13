@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/google/go-cmp/cmp"
 	"github.com/blacklightcms/recurly"
+	"github.com/google/go-cmp/cmp"
 )
 
 // TestAccountEncoding ensures structs are encoded to XML properly.
@@ -199,6 +199,12 @@ func TestAccounts_Get(t *testing.T) {
 			  <accept_language nil="nil"></accept_language>
 			  <hosted_login_token>a92468579e9c4231a6c0031c4716c01d</hosted_login_token>
 			  <created_at type="datetime">2011-10-25T12:00:00Z</created_at>
+			  <custom_fields type="array">
+			    <custom_field>
+			      <name>device_id</name>
+			      <value>KIWTL-WER-ZXMRD</value>
+			    </custom_field>
+			  </custom_fields>
 			</account>`)
 	})
 
@@ -224,6 +230,12 @@ func TestAccounts_Get(t *testing.T) {
 			State:   "CA",
 			Zip:     "94105",
 			Country: "US",
+		},
+		CustomFields: &[]recurly.CustomField{
+			{
+				Name:  "device_id",
+				Value: "KIWTL-WER-ZXMRD",
+			},
 		},
 		HostedLoginToken: "a92468579e9c4231a6c0031c4716c01d",
 		CreatedAt:        recurly.NewTime(ts),
