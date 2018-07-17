@@ -72,7 +72,7 @@ type Subscription struct {
 	Invoice                *Invoice             `xml:"-"`
 	RemainingPauseCycles   int                  `xml:"remaining_pause_cycles,omitempty"`
 	CollectionMethod       string               `xml:"collection_method"`
-	CustomFields           []CustomField        `xml:"custom_fields>custom_field,omitempty"`
+	CustomFields           CustomFields         `xml:"custom_fields,omitempty"`
 }
 
 // UnmarshalXML unmarshals transactions and handles intermediary state during unmarshaling
@@ -161,7 +161,7 @@ type NewSubscription struct {
 	CustomerNotes           string               `xml:"customer_notes,omitempty"`
 	VATReverseChargeNotes   string               `xml:"vat_reverse_charge_notes,omitempty"`
 	BankAccountAuthorizedAt NullTime             `xml:"bank_account_authorized_at,omitempty"`
-	CustomFields            *[]CustomField       `xml:"custom_fields>custom_field,omitempty"`
+	CustomFields            CustomFields         `xml:"custom_fields,omitempty"`
 }
 
 // NewSubscriptionResponse is used to unmarshal either the subscription or the transaction.
@@ -191,8 +191,53 @@ type SubscriptionNotes struct {
 	VATReverseChargeNotes string   `xml:"vat_reverse_charge_notes,omitempty"`
 }
 
-// CustomField is used for creating name - value pair.
-type CustomField struct {
-	Name  string `xml:"name,omitempty"`
-	Value string `xml:"value,omitempty"`
+
+// CustomFields represents custom key value pairs.
+// Note that custom fields must be enabled on your Recurly site and must be added in
+// the dashboard before they can be used.
+type CustomFields map[string]string
+
+// UnmarshalXML unmarshals custom_fields.
+func (c *CustomFields) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var v struct {
+		XMLName xml.Name `xml:"custom_fields"`
+		Fields  []struct {
+			Name  string `xml:"name"`
+			Value string `xml:"value"`
+		} `xml:"custom_field"`
+	}
+	if err := d.DecodeElement(&v, &start); err != nil {
+		return err
+	}
+	m := make(map[string]string, len(v.Fields))
+	for _, f := range v.Fields {
+		m[f.Name] = f.Value
+	}
+	*c = m
+
+	return nil
+}
+
+//MarshalXML marshals custom_fields.
+func (c CustomFields) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if len(c) == 0 {
+		return nil
+	}
+
+	type xmlMapEntry struct {
+		XMLName struct{} `xml:"custom_field"`
+		Name    string   `xml:"name"`
+		Value   string   `xml:"value"`
+	}
+
+	e.EncodeToken(xml.StartElement{Name: xml.Name{Local: "custom_fields"}})
+	for k, v := range c {
+		n := &xmlMapEntry{
+			Name:  k,
+			Value: v,
+		}
+		e.Encode(n)
+	}
+	e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "custom_fields"}})
+	return nil
 }

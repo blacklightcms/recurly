@@ -165,6 +165,10 @@ func TestAccounts_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
+	var customFields = map[string]string{
+		"device_id": "KIWTL-WER-ZXMRD",
+	}
+
 	mux.HandleFunc("/v2/accounts/1", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			t.Fatalf("unexpected method: %s", r.Method)
@@ -231,12 +235,7 @@ func TestAccounts_Get(t *testing.T) {
 			Zip:     "94105",
 			Country: "US",
 		},
-		CustomFields: &[]recurly.CustomField{
-			{
-				Name:  "device_id",
-				Value: "KIWTL-WER-ZXMRD",
-			},
-		},
+		CustomFields:     customFields,
 		HostedLoginToken: "a92468579e9c4231a6c0031c4716c01d",
 		CreatedAt:        recurly.NewTime(ts),
 	}); diff != "" {

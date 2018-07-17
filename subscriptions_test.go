@@ -18,6 +18,10 @@ import (
 // have zero values that we want to send.
 func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 	ts, _ := time.Parse(recurly.DateTimeFormat, "2015-06-03T13:42:23.764061Z")
+	var customFields = map[string]string{
+		"platform": "2.0",
+		"seller":   "Recurly Merchant",
+	}
 	tests := []struct {
 		v        recurly.NewSubscription
 		expected string
@@ -251,16 +255,7 @@ func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 					Code: "123",
 				},
 				BankAccountAuthorizedAt: recurly.NewTime(ts),
-				CustomFields: &[]recurly.CustomField{
-					{
-						Name:  "platform",
-						Value: "2.0",
-					},
-					{
-						Name:  "seller",
-						Value: "Recurly Merchant",
-					},
-				},
+				CustomFields:            customFields,
 			},
 			expected: "<subscription><plan_code>gold</plan_code><account><account_code>123</account_code></account><currency>USD</currency><bank_account_authorized_at>2015-06-03T13:42:23Z</bank_account_authorized_at><custom_fields><custom_field><name>platform</name><value>2.0</value></custom_field><custom_field><name>seller</name><value>Recurly Merchant</value></custom_field></custom_fields></subscription>",
 		},
@@ -757,6 +752,11 @@ func TestSubscriptions_Get_With_CustomFields(t *testing.T) {
 	setup()
 	defer teardown()
 
+	var customFields = map[string]string{
+		"device_id":     "KIWTL-WER-ZXMRD",
+		"purchase_date": "2017-01-23",
+	}
+
 	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "GET" {
 			t.Fatalf("unexpected method: %s", r.Method)
@@ -834,16 +834,7 @@ func TestSubscriptions_Get_With_CustomFields(t *testing.T) {
 		TaxRegion:              "CA",
 		TaxRate:                0.0875,
 		NetTerms:               recurly.NewInt(0),
-		CustomFields: []recurly.CustomField{
-			{
-				Name:  "device_id",
-				Value: "KIWTL-WER-ZXMRD",
-			},
-			{
-				Name:  "purchase_date",
-				Value: "2017-01-23",
-			},
-		},
+		CustomFields:           customFields,
 	}); diff != "" {
 		t.Fatal(diff)
 	}
