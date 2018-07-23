@@ -24,6 +24,7 @@ type Account struct {
 	CreatedAt             NullTime           `xml:"created_at,omitempty"`
 	HasPausedSubscription bool               `xml:"has_paused_subscription,omitempty"`
 	ShippingAddresses     *[]ShippingAddress `xml:"shipping_addresses>shipping_address,omitempty"`
+	CustomFields          *CustomFields      `xml:"custom_fields,omitempty"`
 }
 
 // AccountBalance is used for getting the account balance.
