@@ -18,6 +18,10 @@ import (
 // have zero values that we want to send.
 func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 	ts, _ := time.Parse(recurly.DateTimeFormat, "2015-06-03T13:42:23.764061Z")
+	var customFields = map[string]string{
+		"platform": "2.0",
+		"seller":   "Recurly Merchant",
+	}
 	tests := []struct {
 		v        recurly.NewSubscription
 		expected string
@@ -242,6 +246,18 @@ func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 				BankAccountAuthorizedAt: recurly.NewTime(ts),
 			},
 			expected: "<subscription><plan_code>gold</plan_code><account><account_code>123</account_code></account><currency>USD</currency><bank_account_authorized_at>2015-06-03T13:42:23Z</bank_account_authorized_at></subscription>",
+		},
+		{
+			v: recurly.NewSubscription{
+				PlanCode: "gold",
+				Currency: "USD",
+				Account: recurly.Account{
+					Code: "123",
+				},
+				BankAccountAuthorizedAt: recurly.NewTime(ts),
+				CustomFields:            customFields,
+			},
+			expected: "<subscription><plan_code>gold</plan_code><account><account_code>123</account_code></account><currency>USD</currency><bank_account_authorized_at>2015-06-03T13:42:23Z</bank_account_authorized_at><custom_fields><custom_field><name>platform</name><value>2.0</value></custom_field><custom_field><name>seller</name><value>Recurly Merchant</value></custom_field></custom_fields></subscription>",
 		},
 	}
 
@@ -727,6 +743,98 @@ func TestSubscriptions_Get_PendingSubscription(t *testing.T) {
 				},
 			},
 		},
+	}); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
+func TestSubscriptions_Get_With_CustomFields(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var customFields = &recurly.CustomFields{
+		"device_id":     "KIWTL-WER-ZXMRD",
+		"purchase_date": "2017-01-23",
+	}
+
+	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
+		<subscription href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96">
+			<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
+			<invoice href="https://your-subdomain.recurly.com/v2/invoices/1108"/>
+			<plan href="https://your-subdomain.recurly.com/v2/plans/gold">
+			  <plan_code>gold</plan_code>
+			  <name>Gold plan</name>
+			</plan>
+			<uuid>44f83d7cba354d5b84812419f923ea96</uuid>
+			<state>active</state>
+			<unit_amount_in_cents type="integer">800</unit_amount_in_cents>
+			<currency>EUR</currency>
+			<quantity type="integer">1</quantity>
+			<activated_at type="datetime">2011-05-27T07:00:00Z</activated_at>
+			<canceled_at nil="nil"></canceled_at>
+			<expires_at nil="nil"></expires_at>
+			<current_period_started_at type="datetime">2011-06-27T07:00:00Z</current_period_started_at>
+			<current_period_ends_at type="datetime">2011-07-27T07:00:00Z</current_period_ends_at>
+			<trial_started_at nil="nil"></trial_started_at>
+			<trial_ends_at nil="nil"></trial_ends_at>
+			<tax_in_cents type="integer">72</tax_in_cents>
+			<tax_type>usst</tax_type>
+			<tax_region>CA</tax_region>
+			<tax_rate type="float">0.0875</tax_rate>
+			<po_number nil="nil"></po_number>
+			<net_terms type="integer">0</net_terms>
+			<subscription_add_ons type="array">
+			</subscription_add_ons>
+			<custom_fields type="array">
+			  <custom_field>
+			    <name>device_id</name>
+			    <value>KIWTL-WER-ZXMRD</value>
+			  </custom_field>
+			  <custom_field>
+			    <name>purchase_date</name>
+			    <value>2017-01-23</value>
+			  </custom_field>
+			</custom_fields>
+			<a name="cancel" href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/cancel" method="put"/>
+			<a name="terminate" href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/terminate" method="put"/>
+			<a name="postpone" href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/postpone" method="put"/>
+		</subscription>`)
+	})
+
+	r, subscription, err := client.Subscriptions.Get("44f83d7cb-a354d5b848-12419f923ea96") // UUID has dashes
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected list subcriptions to return OK")
+	}
+
+	if diff := cmp.Diff(subscription, &recurly.Subscription{
+		XMLName: xml.Name{Local: "subscription"},
+		Plan: recurly.NestedPlan{
+			Code: "gold",
+			Name: "Gold plan",
+		},
+		AccountCode:            "1",
+		InvoiceNumber:          1108,
+		UUID:                   "44f83d7cba354d5b84812419f923ea96", // UUID has been sanitized
+		State:                  "active",
+		UnitAmountInCents:      800,
+		Currency:               "EUR",
+		Quantity:               1,
+		ActivatedAt:            recurly.NewTime(time.Date(2011, time.May, 27, 7, 0, 0, 0, time.UTC)),
+		CurrentPeriodStartedAt: recurly.NewTime(time.Date(2011, time.June, 27, 7, 0, 0, 0, time.UTC)),
+		CurrentPeriodEndsAt:    recurly.NewTime(time.Date(2011, time.July, 27, 7, 0, 0, 0, time.UTC)),
+		TaxInCents:             72,
+		TaxType:                "usst",
+		TaxRegion:              "CA",
+		TaxRate:                0.0875,
+		NetTerms:               recurly.NewInt(0),
+		CustomFields:           customFields,
 	}); diff != "" {
 		t.Fatal(diff)
 	}
