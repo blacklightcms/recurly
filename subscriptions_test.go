@@ -18,7 +18,7 @@ import (
 // have zero values that we want to send.
 func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 	ts, _ := time.Parse(recurly.DateTimeFormat, "2015-06-03T13:42:23.764061Z")
-	var customFields = map[string]string{
+	var customFields = &recurly.CustomFields{
 		"platform": "2.0",
 		"seller":   "Recurly Merchant",
 	}
@@ -752,7 +752,7 @@ func TestSubscriptions_Get_With_CustomFields(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var customFields = map[string]string{
+	var customFields = &recurly.CustomFields{
 		"device_id":     "KIWTL-WER-ZXMRD",
 		"purchase_date": "2017-01-23",
 	}

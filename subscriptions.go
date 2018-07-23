@@ -72,7 +72,7 @@ type Subscription struct {
 	Invoice                *Invoice             `xml:"-"`
 	RemainingPauseCycles   int                  `xml:"remaining_pause_cycles,omitempty"`
 	CollectionMethod       string               `xml:"collection_method"`
-	CustomFields           CustomFields         `xml:"custom_fields,omitempty"`
+	CustomFields           *CustomFields        `xml:"custom_fields,omitempty"`
 }
 
 // UnmarshalXML unmarshals transactions and handles intermediary state during unmarshaling
@@ -161,7 +161,7 @@ type NewSubscription struct {
 	CustomerNotes           string               `xml:"customer_notes,omitempty"`
 	VATReverseChargeNotes   string               `xml:"vat_reverse_charge_notes,omitempty"`
 	BankAccountAuthorizedAt NullTime             `xml:"bank_account_authorized_at,omitempty"`
-	CustomFields            CustomFields         `xml:"custom_fields,omitempty"`
+	CustomFields            *CustomFields        `xml:"custom_fields,omitempty"`
 }
 
 // NewSubscriptionResponse is used to unmarshal either the subscription or the transaction.
@@ -190,7 +190,6 @@ type SubscriptionNotes struct {
 	CustomerNotes         string   `xml:"customer_notes,omitempty"`
 	VATReverseChargeNotes string   `xml:"vat_reverse_charge_notes,omitempty"`
 }
-
 
 // CustomFields represents custom key value pairs.
 // Note that custom fields must be enabled on your Recurly site and must be added in

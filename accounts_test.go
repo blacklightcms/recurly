@@ -165,7 +165,7 @@ func TestAccounts_Get(t *testing.T) {
 	setup()
 	defer teardown()
 
-	var customFields = map[string]string{
+	var customFields = &recurly.CustomFields{
 		"device_id": "KIWTL-WER-ZXMRD",
 	}
 
