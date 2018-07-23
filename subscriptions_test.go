@@ -20,7 +20,6 @@ func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 	ts, _ := time.Parse(recurly.DateTimeFormat, "2015-06-03T13:42:23.764061Z")
 	var customFields = &recurly.CustomFields{
 		"platform": "2.0",
-		"seller":   "Recurly Merchant",
 	}
 	tests := []struct {
 		v        recurly.NewSubscription
@@ -257,7 +256,7 @@ func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 				BankAccountAuthorizedAt: recurly.NewTime(ts),
 				CustomFields:            customFields,
 			},
-			expected: "<subscription><plan_code>gold</plan_code><account><account_code>123</account_code></account><currency>USD</currency><bank_account_authorized_at>2015-06-03T13:42:23Z</bank_account_authorized_at><custom_fields><custom_field><name>platform</name><value>2.0</value></custom_field><custom_field><name>seller</name><value>Recurly Merchant</value></custom_field></custom_fields></subscription>",
+			expected: "<subscription><plan_code>gold</plan_code><account><account_code>123</account_code></account><currency>USD</currency><bank_account_authorized_at>2015-06-03T13:42:23Z</bank_account_authorized_at><custom_fields><custom_field><name>platform</name><value>2.0</value></custom_field><custom_field></custom_fields></subscription>",
 		},
 	}
 
