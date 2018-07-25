@@ -54,9 +54,9 @@ func parse(r io.Reader, fn func(s string) (interface{}, error)) (interface{}, er
 // nameToNotification returns the notification interface.
 func nameToNotification(name string) (interface{}, error) {
 	switch name {
-	case BillingInfoUpdated:
+	case BillingInfoUpdated, NewAccount, UpdatedAccount, CanceledAccount, BillingInfoUpdateFailed:
 		return &AccountNotification{Type: name}, nil
-	case NewSubscription, UpdatedSubscription, RenewedSubscription, ExpiredSubscription, CanceledSubscription:
+	case NewSubscription, UpdatedSubscription, RenewedSubscription, ExpiredSubscription, CanceledSubscription, ReactivatedAccount:
 		return &SubscriptionNotification{Type: name}, nil
 	case NewChargeInvoice, ProcessingChargeInvoice, PastDueChargeInvoice, PaidChargeInvoice, FailedChargeInvoice, ReopenedChargeInvoice:
 		return &ChargeInvoiceNotification{Type: name}, nil
@@ -64,10 +64,12 @@ func nameToNotification(name string) (interface{}, error) {
 		return &CreditInvoiceNotification{Type: name}, nil
 	case NewCreditPayment, VoidedCreditPayment:
 		return &CreditPaymentNotification{Type: name}, nil
-	case NewInvoice, PastDueInvoice:
+	case NewInvoice, PastDueInvoice, ProcessingInvoice, ClosedInvoice:
 		return &InvoiceNotification{Type: name}, nil
-	case SuccessfulPayment, FailedPayment, VoidPayment, SuccessfulRefund:
+	case SuccessfulPayment, FailedPayment, VoidPayment, SuccessfulRefund, ScheduledPayment, ProcessingPayment:
 		return &PaymentNotification{Type: name}, nil
+	case NewDunningEvent:
+		return &NewDunningEventNotification{Type: name}, nil
 	}
 	return nil, ErrUnknownNotification{name: name}
 }
@@ -76,14 +78,16 @@ func nameToNotification(name string) (interface{}, error) {
 // the credit invoices feature.
 func nameToNotificationDeprecated(name string) (interface{}, error) {
 	switch name {
-	case BillingInfoUpdated:
+	case BillingInfoUpdated, NewAccount, UpdatedAccount, CanceledAccount, BillingInfoUpdateFailed:
 		return &AccountNotification{Type: name}, nil
-	case NewSubscription, UpdatedSubscription, RenewedSubscription, ExpiredSubscription, CanceledSubscription:
+	case NewSubscription, UpdatedSubscription, RenewedSubscription, ExpiredSubscription, CanceledSubscription, ReactivatedAccount:
 		return &SubscriptionNotification{Type: name}, nil
-	case NewInvoice, PastDueInvoice:
+	case NewInvoice, PastDueInvoice, ProcessingInvoice, ClosedInvoice:
 		return &InvoiceNotification{Type: name}, nil
-	case SuccessfulPayment, FailedPayment, VoidPayment, SuccessfulRefund:
+	case SuccessfulPayment, FailedPayment, VoidPayment, SuccessfulRefund, ScheduledPayment, ProcessingPayment:
 		return &PaymentNotification{Type: name}, nil
+	case NewDunningEvent:
+		return &NewDunningEventDeprecatedNotification{Type: name}, nil
 	}
 	return nil, ErrUnknownNotification{name: name}
 }

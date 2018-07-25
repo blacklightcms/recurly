@@ -5,7 +5,11 @@ import "encoding/xml"
 // Account notifications.
 // https://dev.recurly.com/page/webhooks#account-notifications
 const (
-	BillingInfoUpdated = "billing_info_updated_notification"
+	NewAccount              = "new_account_notification"
+	UpdatedAccount          = "updated_account_notification"
+	CanceledAccount         = "canceled_account_notification"
+	BillingInfoUpdated      = "billing_info_updated_notification"
+	BillingInfoUpdateFailed = "billing_info_update_failed_notification"
 )
 
 // AccountNotification is returned for all account notifications.
