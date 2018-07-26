@@ -16,6 +16,6 @@
     <po_number></po_number>
     <vat_number></vat_number>
     <total_in_cents type="integer">1100</total_in_cents>
-    <date type="datetime">2014-01-01T20:20:29Z</date>
+    <date type="datetime">2014-01-01T20:21:44Z</date>
   </invoice>
 </past_due_invoice_notification>

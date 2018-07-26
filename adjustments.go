@@ -2,10 +2,17 @@ package recurly
 
 import "encoding/xml"
 
+// Adjustment state constants
+const (
+	AdjustmentStatePending = "pending"
+	AdjustmentStateInvoied = "invoiced"
+)
+
 // Adjustment works with charges and credits on a given account.
 type Adjustment struct {
 	AccountCode            string
 	InvoiceNumber          int
+	SubscriptionUUID       string
 	UUID                   string
 	State                  string
 	Description            string
@@ -29,6 +36,7 @@ type Adjustment struct {
 	StartDate              NullTime
 	EndDate                NullTime
 	CreatedAt              NullTime
+	UpdatedAt              NullTime
 }
 
 // MarshalXML marshals only the fields needed for creating/updating adjustments
@@ -38,19 +46,25 @@ func (a Adjustment) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		XMLName           xml.Name `xml:"adjustment"`
 		Description       string   `xml:"description,omitempty"`
 		AccountingCode    string   `xml:"accounting_code,omitempty"`
+		ProductCode       string   `xml:"product_code,omitempty"`
 		UnitAmountInCents int      `xml:"unit_amount_in_cents"`
 		Quantity          int      `xml:"quantity,omitempty"`
-		Currency          string   `xml:"currency"`
+		Currency          string   `xml:"currency,omitempty"` // Required for some operations
 		TaxCode           string   `xml:"tax_code,omitempty"`
 		TaxExempt         NullBool `xml:"tax_exempt,omitempty"`
+		StartDate         NullTime `xml:"start_date,omitempty"`
+		EndDate           NullTime `xml:"end_date,omitempty"`
 	}{
 		Description:       a.Description,
 		AccountingCode:    a.AccountingCode,
+		ProductCode:       a.ProductCode,
 		UnitAmountInCents: a.UnitAmountInCents,
 		Quantity:          a.Quantity,
 		Currency:          a.Currency,
 		TaxCode:           a.TaxCode,
 		TaxExempt:         a.TaxExempt,
+		StartDate:         a.StartDate,
+		EndDate:           a.EndDate,
 	}
 
 	return e.Encode(v)
@@ -61,8 +75,9 @@ func (a Adjustment) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 func (a *Adjustment) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v struct {
 		XMLName                xml.Name    `xml:"adjustment"`
-		AccountCode            hrefString  `xml:"account,omitempty"` // Read only
-		InvoiceNumber          hrefInt     `xml:"invoice,omitempty"` // Read only
+		AccountCode            hrefString  `xml:"account,omitempty"`      // Read only
+		InvoiceNumber          hrefInt     `xml:"invoice,omitempty"`      // Read only
+		SubscriptionUUID       hrefString  `xml:"subscription,omitempty"` // Read only
 		UUID                   string      `xml:"uuid,omitempty"`
 		State                  string      `xml:"state,omitempty"`
 		Description            string      `xml:"description,omitempty"`
@@ -86,6 +101,7 @@ func (a *Adjustment) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error 
 		StartDate              NullTime    `xml:"start_date,omitempty"`
 		EndDate                NullTime    `xml:"end_date,omitempty"`
 		CreatedAt              NullTime    `xml:"created_at,omitempty"`
+		UpdatedAt              NullTime    `xml:"updated_at,omitempty"`
 	}
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err
@@ -93,6 +109,7 @@ func (a *Adjustment) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error 
 	*a = Adjustment{
 		AccountCode:            string(v.AccountCode),
 		InvoiceNumber:          int(v.InvoiceNumber),
+		SubscriptionUUID:       string(v.SubscriptionUUID),
 		UUID:                   v.UUID,
 		State:                  v.State,
 		Description:            v.Description,
@@ -116,6 +133,7 @@ func (a *Adjustment) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error 
 		StartDate:              v.StartDate,
 		EndDate:                v.EndDate,
 		CreatedAt:              v.CreatedAt,
+		UpdatedAt:              v.UpdatedAt,
 	}
 
 	return nil

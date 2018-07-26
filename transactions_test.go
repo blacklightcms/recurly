@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"reflect"
 	"testing"
 	"time"
 
 	"github.com/blacklightcms/recurly"
+	"github.com/google/go-cmp/cmp"
 )
 
 // TestTransactionEncoding ensures structs are encoded to XML properly.
@@ -43,7 +43,7 @@ func TestTransactions_List(t *testing.T) {
         	<transaction href="https://your-subdomain.recurly.com/v2/transactions/a13acd8fe4294916b79aec87b7ea441f" type="credit_card">
         		<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
         		<invoice href="https://your-subdomain.recurly.com/v2/invoices/1108"/>
-        		<subscription href="https://your-subdomain.recurly.com/v2/subscriptions/17caaca1716f33572edc8146e0aaefde"/>
+        		<subscriptions href="https://your-subdomain.recurly.com/v2/transactions/a13acd8fe4294916b79aec87b7ea441f/subscriptions"/>
         		<uuid>a13acd8fe4294916b79aec87b7ea441f</uuid>
         		<action>purchase</action>
         		<amount_in_cents type="integer">1000</amount_in_cents>
@@ -103,24 +103,23 @@ func TestTransactions_List(t *testing.T) {
 		t.Fatalf("unexpected per_page: %s", pp)
 	}
 
-	if !reflect.DeepEqual(transactions, []recurly.Transaction{
+	if diff := cmp.Diff(transactions, []recurly.Transaction{
 		{
-			InvoiceNumber:    1108,
-			SubscriptionUUID: "17caaca1716f33572edc8146e0aaefde",
-			UUID:             "a13acd8fe4294916b79aec87b7ea441f",
-			Action:           "purchase",
-			AmountInCents:    1000,
-			TaxInCents:       0,
-			Currency:         "USD",
-			Status:           "success",
-			PaymentMethod:    "credit_card",
-			Reference:        "5416477",
-			Source:           "subscription",
-			Recurring:        recurly.NewBool(true),
-			Test:             true,
-			Voidable:         recurly.NewBool(true),
-			Refundable:       recurly.NewBool(true),
-			IPAddress:        net.ParseIP("127.0.0.1"),
+			InvoiceNumber: 1108,
+			UUID:          "a13acd8fe4294916b79aec87b7ea441f",
+			Action:        "purchase",
+			AmountInCents: 1000,
+			TaxInCents:    0,
+			Currency:      "USD",
+			Status:        "success",
+			PaymentMethod: "credit_card",
+			Reference:     "5416477",
+			Source:        "subscription",
+			Recurring:     recurly.NewBool(true),
+			Test:          true,
+			Voidable:      recurly.NewBool(true),
+			Refundable:    recurly.NewBool(true),
+			IPAddress:     net.ParseIP("127.0.0.1"),
 			CVVResult: recurly.CVVResult{
 				recurly.TransactionResult{
 					Code:    "M",
@@ -153,12 +152,12 @@ func TestTransactions_List(t *testing.T) {
 					Year:      2017,
 					Month:     11,
 					FirstSix:  411111,
-					LastFour:  1111,
+					LastFour:  "1111",
 				},
 			},
 		},
-	}) {
-		t.Fatalf("unexpected transaction: %v", transactions)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -236,24 +235,23 @@ func TestTransactions_ListAccount(t *testing.T) {
 		t.Fatalf("unexpected per_page: %s", pp)
 	}
 
-	if !reflect.DeepEqual(transactions, []recurly.Transaction{
+	if diff := cmp.Diff(transactions, []recurly.Transaction{
 		{
-			InvoiceNumber:    1108,
-			SubscriptionUUID: "17caaca1716f33572edc8146e0aaefde",
-			UUID:             "a13acd8fe4294916b79aec87b7ea441f",
-			Action:           "purchase",
-			AmountInCents:    1000,
-			TaxInCents:       0,
-			Currency:         "USD",
-			Status:           "success",
-			PaymentMethod:    "credit_card",
-			Reference:        "5416477",
-			Source:           "subscription",
-			Recurring:        recurly.NewBool(true),
-			Test:             true,
-			Voidable:         recurly.NewBool(true),
-			Refundable:       recurly.NewBool(true),
-			IPAddress:        net.ParseIP("127.0.0.1"),
+			InvoiceNumber: 1108,
+			UUID:          "a13acd8fe4294916b79aec87b7ea441f",
+			Action:        "purchase",
+			AmountInCents: 1000,
+			TaxInCents:    0,
+			Currency:      "USD",
+			Status:        "success",
+			PaymentMethod: "credit_card",
+			Reference:     "5416477",
+			Source:        "subscription",
+			Recurring:     recurly.NewBool(true),
+			Test:          true,
+			Voidable:      recurly.NewBool(true),
+			Refundable:    recurly.NewBool(true),
+			IPAddress:     net.ParseIP("127.0.0.1"),
 			CVVResult: recurly.CVVResult{
 				recurly.TransactionResult{
 					Code:    "M",
@@ -286,12 +284,12 @@ func TestTransactions_ListAccount(t *testing.T) {
 					Year:      2017,
 					Month:     11,
 					FirstSix:  411111,
-					LastFour:  1111,
+					LastFour:  "1111",
 				},
 			},
 		},
-	}) {
-		t.Fatalf("unexpected transactions: %v", transactions)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -315,6 +313,7 @@ func TestTransactions_Get(t *testing.T) {
     		<tax_in_cents type="integer">0</tax_in_cents>
     		<currency>USD</currency>
     		<status>success</status>
+    		<description>Order #717</description>
     		<payment_method>credit_card</payment_method>
     		<reference>5416477</reference>
     		<source>subscription</source>
@@ -358,30 +357,30 @@ func TestTransactions_Get(t *testing.T) {
     	</transaction>`)
 	})
 
-	r, transaction, err := client.Transactions.Get("a13acd8fe4294916b79aec87b7ea441f")
+	r, transaction, err := client.Transactions.Get("a13acd8f-e4294916b79aec87-b7ea441f") // UUID contains dashes
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
 		t.Fatal("expected get transaction to return OK")
 	}
 
-	if !reflect.DeepEqual(transaction, &recurly.Transaction{
-		InvoiceNumber:    1108,
-		SubscriptionUUID: "17caaca1716f33572edc8146e0aaefde",
-		UUID:             "a13acd8fe4294916b79aec87b7ea441f",
-		Action:           "purchase",
-		AmountInCents:    1000,
-		TaxInCents:       0,
-		Currency:         "USD",
-		Status:           "success",
-		PaymentMethod:    "credit_card",
-		Reference:        "5416477",
-		Source:           "subscription",
-		Recurring:        recurly.NewBool(true),
-		Test:             true,
-		Voidable:         recurly.NewBool(true),
-		Refundable:       recurly.NewBool(true),
-		IPAddress:        net.ParseIP("127.0.0.1"),
+	if diff := cmp.Diff(transaction, &recurly.Transaction{
+		InvoiceNumber: 1108,
+		UUID:          "a13acd8fe4294916b79aec87b7ea441f", // UUID has been sanitized
+		Action:        "purchase",
+		AmountInCents: 1000,
+		TaxInCents:    0,
+		Currency:      "USD",
+		Status:        "success",
+		Description:   "Order #717",
+		PaymentMethod: "credit_card",
+		Reference:     "5416477",
+		Source:        "subscription",
+		Recurring:     recurly.NewBool(true),
+		Test:          true,
+		Voidable:      recurly.NewBool(true),
+		Refundable:    recurly.NewBool(true),
+		IPAddress:     net.ParseIP("127.0.0.1"),
 		CVVResult: recurly.CVVResult{
 			recurly.TransactionResult{
 				Code:    "M",
@@ -414,11 +413,11 @@ func TestTransactions_Get(t *testing.T) {
 				Year:      2017,
 				Month:     11,
 				FirstSix:  411111,
-				LastFour:  1111,
+				LastFour:  "1111",
 			},
 		},
-	}) {
-		t.Fatalf("unexpected transaction: %+v", transaction)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -451,7 +450,7 @@ func TestTransactions_New(t *testing.T) {
 			t.Fatalf("unexpected method: %s", r.Method)
 		}
 		defer r.Body.Close()
-		expected := `<transaction><amount_in_cents>100</amount_in_cents><currency>USD</currency><account><account_code>25</account_code></account></transaction>`
+		expected := `<transaction><amount_in_cents>100</amount_in_cents><currency>USD</currency><description>description</description><product_code>code</product_code><account><account_code>25</account_code></account></transaction>`
 		var given bytes.Buffer
 		given.ReadFrom(r.Body)
 		if expected != given.String() {
@@ -469,6 +468,8 @@ func TestTransactions_New(t *testing.T) {
 			Account: recurly.Account{
 				Code: "25",
 			},
+			Description: "description",
+			ProductCode: "code",
 		})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -506,13 +507,6 @@ func TestTransactions_Err_FraudCard(t *testing.T) {
 			    <currency>USD</currency>
 			    <status>declined</status>
 			    <payment_method>credit_card</payment_method>
-			    <reference>6223543</reference>
-			    <source>transaction</source>
-			    <recurring type="boolean">false</recurring>
-			    <test type="boolean">true</test>
-			    <voidable type="boolean">false</voidable>
-			    <refundable type="boolean">false</refundable>
-			    <ip_address>184.23.184.210</ip_address>
 			    <transaction_error>
 			      <error_code>fraud_gateway</error_code>
 			      <error_category>fraud</error_category>
@@ -520,42 +514,13 @@ func TestTransactions_Err_FraudCard(t *testing.T) {
 			      <customer_message>The transaction was declined. Please use a different card, contact your bank, or contact support.</customer_message>
 			      <gateway_error_code nil="nil"></gateway_error_code>
 			    </transaction_error>
-			    <cvv_result code="" nil="nil"></cvv_result>
-			    <avs_result code="" nil="nil"></avs_result>
-			    <avs_result_street nil="nil"></avs_result_street>
-			    <avs_result_postal nil="nil"></avs_result_postal>
-			    <created_at type="datetime">2015-07-31T20:45:01Z</created_at>
 			    <details>
-			      <account>
-			        <account_code>1</account_code>
-			        <first_name>Verena</first_name>
-			        <last_name>Example</last_name>
-			        <company></company>
-			        <email></email>
-			        <billing_info type="credit_card">
-			          <first_name>Verena</first_name>
-			          <last_name>Example</last_name>
-			          <address1>123 Main St.</address1>
-			          <address2></address2>
-			          <city>San Francisco</city>
-			          <state>CA</state>
-			          <zip>94133</zip>
-			          <country>US</country>
-			          <phone nil="nil"></phone>
-			          <vat_number nil="nil"></vat_number>
-			          <card_type>Visa</card_type>
-			          <year type="integer">2020</year>
-			          <month type="integer">10</month>
-			          <first_six>400000</first_six>
-			          <last_four>0085</last_four>
-			        </billing_info>
-			      </account>
 			    </details>
 			  </transaction>
 			</errors>`)
 	})
 
-	r, _, err := client.Transactions.Create(recurly.Transaction{
+	r, transaction, err := client.Transactions.Create(recurly.Transaction{
 		AmountInCents: 100,
 		Currency:      "USD",
 		Account: recurly.Account{
@@ -573,14 +538,22 @@ func TestTransactions_Err_FraudCard(t *testing.T) {
 		t.Fatalf("error occurred making API call. Err: %s", err)
 	} else if r.IsOK() {
 		t.Fatal("expected create fraudulent transaction to return error")
-	} else if !reflect.DeepEqual(r.TransactionError, &recurly.TransactionError{
-		XMLName:         xml.Name{Local: "transaction_error"},
-		ErrorCode:       "fraud_gateway",
-		ErrorCategory:   "fraud",
-		MerchantMessage: "The payment gateway declined the transaction due to fraud filters enabled in your gateway.",
-		CustomerMessage: "The transaction was declined. Please use a different card, contact your bank, or contact support.",
-	}) {
-		t.Fatalf("error did not match: %v", r.TransactionError)
+	} else if diff := cmp.Diff(transaction, &recurly.Transaction{
+		UUID:          "3054a79e4c3ab4699f95be455f8653bb",
+		Action:        "purchase",
+		AmountInCents: 100,
+		Currency:      "USD",
+		Status:        "declined",
+		PaymentMethod: "credit_card",
+		TransactionError: &recurly.TransactionError{
+			XMLName:         xml.Name{Local: "transaction_error"},
+			ErrorCode:       "fraud_gateway",
+			ErrorCategory:   "fraud",
+			MerchantMessage: "The payment gateway declined the transaction due to fraud filters enabled in your gateway.",
+			CustomerMessage: "The transaction was declined. Please use a different card, contact your bank, or contact support.",
+		},
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 

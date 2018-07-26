@@ -14,11 +14,6 @@ type couponsImpl struct {
 	client *Client
 }
 
-// NewCouponsImpl returns a new instance of couponsImpl.
-func NewCouponsImpl(client *Client) *couponsImpl {
-	return &couponsImpl{client: client}
-}
-
 // List returns a list of all the coupons on your site.
 // https://dev.recurly.com/docs/list-active-coupons
 func (s *couponsImpl) List(params Params) (*Response, []Coupon, error) {

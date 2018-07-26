@@ -6,10 +6,10 @@ import (
 	"fmt"
 	"net"
 	"net/http"
-	"reflect"
 	"testing"
 
 	"github.com/blacklightcms/recurly"
+	"github.com/google/go-cmp/cmp"
 )
 
 // TestBillingEncoding ensures structs are encoded to XML properly.
@@ -50,7 +50,7 @@ func TestBilling_Encoding(t *testing.T) {
 func TestBilling_Type(t *testing.T) {
 	b0 := recurly.Billing{
 		FirstSix: 411111,
-		LastFour: 1111,
+		LastFour: "1111",
 		Month:    11,
 		Year:     2020,
 	}
@@ -110,7 +110,7 @@ func TestBilling_Get(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	} else if resp.IsError() {
 		t.Fatal("expected get billing info to return OK")
-	} else if !reflect.DeepEqual(b, &recurly.Billing{
+	} else if diff := cmp.Diff(b, &recurly.Billing{
 		XMLName:          xml.Name{Local: "billing_info"},
 		FirstName:        "Verena",
 		LastName:         "Example",
@@ -126,9 +126,52 @@ func TestBilling_Get(t *testing.T) {
 		Year:             2015,
 		Month:            11,
 		FirstSix:         411111,
-		LastFour:         1111,
-	}) {
-		t.Fatalf("unexpected billing: %v", b)
+		LastFour:         "1111",
+	}); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
+// ACH customers may not have billing info. This asserts that nil values for
+// many of the fields are safely ignored without parse errors.
+func TestBilling_Get_ACH(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/accounts/1/billing_info", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "GET" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
+            <billing_info type="ach">
+                <first_name>Verena</first_name>
+                <last_name>Example</last_name>
+                <address1 nil="nil"></address1>
+                <address2 nil="nil"></address2>
+                <city nil="nil"></city>
+                <state nil="nil"></state>
+                <zip nil="nil"></zip>
+                <country nil="nil"></country>
+                <phone nil="nil"></phone>
+                <vat_number nil="nil"></vat_number>
+                <account_type nil="nil"></account_type>
+                <last_four nil="nil"></last_four>
+                <routing_number nil="nil"></routing_number>
+            </billing_info>`)
+	})
+
+	resp, b, err := client.Billing.Get("1")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if resp.IsError() {
+		t.Fatal("expected get billing info to return OK")
+	} else if diff := cmp.Diff(b, &recurly.Billing{
+		XMLName:   xml.Name{Local: "billing_info"},
+		FirstName: "Verena",
+		LastName:  "Example",
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -200,7 +243,7 @@ func TestBilling_Create_WithToken(t *testing.T) {
 		t.Fatalf("unexpected error: %v", err)
 	} else if resp.IsError() {
 		t.Fatal("expected creating billing info to return OK")
-	} else if !reflect.DeepEqual(b, &recurly.Billing{
+	} else if diff := cmp.Diff(b, &recurly.Billing{
 		XMLName:          xml.Name{Local: "billing_info"},
 		FirstName:        "Verena",
 		LastName:         "Example",
@@ -216,9 +259,9 @@ func TestBilling_Create_WithToken(t *testing.T) {
 		Year:             2015,
 		Month:            11,
 		FirstSix:         411111,
-		LastFour:         1111,
-	}) {
-		t.Fatalf("unexpected billing: %v", b)
+		LastFour:         "1111",
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -343,20 +386,22 @@ func TestBilling_Update_InvalidToken(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><error><symbol>token_invalid</symbol><description>Token is either invalid or expired</description></error>`)
 	})
 
-	resp, _, err := client.Billing.UpdateWithToken("abceasf", token)
+	resp, billing, err := client.Billing.UpdateWithToken("abceasf", token)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
+	} else if billing != nil {
+		t.Fatalf("unexpected billing to be nil: %#v", billing)
 	}
 
 	if resp.IsOK() {
 		t.Fatal("expected updating billing info with invalid token to return error")
-	} else if !reflect.DeepEqual(resp.Errors, []recurly.Error{
+	} else if diff := cmp.Diff(resp.Errors, []recurly.Error{
 		{
 			Symbol:  "token_invalid",
 			Message: "Token is either invalid or expired",
 		},
-	}) {
-		t.Fatalf("unexpected errors: %v", resp.Errors)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -395,7 +440,7 @@ func TestBilling_Update_WithCC(t *testing.T) {
 		Token:             "abc",
 		IPAddressCountry:  "US",
 		FirstSix:          411111,
-		LastFour:          1111,
+		LastFour:          "1111",
 		CardType:          "visa",
 		PaypalAgreementID: "ppl",
 		AmazonAgreementID: "asdfb",
@@ -444,7 +489,7 @@ func TestBilling_Update_WithBankAccount(t *testing.T) {
 		Token:             "abc",
 		IPAddressCountry:  "US",
 		FirstSix:          111111,
-		LastFour:          1111,
+		LastFour:          "1111",
 		CardType:          "visa",
 		PaypalAgreementID: "ppl",
 		AmazonAgreementID: "asdfb",

@@ -14,11 +14,6 @@ type transactionsImpl struct {
 	client *Client
 }
 
-// NewTransactionsImpl returns a new instance of transactionsImpl.
-func NewTransactionsImpl(client *Client) *transactionsImpl {
-	return &transactionsImpl{client: client}
-}
-
 // List returns a list of transactions
 // https://dev.recurly.com/docs/list-transactions
 func (s *transactionsImpl) List(params Params) (*Response, []Transaction, error) {
@@ -60,7 +55,7 @@ func (s *transactionsImpl) ListAccount(accountCode string, params Params) (*Resp
 // Please see transaction error codes for more details.
 // https://dev.recurly.com/docs/lookup-transaction
 func (s *transactionsImpl) Get(uuid string) (*Response, *Transaction, error) {
-	action := fmt.Sprintf("transactions/%s", uuid)
+	action := fmt.Sprintf("transactions/%s", SanitizeUUID(uuid))
 	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
@@ -91,6 +86,14 @@ func (s *transactionsImpl) Create(t Transaction) (*Response, *Transaction, error
 
 	var dst Transaction
 	resp, err := s.client.do(req, &dst)
+
+	// If there is an error set the response transaction as the returned transaction
+	// so that the caller has access to TransactionError.
+	if resp.IsError() {
+		if resp.transaction != nil {
+			dst = *resp.transaction
+		}
+	}
 
 	return resp, &dst, err
 }

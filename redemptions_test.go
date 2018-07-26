@@ -4,11 +4,11 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
-	"reflect"
 	"testing"
 	"time"
 
 	"github.com/blacklightcms/recurly"
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestRedemptions_GetForAccount(t *testing.T) {
@@ -40,7 +40,7 @@ func TestRedemptions_GetForAccount(t *testing.T) {
 	}
 
 	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-06-27T12:34:56Z")
-	if !reflect.DeepEqual(redemption, &recurly.Redemption{
+	if diff := cmp.Diff(redemption, &recurly.Redemption{
 		CouponCode:             "special",
 		AccountCode:            "1",
 		SingleUse:              recurly.NewBool(false),
@@ -48,8 +48,8 @@ func TestRedemptions_GetForAccount(t *testing.T) {
 		Currency:               "USD",
 		State:                  "active",
 		CreatedAt:              recurly.NewTime(ts),
-	}) {
-		t.Fatalf("unexpected redemption: %v", redemption)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
@@ -102,7 +102,7 @@ func TestRedemptions_GetForInvoice(t *testing.T) {
 	}
 
 	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-06-27T12:34:56Z")
-	if !reflect.DeepEqual(redemption, &recurly.Redemption{
+	if diff := cmp.Diff(redemption, &recurly.Redemption{
 		CouponCode:             "special",
 		AccountCode:            "1",
 		SingleUse:              recurly.NewBool(true),
@@ -110,8 +110,8 @@ func TestRedemptions_GetForInvoice(t *testing.T) {
 		Currency:               "USD",
 		State:                  "inactive",
 		CreatedAt:              recurly.NewTime(ts),
-	}) {
-		t.Fatalf("unexpected redemption: %v", redemption)
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 

@@ -66,7 +66,8 @@ type InvoicesService interface {
 	Collect(invoiceNumber int) (*Response, *Invoice, error)
 	MarkPaid(invoiceNumber int) (*Response, *Invoice, error)
 	MarkFailed(invoiceNumber int) (*Response, *Invoice, error)
-	RefundVoidOpenAmount(invoiceNumber int, amountInCents int, refundApplyOrder string) (*Response, *Invoice, error)
+	RefundVoidOpenAmount(invoiceNumber int, amountInCents int, refundMethod string) (*Response, *Invoice, error)
+	VoidCreditInvoice(invoiceNumber int) (*Response, *Invoice, error)
 	RecordPayment(offlinePayment OfflinePayment) (*Response, *Transaction, error)
 }
 
@@ -79,6 +80,13 @@ type PlansService interface {
 	Delete(code string) (*Response, error)
 }
 
+// PurchasesService represents the interactions available for a purchase
+// involving at least one adjustment or one subscription.
+type PurchasesService interface {
+	Create(p Purchase) (*Response, *InvoiceCollection, error)
+	Preview(p Purchase) (*Response, *InvoiceCollection, error)
+}
+
 // RedemptionsService represents the interactions available for redemptions.
 type RedemptionsService interface {
 	GetForAccount(accountCode string) (*Response, *Redemption, error)
@@ -87,12 +95,21 @@ type RedemptionsService interface {
 	Delete(accountCode string) (*Response, error)
 }
 
-// SubscriptionsService represents the interactinos available for subscriptions.
+// ShippingAddressesService represents the interactions available for shipping addresses.
+type ShippingAddressesService interface {
+	ListAccount(accountCode string, params Params) (*Response, []ShippingAddress, error)
+	Create(accountCode string, address ShippingAddress) (*Response, *ShippingAddress, error)
+	Update(accountCode string, shippingAddressID int64, address ShippingAddress) (*Response, *ShippingAddress, error)
+	Delete(accountCode string, shippingAddressID int64) (*Response, error)
+	GetSubscriptions(accountCode string, shippingAddressID int64) (*Response, []Subscription, error)
+}
+
+// SubscriptionsService represents the interactions available for subscriptions.
 type SubscriptionsService interface {
 	List(params Params) (*Response, []Subscription, error)
 	ListAccount(accountCode string, params Params) (*Response, []Subscription, error)
 	Get(uuid string) (*Response, *Subscription, error)
-	Create(sub NewSubscription) (*Response, *Subscription, error)
+	Create(sub NewSubscription) (*Response, *NewSubscriptionResponse, error)
 	Preview(sub NewSubscription) (*Response, *Subscription, error)
 	Update(uuid string, sub UpdateSubscription) (*Response, *Subscription, error)
 	UpdateNotes(uuid string, n SubscriptionNotes) (*Response, *Subscription, error)
@@ -103,6 +120,8 @@ type SubscriptionsService interface {
 	TerminateWithFullRefund(uuid string) (*Response, *Subscription, error)
 	TerminateWithoutRefund(uuid string) (*Response, *Subscription, error)
 	Postpone(uuid string, dt time.Time, bulk bool) (*Response, *Subscription, error)
+	Pause(uuid string, cycles int) (*Response, *Subscription, error)
+	Resume(uuid string) (*Response, *Subscription, error)
 }
 
 // TransactionsService represents the interactions available for transactions.
@@ -111,4 +130,11 @@ type TransactionsService interface {
 	ListAccount(accountCode string, params Params) (*Response, []Transaction, error)
 	Get(uuid string) (*Response, *Transaction, error)
 	Create(t Transaction) (*Response, *Transaction, error)
+}
+
+// CreditPaymentsService represents the interactions available for credit payments.
+type CreditPaymentsService interface {
+	List(params Params) (*Response, []CreditPayment, error)
+	ListAccount(accountCode string, params Params) (*Response, []CreditPayment, error)
+	Get(uuid string) (*Response, *CreditPayment, error)
 }

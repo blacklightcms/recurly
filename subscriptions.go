@@ -1,6 +1,14 @@
 package recurly
 
-import "encoding/xml"
+import (
+	"encoding/xml"
+	"strings"
+)
+
+// SanitizeUUID returns the uuid without dashes.
+func SanitizeUUID(id string) string {
+	return strings.TrimSpace(strings.Replace(id, "-", "", -1))
+}
 
 const (
 	// SubscriptionStateActive represents subscriptions that are valid for the
@@ -28,6 +36,10 @@ const (
 	// SubscriptionStatePastDue are subscriptions that are active or canceled
 	// and have a past-due invoice
 	SubscriptionStatePastDue = "past_due"
+
+	// SubscriptionStatePaused are subscriptions that are in a paused state
+	// and will not be billed for the set RemainingPauseCycles
+	SubscriptionStatePaused = "paused"
 )
 
 // Subscription represents an individual subscription.
@@ -41,6 +53,7 @@ type Subscription struct {
 	UnitAmountInCents      int                  `xml:"unit_amount_in_cents,omitempty"`
 	Currency               string               `xml:"currency,omitempty"`
 	Quantity               int                  `xml:"quantity,omitempty"`
+	TotalAmountInCents     int                  `xml:"total_amount_in_cents,omitempty"`
 	ActivatedAt            NullTime             `xml:"activated_at,omitempty"`
 	CanceledAt             NullTime             `xml:"canceled_at,omitempty"`
 	ExpiresAt              NullTime             `xml:"expires_at,omitempty"`
@@ -56,65 +69,32 @@ type Subscription struct {
 	NetTerms               NullInt              `xml:"net_terms,omitempty"`
 	SubscriptionAddOns     []SubscriptionAddOn  `xml:"subscription_add_ons>subscription_add_on,omitempty"`
 	PendingSubscription    *PendingSubscription `xml:"pending_subscription,omitempty"`
+	Invoice                *Invoice             `xml:"-"`
+	RemainingPauseCycles   int                  `xml:"remaining_pause_cycles,omitempty"`
+	CollectionMethod       string               `xml:"collection_method"` 
 }
 
 // UnmarshalXML unmarshals transactions and handles intermediary state during unmarshaling
 // for types like href.
 func (s *Subscription) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	type subscriptionAlias Subscription
 	var v struct {
-		XMLName                xml.Name             `xml:"subscription"`
-		Plan                   NestedPlan           `xml:"plan,omitempty"`
-		AccountCode            hrefString           `xml:"account"`
-		InvoiceNumber          hrefInt              `xml:"invoice"`
-		UUID                   string               `xml:"uuid,omitempty"`
-		State                  string               `xml:"state,omitempty"`
-		UnitAmountInCents      int                  `xml:"unit_amount_in_cents,omitempty"`
-		Currency               string               `xml:"currency,omitempty"`
-		Quantity               int                  `xml:"quantity,omitempty"`
-		ActivatedAt            NullTime             `xml:"activated_at,omitempty"`
-		CanceledAt             NullTime             `xml:"canceled_at,omitempty"`
-		ExpiresAt              NullTime             `xml:"expires_at,omitempty"`
-		CurrentPeriodStartedAt NullTime             `xml:"current_period_started_at,omitempty"`
-		CurrentPeriodEndsAt    NullTime             `xml:"current_period_ends_at,omitempty"`
-		TrialStartedAt         NullTime             `xml:"trial_started_at,omitempty"`
-		TrialEndsAt            NullTime             `xml:"trial_ends_at,omitempty"`
-		TaxInCents             int                  `xml:"tax_in_cents,omitempty"`
-		TaxType                string               `xml:"tax_type,omitempty"`
-		TaxRegion              string               `xml:"tax_region,omitempty"`
-		TaxRate                float64              `xml:"tax_rate,omitempty"`
-		PONumber               string               `xml:"po_number,omitempty"`
-		NetTerms               NullInt              `xml:"net_terms,omitempty"`
-		SubscriptionAddOns     []SubscriptionAddOn  `xml:"subscription_add_ons>subscription_add_on,omitempty"`
-		PendingSubscription    *PendingSubscription `xml:"pending_subscription,omitempty"`
+		subscriptionAlias
+		XMLName           xml.Name           `xml:"subscription"`
+		AccountCode       hrefString         `xml:"account"`
+		InvoiceNumber     hrefInt            `xml:"invoice"`
+		InvoiceCollection *InvoiceCollection `xml:"invoice_collection"`
 	}
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err
 	}
-	*s = Subscription{
-		XMLName:                v.XMLName,
-		Plan:                   v.Plan,
-		AccountCode:            string(v.AccountCode),
-		InvoiceNumber:          int(v.InvoiceNumber),
-		UUID:                   v.UUID,
-		State:                  v.State,
-		UnitAmountInCents:      v.UnitAmountInCents,
-		Currency:               v.Currency,
-		Quantity:               v.Quantity,
-		ActivatedAt:            v.ActivatedAt,
-		CanceledAt:             v.CanceledAt,
-		ExpiresAt:              v.ExpiresAt,
-		CurrentPeriodStartedAt: v.CurrentPeriodStartedAt,
-		CurrentPeriodEndsAt:    v.CurrentPeriodEndsAt,
-		TrialStartedAt:         v.TrialStartedAt,
-		TrialEndsAt:            v.TrialEndsAt,
-		TaxInCents:             v.TaxInCents,
-		TaxType:                v.TaxType,
-		TaxRegion:              v.TaxRegion,
-		TaxRate:                v.TaxRate,
-		PONumber:               v.PONumber,
-		NetTerms:               v.NetTerms,
-		SubscriptionAddOns:     v.SubscriptionAddOns,
-		PendingSubscription:    v.PendingSubscription,
+	*s = Subscription(v.subscriptionAlias)
+	s.XMLName = v.XMLName
+	s.AccountCode = string(v.AccountCode)
+	s.InvoiceNumber = int(v.InvoiceNumber)
+
+	if v.InvoiceCollection != nil {
+		s.Invoice = v.InvoiceCollection.ChargeInvoice
 	}
 
 	return nil
@@ -153,6 +133,7 @@ type SubscriptionAddOn struct {
 type PendingSubscription struct {
 	XMLName            xml.Name            `xml:"pending_subscription"`
 	Plan               NestedPlan          `xml:"plan,omitempty"`
+	UnitAmountInCents  int                 `xml:"unit_amount_in_cents,omitempty"`
 	Quantity           int                 `xml:"quantity,omitempty"` // Quantity of subscriptions
 	SubscriptionAddOns []SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
 }
@@ -179,6 +160,12 @@ type NewSubscription struct {
 	CustomerNotes           string               `xml:"customer_notes,omitempty"`
 	VATReverseChargeNotes   string               `xml:"vat_reverse_charge_notes,omitempty"`
 	BankAccountAuthorizedAt NullTime             `xml:"bank_account_authorized_at,omitempty"`
+}
+
+// NewSubscriptionResponse is used to unmarshal either the subscription or the transaction.
+type NewSubscriptionResponse struct {
+	Subscription *Subscription
+	Transaction  *Transaction // UnprocessableEntity errors return only the transaction
 }
 
 // UpdateSubscription is used to update subscriptions

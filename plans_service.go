@@ -14,11 +14,6 @@ type plansImpl struct {
 	client *Client
 }
 
-// NewPlansImpl returns a new instance of plansImpl.
-func NewPlansImpl(client *Client) *plansImpl {
-	return &plansImpl{client: client}
-}
-
 // List will retrieve all your active subscription plans.
 // https://docs.recurly.com/api/plans#list-plans
 func (s *plansImpl) List(params Params) (*Response, []Plan, error) {

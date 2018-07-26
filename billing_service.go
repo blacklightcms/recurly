@@ -13,11 +13,6 @@ type billingImpl struct {
 	client *Client
 }
 
-// NewBillingImpl returns a new instance of billingImpl.
-func NewBillingImpl(client *Client) *billingImpl {
-	return &billingImpl{client: client}
-}
-
 // Get returns only the account's current billing information.
 // https://docs.recurly.com/api/billing-info#lookup-billing-info
 func (s *billingImpl) Get(accountCode string) (*Response, *Billing, error) {
@@ -124,6 +119,9 @@ func (s *billingImpl) UpdateWithToken(accountCode string, token string) (*Respon
 
 	var dst Billing
 	resp, err := s.client.do(req, &dst)
+	if err != nil || resp.StatusCode >= http.StatusBadRequest {
+		return resp, nil, err
+	}
 
 	return resp, &dst, err
 }

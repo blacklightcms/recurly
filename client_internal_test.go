@@ -7,8 +7,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"reflect"
 	"testing"
+
+	"github.com/google/go-cmp/cmp"
 )
 
 // TestClient_NewRequest tests the internals of recurly.client.
@@ -60,8 +61,8 @@ func TestClient_NewRequest(t *testing.T) {
 
 	expected := []byte("<account><account_code>abc</account_code></account>")
 	given, _ := ioutil.ReadAll(req.Body)
-	if !reflect.DeepEqual(expected, given) {
-		t.Fatalf("expected string body equal to %s, given %s", expected, given)
+	if diff := cmp.Diff(expected, given); diff != "" {
+		t.Fatal(diff)
 	}
 
 	query = req.URL.Query()
@@ -70,8 +71,9 @@ func TestClient_NewRequest(t *testing.T) {
 	}
 }
 
-// TestClient_Error tests the internals of recurly.client.
-func TestClient_Error(t *testing.T) {
+// TestClient_Errors tests the internals of recurly.client returning a 422
+// repsonse with an array of errors.
+func TestClient_Errors(t *testing.T) {
 	mux := http.NewServeMux()
 	server := httptest.NewServer(mux)
 	client := NewClient("test", "abc", nil)
@@ -99,10 +101,8 @@ func TestClient_Error(t *testing.T) {
 		t.Fatalf("expected response to not be ok")
 	}
 
-	// TransactionError should be nil
-	if resp.TransactionError != nil {
-		t.Fatal("expected transaction error to be nil")
-	} else if resp.Transaction != nil {
+	// Transaction should be nil
+	if resp.transaction != nil {
 		t.Fatal("expected transaction to be nil")
 	}
 
@@ -121,7 +121,55 @@ func TestClient_Error(t *testing.T) {
 		},
 	}
 
-	if !reflect.DeepEqual(expected, resp.Errors) {
-		t.Fatalf("unexpected error: %v", resp.Errors)
+	if diff := cmp.Diff(expected, resp.Errors); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
+// TestClient_Error tests the internals of recurly.client with a 422
+// response with a single error.
+func TestClient_Error(t *testing.T) {
+	mux := http.NewServeMux()
+	server := httptest.NewServer(mux)
+	client := NewClient("test", "abc", nil)
+	client.BaseURL = server.URL + "/"
+	defer server.Close()
+
+	mux.HandleFunc("/error", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(422)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
+			<error>
+				<symbol>simultaneous_request</symbol>
+				<description>A change for subscription 3cf89f0c3fcda0b15c50134f63856d4e is already in progress.</description>
+			</error>`)
+	})
+
+	req, err := http.NewRequest("GET", client.BaseURL+"error", nil)
+	if err != nil {
+		t.Fatalf("error creating request. err: %v", err)
+	}
+
+	resp, err := client.do(req, nil)
+	if err != nil {
+		t.Fatalf("error making request. err: %v", err)
+	} else if resp.IsOK() {
+		t.Fatalf("expected response to not be ok")
+	}
+
+	// Transaction should be nil
+	if resp.transaction != nil {
+		t.Fatal("expected transaction to be nil")
+	}
+
+	expected := []Error{
+		{
+			XMLName:     xml.Name{Local: "error"},
+			Symbol:      "simultaneous_request",
+			Description: "A change for subscription 3cf89f0c3fcda0b15c50134f63856d4e is already in progress.",
+		},
+	}
+
+	if diff := cmp.Diff(expected, resp.Errors); diff != "" {
+		t.Fatal(diff)
 	}
 }

@@ -12,6 +12,7 @@
     <id>a5143c1d3a6f4a8287d0e2cc1d4c0427</id>
     <invoice_id>1974a09kj90s0789dsf099798326881c</invoice_id>
     <invoice_number type="integer">2059</invoice_number>
+    <payment_method>credit_card</payment_method>
     <action>purchase</action>
     <date type="datetime">2009-11-22T13:10:38Z</date>
     <amount_in_cents type="integer">1000</amount_in_cents>
