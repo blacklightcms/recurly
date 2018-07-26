@@ -823,8 +823,6 @@ func TestParse_ScheduledPaymentNotification(t *testing.T) {
 }
 
 func TestParse_NewDunningEventNotification(t *testing.T) {
-	fmt.Println("Available after credit invoices have been turned on in your account. See https://docs.recurly.com/docs/credit-invoices-release#section-updates-to-the-api-and-sdks for more information.")
-
 	createdTs, _ := time.Parse(recurly.DateTimeFormat, "2018-01-09T16:47:43Z")
 	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2017-11-09T16:47:30Z")
 	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-02-09T16:47:30Z")
@@ -879,7 +877,6 @@ func TestParse_NewDunningEventNotification(t *testing.T) {
 }
 
 func TestParse_NewDunningEventDeprecatedNotification(t *testing.T) {
-
 	createdTs, _ := time.Parse(recurly.DateTimeFormat, "2016-10-26T16:00:12Z")
 	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2016-10-26T05:42:27Z")
 	closedAt, _ := time.Parse(recurly.DateTimeFormat, "2016-10-27T16:00:26Z")
