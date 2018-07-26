@@ -2,7 +2,6 @@ package webhooks_test
 
 import (
 	"encoding/xml"
-	"fmt"
 	"os"
 	"testing"
 	"time"
