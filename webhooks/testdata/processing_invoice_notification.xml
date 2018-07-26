@@ -4,7 +4,7 @@
         <account_code>1</account_code>
         <username nil="true"></username>
         <email>verena@example.com</email>
-        <first_name>Verana</first_name>
+        <first_name>Verena</first_name>
         <last_name>Example</last_name>
         <company_name nil="true"></company_name>
     </account>
@@ -20,7 +20,7 @@
         <currency>USD</currency>
         <date type="datetime">2014-01-01T20:21:44Z</date>
         <closed_at type="datetime" nil="true"></closed_at>
-        <net_terms type="integer">0</net_terms>
+        <net_terms type="integer">1</net_terms>
         <collection_method>automatic</collection_method>
     </invoice>
 </processing_invoice_notification>

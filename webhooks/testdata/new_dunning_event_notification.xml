@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <new_dunning_event_notification>
     <account>
-        <account_code>1234</account_code>
-        <username></username>
-        <email></email>
-        <first_name></first_name>
-        <last_name></last_name>
-        <company_name></company_name>
+        <account_code>1</account_code>
+        <username>verena</username>
+        <email>verena@example.com</email>
+        <first_name>Verena</first_name>
+        <last_name>Example</last_name>
+        <company_name>Company, Inc.</company_name>
         <phone></phone>
     </account>
     <invoice>
