@@ -89,8 +89,8 @@ type PurchasesService interface {
 
 // RedemptionsService represents the interactions available for redemptions.
 type RedemptionsService interface {
-	GetForAccount(accountCode string) (*Response, *Redemption, error)
-	GetForInvoice(invoiceNumber string) (*Response, *Redemption, error)
+	GetForAccount(accountCode string) (*Response, []Redemption, error)
+	GetForInvoice(invoiceNumber string) (*Response, []Redemption, error)
 	Redeem(code string, accountCode string, currency string) (*Response, *Redemption, error)
 	Delete(accountCode string) (*Response, error)
 }

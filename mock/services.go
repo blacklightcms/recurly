@@ -396,10 +396,10 @@ var _ recurly.RedemptionsService = &RedemptionsService{}
 
 // RedemptionsService represents the interactions available for redemptions.
 type RedemptionsService struct {
-	OnGetForAccount      func(accountCode string) (*recurly.Response, *recurly.Redemption, error)
+	OnGetForAccount      func(accountCode string) (*recurly.Response, []recurly.Redemption, error)
 	GetForAccountInvoked bool
 
-	OnGetForInvoice      func(invoiceNumber string) (*recurly.Response, *recurly.Redemption, error)
+	OnGetForInvoice      func(invoiceNumber string) (*recurly.Response, []recurly.Redemption, error)
 	GetForInvoiceInvoked bool
 
 	OnRedeem      func(code string, accountCode string, currency string) (*recurly.Response, *recurly.Redemption, error)
@@ -409,12 +409,12 @@ type RedemptionsService struct {
 	DeleteInvoked bool
 }
 
-func (m *RedemptionsService) GetForAccount(accountCode string) (*recurly.Response, *recurly.Redemption, error) {
+func (m *RedemptionsService) GetForAccount(accountCode string) (*recurly.Response, []recurly.Redemption, error) {
 	m.GetForAccountInvoked = true
 	return m.OnGetForAccount(accountCode)
 }
 
-func (m *RedemptionsService) GetForInvoice(invoiceNumber string) (*recurly.Response, *recurly.Redemption, error) {
+func (m *RedemptionsService) GetForInvoice(invoiceNumber string) (*recurly.Response, []recurly.Redemption, error) {
 	m.GetForInvoiceInvoked = true
 	return m.OnGetForInvoice(invoiceNumber)
 }

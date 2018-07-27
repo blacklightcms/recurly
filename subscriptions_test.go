@@ -266,7 +266,7 @@ func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 		if err := xml.NewEncoder(&given).Encode(tt.v); err != nil {
 			t.Fatalf("(%d) unexpected encode error: %v", i, err)
 		} else if tt.expected != given.String() {
-			t.Fatalf("(%d) unexpected value: %s", i, given.String())
+			t.Fatalf("(%d) unexpected value: %s", i, cmp.Diff(given.String(), tt.expected))
 		}
 	}
 }
