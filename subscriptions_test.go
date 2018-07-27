@@ -32,7 +32,9 @@ func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 		},
 		{
 			v: recurly.NewSubscription{
-				PlanCode: "gold",
+				PlanCode:             "gold",
+				AutoRenew:            true,
+				RenewalBillingCycles: recurly.NullInt{Valid: true, Int: 2},
 				Account: recurly.Account{
 					Code: "123",
 					BillingInfo: &recurly.Billing{
@@ -40,7 +42,7 @@ func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 					},
 				},
 			},
-			expected: "<subscription><plan_code>gold</plan_code><account><account_code>123</account_code><billing_info><token_id>507c7f79bcf86cd7994f6c0e</token_id></billing_info></account><currency></currency></subscription>",
+			expected: "<subscription><plan_code>gold</plan_code><account><account_code>123</account_code><billing_info><token_id>507c7f79bcf86cd7994f6c0e</token_id></billing_info></account><currency></currency><renewal_billing_cycles>2</renewal_billing_cycles><auto_renew>true</auto_renew></subscription>",
 		},
 		{
 			v: recurly.NewSubscription{
@@ -265,8 +267,8 @@ func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 		var given bytes.Buffer
 		if err := xml.NewEncoder(&given).Encode(tt.v); err != nil {
 			t.Fatalf("(%d) unexpected encode error: %v", i, err)
-		} else if tt.expected != given.String() {
-			t.Fatalf("(%d) unexpected value: %s", i, cmp.Diff(given.String(), tt.expected))
+		} else if diff := cmp.Diff(tt.expected, given.String()); diff != "" {
+			t.Fatal(diff)
 		}
 	}
 }
@@ -288,8 +290,8 @@ func TestSubscriptions_UpdateSubscription_Encoding(t *testing.T) {
 			expected: "<subscription><plan_code>new-code</plan_code></subscription>",
 		},
 		{
-			v:        recurly.UpdateSubscription{Quantity: 14},
-			expected: "<subscription><quantity>14</quantity></subscription>",
+			v:        recurly.UpdateSubscription{Quantity: 14, AutoRenew: true, RenewalBillingCycles: recurly.NullInt{Valid: true, Int: 2}},
+			expected: "<subscription><quantity>14</quantity><renewal_billing_cycles>2</renewal_billing_cycles><auto_renew>true</auto_renew></subscription>",
 		},
 		{
 			v:        recurly.UpdateSubscription{UnitAmountInCents: 3500},
@@ -336,8 +338,8 @@ func TestSubscriptions_UpdateSubscription_Encoding(t *testing.T) {
 		var given bytes.Buffer
 		if err := xml.NewEncoder(&given).Encode(tt.v); err != nil {
 			t.Fatalf("(%d) unexpected encode error: %v", i, err)
-		} else if tt.expected != given.String() {
-			t.Fatalf("(%d) unexpected value: %s", i, given.String())
+		} else if diff := cmp.Diff(tt.expected, given.String()); diff != "" {
+			t.Fatal(diff)
 		}
 	}
 }
@@ -378,6 +380,9 @@ func TestSubscriptions_List(t *testing.T) {
 				<tax_rate type="float">0.0875</tax_rate>
 				<po_number nil="nil"></po_number>
 				<net_terms type="integer">0</net_terms>
+				<auto_renew>true</auto_renew>
+				<current_term_started_at type="datetime">2010-07-27T07:00:00Z</current_term_started_at>
+				<current_term_ends_at type="datetime">2010-07-27T07:00:00Z</current_term_ends_at>
 				<subscription_add_ons type="array">
 					<subscription_add_on>
 						<add_on_type>fixed</add_on_type>
@@ -423,10 +428,13 @@ func TestSubscriptions_List(t *testing.T) {
 			ActivatedAt:            recurly.NewTime(activated),
 			CurrentPeriodStartedAt: recurly.NewTime(cpStartedAt),
 			CurrentPeriodEndsAt:    recurly.NewTime(cpEndsAt),
+			CurrentTermStartedAt:   recurly.NewTime(cpEndsAt),
+			CurrentTermEndsAt:      recurly.NewTime(cpEndsAt),
 			TaxInCents:             72,
 			TaxType:                "usst",
 			TaxRegion:              "CA",
 			TaxRate:                0.0875,
+			AutoRenew:              true,
 			NetTerms:               recurly.NewInt(0),
 			SubscriptionAddOns: []recurly.SubscriptionAddOn{
 				{
