@@ -3,7 +3,6 @@ package recurly
 import (
 	"encoding/xml"
 	"fmt"
-	"net/http"
 )
 
 var _ RedemptionsService = &redemptionsImpl{}
@@ -14,42 +13,44 @@ type redemptionsImpl struct {
 	client *Client
 }
 
-// GetForAccount looks up information about the 'active' coupon redemption on
+// GetForAccount looks up information about the 'active' coupon redemptions on
 // an account
 // https://dev.recurly.com/docs/lookup-a-coupon-redemption-on-an-account
-func (s *redemptionsImpl) GetForAccount(accountCode string) (*Response, *Redemption, error) {
-	action := fmt.Sprintf("accounts/%s/redemption", accountCode)
+func (s *redemptionsImpl) GetForAccount(accountCode string) (*Response, []Redemption, error) {
+	action := fmt.Sprintf("accounts/%s/redemptions", accountCode)
 	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var dst Redemption
-	resp, err := s.client.do(req, &dst)
-	if err != nil || resp.StatusCode >= http.StatusBadRequest {
-		return resp, nil, err
+	var r struct {
+		XMLName     xml.Name     `xml:"redemptions"`
+		Redemptions []Redemption `xml:"redemption"`
 	}
 
-	return resp, &dst, err
+	resp, err := s.client.do(req, &r)
+
+	return resp, r.Redemptions, err
 }
 
 // GetForInvoice looks up information about a coupon redemption applied
 // to an invoice.
 // https://dev.recurly.com/docs/lookup-a-coupon-redemption-on-an-invoice
-func (s *redemptionsImpl) GetForInvoice(invoiceNumber string) (*Response, *Redemption, error) {
-	action := fmt.Sprintf("invoices/%s/redemption", invoiceNumber)
+func (s *redemptionsImpl) GetForInvoice(invoiceNumber string) (*Response, []Redemption, error) {
+	action := fmt.Sprintf("invoices/%s/redemptions", invoiceNumber)
 	req, err := s.client.newRequest("GET", action, nil, nil)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	var dst Redemption
-	resp, err := s.client.do(req, &dst)
-	if err != nil || resp.StatusCode >= http.StatusBadRequest {
-		return resp, nil, err
+	var r struct {
+		XMLName     xml.Name     `xml:"redemptions"`
+		Redemptions []Redemption `xml:"redemption"`
 	}
 
-	return resp, &dst, err
+	resp, err := s.client.do(req, &r)
+
+	return resp, r.Redemptions, err
 }
 
 // Redeem will redeem a coupon before or after a subscription. Most coupons are
