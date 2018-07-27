@@ -44,6 +44,7 @@ func TestInvoices_List(t *testing.T) {
         		<invoice_number type="integer">1005</invoice_number>
         		<po_number nil="nil"></po_number>
         		<vat_number nil="nil"></vat_number>
+        		<discount_in_cents type="integer">17</discount_in_cents>
         		<subtotal_in_cents type="integer">1200</subtotal_in_cents>
         		<tax_in_cents type="integer">0</tax_in_cents>
         		<total_in_cents type="integer">1200</total_in_cents>
@@ -123,6 +124,7 @@ func TestInvoices_List(t *testing.T) {
 		UUID:             "421f7b7d414e4c6792938e7c49d552e9",
 		State:            recurly.InvoiceStateOpenDeprecated,
 		InvoiceNumber:    1005,
+		DiscountInCents:  17,
 		SubtotalInCents:  1200,
 		TaxInCents:       0,
 		TotalInCents:     1200,
@@ -794,7 +796,7 @@ func TestInvoices_Create(t *testing.T) {
 				<recovery_reason nil="nil"/>
 				<subtotal_before_discount_in_cents type="integer">5000</subtotal_before_discount_in_cents>
 				<subtotal_in_cents type="integer">3000</subtotal_in_cents>
-				<discount_in_cents type="integer">0</discount_in_cents>
+				<discount_in_cents type="integer">17</discount_in_cents>
 				<due_on type="datetime">2018-03-20T15:43:41Z</due_on>
 				<net_terms type="integer">0</net_terms>
 				<collection_method>manual</collection_method>
@@ -835,6 +837,7 @@ func TestInvoices_Create(t *testing.T) {
 		UUID:                    "43adb97640cc05dee0b10042e596307f",
 		State:                   recurly.ChargeInvoiceStatePending,
 		InvoiceNumber:           1016,
+		DiscountInCents:         17,
 		SubtotalInCents:         3000,
 		TaxInCents:              425,
 		TotalInCents:            3425,

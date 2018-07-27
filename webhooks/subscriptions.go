@@ -10,6 +10,7 @@ const (
 	RenewedSubscription  = "renewed_subscription_notification"
 	ExpiredSubscription  = "expired_subscription_notification"
 	CanceledSubscription = "canceled_subscription_notification"
+	ReactivatedAccount   = "reactivated_account_notification"
 )
 
 // SubscriptionNotification is returned for all subscription notifications.

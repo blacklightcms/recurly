@@ -75,7 +75,7 @@ func TestShippingAddress_ListAccount(t *testing.T) {
 
 	if diff := cmp.Diff(shippingAddresses, []recurly.ShippingAddress{
 		{
-			ID:          "2438622711411416831",
+			ID:          2438622711411416831,
 			AccountCode: "1",
 			Nickname:    "Work",
 			FirstName:   "Verena",
@@ -155,7 +155,7 @@ func TestShippingAddress_Create(t *testing.T) {
 	updated, _ := time.Parse(recurly.DateTimeFormat, "2018-03-19T15:48:00Z")
 
 	if diff := cmp.Diff(shippingAddress, &recurly.ShippingAddress{
-		ID:          "2438622711411416831",
+		ID:          2438622711411416831,
 		AccountCode: "1",
 		Nickname:    "Work",
 		FirstName:   "Verena",
@@ -208,7 +208,7 @@ func TestShippingAddress_Update(t *testing.T) {
 		</shipping_address>`)
 	})
 
-	r, shippingAddress, err := client.ShippingAddresses.Update("1", "2438622711411416831", recurly.ShippingAddress{})
+	r, shippingAddress, err := client.ShippingAddresses.Update("1", 2438622711411416831, recurly.ShippingAddress{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
@@ -218,7 +218,7 @@ func TestShippingAddress_Update(t *testing.T) {
 	updated, _ := time.Parse(recurly.DateTimeFormat, "2018-03-19T15:48:00Z")
 
 	if diff := cmp.Diff(shippingAddress, &recurly.ShippingAddress{
-		ID:          "2438622711411416831",
+		ID:          2438622711411416831,
 		AccountCode: "1",
 		Nickname:    "Work",
 		FirstName:   "Verena",
@@ -250,7 +250,7 @@ func TestShippingAddressDelete(t *testing.T) {
 		w.WriteHeader(204)
 	})
 
-	r, err := client.ShippingAddresses.Delete("1", "2438622711411416831")
+	r, err := client.ShippingAddresses.Delete("1", 2438622711411416831)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
@@ -302,7 +302,7 @@ func TestShippingAddress_GetSubscriptions(t *testing.T) {
 				</subscription>
 			</subscriptions>`)
 	})
-	resp, subscriptions, err := client.ShippingAddresses.GetSubscriptions("1", "2438622711411416831")
+	resp, subscriptions, err := client.ShippingAddresses.GetSubscriptions("1", 2438622711411416831)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if resp.IsError() {
