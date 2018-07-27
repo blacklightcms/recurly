@@ -148,18 +148,18 @@ func TestCoupons_List(t *testing.T) {
             <applies_for_months nil="nil"></applies_for_months>
             <max_redemptions type="integer">10</max_redemptions>
             <applies_to_all_plans type="boolean">false</applies_to_all_plans>
-        		<duration>single_use</duration>
-					  <temporal_unit nil="nil"/>
-					  <temporal_amount nil="nil"/>
+            <duration>single_use</duration>
+            <temporal_unit nil="nil"/>
+            <temporal_amount nil="nil"/>
             <redemption_resource>account</redemption_resource>
             <max_redemptions_per_account nil="nil"/>
-        		<created_at type="datetime">2011-04-10T07:00:00Z</created_at>
-        		<plan_codes type="array">
-        			<plan_code>gold</plan_code>
-        			<plan_code>platinum</plan_code>
-        		</plan_codes>
-        		<a name="redeem" href="https://your-subdomain.recurly.com/v2/coupons/special/redeem" method="post"/>
-        	</coupon>
+            <created_at type="datetime">2011-04-10T07:00:00Z</created_at>
+            <plan_codes type="array">
+              <plan_code>gold</plan_code>
+              <plan_code>platinum</plan_code>
+            </plan_codes>
+            <a name="redeem" href="https://your-subdomain.recurly.com/v2/coupons/special/redeem" method="post"/>
+          </coupon>
         </coupons>`)
 	})
 
@@ -209,7 +209,7 @@ func TestCoupons_Get(t *testing.T) {
 		w.WriteHeader(200)
 		io.WriteString(w, `<?xml version="1.0" encoding="UTF-8"?>
             <coupon href="https://your-subdomain.recurly.com/v2/coupons/special">
-        		<redemptions href="https://your-subdomain.recurly.com/v2/coupons/special/redemptions"/>
+            <redemptions href="https://your-subdomain.recurly.com/v2/coupons/special/redemptions"/>
             <id type="integer">2151093486799579392</id>
         		<coupon_code>special</coupon_code>
         		<name>20$ off</name>
