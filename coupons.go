@@ -6,6 +6,7 @@ import "encoding/xml"
 // https://dev.recurly.com/docs/lookup-a-coupon
 type Coupon struct {
 	XMLName                  xml.Name    `xml:"coupon"`
+	ID                       uint64      `xml:"id"`
 	Code                     string      `xml:"coupon_code"`
 	Type                     string      `xml:"coupon_type"`
 	Name                     string      `xml:"name"`
@@ -23,6 +24,8 @@ type Coupon struct {
 	RedeemByDate             NullTime    `xml:"redeem_by_date,omitempty"`
 	MaxRedemptions           NullInt     `xml:"max_redemptions,omitempty"`
 	CreatedAt                NullTime    `xml:"created_at,omitempty"`
+	UpdatedAt                NullTime    `xml:"updated_at,omitempty"`
+	DeletedAt                NullTime    `xml:"deleted_at,omitempty"`
 	TemporalUnit             string      `xml:"temporal_unit,omitempty"`
 	TemporalAmount           NullInt     `xml:"temporal_amount,omitempty"`
 	MaxRedemptionsPerAccount NullInt     `xml:"max_redemptions_per_account,omitempty"`

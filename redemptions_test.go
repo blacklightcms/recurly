@@ -2,7 +2,6 @@ package recurly_test
 
 import (
 	"bytes"
-	"encoding/xml"
 	"fmt"
 	"net/http"
 	"testing"
@@ -26,12 +25,15 @@ func TestRedemptions_GetForAccount(t *testing.T) {
         <redemption href="https://your-subdomain.recurly.com/v2/accounts/1/redemption">
             <coupon href="https://your-subdomain.recurly.com/v2/coupons/special"/>
             <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
-            <single_use type="boolean">false</single_use>
+            <subscription href="https://your-subdomain.recurly.com/v2/subscriptions/37bfef7a8e44cfc3817b7a43eba8a6e6" />
+            <uuid>374a1c75374bd81493a3f7425db0a2b8</uuid>
+             <single_use type="boolean">false</single_use>
             <total_discounted_in_cents type="integer">0</total_discounted_in_cents>
             <currency>USD</currency>
             <state>active</state>
             <coupon_code>special</coupon_code>
             <created_at type="datetime">2011-06-27T12:34:56Z</created_at>
+            <updated_at type="datetime">2011-06-27T12:34:56Z</updated_at>
         </redemption>
      </redemptions>`)
 	})
@@ -45,13 +47,16 @@ func TestRedemptions_GetForAccount(t *testing.T) {
 
 	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-06-27T12:34:56Z")
 	if diff := cmp.Diff(redemptions[0], recurly.Redemption{
-		XMLName:                xml.Name{Local: "redemption"},
+		UUID:                   "374a1c75374bd81493a3f7425db0a2b8",
+		SubscriptionUUID:       "37bfef7a8e44cfc3817b7a43eba8a6e6",
+		AccountCode:            "1",
 		CouponCode:             "special",
-		SingleUse:              recurly.NewBool(false),
+		SingleUse:              false,
 		TotalDiscountedInCents: 0,
 		Currency:               "USD",
-		State:                  "active",
+		State:                  recurly.RedemptionStateActive,
 		CreatedAt:              recurly.NewTime(ts),
+		UpdatedAt:              recurly.NewTime(ts),
 	}); diff != "" {
 		t.Fatal(diff)
 	}
@@ -91,12 +96,15 @@ func TestRedemptions_GetForInvoice(t *testing.T) {
         <redemption href="https://your-subdomain.recurly.com/v2/accounts/1/redemption">
             <coupon href="https://your-subdomain.recurly.com/v2/coupons/special"/>
             <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
+            <subscription href="https://your-subdomain.recurly.com/v2/subscriptions/37bfef7a8e44cfc3817b7a43eba8a6e6" />
+            <uuid>374a1c75374bd81493a3f7425db0a2b8</uuid>
             <single_use type="boolean">true</single_use>
             <total_discounted_in_cents type="integer">0</total_discounted_in_cents>
             <currency>USD</currency>
             <state>inactive</state>
             <coupon_code>special</coupon_code>
             <created_at type="datetime">2011-06-27T12:34:56Z</created_at>
+            <updated_at type="datetime">2011-06-27T12:34:56Z</updated_at>
         </redemption>
       </redemptions>`)
 	})
@@ -110,13 +118,16 @@ func TestRedemptions_GetForInvoice(t *testing.T) {
 
 	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-06-27T12:34:56Z")
 	if diff := cmp.Diff(redemptions[0], recurly.Redemption{
-		XMLName:                xml.Name{Local: "redemption"},
+		UUID:                   "374a1c75374bd81493a3f7425db0a2b8",
+		SubscriptionUUID:       "37bfef7a8e44cfc3817b7a43eba8a6e6",
+		AccountCode:            "1",
 		CouponCode:             "special",
-		SingleUse:              recurly.NewBool(true),
+		SingleUse:              true,
 		TotalDiscountedInCents: 0,
 		Currency:               "USD",
-		State:                  "inactive",
+		State:                  recurly.RedemptionStateInactive,
 		CreatedAt:              recurly.NewTime(ts),
+		UpdatedAt:              recurly.NewTime(ts),
 	}); diff != "" {
 		t.Fatal(diff)
 	}
