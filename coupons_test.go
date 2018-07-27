@@ -217,7 +217,7 @@ func TestCoupons_Get(t *testing.T) {
 			<coupon_type>bulk</coupon_type>
 			<discount_type>dollars</discount_type>
 			<discount_in_cents>
-				<USD type="integer">2000</USD>
+			 <USD type="integer">2000</USD>
 			</discount_in_cents>
 			<redemption_resource>account</redemption_resource>
 			<unique_code_template>'savemore'99999999</unique_code_template>
@@ -226,11 +226,11 @@ func TestCoupons_Get(t *testing.T) {
 			<single_use type="boolean">true</single_use>
 			<applies_for_months nil="nil"></applies_for_months>
 			<max_redemptions type="integer">10</max_redemptions>
-			<applies_to_all_plans type="boolean">false</applies_to_all_plans>
+      <applies_to_all_plans type="boolean">false</applies_to_all_plans>
 			<created_at type="datetime">2011-04-10T07:00:00Z</created_at>
 			<plan_codes type="array">
-				<plan_code>gold</plan_code>
-				<plan_code>platinum</plan_code>
+			  <plan_code>gold</plan_code>
+			  <plan_code>platinum</plan_code>
 			</plan_codes>
 			<a name="redeem" href="https://your-subdomain.recurly.com/v2/coupons/special/redeem" method="post"/>
 		</coupon>`)
