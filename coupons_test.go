@@ -208,32 +208,32 @@ func TestCoupons_Get(t *testing.T) {
 		}
 		w.WriteHeader(200)
 		io.WriteString(w, `<?xml version="1.0" encoding="UTF-8"?>
-		<coupon href="https://your-subdomain.recurly.com/v2/coupons/special">
-			<redemptions href="https://your-subdomain.recurly.com/v2/coupons/special/redemptions"/>
-			<id type="integer">2151093486799579392</id>
-			<coupon_code>special</coupon_code>
-			<name>20$ off</name>
-			<state>redeemable</state>
-			<coupon_type>bulk</coupon_type>
-			<discount_type>dollars</discount_type>
-			<discount_in_cents>
-			 <USD type="integer">2000</USD>
-			</discount_in_cents>
-			<redemption_resource>account</redemption_resource>
-			<unique_code_template>'savemore'99999999</unique_code_template>
-			<redeem_by_date type="datetime">2014-01-01T07:00:00Z</redeem_by_date>
-			<max_redemptions_per_account type="integer">1</max_redemptions_per_account>
-			<single_use type="boolean">true</single_use>
-			<applies_for_months nil="nil"></applies_for_months>
-			<max_redemptions type="integer">10</max_redemptions>
-      <applies_to_all_plans type="boolean">false</applies_to_all_plans>
-			<created_at type="datetime">2011-04-10T07:00:00Z</created_at>
-			<plan_codes type="array">
-			  <plan_code>gold</plan_code>
-			  <plan_code>platinum</plan_code>
-			</plan_codes>
-			<a name="redeem" href="https://your-subdomain.recurly.com/v2/coupons/special/redeem" method="post"/>
-		</coupon>`)
+      <coupon href="https://your-subdomain.recurly.com/v2/coupons/special">
+       	<redemptions href="https://your-subdomain.recurly.com/v2/coupons/special/redemptions"/>
+       	<id type="integer">2151093486799579392</id>
+       	<coupon_code>special</coupon_code>
+       	<name>20$ off</name>
+       	<state>redeemable</state>
+       	<coupon_type>bulk</coupon_type>
+       	<discount_type>dollars</discount_type>
+       	<discount_in_cents>
+       	  <USD type="integer">2000</USD>
+       	</discount_in_cents>
+       	<redemption_resource>account</redemption_resource>
+       	<unique_code_template>'savemore'99999999</unique_code_template>
+       	<redeem_by_date type="datetime">2014-01-01T07:00:00Z</redeem_by_date>
+       	<max_redemptions_per_account type="integer">1</max_redemptions_per_account>
+       	<single_use type="boolean">true</single_use>
+       	<applies_for_months nil="nil"></applies_for_months>
+       	<max_redemptions type="integer">10</max_redemptions>
+        <applies_to_all_plans type="boolean">false</applies_to_all_plans>
+       	<created_at type="datetime">2011-04-10T07:00:00Z</created_at>
+       	<plan_codes type="array">
+       	  <plan_code>gold</plan_code>
+       	  <plan_code>platinum</plan_code>
+       	</plan_codes>
+       	<a name="redeem" href="https://your-subdomain.recurly.com/v2/coupons/special/redeem" method="post"/>
+      </coupon>`)
 	})
 
 	resp, coupon, err := client.Coupons.Get("special")
