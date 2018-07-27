@@ -2,6 +2,7 @@ package recurly
 
 import (
 	"encoding/xml"
+	"sort"
 	"strings"
 )
 
@@ -230,10 +231,18 @@ func (c CustomFields) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	}
 
 	e.EncodeToken(xml.StartElement{Name: xml.Name{Local: "custom_fields"}})
-	for k, v := range c {
+
+	// Ensure key field order, otherwise causes rendered xml can have order difference
+	var keys []string
+	for k := range c {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
 		n := &xmlMapEntry{
 			Name:  k,
-			Value: v,
+			Value: c[k],
 		}
 		e.Encode(n)
 	}
