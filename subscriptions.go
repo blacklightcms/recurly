@@ -73,6 +73,7 @@ type Subscription struct {
 	CurrentTermEndsAt      NullTime             `xml:"current_term_ends_at,omitempty"`
 	PendingSubscription    *PendingSubscription `xml:"pending_subscription,omitempty"`
 	Invoice                *Invoice             `xml:"-"`
+	InvoiceCollection      *InvoiceCollection   `xml:"-"`
 	RemainingPauseCycles   int                  `xml:"remaining_pause_cycles,omitempty"`
 	CollectionMethod       string               `xml:"collection_method"`
 	AutoRenew              bool                 `xml:"auto_renew,omitempty"`

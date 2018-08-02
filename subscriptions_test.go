@@ -1017,23 +1017,274 @@ func TestSubscriptions_Notes(t *testing.T) {
 	}
 }
 
-func TestSubscriptions_Change(t *testing.T) {
+func TestSubscriptions_PreviewChange(t *testing.T) {
 	setup()
 	defer teardown()
 
-	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/preview", func(w http.ResponseWriter, r *http.Request) {
+	mux.HandleFunc("/v2/subscriptions/46652c59f3f1a1cdab9d404a6d91ddab/preview", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			t.Fatalf("unexpected method: %s", r.Method)
 		}
 		w.WriteHeader(201)
-		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?>
+			<subscription href="https://your-subdomain.recurly.com/v2/subscriptions/46652c59f3f1a1cdab9d404a6d91ddab">
+				<account href="https://your-subdomain.recurly.com/v2/accounts/multi-test-one"/>
+				<plan href="https://your-subdomain.recurly.com/v2/plans/multi-high">
+					<plan_code>multi-high</plan_code>
+					<name>Multi-Plan High End</name>
+				</plan>
+				<revenue_schedule_type>evenly</revenue_schedule_type>
+				<uuid>46652c59f3f1a1cdab9d404a6d91ddab</uuid>
+				<state>active</state>
+				<unit_amount_in_cents type="integer">150000</unit_amount_in_cents>
+				<currency>USD</currency>
+				<quantity type="integer">1</quantity>
+				<activated_at type="datetime">2018-08-01T16:45:16Z</activated_at>
+				<canceled_at nil="nil"></canceled_at>
+				<expires_at nil="nil"></expires_at>
+				<updated_at type="datetime">2018-08-01T21:00:14Z</updated_at>
+				<current_period_started_at type="datetime">2018-08-01T21:00:00Z</current_period_started_at>
+				<current_period_ends_at type="datetime">2018-09-01T21:00:00Z</current_period_ends_at>
+				<cost_in_cents type="integer">162000</cost_in_cents>
+				<collection_method>automatic</collection_method>
+				<subscription_add_ons type="array">
+					<subscription_add_on>
+						<add_on_type>fixed</add_on_type>
+						<add_on_code>product</add_on_code>
+						<unit_amount_in_cents type="integer">1500</unit_amount_in_cents>
+						<quantity type="integer">8</quantity>
+						<revenue_schedule_type>evenly</revenue_schedule_type>
+					</subscription_add_on>
+				</subscription_add_ons>
+				<invoice_collection>
+					<charge_invoice href="">
+						<account href="https://your-subdomain.recurly.com/v2/accounts/multi-test-one"/>
+						<uuid>4669ef730162b1a4db576a4722a40d8e</uuid>
+						<state>pending</state>
+						<total_in_cents type="integer">158094</total_in_cents>
+						<currency>USD</currency>
+						<attempt_next_collection_at type="datetime">2018-08-02T14:56:50Z</attempt_next_collection_at>
+						<subtotal_before_discount_in_cents type="integer">158094</subtotal_before_discount_in_cents>
+						<subtotal_in_cents type="integer">158094</subtotal_in_cents>
+						<discount_in_cents type="integer">0</discount_in_cents>
+						<due_on type="datetime">2018-08-02T14:56:50Z</due_on>
+						<balance_in_cents type="integer">126865</balance_in_cents>
+						<type>charge</type>
+						<origin>immediate_change</origin>
+						<refundable_total_in_cents type="integer">158094</refundable_total_in_cents>
+						<credit_payments type="array">
+							<credit_payment href="">
+								<account href="https://your-subdomain.recurly.com/v2/accounts/multi-test-one"/>
+								<uuid>4669ef73118cde865e2b974244887cf1</uuid>
+								<action>payment</action>
+								<currency>USD</currency>
+								<amount_in_cents type="integer">31229</amount_in_cents>
+							</credit_payment>
+						</credit_payments>
+						<collection_method>automatic</collection_method>
+						<line_items type="array">
+							<adjustment href="" type="charge">
+								<account href="https://your-subdomain.recurly.com/v2/accounts/multi-test-one"/>
+								<refundable_total_in_cents type="integer">146382</refundable_total_in_cents>
+								<uuid>4669ef72d31522286d6e074d74869ed1</uuid>
+								<state>pending</state>
+								<description>Multi-Plan High End</description>
+								<accounting_code nil="nil"></accounting_code>
+								<product_code>multi-high</product_code>
+								<origin>plan</origin>
+								<unit_amount_in_cents type="integer">146382</unit_amount_in_cents>
+								<quantity type="integer">1</quantity>
+								<discount_in_cents type="integer">0</discount_in_cents>
+								<tax_in_cents type="integer">0</tax_in_cents>
+								<total_in_cents type="integer">146382</total_in_cents>
+								<currency>USD</currency>
+								<proration_rate type="float">0.9759</proration_rate>
+								<start_date type="datetime">2018-08-02T14:56:50Z</start_date>
+								<end_date type="datetime">2018-09-01T21:00:00Z</end_date>
+								<created_at nil="nil"></created_at>
+								<updated_at nil="nil"></updated_at>
+								<revenue_schedule_type>evenly</revenue_schedule_type>
+							</adjustment>
+							<adjustment href="" type="charge">
+								<account href="https://your-subdomain.recurly.com/v2/accounts/multi-test-one"/>
+								<refundable_total_in_cents type="integer">11712</refundable_total_in_cents>
+								<uuid>4669ef72d6a341370b3ca24f4eae2381</uuid>
+								<state>pending</state>
+								<description>desc</description>
+								<accounting_code nil="nil"></accounting_code>
+								<product_code>product</product_code>
+								<origin>add_on</origin>
+								<unit_amount_in_cents type="integer">1464</unit_amount_in_cents>
+								<quantity type="integer">8</quantity>
+								<total_in_cents type="integer">11712</total_in_cents>
+								<currency>USD</currency>
+								<proration_rate type="float">0.9759</proration_rate>
+								<start_date type="datetime">2018-08-02T14:56:50Z</start_date>
+								<end_date type="datetime">2018-09-01T21:00:00Z</end_date>
+								<revenue_schedule_type>evenly</revenue_schedule_type>
+							</adjustment>
+						</line_items>
+						<transactions type="array">
+						</transactions>
+					</charge_invoice>
+					<credit_invoices type="array">
+						<credit_invoice href="">
+							<account href="https://your-subdomain.recurly.com/v2/accounts/multi-test-one"/>
+							<uuid>4669ef72e546b859621857449e86d822</uuid>
+							<state>closed</state>
+							<total_in_cents type="integer">-31229</total_in_cents>
+							<currency>USD</currency>
+							<closed_at type="datetime">2018-08-02T14:56:50Z</closed_at>
+							<subtotal_before_discount_in_cents type="integer">-31229</subtotal_before_discount_in_cents>
+							<subtotal_in_cents type="integer">-31229</subtotal_in_cents>
+							<type>credit</type>
+							<origin>immediate_change</origin>
+							<credit_payments type="array">
+								<credit_payment href="">
+									<account href="https://your-subdomain.recurly.com/v2/accounts/multi-test-one"/>
+									<uuid>4669ef73118cde865e2b974244887cf1</uuid>
+									<action>payment</action>
+									<currency>USD</currency>
+									<amount_in_cents type="integer">31229</amount_in_cents>
+								</credit_payment>
+							</credit_payments>
+							<line_items type="array">
+								<adjustment href="" type="credit">
+									<account href="https://your-subdomain.recurly.com/v2/accounts/multi-test-one"/>
+									<uuid>4669ef72bf5a190570a0fc4c37b9eef7</uuid>
+									<state>pending</state>
+									<description>Multi-Plan Low End</description>
+									<product_code>multi-low</product_code>
+									<origin>plan</origin>
+									<unit_amount_in_cents type="integer">-19518</unit_amount_in_cents>
+									<quantity type="integer">1</quantity>
+									<quantity_remaining type="integer">1</quantity_remaining>
+									<original_adjustment_uuid>466615c82c79f22fcbf024428fb69006</original_adjustment_uuid>
+									<total_in_cents type="integer">-19518</total_in_cents>
+									<currency>USD</currency>
+									<proration_rate type="float">0.9759</proration_rate>
+									<start_date type="datetime">2018-08-02T14:56:50Z</start_date>
+									<end_date type="datetime">2018-09-01T21:00:00Z</end_date>
+									<revenue_schedule_type>evenly</revenue_schedule_type>
+									<credit_reason_code>refund</credit_reason_code>
+								</adjustment>
+								<adjustment href="" type="credit">
+									<account href="https://your-subdomain.recurly.com/v2/accounts/multi-test-one"/>
+									<uuid>4669ef72cbf2bb738fbdfb4c87bc88dc</uuid>
+									<state>pending</state>
+									<description>Domains</description>
+									<product_code>domains</product_code>
+									<origin>add_on</origin>
+									<unit_amount_in_cents type="integer">-11711</unit_amount_in_cents>
+									<quantity type="integer">1</quantity>
+									<quantity_remaining type="integer">1</quantity_remaining>
+									<original_adjustment_uuid>466615c83144d4334e855b4f5e8fcc9f</original_adjustment_uuid>
+									<total_in_cents type="integer">-11711</total_in_cents>
+									<currency>USD</currency>
+									<proration_rate type="float">0.9759</proration_rate>
+									<start_date type="datetime">2018-08-02T14:56:50Z</start_date>
+									<end_date type="datetime">2018-09-01T21:00:00Z</end_date>
+									<revenue_schedule_type>evenly</revenue_schedule_type>
+									<credit_reason_code>refund</credit_reason_code>
+								</adjustment>
+							</line_items>
+							<transactions type="array">
+							</transactions>
+						</credit_invoice>
+					</credit_invoices>
+				</invoice_collection>
+			</subscription>`)
 	})
 
-	r, _, err := client.Subscriptions.PreviewChange("44f83d7cba-354d5b84812-419f923ea96", recurly.UpdateSubscription{}) // UUID has dashes and should be sanitized
+	activatedAt := recurly.NewTimeFromString("2018-08-01T16:45:16Z")
+	currentPeriodStartedAt := recurly.NewTimeFromString("2018-08-01T21:00:00Z")
+	currentPeriodEndsAt := recurly.NewTimeFromString("2018-09-01T21:00:00Z")
+	dueOn := recurly.NewTimeFromString("2018-08-02T14:56:50Z")
+	r, sub, err := client.Subscriptions.PreviewChange("46652c59f3-f1a1cdab9d4-04a6d91ddab", recurly.UpdateSubscription{}) // UUID has dashes and should be sanitized
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	} else if r.IsError() {
 		t.Fatal("expected preview subscription change to return OK")
+	} else if diff := cmp.Diff(sub, &recurly.Subscription{
+		XMLName:     xml.Name{Local: "subscription"},
+		UUID:        "46652c59f3f1a1cdab9d404a6d91ddab",
+		AccountCode: "multi-test-one",
+		Plan: recurly.NestedPlan{
+			Code: "multi-high",
+			Name: "Multi-Plan High End",
+		},
+		State:                  "active",
+		UnitAmountInCents:      150000,
+		Currency:               "USD",
+		Quantity:               1,
+		ActivatedAt:            activatedAt,
+		CurrentPeriodStartedAt: currentPeriodStartedAt,
+		CurrentPeriodEndsAt:    currentPeriodEndsAt,
+		CollectionMethod:       "automatic",
+		SubscriptionAddOns: []recurly.SubscriptionAddOn{
+			{
+				XMLName:           xml.Name{Local: "subscription_add_on"},
+				Type:              "fixed",
+				Code:              "product",
+				UnitAmountInCents: 1500,
+				Quantity:          8,
+			},
+		},
+		Invoice: &recurly.Invoice{
+			XMLName:                 xml.Name{Local: "invoice"},
+			UUID:                    "4669ef730162b1a4db576a4722a40d8e",
+			AccountCode:             "multi-test-one",
+			State:                   "pending",
+			TotalInCents:            158094,
+			Currency:                "USD",
+			AttemptNextCollectionAt: dueOn,
+			SubtotalInCents:         158094,
+			DueOn:                   dueOn,
+			BalanceInCents:          126865,
+			Type:                    "charge",
+			Origin:                  "immediate_change",
+			CreditPayments: []recurly.CreditPayment{{
+				XMLName:       xml.Name{Local: "credit_payment"},
+				AccountCode:   "multi-test-one",
+				UUID:          "4669ef73118cde865e2b974244887cf1",
+				Action:        "payment",
+				Currency:      "USD",
+				AmountInCents: 31229,
+			}},
+			CollectionMethod: "automatic",
+			LineItems: []recurly.Adjustment{
+				{
+					UUID:              "4669ef72d31522286d6e074d74869ed1",
+					AccountCode:       "multi-test-one",
+					State:             "pending",
+					Description:       "Multi-Plan High End",
+					ProductCode:       "multi-high",
+					Origin:            "plan",
+					UnitAmountInCents: 146382,
+					Quantity:          1,
+					TotalInCents:      146382,
+					Currency:          "USD",
+					StartDate:         dueOn,
+					EndDate:           currentPeriodEndsAt,
+				},
+				{
+					UUID:              "4669ef72d6a341370b3ca24f4eae2381",
+					AccountCode:       "multi-test-one",
+					State:             "pending",
+					Description:       "desc",
+					ProductCode:       "product",
+					Origin:            "add_on",
+					UnitAmountInCents: 1464,
+					Quantity:          8,
+					TotalInCents:      11712,
+					Currency:          "USD",
+					StartDate:         dueOn,
+					EndDate:           currentPeriodEndsAt,
+				},
+			},
+		},
+	}); diff != "" {
+		t.Fatal(diff)
 	}
 }
 
