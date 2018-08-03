@@ -210,7 +210,7 @@ func (i *InvoiceCollection) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 		CreditPayments:          v.ChargeInvoice.CreditPayments,
 	}
 	*i = InvoiceCollection{
-		XMLName:       xml.Name{Local: "invoice"},
+		XMLName:       xml.Name{Local: "invoice_collection"},
 		ChargeInvoice: &invoice,
 	}
 

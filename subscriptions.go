@@ -72,7 +72,7 @@ type Subscription struct {
 	CurrentTermStartedAt   NullTime             `xml:"current_term_started_at,omitempty"`
 	CurrentTermEndsAt      NullTime             `xml:"current_term_ends_at,omitempty"`
 	PendingSubscription    *PendingSubscription `xml:"pending_subscription,omitempty"`
-	Invoice                *Invoice             `xml:"-"`
+	InvoiceCollection      *InvoiceCollection   `xml:"invoice_collection,omitempty"`
 	RemainingPauseCycles   int                  `xml:"remaining_pause_cycles,omitempty"`
 	CollectionMethod       string               `xml:"collection_method"`
 	AutoRenew              bool                 `xml:"auto_renew,omitempty"`
@@ -86,10 +86,9 @@ func (s *Subscription) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 	type subscriptionAlias Subscription
 	var v struct {
 		subscriptionAlias
-		XMLName           xml.Name           `xml:"subscription"`
-		AccountCode       hrefString         `xml:"account"`
-		InvoiceNumber     hrefInt            `xml:"invoice"`
-		InvoiceCollection *InvoiceCollection `xml:"invoice_collection"`
+		XMLName       xml.Name   `xml:"subscription"`
+		AccountCode   hrefString `xml:"account"`
+		InvoiceNumber hrefInt    `xml:"invoice"`
 	}
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err
@@ -98,10 +97,6 @@ func (s *Subscription) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 	s.XMLName = v.XMLName
 	s.AccountCode = string(v.AccountCode)
 	s.InvoiceNumber = int(v.InvoiceNumber)
-
-	if v.InvoiceCollection != nil {
-		s.Invoice = v.InvoiceCollection.ChargeInvoice
-	}
 
 	return nil
 }
