@@ -27,6 +27,5 @@
     <trial_ends_at type="datetime" nil="true"></trial_ends_at>
     <paused_at type="datetime" nil="true"></paused_at>
     <resume_at type="datetime" nil="true"></resume_at>
-    <remaining_pause_cycles nil="true"></remaining_pause_cycles>
   </subscription>
 </subscription_pause_canceled_notification>
