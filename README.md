@@ -332,6 +332,12 @@ Subscription Notifications
  - `RenewedSubscriptionNotification`
  - `ExpiredSubscriptionNotification`
  - `CanceledSubscriptionNotification`
+ - `PausedSubscriptionNotification`
+ - `ResumedSubscriptionNotification`
+ - `ScheduledSubscriptionPuaseNotification`
+ - `SubscriptionPauseModifiedNotification`
+ - `PausedSubscriptionRenewalNotification`
+ - `SubscriptionPauseCanceledNotification`
  - `ReactivatedAccountNotification`
 
  Invoice Notifications
