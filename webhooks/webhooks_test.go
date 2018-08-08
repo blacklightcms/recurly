@@ -509,6 +509,50 @@ func TestParse_ResumedSubscriptionNotification(t *testing.T) {
 	}
 }
 
+func TestParse_ScheduledSubscriptionPausenNotification(t *testing.T) {
+	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-09T22:12:36Z")
+	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-09T22:12:36Z")
+	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2019-03-09T22:12:36Z")
+	pausedTs, _ := time.Parse(recurly.DateTimeFormat, "2019-03-09T22:12:36Z")
+	resumeTs, _ := time.Parse(recurly.DateTimeFormat, "2024-03-09T22:12:36Z")
+
+	xmlFile := MustOpenFile("testdata/scheduled_subscription_pause_notification.xml")
+	result, err := webhooks.Parse(xmlFile)
+	if err != nil {
+		t.Fatal(err)
+	} else if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
+		t.Fatalf("unexpected type: %T, result", n)
+	} else if diff := cmp.Diff(n, &webhooks.SubscriptionNotification{
+		Type: webhooks.ScheduledPauseSubscription,
+		Account: webhooks.Account{
+			XMLName:   xml.Name{Local: "account"},
+			Code:      "1",
+			Email:     "verena@example.com",
+			FirstName: "Verena",
+			LastName:  "Example",
+		},
+		Subscription: recurly.Subscription{
+			XMLName: xml.Name{Local: "subscription"},
+			Plan: recurly.NestedPlan{
+				Code: "daily_plan",
+				Name: "daily_plan",
+			},
+			UUID:                   "437b9def1c442e659f90f4416086dd66",
+			State:                  "active",
+			Quantity:               1,
+			TotalAmountInCents:     709,
+			ActivatedAt:            recurly.NewTime(activatedTs),
+			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
+			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+			PausedAt:               recurly.NewTime(pausedTs),
+			ResumeAt:               recurly.NewTime(resumeTs),
+			RemainingPauseCycles:   5,
+		},
+	}); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
 func TestParse_ReactivatedAccountNotification(t *testing.T) {
 	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-07-22T20:42:05Z")
 	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-22T20:42:05Z")
