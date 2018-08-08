@@ -503,7 +503,6 @@ func TestParse_ResumedSubscriptionNotification(t *testing.T) {
 			ActivatedAt:            recurly.NewTime(activatedTs),
 			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
 			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
-			RemainingPauseCycles:   0,
 		},
 	}); diff != "" {
 		t.Fatal(diff)
