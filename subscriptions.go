@@ -62,6 +62,8 @@ type Subscription struct {
 	CurrentPeriodEndsAt    NullTime             `xml:"current_period_ends_at,omitempty"`
 	TrialStartedAt         NullTime             `xml:"trial_started_at,omitempty"`
 	TrialEndsAt            NullTime             `xml:"trial_ends_at,omitempty"`
+	PausedAt               NullTime             `xml:"paused_at,omitempty"`
+	ResumeAt               NullTime             `xml:"resume_at,omitempty"`
 	TaxInCents             int                  `xml:"tax_in_cents,omitempty"`
 	TaxType                string               `xml:"tax_type,omitempty"`
 	TaxRegion              string               `xml:"tax_region,omitempty"`

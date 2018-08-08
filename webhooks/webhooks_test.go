@@ -460,6 +460,8 @@ func TestParse_PausedSubscriptionNotification(t *testing.T) {
 			ActivatedAt:            recurly.NewTime(activatedTs),
 			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
 			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+			PausedAt:               recurly.NewTime(pausedTs),
+			ResumeAt:               recurly.NewTime(resumeTs),
 			RemainingPauseCycles:   9,
 		},
 	}); diff != "" {
