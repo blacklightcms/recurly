@@ -509,7 +509,7 @@ func TestParse_ResumedSubscriptionNotification(t *testing.T) {
 	}
 }
 
-func TestParse_ScheduledSubscriptionPausenNotification(t *testing.T) {
+func TestParse_ScheduledSubscriptionPausedNotification(t *testing.T) {
 	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-09T22:12:36Z")
 	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-09T22:12:36Z")
 	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2019-03-09T22:12:36Z")

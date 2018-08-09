@@ -334,7 +334,7 @@ Subscription Notifications
  - `CanceledSubscriptionNotification`
  - `PausedSubscriptionNotification`
  - `ResumedSubscriptionNotification`
- - `ScheduledSubscriptionPuaseNotification`
+ - `ScheduledSubscriptionPauseNotification`
  - `SubscriptionPauseModifiedNotification`
  - `PausedSubscriptionRenewalNotification`
  - `SubscriptionPauseCanceledNotification`
