@@ -2,6 +2,7 @@ package recurly
 
 import (
 	"encoding/xml"
+	"fmt"
 	"net/http"
 	"net/url"
 	"regexp"
@@ -100,4 +101,8 @@ type Error struct {
 	Field       string   `xml:"field,attr"`
 	Symbol      string   `xml:"symbol,attr"`
 	Description string   `xml:"-"`
+}
+
+func (e *Error) Error() string {
+	return fmt.Sprintf("error validating %s: %s, %s, symbol: %s", e.Field, e.Message, e.Description, e.Symbol)
 }

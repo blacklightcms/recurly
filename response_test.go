@@ -100,3 +100,20 @@ func TestResponse_CursorLinkParsing(t *testing.T) {
 		t.Fatalf("unexpected next: %s", resp2.Next())
 	}
 }
+
+func TestErrorIfc(t *testing.T) {
+	e := &recurly.Error{
+		Message:     "message",
+		Field:       "field",
+		Symbol:      "symbol",
+		Description: "desc",
+	}
+
+	expected := "error validating field: message, desc, symbol: symbol"
+
+	res := e.Error()
+
+	if expected != res {
+		t.Fatalf("unepected response, expected %s, got %s", expected, res)
+	}
+}
