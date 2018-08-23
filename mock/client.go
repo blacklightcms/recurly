@@ -3,7 +3,7 @@ package mock
 import (
 	"net/http"
 
-	"github.com/blacklightcms/recurly"
+	"github.com/launchpadcentral/recurly"
 )
 
 // NewClient returns a new instance of *recury.Client with the

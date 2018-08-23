@@ -1,6 +1,6 @@
 package webhooks
 
-import "github.com/blacklightcms/recurly"
+import "github.com/launchpadcentral/recurly"
 
 const (
     NewDunningEvent = "new_dunning_event_notification"
