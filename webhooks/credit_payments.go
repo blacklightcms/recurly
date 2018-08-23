@@ -3,7 +3,7 @@ package webhooks
 import (
 	"encoding/xml"
 
-	"github.com/blacklightcms/recurly"
+	"github.com/launchpadcentral/recurly"
 )
 
 // Credit payment notifications.

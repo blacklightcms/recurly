@@ -1,13 +1,13 @@
 # Recurly
 Recurly is a Go (golang) API Client for the [Recurly](https://recurly.com/) API.
 
- [![Build Status](https://travis-ci.org/blacklightcms/recurly.svg?branch=master)](https://travis-ci.org/blacklightcms/recurly)  [![GoDoc](https://godoc.org/github.com/blacklightcms/recurly?status.svg)](https://godoc.org/github.com/blacklightcms/recurly)
+ [![Build Status](https://travis-ci.org/launchpadcentral/recurly.svg?branch=master)](https://travis-ci.org/launchpadcentral/recurly)  [![GoDoc](https://godoc.org/github.com/launchpadcentral/recurly?status.svg)](https://godoc.org/github.com/launchpadcentral/recurly)
 
 ## Announcement: Credit Invoice Release 
 As of v2.10, Recurly has released data structure and API changes to support the [credit invoice release](https://docs.recurly.com/docs/credit-invoices-release). All sites created after May 8, 2018, have this turned on automatically. Existing sites must turn it on no later than Nov 1, 2018. New features will be applicable once the feature is turned on; legacy (existing) invoices will continue to use some deprecated features until they are closed. Most new code can coexist with existing, allowing you to write code to support your transition smoothly. Note that the `new_dunning_event` webhook data structure will change and both may be sent while you have both legacy and new invoices with dunning events. Please review the `Parse` and `ParseDeprecated` methods if you listen for this webhook.  Deprecated code will be removed with any library updates no earlier than December 1, 2018. 
 
 ## References
- * [API Reference](http://godoc.org/github.com/blacklightcms/recurly)
+ * [API Reference](http://godoc.org/github.com/launchpadcentral/recurly)
  * [Recurly API Documentation](https://dev.recurly.com/docs/)
  * [recurly.js Documentation](https://docs.recurly.com/js/)
  * Documentation and examples below. Unit tests also provide thorough examples.
@@ -15,13 +15,13 @@ As of v2.10, Recurly has released data structure and API changes to support the 
 ## Installation
 Install using the "go get" command:
 ```
-go get github.com/blacklightcms/recurly
+go get github.com/launchpadcentral/recurly
 ```
 
 ### Example
 
 ```go
-import "github.com/blacklightcms/recurly"
+import "github.com/launchpadcentral/recurly"
 ```
 
 Construct a new Recurly Client and then work off of that. For example, to list
@@ -61,18 +61,18 @@ The basic usage format is to create a client, and then operate directly off of e
 of the services.
 
 The services are (each link to the GoDoc documentation):
- * [Accounts](https://godoc.org/github.com/blacklightcms/recurly#AccountsService)
- * [AddOns](https://godoc.org/github.com/blacklightcms/recurly#AddOnsService)
- * [Adjustments](https://godoc.org/github.com/blacklightcms/recurly#AdjustmentsService)
- * [Billing](https://godoc.org/github.com/blacklightcms/recurly#BillingService)
- * [Coupons](https://godoc.org/github.com/blacklightcms/recurly#CouponsService)
- * [CreditPayments](https://godoc.org/github.com/blacklightcms/recurly#CreditPaymentsService)
- * [Invoices](https://godoc.org/github.com/blacklightcms/recurly#InvoicesService)
- * [Plans](https://godoc.org/github.com/blacklightcms/recurly#PlansService)
- * [Redemptions](https://godoc.org/github.com/blacklightcms/recurly#RedemptionsService)
- * [Subscriptions](https://godoc.org/github.com/blacklightcms/recurly#SubscriptionsService)
- * [Transactions](https://godoc.org/github.com/blacklightcms/recurly#TransactionsService)
- * [Purchases](https://godoc.org/github.com/blacklightcms/recurly#PurchasesService)
+ * [Accounts](https://godoc.org/github.com/launchpadcentral/recurly#AccountsService)
+ * [AddOns](https://godoc.org/github.com/launchpadcentral/recurly#AddOnsService)
+ * [Adjustments](https://godoc.org/github.com/launchpadcentral/recurly#AdjustmentsService)
+ * [Billing](https://godoc.org/github.com/launchpadcentral/recurly#BillingService)
+ * [Coupons](https://godoc.org/github.com/launchpadcentral/recurly#CouponsService)
+ * [CreditPayments](https://godoc.org/github.com/launchpadcentral/recurly#CreditPaymentsService)
+ * [Invoices](https://godoc.org/github.com/launchpadcentral/recurly#InvoicesService)
+ * [Plans](https://godoc.org/github.com/launchpadcentral/recurly#PlansService)
+ * [Redemptions](https://godoc.org/github.com/launchpadcentral/recurly#RedemptionsService)
+ * [Subscriptions](https://godoc.org/github.com/launchpadcentral/recurly#SubscriptionsService)
+ * [Transactions](https://godoc.org/github.com/launchpadcentral/recurly#TransactionsService)
+ * [Purchases](https://godoc.org/github.com/launchpadcentral/recurly#PurchasesService)
 
 Each of the services correspond to their respective sections in the
 [Recurly API Documentation](https://dev.recurly.com/docs/).

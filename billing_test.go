@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/blacklightcms/recurly"
+	"github.com/launchpadcentral/recurly"
 	"github.com/google/go-cmp/cmp"
 )
 

@@ -1,6 +1,6 @@
 package webhooks
 
-import "github.com/blacklightcms/recurly"
+import "github.com/launchpadcentral/recurly"
 
 // Subscription notifications.
 // https://dev.recurly.com/page/webhooks#subscription-notifications

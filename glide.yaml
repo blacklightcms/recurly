@@ -1,4 +1,4 @@
-package: github.com/blacklightcms/recurly
+package: github.com/launchpadcentral/recurly
 testImport:
 - package: github.com/google/go-cmp
   subpackages:

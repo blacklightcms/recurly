@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/blacklightcms/recurly"
+	"github.com/launchpadcentral/recurly"
 )
 
 func TestPurchases_Purchase_Encoding(t *testing.T) {
