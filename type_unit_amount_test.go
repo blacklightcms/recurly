@@ -22,6 +22,7 @@ func TestUnitAmount(t *testing.T) {
 		{v: s{Amount: UnitAmount{EUR: 650}}, expected: "<s><amount><EUR>650</EUR></amount></s>"},
 		{v: s{Amount: UnitAmount{GBP: 3000}}, expected: "<s><amount><GBP>3000</GBP></amount></s>"},
 		{v: s{Amount: UnitAmount{CAD: 300}}, expected: "<s><amount><CAD>300</CAD></amount></s>"},
+		{v: s{Amount: UnitAmount{AUD: 400}}, expected: "<s><amount><AUD>400</AUD></amount></s>"},
 		{v: s{}, expected: "<s></s>"},
 		{v: s{Amount: UnitAmount{USD: 1}}, expected: "<s><amount><USD>1</USD></amount></s>"},
 	}
