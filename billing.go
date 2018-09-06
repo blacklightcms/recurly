@@ -23,7 +23,7 @@ type Billing struct {
 	IPAddressCountry string   `xml:"ip_address_country,omitempty"`
 
 	// Credit Card Info
-	FirstSix int    `xml:"first_six,omitempty"`
+	FirstSix string `xml:"first_six,omitempty"` // Card number can start with zero
 	LastFour string `xml:"last_four,omitempty"` // String not int so that leading zeros are present
 	CardType string `xml:"card_type,omitempty"`
 	Number   int    `xml:"number,omitempty"`
@@ -72,7 +72,7 @@ func (b *Billing) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		IPAddressCountry string   `xml:"ip_address_country,omitempty"`
 
 		// Credit Card Info
-		FirstSix NullInt `xml:"first_six,omitempty"`
+		FirstSix string  `xml:"first_six,omitempty"`
 		LastFour string  `xml:"last_four,omitempty"`
 		CardType string  `xml:"card_type,omitempty"`
 		Number   int     `xml:"number,omitempty"`
@@ -112,7 +112,7 @@ func (b *Billing) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 		IPAddress:        v.IPAddress,
 		IPAddressCountry: v.IPAddressCountry,
 
-		FirstSix: v.FirstSix.Int,
+		FirstSix: v.FirstSix,
 		LastFour: v.LastFour,
 		CardType: v.CardType,
 		Number:   v.Number,
@@ -132,7 +132,7 @@ func (b *Billing) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 
 // Type returns the billing info type. Currently options: card, bank, ""
 func (b Billing) Type() string {
-	if b.FirstSix > 0 && b.LastFour != "" && b.Month > 0 && b.Year > 0 {
+	if b.FirstSix != "" && b.LastFour != "" && b.Month > 0 && b.Year > 0 {
 		return "card"
 	} else if b.NameOnAccount != "" && b.RoutingNumber != "" && b.AccountNumber != "" {
 		return "bank"
