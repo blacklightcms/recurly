@@ -49,7 +49,7 @@ func TestBilling_Encoding(t *testing.T) {
 
 func TestBilling_Type(t *testing.T) {
 	b0 := recurly.Billing{
-		FirstSix: 411111,
+		FirstSix: "011111",
 		LastFour: "1111",
 		Month:    11,
 		Year:     2020,
@@ -125,7 +125,7 @@ func TestBilling_Get(t *testing.T) {
 		CardType:         "Visa",
 		Year:             2015,
 		Month:            11,
-		FirstSix:         411111,
+		FirstSix:         "411111",
 		LastFour:         "1111",
 	}); diff != "" {
 		t.Fatal(diff)
@@ -258,7 +258,7 @@ func TestBilling_Create_WithToken(t *testing.T) {
 		CardType:         "Visa",
 		Year:             2015,
 		Month:            11,
-		FirstSix:         411111,
+		FirstSix:         "411111",
 		LastFour:         "1111",
 	}); diff != "" {
 		t.Fatal(diff)
@@ -439,7 +439,7 @@ func TestBilling_Update_WithCC(t *testing.T) {
 		// Add additional fields that should be removed
 		Token:             "abc",
 		IPAddressCountry:  "US",
-		FirstSix:          411111,
+		FirstSix:          "411111",
 		LastFour:          "1111",
 		CardType:          "visa",
 		PaypalAgreementID: "ppl",
@@ -488,7 +488,7 @@ func TestBilling_Update_WithBankAccount(t *testing.T) {
 		// Add additional fields that should be removed
 		Token:             "abc",
 		IPAddressCountry:  "US",
-		FirstSix:          111111,
+		FirstSix:          "111111",
 		LastFour:          "1111",
 		CardType:          "visa",
 		PaypalAgreementID: "ppl",

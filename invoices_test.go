@@ -591,7 +591,7 @@ func TestInvoices_Get(t *testing.T) {
 						CardType:  "Visa",
 						Year:      2017,
 						Month:     11,
-						FirstSix:  411111,
+						FirstSix:  "411111",
 						LastFour:  "1111",
 					},
 				},
