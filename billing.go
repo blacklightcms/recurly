@@ -23,7 +23,7 @@ type Billing struct {
 	IPAddressCountry string   `xml:"ip_address_country,omitempty"`
 
 	// Credit Card Info
-	FirstSix string `xml:"first_six,omitempty"` // Card number can start with zero
+	FirstSix string `xml:"first_six,omitempty"` // String not int so card number can start with zero
 	LastFour string `xml:"last_four,omitempty"` // String not int so that leading zeros are present
 	CardType string `xml:"card_type,omitempty"`
 	Number   int    `xml:"number,omitempty"`
