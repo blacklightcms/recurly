@@ -180,6 +180,33 @@ func TestRedemptions_RedeemCoupon(t *testing.T) {
 	}
 }
 
+func TestRedemptions_RedeemCouponToSubscription(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/coupons/special/redeem", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		var given bytes.Buffer
+		given.ReadFrom(r.Body)
+		expected := "<redemption><account_code>1</account_code><currency>USD</currency></redemption>"
+		if expected != given.String() {
+			t.Fatalf("unexpected input: %s", given.String())
+		}
+
+		w.WriteHeader(201)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><redemption></redemption>`)
+	})
+
+	r, _, err := client.Redemptions.RedeemToSubscription("special", "1", "USD", "mysubscriptionuuid")
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if r.IsError() {
+		t.Fatal("expected redeeming add on to return OK")
+	}
+}
+
 func TestRedemptions_Delete(t *testing.T) {
 	setup()
 	defer teardown()
