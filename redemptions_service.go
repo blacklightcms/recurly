@@ -88,7 +88,7 @@ func (s *redemptionsImpl) RedeemToSubscription(code string, accountCode string, 
 		XMLName          xml.Name `xml:"redemption"`
 		AccountCode      string   `xml:"account_code"`
 		Currency         string   `xml:"currency"`
-		SubscriptionUUID string   `xml:"subscription_uuid"`
+		SubscriptionUUID string   `xml:"subscription_uuid"` // `xml:"subscription"` //
 	}{
 		AccountCode: accountCode,
 		Currency:    currency,
