@@ -92,6 +92,7 @@ type RedemptionsService interface {
 	GetForAccount(accountCode string) (*Response, []Redemption, error)
 	GetForInvoice(invoiceNumber string) (*Response, []Redemption, error)
 	Redeem(code string, accountCode string, currency string) (*Response, *Redemption, error)
+	RedeemToSubscription(code string, accountCode string, currency string, subscriptionUUID) (*Response, *Redemption, error)
 	Delete(accountCode string) (*Response, error)
 }
 
