@@ -32,5 +32,5 @@ type Coupon struct {
 	UniqueCodeTemplate       string      `xml:"unique_code_template,omitempty"`
 	UniqueCouponCodeCount    NullInt     `xml:"unique_coupon_codes_count,omitempty"`
 	PlanCodes                []string    `xml:"plan_codes>plan_code,omitempty"`
-	SubscriptionUUID         string      `xml:"subscription,omitempty"`
+	SubscriptionUUID         string      `xml:"subscription_uuid,omitempty"`
 }
