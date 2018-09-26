@@ -81,6 +81,29 @@ func (s *redemptionsImpl) Redeem(code string, accountCode string, currency strin
 	return resp, &dst, err
 }
 
+// Use this function to redeem a coupon on an existing subscription
+func (s *redemptionsImpl) RedeemToSubscription(code string, accountCode string, currency string, subscriptionUUID string) (*Response, *Redemption, error) {
+	action := fmt.Sprintf("coupons/%s/redeem", code)
+	data := struct {
+		XMLName          xml.Name `xml:"redemption"`
+		AccountCode      string   `xml:"account_code"`
+		Currency         string   `xml:"currency"`
+		SubscriptionUUID string   `xml:"subscription_uuid"`
+	}{
+		AccountCode: accountCode,
+		Currency:    currency,
+	}
+	req, err := s.client.newRequest("POST", action, nil, data)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var dst Redemption
+	resp, err := s.client.do(req, &dst)
+
+	return resp, &dst, err
+}
+
 // Delete removes a coupon from an account. Recurly will automatically remove
 // coupons after they expire or are otherwise no longer valid for an account.
 // If you want to remove a coupon from an account before it expires, use this
