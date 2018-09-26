@@ -429,7 +429,7 @@ func (m *RedemptionsService) Redeem(code string, accountCode string, currency st
 
 func (m *RedemptionsService) RedeemToSubscription(code string, accountCode string, currency string, subscriptionUUID string) (*recurly.Response, *recurly.Redemption, error) {
 	m.RedeemToSubscriptionInvoked = true
-	return m.OnRedeem(code, accountCode, currency, subscriptionUUID)
+	return m.OnRedeemToSubscription(code, accountCode, currency, subscriptionUUID)
 }
 
 func (m *RedemptionsService) Delete(accountCode string) (*recurly.Response, error) {
