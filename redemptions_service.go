@@ -90,8 +90,9 @@ func (s *redemptionsImpl) RedeemToSubscription(code string, accountCode string, 
 		Currency         string   `xml:"currency"`
 		SubscriptionUUID string   `xml:"subscription_uuid"` // `xml:"subscription"` //
 	}{
-		AccountCode: accountCode,
-		Currency:    currency,
+		AccountCode:      accountCode,
+		Currency:         currency,
+		SubscriptionUUID: subscriptionUUID,
 	}
 	req, err := s.client.newRequest("POST", action, nil, data)
 	if err != nil {
