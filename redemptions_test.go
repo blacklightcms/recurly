@@ -190,7 +190,7 @@ func TestRedemptions_RedeemCouponToSubscription(t *testing.T) {
 		}
 		var given bytes.Buffer
 		given.ReadFrom(r.Body)
-		expected := "<redemption><account_code>1</account_code><currency>USD</currency></redemption>"
+		expected := "<redemption><account_code>1</account_code><currency>USD</currency><subscription_uuid>mysubscriptionuuid</subscription_uuid></redemption>"
 		if expected != given.String() {
 			t.Fatalf("unexpected input: %s", given.String())
 		}
