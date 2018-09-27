@@ -5,6 +5,7 @@ import (
 	"net/http/httptest"
 
 	"github.com/blacklightcms/recurly"
+	// "github.com/plell/recurly"
 )
 
 var (

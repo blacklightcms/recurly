@@ -4,8 +4,7 @@ import (
 	"bytes"
 	"time"
 
-	//"github.com/blacklightcms/recurly"
-	"github.com/plell/recurly"
+	"github.com/blacklightcms/recurly"
 )
 
 var _ recurly.AccountsService = &AccountsService{}
