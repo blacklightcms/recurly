@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/blacklightcms/recurly"
-	// "github.com/plell/recurly"
 )
 
 // NewClient returns a new instance of *recury.Client with the
