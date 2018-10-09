@@ -54,7 +54,7 @@ func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 				SubscriptionAddOns: &[]recurly.SubscriptionAddOn{
 					{
 						Code:              "extra_users",
-						UnitAmountInCents: 1000,
+						UnitAmountInCents: recurly.NewInt(1000),
 						Quantity:          2,
 					},
 				},
@@ -313,7 +313,7 @@ func TestSubscriptions_UpdateSubscription_Encoding(t *testing.T) {
 			v: recurly.UpdateSubscription{SubscriptionAddOns: &[]recurly.SubscriptionAddOn{
 				{
 					Code:              "extra_users",
-					UnitAmountInCents: 1000,
+					UnitAmountInCents: recurly.NewInt(1000),
 					Quantity:          2,
 				},
 			}},
@@ -324,7 +324,7 @@ func TestSubscriptions_UpdateSubscription_Encoding(t *testing.T) {
 				SubscriptionAddOns: []recurly.SubscriptionAddOn{
 					{
 						Code:              "extra_users",
-						UnitAmountInCents: 1000,
+						UnitAmountInCents: recurly.NewInt(1000),
 						Quantity:          2,
 					},
 				},
@@ -442,7 +442,7 @@ func TestSubscriptions_List(t *testing.T) {
 					Type:              "fixed",
 					Code:              "my_add_on",
 					Quantity:          1,
-					UnitAmountInCents: 1,
+					UnitAmountInCents: recurly.NewInt(1),
 				},
 			},
 		},
@@ -687,7 +687,6 @@ func TestSubscriptions_Get_PendingSubscription(t *testing.T) {
 					<subscription_add_on>
 						<add_on_type>fixed</add_on_type>
 						<add_on_code>add-on-two</add_on_code>
-						<unit_amount_in_cents type="integer">1300</unit_amount_in_cents>
 						<quantity type="integer">1</quantity>
 					</subscription_add_on>
 				</subscription_add_ons>
@@ -739,15 +738,14 @@ func TestSubscriptions_Get_PendingSubscription(t *testing.T) {
 					XMLName:           xml.Name{Local: "subscription_add_on"},
 					Type:              "fixed",
 					Code:              "add-on-one",
-					UnitAmountInCents: 1100,
+					UnitAmountInCents: recurly.NewInt(1100),
 					Quantity:          1,
 				},
 				{
-					XMLName:           xml.Name{Local: "subscription_add_on"},
-					Type:              "fixed",
-					Code:              "add-on-two",
-					UnitAmountInCents: 1300,
-					Quantity:          1,
+					XMLName:  xml.Name{Local: "subscription_add_on"},
+					Type:     "fixed",
+					Code:     "add-on-two",
+					Quantity: 1,
 				},
 			},
 		},
@@ -1229,7 +1227,7 @@ func TestSubscriptions_PreviewChange(t *testing.T) {
 				XMLName:           xml.Name{Local: "subscription_add_on"},
 				Type:              "fixed",
 				Code:              "product",
-				UnitAmountInCents: 1500,
+				UnitAmountInCents: recurly.NewInt(1500),
 				Quantity:          8,
 			},
 		},
