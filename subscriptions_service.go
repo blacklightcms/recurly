@@ -191,7 +191,7 @@ func (s *subscriptionsImpl) Reactivate(uuid string) (*Response, *Subscription, e
 // https://docs.recurly.com/api/subscriptions#terminate-subscription
 func (s *subscriptionsImpl) TerminateWithPartialRefund(uuid string) (*Response, *Subscription, error) {
 	action := fmt.Sprintf("subscriptions/%s/terminate", SanitizeUUID(uuid))
-	req, err := s.client.newRequest("PUT", action, Params{"refund_type": "partial"}, nil)
+	req, err := s.client.newRequest("PUT", action, Params{"refund": "partial"}, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -207,7 +207,7 @@ func (s *subscriptionsImpl) TerminateWithPartialRefund(uuid string) (*Response, 
 // https://docs.recurly.com/api/subscriptions#terminate-subscription
 func (s *subscriptionsImpl) TerminateWithFullRefund(uuid string) (*Response, *Subscription, error) {
 	action := fmt.Sprintf("subscriptions/%s/terminate", SanitizeUUID(uuid))
-	req, err := s.client.newRequest("PUT", action, Params{"refund_type": "full"}, nil)
+	req, err := s.client.newRequest("PUT", action, Params{"refund": "full"}, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -223,7 +223,7 @@ func (s *subscriptionsImpl) TerminateWithFullRefund(uuid string) (*Response, *Su
 // https://docs.recurly.com/api/subscriptions#terminate-subscription
 func (s *subscriptionsImpl) TerminateWithoutRefund(uuid string) (*Response, *Subscription, error) {
 	action := fmt.Sprintf("subscriptions/%s/terminate", SanitizeUUID(uuid))
-	req, err := s.client.newRequest("PUT", action, Params{"refund_type": "none"}, nil)
+	req, err := s.client.newRequest("PUT", action, Params{"refund": "none"}, nil)
 	if err != nil {
 		return nil, nil, err
 	}

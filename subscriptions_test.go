@@ -1339,8 +1339,8 @@ func TestSubscriptions_Terminate_PartialRefund(t *testing.T) {
 	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/terminate", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "PUT" {
 			t.Fatalf("unexpected method: %s", r.Method)
-		} else if refundType := r.URL.Query().Get("refund_type"); refundType != "partial" {
-			t.Fatalf("unexpected input for refund_type: %s", refundType)
+		} else if refundType := r.URL.Query().Get("refund"); refundType != "partial" {
+			t.Fatalf("unexpected input for refund: %s", refundType)
 		}
 		w.WriteHeader(200)
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
@@ -1361,8 +1361,8 @@ func TestSubscriptions_Terminate_FullRefund(t *testing.T) {
 	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/terminate", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "PUT" {
 			t.Fatalf("unexpected method: %s", r.Method)
-		} else if refundType := r.URL.Query().Get("refund_type"); refundType != "full" {
-			t.Fatalf("unexpected input for refund_type: %s", refundType)
+		} else if refundType := r.URL.Query().Get("refund"); refundType != "full" {
+			t.Fatalf("unexpected input for refund: %s", refundType)
 		}
 		w.WriteHeader(200)
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
@@ -1383,8 +1383,8 @@ func TestSubscriptions_Terminate_WithoutRefund(t *testing.T) {
 	mux.HandleFunc("/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/terminate", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "PUT" {
 			t.Fatalf("unexpected method: %s", r.Method)
-		} else if refundType := r.URL.Query().Get("refund_type"); refundType != "none" {
-			t.Fatalf("unexpected input for refund_type: %s", refundType)
+		} else if refundType := r.URL.Query().Get("refund"); refundType != "none" {
+			t.Fatalf("unexpected input for refund: %s", refundType)
 		}
 		w.WriteHeader(200)
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription></subscription>`)
