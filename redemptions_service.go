@@ -81,14 +81,14 @@ func (s *redemptionsImpl) Redeem(code string, accountCode string, currency strin
 	return resp, &dst, err
 }
 
-// Use this function to redeem a coupon on an existing subscription
+// Use this function to redeem a coupon on an existing subscription.
 func (s *redemptionsImpl) RedeemToSubscription(code string, accountCode string, currency string, subscriptionUUID string) (*Response, *Redemption, error) {
 	action := fmt.Sprintf("coupons/%s/redeem", code)
 	data := struct {
 		XMLName          xml.Name `xml:"redemption"`
 		AccountCode      string   `xml:"account_code"`
 		Currency         string   `xml:"currency"`
-		SubscriptionUUID string   `xml:"subscription_uuid"` // `xml:"subscription"` //
+		SubscriptionUUID string   `xml:"subscription_uuid"`
 	}{
 		AccountCode:      accountCode,
 		Currency:         currency,
