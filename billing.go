@@ -5,6 +5,20 @@ import (
 	"net"
 )
 
+// Supported card type constants.
+const (
+	CardTypeAmericanExpress    = "american_express"
+	CardTypeDankort            = "dankort"
+	CardTypeDinersClub         = "diners_club"
+	CardTypeDiscover           = "discover"
+	CardTypeForbrugsforeningen = "forbrugsforeningen"
+	CardTypeJCB                = "jcb"
+	CardTypeLaser              = "laser"
+	CardTypeMaestro            = "maestro"
+	CardTypeMaster             = "master"
+	CardTypeVisa               = "visa"
+)
+
 // Billing represents billing info for a single account on your site
 type Billing struct {
 	XMLName          xml.Name `xml:"billing_info,omitempty"`

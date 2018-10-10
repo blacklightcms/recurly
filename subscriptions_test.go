@@ -134,9 +134,9 @@ func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 				Account: recurly.Account{
 					Code: "123",
 				},
-				FirstRenewalDate: recurly.NewTime(ts),
+				NextBillDate: recurly.NewTime(ts),
 			},
-			expected: "<subscription><plan_code>gold</plan_code><account><account_code>123</account_code></account><currency>USD</currency><first_renewal_date>2015-06-03T13:42:23Z</first_renewal_date></subscription>",
+			expected: "<subscription><plan_code>gold</plan_code><account><account_code>123</account_code></account><currency>USD</currency><next_bill_date>2015-06-03T13:42:23Z</next_bill_date></subscription>",
 		},
 		{
 			v: recurly.NewSubscription{
