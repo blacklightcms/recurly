@@ -15,7 +15,7 @@ type addOnsImpl struct {
 }
 
 // List returns a list of add ons for a plan.
-// https://docs.recurly.com/api/plans/add-ons#list-addons
+// https://dev.recurly.com/docs/list-add-ons-for-a-plan
 func (s *addOnsImpl) List(planCode string, params Params) (*Response, []AddOn, error) {
 	action := fmt.Sprintf("plans/%s/add_ons", planCode)
 	req, err := s.client.newRequest("GET", action, params, nil)
@@ -33,7 +33,7 @@ func (s *addOnsImpl) List(planCode string, params Params) (*Response, []AddOn, e
 }
 
 // Get returns information about an add on.
-// https://docs.recurly.com/api/plans/add-ons#lookup-addon
+// https://dev.recurly.com/docs/lookup-an-add-on
 func (s *addOnsImpl) Get(planCode string, code string) (*Response, *AddOn, error) {
 	action := fmt.Sprintf("plans/%s/add_ons/%s", planCode, code)
 	req, err := s.client.newRequest("GET", action, nil, nil)
@@ -51,7 +51,7 @@ func (s *addOnsImpl) Get(planCode string, code string) (*Response, *AddOn, error
 }
 
 // Create adds an add on to a plan.
-// https://docs.recurly.com/api/plans/add-ons#create-addon
+// https://dev.recurly.com/docs/create-an-add-on
 func (s *addOnsImpl) Create(planCode string, a AddOn) (*Response, *AddOn, error) {
 	action := fmt.Sprintf("plans/%s/add_ons", planCode)
 	req, err := s.client.newRequest("POST", action, nil, a)
@@ -67,7 +67,7 @@ func (s *addOnsImpl) Create(planCode string, a AddOn) (*Response, *AddOn, error)
 
 // Update will update the pricing information or description for an add-on.
 // Subscriptions who have already subscribed to the add-on will not receive the new pricing.
-// https://docs.recurly.com/api/plans/add-ons#update-addon
+// https://dev.recurly.com/docs/update-an-add-on
 func (s *addOnsImpl) Update(planCode string, code string, a AddOn) (*Response, *AddOn, error) {
 	action := fmt.Sprintf("plans/%s/add_ons/%s", planCode, code)
 	req, err := s.client.newRequest("PUT", action, nil, a)
@@ -82,7 +82,7 @@ func (s *addOnsImpl) Update(planCode string, code string, a AddOn) (*Response, *
 }
 
 // Delete will remove an add on from a plan.
-// https://docs.recurly.com/api/plans/add-ons#delete-addon
+// https://dev.recurly.com/docs/delete-an-add-on
 func (s *addOnsImpl) Delete(planCode string, code string) (*Response, error) {
 	action := fmt.Sprintf("plans/%s/add_ons/%s", planCode, code)
 	req, err := s.client.newRequest("DELETE", action, nil, nil)

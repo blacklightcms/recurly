@@ -10,6 +10,7 @@ type purchasesImpl struct {
 	client *Client
 }
 
+// https://dev.recurly.com/docs/create-purchase
 func (s *purchasesImpl) Create(p Purchase) (*Response, *InvoiceCollection, error) {
 	req, err := s.client.newRequest("POST", "purchases", nil, p)
 	if err != nil {
@@ -25,6 +26,7 @@ func (s *purchasesImpl) Create(p Purchase) (*Response, *InvoiceCollection, error
 	return resp, &dst, err
 }
 
+// https://dev.recurly.com/docs/create-purchase
 func (s *purchasesImpl) Preview(p Purchase) (*Response, *InvoiceCollection, error) {
 	req, err := s.client.newRequest("POST", "purchases/preview", nil, p)
 	if err != nil {

@@ -15,7 +15,7 @@ type plansImpl struct {
 }
 
 // List will retrieve all your active subscription plans.
-// https://docs.recurly.com/api/plans#list-plans
+// https://dev.recurly.com/docs/list-plans
 func (s *plansImpl) List(params Params) (*Response, []Plan, error) {
 	req, err := s.client.newRequest("GET", "plans", params, nil)
 	if err != nil {
@@ -32,7 +32,7 @@ func (s *plansImpl) List(params Params) (*Response, []Plan, error) {
 }
 
 // Get will lookup a specific plan by code.
-// https://docs.recurly.com/api/plans#lookup-plan
+// https://dev.recurly.com/docs/lookup-plan-details
 func (s *plansImpl) Get(code string) (*Response, *Plan, error) {
 	action := fmt.Sprintf("plans/%s", code)
 	req, err := s.client.newRequest("GET", action, nil, nil)
@@ -50,7 +50,7 @@ func (s *plansImpl) Get(code string) (*Response, *Plan, error) {
 }
 
 // Create will create a new subscription plan.
-// https://docs.recurly.com/api/plans#create-plan
+// https://dev.recurly.com/docs/create-plan
 func (s *plansImpl) Create(p Plan) (*Response, *Plan, error) {
 	req, err := s.client.newRequest("POST", "plans", nil, p)
 	if err != nil {
@@ -65,7 +65,7 @@ func (s *plansImpl) Create(p Plan) (*Response, *Plan, error) {
 
 // Update will update the pricing or details for a plan. Existing subscriptions
 // will remain at the previous renewal amounts.
-// https://docs.recurly.com/api/plans#update-plan
+// https://dev.recurly.com/docs/update-plan
 func (s *plansImpl) Update(code string, p Plan) (*Response, *Plan, error) {
 	action := fmt.Sprintf("plans/%s", code)
 	req, err := s.client.newRequest("PUT", action, nil, p)
@@ -80,7 +80,7 @@ func (s *plansImpl) Update(code string, p Plan) (*Response, *Plan, error) {
 }
 
 // Delete will make a plan inactive. New accounts cannot be created on the plan.
-// https://docs.recurly.com/api/plans#delete-plan
+// https://dev.recurly.com/docs/delete-plan
 func (s *plansImpl) Delete(code string) (*Response, error) {
 	action := fmt.Sprintf("plans/%s", code)
 	req, err := s.client.newRequest("DELETE", action, nil, nil)
