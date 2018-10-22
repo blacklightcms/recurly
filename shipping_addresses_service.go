@@ -14,6 +14,7 @@ type shippingAddressesImpl struct {
 }
 
 // ListAccount returns a list of all shipping addresses associated with an account.
+// https://dev.recurly.com/docs/list-accounts-shipping-address
 func (s *shippingAddressesImpl) ListAccount(accountCode string, params Params) (*Response, []ShippingAddress, error) {
 	action := fmt.Sprintf("accounts/%s/shipping_addresses", accountCode)
 	req, err := s.client.newRequest("GET", action, params, nil)
@@ -30,6 +31,7 @@ func (s *shippingAddressesImpl) ListAccount(accountCode string, params Params) (
 }
 
 // Create creates a new shipping address.
+// https://dev.recurly.com/docs/create-shipping-address-on-an-account
 func (s *shippingAddressesImpl) Create(accountCode string, shippingAddress ShippingAddress) (*Response, *ShippingAddress, error) {
 	action := fmt.Sprintf("accounts/%s/shipping_addresses", accountCode)
 	req, err := s.client.newRequest("POST", action, nil, shippingAddress)
@@ -42,6 +44,7 @@ func (s *shippingAddressesImpl) Create(accountCode string, shippingAddress Shipp
 }
 
 // Update requests an update to an existing shipping address.
+// https://dev.recurly.com/docs/edit-shipping-address-on-an-existing-account
 func (s *shippingAddressesImpl) Update(accountCode string, shippingAddressID int64, shippingAddress ShippingAddress) (*Response, *ShippingAddress, error) {
 	action := fmt.Sprintf("accounts/%s/shipping_addresses/%d", accountCode, shippingAddressID)
 	req, err := s.client.newRequest("PUT", action, nil, shippingAddress)
@@ -55,6 +58,7 @@ func (s *shippingAddressesImpl) Update(accountCode string, shippingAddressID int
 }
 
 // Delete removes a shipping address from an account.
+// https://dev.recurly.com/docs/delete-shipping-address-on-an-existing-account
 func (s *shippingAddressesImpl) Delete(accountCode string, shippingAddressID int64) (*Response, error) {
 	action := fmt.Sprintf("accounts/%s/shipping_addresses/%d", accountCode, shippingAddressID)
 	req, err := s.client.newRequest("DELETE", action, nil, nil)

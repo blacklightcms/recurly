@@ -64,7 +64,7 @@ func (s *couponsImpl) Create(c Coupon) (*Response, *Coupon, error) {
 }
 
 // Delete deactivates the coupon so it can no longer be redeemed.
-// https://docs.recurly.com/api/plans/add-ons#delete-addon
+// https://dev.recurly.com/docs/deactivate-coupon
 func (s *couponsImpl) Delete(code string) (*Response, error) {
 	action := fmt.Sprintf("coupons/%s", code)
 	req, err := s.client.newRequest("DELETE", action, nil, nil)

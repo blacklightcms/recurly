@@ -23,7 +23,7 @@ type accountsImpl struct {
 }
 
 // List returns a list of the accounts on your site.
-// https://docs.recurly.com/api/accounts#list-accounts
+// https://dev.recurly.com/docs/list-accounts
 func (s *accountsImpl) List(params Params) (*Response, []Account, error) {
 	req, err := s.client.newRequest("GET", "accounts", params, nil)
 	if err != nil {
@@ -44,7 +44,7 @@ func (s *accountsImpl) List(params Params) (*Response, []Account, error) {
 }
 
 // Get returns information about a single account.
-// https://docs.recurly.com/api/accounts#get-account
+// https://dev.recurly.com/docs/get-account
 func (s *accountsImpl) Get(code string) (*Response, *Account, error) {
 	action := fmt.Sprintf("accounts/%s", code)
 	req, err := s.client.newRequest("GET", action, nil, nil)
@@ -80,7 +80,7 @@ func (s *accountsImpl) LookupAccountBalance(code string) (*Response, *AccountBal
 }
 
 // Create will create a new account. You may optionally include billing information.
-// https://docs.recurly.com/api/accounts#create-account
+// https://dev.recurly.com/docs/create-an-account
 func (s *accountsImpl) Create(a Account) (*Response, *Account, error) {
 	req, err := s.client.newRequest("POST", "accounts", nil, a)
 	if err != nil {
@@ -97,7 +97,7 @@ func (s *accountsImpl) Create(a Account) (*Response, *Account, error) {
 // Update will update an existing account.
 // It's recommended to create a new account object with only the changes you
 // want to make. The updated account object will be returned on success.
-// https://docs.recurly.com/api/accounts#update-account
+// https://dev.recurly.com/docs/update-account
 func (s *accountsImpl) Update(code string, a Account) (*Response, *Account, error) {
 	action := fmt.Sprintf("accounts/%s", code)
 	req, err := s.client.newRequest("PUT", action, nil, a)
@@ -114,7 +114,7 @@ func (s *accountsImpl) Update(code string, a Account) (*Response, *Account, erro
 
 // Close marks an account as closed and cancels any active subscriptions. Any
 // saved billing information will also be permanently removed from the account.
-// https://docs.recurly.com/api/accounts#close-account
+// https://dev.recurly.com/docs/close-account
 func (s *accountsImpl) Close(code string) (*Response, error) {
 	action := fmt.Sprintf("accounts/%s", code)
 	req, err := s.client.newRequest("DELETE", action, nil, nil)
@@ -126,7 +126,7 @@ func (s *accountsImpl) Close(code string) (*Response, error) {
 }
 
 // Reopen transitions a closed account back to active.
-// https://docs.recurly.com/api/accounts#reopen-account
+// https://dev.recurly.com/docs/reopen-account
 func (s *accountsImpl) Reopen(code string) (*Response, error) {
 	action := fmt.Sprintf("accounts/%s/reopen", code)
 	req, err := s.client.newRequest("PUT", action, nil, nil)
@@ -138,7 +138,7 @@ func (s *accountsImpl) Reopen(code string) (*Response, error) {
 }
 
 // ListNotes returns a list of the notes on an account sorted in descending order.
-// https://docs.recurly.com/api/accounts#get-account-notes
+// https://dev.recurly.com/docs/list-account-notes
 func (s *accountsImpl) ListNotes(code string) (*Response, []Note, error) {
 	action := fmt.Sprintf("accounts/%s/notes", code)
 	req, err := s.client.newRequest("GET", action, nil, nil)
