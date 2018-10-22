@@ -1,6 +1,7 @@
 package recurly
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"time"
 )
@@ -10,8 +11,8 @@ const DateTimeFormat = "2006-01-02T15:04:05Z07:00"
 
 // NullTime is used for properly handling time.Time types that could be null.
 type NullTime struct {
-	*time.Time
-	Raw string `xml:",innerxml"`
+	*time.Time `json:"time,omitempty"`
+	Raw        string `xml:",innerxml"`
 }
 
 // NewTime generates a new NullTime.
@@ -42,6 +43,10 @@ func (t *NullTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	}
 
 	return nil
+}
+
+func (t NullTime) MarshalJSON() ([]byte, error) {
+	return json.Marshal(t.Time)
 }
 
 // MarshalXML marshals times into their proper format. Otherwise nothing is

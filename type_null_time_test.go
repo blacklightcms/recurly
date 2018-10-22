@@ -2,6 +2,7 @@ package recurly
 
 import (
 	"bytes"
+	"encoding/json"
 	"encoding/xml"
 	"fmt"
 	"testing"
@@ -29,6 +30,20 @@ func TestNulTime(t *testing.T) {
 		t.Fatal(diff)
 	} else if diff := cmp.Diff(expected2, given2); diff != "" {
 		t.Fatal(diff)
+	}
+
+	// check marshal interface
+	if bytes, err := json.Marshal(given1); err != nil {
+		t.Fatalf("json marshaling error %s", err.Error())
+	} else {
+		timeBytes, _ := json.Marshal(given1.Time)
+		if diff := cmp.Diff(timeBytes, bytes); diff != "" {
+			t.Fatal(diff)
+		}
+	}
+
+	if _, err := json.Marshal(given3); err != nil {
+		t.Fatalf("json marshaling error %s", err.Error())
 	}
 
 	type s struct {
