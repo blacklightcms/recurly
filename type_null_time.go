@@ -11,8 +11,8 @@ const DateTimeFormat = "2006-01-02T15:04:05Z07:00"
 
 // NullTime is used for properly handling time.Time types that could be null.
 type NullTime struct {
-	*time.Time `json:"time,omitempty"`
-	Raw        string `xml:",innerxml"`
+	*time.Time
+	Raw string `xml:",innerxml"`
 }
 
 // NewTime generates a new NullTime.
