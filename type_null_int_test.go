@@ -2,6 +2,7 @@ package recurly
 
 import (
 	"bytes"
+	"encoding/json"
 	"encoding/xml"
 	"testing"
 
@@ -13,6 +14,21 @@ func TestNullInt(t *testing.T) {
 		t.Fatal(diff)
 	} else if diff := cmp.Diff(NewInt(0), NullInt{Int: 0, Valid: true}); diff != "" {
 		t.Fatal(diff)
+	}
+
+	jsontests := []struct {
+		v        NullInt
+		expected string
+	}{
+		{v: NewInt(5), expected: "5"},
+		{v: NewInt(0), expected: "0"},
+		{v: NullInt{}, expected: ""},
+	}
+	for _, tt := range jsontests {
+		bytes, _ := json.Marshal(tt.v)
+		if diff := cmp.Diff(string(bytes), tt.expected); diff != "" {
+			t.Fatal(diff)
+		}
 	}
 
 	type s struct {

@@ -3,6 +3,7 @@
 package recurly
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"strings"
 )
@@ -16,6 +17,14 @@ type NullInt struct {
 // NewInt builds a new NullInt struct.
 func NewInt(i int) NullInt {
 	return NullInt{Int: i, Valid: true}
+}
+
+// MarshalJSON marshals an int based on whether valid is true
+func (n NullInt) MarshalJSON() ([]byte, error) {
+	if n.Valid {
+		return json.Marshal(n.Int)
+	}
+	return []byte(""), nil
 }
 
 // UnmarshalXML unmarshals an int properly, as well as marshaling an empty string to nil.

@@ -2,6 +2,7 @@ package recurly
 
 import (
 	"bytes"
+	"encoding/json"
 	"encoding/xml"
 	"testing"
 
@@ -27,6 +28,21 @@ func TestNullBool(t *testing.T) {
 		t.Fatalf("unexpected value")
 	} else if given2.Is(false) {
 		t.Fatalf("unexpected value")
+	}
+
+	jsontests := []struct {
+		v        NullBool
+		expected string
+	}{
+		{v: given0, expected: "true"},
+		{v: given1, expected: "false"},
+		{v: given2, expected: ""},
+	}
+	for _, tt := range jsontests {
+		bytes, _ := json.Marshal(tt.v)
+		if diff := cmp.Diff(string(bytes), tt.expected); diff != "" {
+			t.Fatal(diff)
+		}
 	}
 
 	type s struct {
