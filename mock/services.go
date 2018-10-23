@@ -405,6 +405,9 @@ type RedemptionsService struct {
 	OnRedeem      func(code string, accountCode string, currency string) (*recurly.Response, *recurly.Redemption, error)
 	RedeemInvoked bool
 
+	OnRedeemToSubscription      func(code string, accountCode string, currency string, subscriptionUUID string) (*recurly.Response, *recurly.Redemption, error)
+	RedeemToSubscriptionInvoked bool
+
 	OnDelete      func(accountCode string) (*recurly.Response, error)
 	DeleteInvoked bool
 }
@@ -422,6 +425,11 @@ func (m *RedemptionsService) GetForInvoice(invoiceNumber string) (*recurly.Respo
 func (m *RedemptionsService) Redeem(code string, accountCode string, currency string) (*recurly.Response, *recurly.Redemption, error) {
 	m.RedeemInvoked = true
 	return m.OnRedeem(code, accountCode, currency)
+}
+
+func (m *RedemptionsService) RedeemToSubscription(code string, accountCode string, currency string, subscriptionUUID string) (*recurly.Response, *recurly.Redemption, error) {
+	m.RedeemToSubscriptionInvoked = true
+	return m.OnRedeemToSubscription(code, accountCode, currency, subscriptionUUID)
 }
 
 func (m *RedemptionsService) Delete(accountCode string) (*recurly.Response, error) {
