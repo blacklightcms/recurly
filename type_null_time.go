@@ -45,6 +45,8 @@ func (t *NullTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	return nil
 }
 
+// MarshalJSON method has to be added here due to embeded interface json marshal issue in Go
+// with panic on nil time field
 func (t NullTime) MarshalJSON() ([]byte, error) {
 	return json.Marshal(t.Time)
 }
