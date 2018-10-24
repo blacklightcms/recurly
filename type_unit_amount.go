@@ -13,11 +13,11 @@ type UnitAmount struct {
 }
 
 type uaAlias struct {
-	USD int `xml:"USD,omitempty"`
-	EUR int `xml:"EUR,omitempty"`
-	GBP int `xml:"GBP,omitempty"`
-	CAD int `xml:"CAD,omitempty"`
-	AUD int `xml:"AUD,omitempty"`
+	USD int `xml:"USD,omitempty" json:"USD,omitempty"`
+	EUR int `xml:"EUR,omitempty" json:"EUR,omitempty"`
+	GBP int `xml:"GBP,omitempty" json:"GBP,omitempty"`
+	CAD int `xml:"CAD,omitempty" json:"CAD,omitempty"`
+	AUD int `xml:"AUD,omitempty" json:"AUD,omitempty"`
 }
 
 // UnmarshalXML unmarshals an int properly, as well as marshaling an empty string to nil.
