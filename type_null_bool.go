@@ -1,6 +1,7 @@
 package recurly
 
 import (
+	"encoding/json"
 	"encoding/xml"
 	"strconv"
 )
@@ -24,6 +25,14 @@ func NewBool(b bool) NullBool {
 // Is checks to see if the boolean is valid and equivalent
 func (n NullBool) Is(b bool) bool {
 	return n.Valid && n.Bool == b
+}
+
+// MarshalJSON marshals an bool based on whether valid is true
+func (n NullBool) MarshalJSON() ([]byte, error) {
+	if n.Valid {
+		return json.Marshal(n.Bool)
+	}
+	return []byte("null"), nil
 }
 
 // UnmarshalXML unmarshals an bool properly, as well as marshaling an empty string to nil.
