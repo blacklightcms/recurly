@@ -32,7 +32,7 @@ func (n NullBool) MarshalJSON() ([]byte, error) {
 	if n.Valid {
 		return json.Marshal(n.Bool)
 	}
-	return []byte(""), nil
+	return []byte("null"), nil
 }
 
 // UnmarshalXML unmarshals an bool properly, as well as marshaling an empty string to nil.

@@ -5,19 +5,19 @@ import "encoding/xml"
 // UnitAmount is used in plans where unit amounts are represented in cents
 // in both EUR and USD.
 type UnitAmount struct {
-	USD int `xml:"USD,omitempty" json:"USD,omitempty"`
-	EUR int `xml:"EUR,omitempty" json:"EUR,omitempty"`
-	GBP int `xml:"GBP,omitempty" json:"GBP,omitempty"`
-	CAD int `xml:"CAD,omitempty" json:"CAD,omitempty"`
-	AUD int `xml:"AUD,omitempty" json:"AUD,omitempty"`
+	USD int `xml:"USD,omitempty"`
+	EUR int `xml:"EUR,omitempty"`
+	GBP int `xml:"GBP,omitempty"`
+	CAD int `xml:"CAD,omitempty"`
+	AUD int `xml:"AUD,omitempty"`
 }
 
 type uaAlias struct {
-	USD int `xml:"USD,omitempty" json:"USD,omitempty"`
-	EUR int `xml:"EUR,omitempty" json:"EUR,omitempty"`
-	GBP int `xml:"GBP,omitempty" json:"GBP,omitempty"`
-	CAD int `xml:"CAD,omitempty" json:"CAD,omitempty"`
-	AUD int `xml:"AUD,omitempty" json:"AUD,omitempty"`
+	USD int `xml:"USD,omitempty"`
+	EUR int `xml:"EUR,omitempty"`
+	GBP int `xml:"GBP,omitempty"`
+	CAD int `xml:"CAD,omitempty"`
+	AUD int `xml:"AUD,omitempty"`
 }
 
 // UnmarshalXML unmarshals an int properly, as well as marshaling an empty string to nil.

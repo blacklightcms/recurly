@@ -36,7 +36,7 @@ func TestNullBool(t *testing.T) {
 	}{
 		{v: given0, expected: "true"},
 		{v: given1, expected: "false"},
-		{v: given2, expected: ""},
+		{v: given2, expected: "null"},
 	}
 	for _, tt := range jsontests {
 		bytes, _ := json.Marshal(tt.v)

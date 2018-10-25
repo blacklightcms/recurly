@@ -33,17 +33,21 @@ func TestNulTime(t *testing.T) {
 	}
 
 	// check marshal interface
-	if bytes, err := json.Marshal(given1); err != nil {
+	b, err := json.Marshal(given1)
+	if err != nil {
 		t.Fatalf("json marshaling error %s", err.Error())
 	} else {
-		timeBytes, _ := json.Marshal(given1.Time)
-		if diff := cmp.Diff(timeBytes, bytes); diff != "" {
+		tb, _ := json.Marshal(given1.Time)
+		if diff := cmp.Diff(tb, b); diff != "" {
 			t.Fatal(diff)
 		}
 	}
 
-	if _, err := json.Marshal(given3); err != nil {
+	b, err = json.Marshal(given3)
+	if err != nil {
 		t.Fatalf("json marshaling error %s", err.Error())
+	} else if !bytes.Equal(b, []byte("null")) {
+		t.Fatal("null time not marshaled to null")
 	}
 
 	type s struct {

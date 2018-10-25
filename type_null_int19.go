@@ -24,7 +24,7 @@ func (n NullInt) MarshalJSON() ([]byte, error) {
 	if n.Valid {
 		return json.Marshal(n.Int)
 	}
-	return []byte(""), nil
+	return []byte("null"), nil
 }
 
 // UnmarshalXML unmarshals an int properly, as well as marshaling an empty string to nil.

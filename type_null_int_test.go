@@ -22,7 +22,7 @@ func TestNullInt(t *testing.T) {
 	}{
 		{v: NewInt(5), expected: "5"},
 		{v: NewInt(0), expected: "0"},
-		{v: NullInt{}, expected: ""},
+		{v: NullInt{}, expected: "null"},
 	}
 	for _, tt := range jsontests {
 		bytes, _ := json.Marshal(tt.v)
