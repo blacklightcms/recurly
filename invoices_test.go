@@ -849,10 +849,9 @@ func TestInvoices_Create(t *testing.T) {
                 <terms_and_conditions nil="nil"></terms_and_conditions>
                 <line_items type="array">
                     <adjustment type="credit">
-                        <account href="https://fubotv-dev.recurly.com/v2/accounts/5bd1c0dada7d01000d625d3b"/>
+                        <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
                         <uuid>482eb168b63e29b0df51b1450b980656</uuid>
                         <state>pending</state>
-                        <description>fubo</description>
                         <accounting_code nil="nil"></accounting_code>
                         <product_code>test</product_code>
                         <origin>plan</origin>
