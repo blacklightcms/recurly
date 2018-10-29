@@ -816,30 +816,14 @@ func TestInvoices_Create(t *testing.T) {
 			</charge_invoice>
 			<credit_invoices type="array">
 <credit_invoice>
-                <account href="https://fubotv-dev.recurly.com/v2/accounts/5bd1c0dada7d01000d625d3b"/>
-                <address>
-                    <address1 nil="nil"></address1>
-                    <address2 nil="nil"></address2>
-                    <city nil="nil"></city>
-                    <state nil="nil"></state>
-                    <zip>34556</zip>
-                    <country nil="nil"></country>
-                    <phone nil="nil"></phone>
-                </address>
+                <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
                 <uuid>482eb168f7ac5016473390402eb6448a</uuid>
                 <state>open</state>
                 <invoice_number_prefix></invoice_number_prefix>
-                <invoice_number nil="nil"></invoice_number>
-                <vat_number nil="nil"></vat_number>
                 <tax_in_cents type="integer">0</tax_in_cents>
                 <total_in_cents type="integer">-4014</total_in_cents>
                 <currency>USD</currency>
-                <created_at nil="nil"></created_at>
-                <updated_at nil="nil"></updated_at>
                 <attempt_next_collection_at nil="nil"></attempt_next_collection_at>
-                <closed_at nil="nil"></closed_at>
-                <customer_notes nil="nil"></customer_notes>
-                <recovery_reason nil="nil"></recovery_reason>
                 <subtotal_before_discount_in_cents type="integer">-4450</subtotal_before_discount_in_cents>
                 <subtotal_in_cents type="integer">-4014</subtotal_in_cents>
                 <discount_in_cents type="integer">-436</discount_in_cents>
@@ -849,7 +833,7 @@ func TestInvoices_Create(t *testing.T) {
                 <origin>immediate_change</origin>
                 <credit_payments type="array">
                     <credit_payment>
-                        <account href="https://fubotv-dev.recurly.com/v2/accounts/5bd1c0dada7d01000d625d3b"/>
+                        <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
                         <uuid>482eb1693c5a55507831474cec93265d</uuid>
                         <action>payment</action>
                         <currency>USD</currency>
@@ -870,7 +854,7 @@ func TestInvoices_Create(t *testing.T) {
                         <state>pending</state>
                         <description>fubo</description>
                         <accounting_code nil="nil"></accounting_code>
-                        <product_code>fubotv-basic</product_code>
+                        <product_code>test</product_code>
                         <origin>plan</origin>
                         <unit_amount_in_cents type="integer">-3927</unit_amount_in_cents>
                         <quantity type="integer">1</quantity>
@@ -884,13 +868,11 @@ func TestInvoices_Create(t *testing.T) {
                         <taxable type="boolean">false</taxable>
                         <start_date type="datetime">2018-10-29T12:57:03Z</start_date>
                         <end_date type="datetime">2018-11-25T14:17:32Z</end_date>
-                        <created_at nil="nil"></created_at>
-                        <updated_at nil="nil"></updated_at>
                         <revenue_schedule_type>evenly</revenue_schedule_type>
                         <credit_reason_code>refund</credit_reason_code>
                     </adjustment>
                     <adjustment type="credit">
-                        <account href="https://fubotv-dev.recurly.com/v2/accounts/5bd1c0dada7d01000d625d3b"/>
+                        <account href="https://your-subdomain.recurly.com/v2/accounts/5bd1c0dada7d01000d625d3b"/>
                         <uuid>482eb168c8e74f1f1be6b14727a4c969</uuid>
                         <state>pending</state>
                         <description>3rd Screen</description>
