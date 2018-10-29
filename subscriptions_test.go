@@ -952,6 +952,18 @@ func TestSubscriptions_Preview(t *testing.T) {
 				<state>pending</state>
 				</charge_invoice>
 				<credit_invoices type="array">
+           <credit_invoice>
+                <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
+                <uuid>43adfe52c21cbb221557a24940bcd7e5</uuid>
+                <state>open</state>
+                <total_in_cents type="integer">-4014</total_in_cents>
+                <currency>USD</currency>
+                <subtotal_in_cents type="integer">-4014</subtotal_in_cents>
+                <discount_in_cents type="integer">-436</discount_in_cents>
+                <balance_in_cents type="integer">-2444</balance_in_cents>
+                <type>credit</type>
+                <origin>immediate_change</origin>
+            </credit_invoice>
 				</credit_invoices>
 			</invoice_collection>
 		</subscription>`)
@@ -971,6 +983,21 @@ func TestSubscriptions_Preview(t *testing.T) {
 				AccountCode: "1",
 				UUID:        "43adfe52c21cbb221557a24940bcd7e5",
 				State:       recurly.ChargeInvoiceStatePending,
+			},
+			CreditInvoices: []recurly.Invoice{
+				{
+					XMLName:         xml.Name{Local: "invoice"},
+					AccountCode:     "1",
+					UUID:            "43adfe52c21cbb221557a24940bcd7e5",
+					State:           recurly.CreditInvoiceStateOpen,
+					TotalInCents:    -4014,
+					Currency:        "USD",
+					SubtotalInCents: -4014,
+					DiscountInCents: -436,
+					BalanceInCents:  -2444,
+					Type:            "credit",
+					Origin:          "immediate_change",
+				},
 			},
 		},
 	}); diff != "" {
@@ -1283,6 +1310,62 @@ func TestSubscriptions_PreviewChange(t *testing.T) {
 						Currency:          "USD",
 						StartDate:         dueOn,
 						EndDate:           currentPeriodEndsAt,
+					},
+				},
+			},
+			CreditInvoices: []recurly.Invoice{
+				{
+					XMLName:         xml.Name{Local: "invoice"},
+					AccountCode:     "multi-test-one",
+					UUID:            "4669ef72e546b859621857449e86d822",
+					State:           "closed",
+					SubtotalInCents: -31229,
+					TotalInCents:    -31229,
+					Currency:        "USD",
+					ClosedAt:        dueOn,
+					Type:            "credit",
+					Origin:          "immediate_change",
+					LineItems: []recurly.Adjustment{
+						{
+							AccountCode:            "multi-test-one",
+							UUID:                   "4669ef72bf5a190570a0fc4c37b9eef7",
+							State:                  "pending",
+							Description:            "Multi-Plan Low End",
+							ProductCode:            "multi-low",
+							Origin:                 "plan",
+							UnitAmountInCents:      -19518,
+							Quantity:               1,
+							OriginalAdjustmentUUID: "466615c82c79f22fcbf024428fb69006",
+							TotalInCents:           -19518,
+							Currency:               "USD",
+							StartDate:              dueOn,
+							EndDate:                currentPeriodEndsAt,
+						},
+						{
+							AccountCode:            "multi-test-one",
+							UUID:                   "4669ef72cbf2bb738fbdfb4c87bc88dc",
+							State:                  "pending",
+							Description:            "Domains",
+							ProductCode:            "domains",
+							Origin:                 "add_on",
+							UnitAmountInCents:      -11711,
+							Quantity:               1,
+							OriginalAdjustmentUUID: "466615c83144d4334e855b4f5e8fcc9f",
+							TotalInCents:           -11711,
+							Currency:               "USD",
+							StartDate:              dueOn,
+							EndDate:                currentPeriodEndsAt,
+						},
+					},
+					CreditPayments: []recurly.CreditPayment{
+						{
+							XMLName:       xml.Name{Local: "credit_payment"},
+							AccountCode:   "multi-test-one",
+							UUID:          "4669ef73118cde865e2b974244887cf1",
+							Action:        "payment",
+							Currency:      "USD",
+							AmountInCents: 31229,
+						},
 					},
 				},
 			},

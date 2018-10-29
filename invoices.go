@@ -157,10 +157,10 @@ func (i *Invoice) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 
 // InvoiceCollection is the data type returned from Preview, Post,
 // MarkFailed, and inside PreviewSubscription, and PreviewSubscriptionChange.
-// In v2.12 this struct will include `credit_invoices`.
 type InvoiceCollection struct {
-	XMLName       xml.Name `xml:"invoice_collection"`
-	ChargeInvoice *Invoice `xml:"-"`
+	XMLName        xml.Name  `xml:"invoice_collection"`
+	ChargeInvoice  *Invoice  `xml:"-"`
+	CreditInvoices []Invoice `xml:"-"`
 }
 
 // UnmarshalXML unmarshals invoices and handles intermediary state during unmarshaling
@@ -172,6 +172,10 @@ func (i *InvoiceCollection) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 			XMLName xml.Name `xml:"charge_invoice,omitempty"`
 			invoiceFields
 		} `xml:"charge_invoice,omitempty"`
+		CreditInvoices []struct {
+			XMLName xml.Name `xml:"credit_invoice,omitempty"`
+			invoiceFields
+		} `xml:"credit_invoices>credit_invoice,omitempty"`
 	}
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err
@@ -209,9 +213,46 @@ func (i *InvoiceCollection) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 		Transactions:            v.ChargeInvoice.Transactions,
 		CreditPayments:          v.ChargeInvoice.CreditPayments,
 	}
+	var creditInvoices []Invoice
+	for _, ci := range v.CreditInvoices {
+		creditInvoices = append(creditInvoices, Invoice{
+			XMLName:               xml.Name{Local: "invoice"},
+			AccountCode:           string(ci.AccountCode),
+			Address:               ci.Address,
+			OriginalInvoiceNumber: int(ci.OriginalInvoiceNumber),
+			UUID:                    ci.UUID,
+			State:                   ci.State,
+			InvoiceNumberPrefix:     ci.InvoiceNumberPrefix,
+			InvoiceNumber:           ci.InvoiceNumber,
+			PONumber:                ci.PONumber,
+			VATNumber:               ci.VATNumber,
+			DiscountInCents:         ci.DiscountInCents,
+			SubtotalInCents:         ci.SubtotalInCents,
+			TaxInCents:              ci.TaxInCents,
+			TotalInCents:            ci.TotalInCents,
+			BalanceInCents:          ci.BalanceInCents,
+			Currency:                ci.Currency,
+			DueOn:                   ci.DueOn,
+			CreatedAt:               ci.CreatedAt,
+			UpdatedAt:               ci.UpdatedAt,
+			AttemptNextCollectionAt: ci.AttemptNextCollectionAt,
+			ClosedAt:                ci.ClosedAt,
+			Type:                    ci.Type,
+			Origin:                  ci.Origin,
+			TaxType:                 ci.TaxType,
+			TaxRegion:               ci.TaxRegion,
+			TaxRate:                 ci.TaxRate,
+			NetTerms:                ci.NetTerms,
+			CollectionMethod:        ci.CollectionMethod,
+			LineItems:               ci.LineItems,
+			Transactions:            ci.Transactions,
+			CreditPayments:          ci.CreditPayments,
+		})
+	}
 	*i = InvoiceCollection{
-		XMLName:       xml.Name{Local: "invoice_collection"},
-		ChargeInvoice: &invoice,
+		XMLName:        xml.Name{Local: "invoice_collection"},
+		ChargeInvoice:  &invoice,
+		CreditInvoices: creditInvoices,
 	}
 
 	return nil
