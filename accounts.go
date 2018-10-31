@@ -37,13 +37,17 @@ type AccountBalance struct {
 
 // Address is used for embedded addresses within other structs.
 type Address struct {
-	Address  string `xml:"address1,omitempty"`
-	Address2 string `xml:"address2,omitempty"`
-	City     string `xml:"city,omitempty"`
-	State    string `xml:"state,omitempty"`
-	Zip      string `xml:"zip,omitempty"`
-	Country  string `xml:"country,omitempty"`
-	Phone    string `xml:"phone,omitempty"`
+	NameOnAccount string `xml:"name_on_account,omitempty"`
+	FirstName     string `xml:"first_name,omitempty"`
+	LastName      string `xml:"last_name,omitempty"`
+	Company       string `xml:"company,omitempty"`
+	Address       string `xml:"address1,omitempty"`
+	Address2      string `xml:"address2,omitempty"`
+	City          string `xml:"city,omitempty"`
+	State         string `xml:"state,omitempty"`
+	Zip           string `xml:"zip,omitempty"`
+	Country       string `xml:"country,omitempty"`
+	Phone         string `xml:"phone,omitempty"`
 }
 
 // MarshalXML ensures addresses marshal to nil if empty without the need
