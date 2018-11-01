@@ -896,8 +896,8 @@ func TestInvoices_Create(t *testing.T) {
           </line_items>
           <transactions type="array"></transactions>
          </credit_invoice>
-			 </credit_invoices>
-		 </invoice_collection>`)
+       </credit_invoices>
+     </invoice_collection>`)
 	})
 
 	resp, invoice, err := client.Invoices.Create("10", recurly.Invoice{})
