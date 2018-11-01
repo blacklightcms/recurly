@@ -381,6 +381,7 @@ func TestSubscriptions_List(t *testing.T) {
 				<po_number nil="nil"></po_number>
 				<net_terms type="integer">0</net_terms>
 				<auto_renew>true</auto_renew>
+				<customer_notes>customer_notes_test_list</customer_notes>
 				<current_term_started_at type="datetime">2010-07-27T07:00:00Z</current_term_started_at>
 				<current_term_ends_at type="datetime">2010-07-27T07:00:00Z</current_term_ends_at>
 				<subscription_add_ons type="array">
@@ -436,6 +437,7 @@ func TestSubscriptions_List(t *testing.T) {
 			TaxRate:                0.0875,
 			AutoRenew:              true,
 			NetTerms:               recurly.NewInt(0),
+			CustomerNotes:          "customer_notes_test_list",
 			SubscriptionAddOns: []recurly.SubscriptionAddOn{
 				{
 					XMLName:           xml.Name{Local: "subscription_add_on"},
@@ -481,6 +483,7 @@ func TestSubscriptions_ListAccount(t *testing.T) {
 				<current_period_ends_at type="datetime">2010-07-27T07:00:00Z</current_period_ends_at>
 				<trial_started_at nil="nil"></trial_started_at>
 				<trial_ends_at nil="nil"></trial_ends_at>
+				<customer_notes>customer_notes_test_list_account</customer_notes>
 				<tax_in_cents type="integer">72</tax_in_cents>
 				<tax_type>usst</tax_type>
 				<tax_region>CA</tax_region>
@@ -531,6 +534,7 @@ func TestSubscriptions_ListAccount(t *testing.T) {
 			TaxRegion:              "CA",
 			TaxRate:                0.0875,
 			NetTerms:               recurly.NewInt(0),
+			CustomerNotes:          "customer_notes_test_list_account",
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -566,6 +570,7 @@ func TestSubscriptions_Get(t *testing.T) {
 			<current_period_ends_at type="datetime">2011-07-27T07:00:00Z</current_period_ends_at>
 			<trial_started_at nil="nil"></trial_started_at>
 			<trial_ends_at nil="nil"></trial_ends_at>
+			<customer_notes>customer_notes_test_get</customer_notes>
 			<tax_in_cents type="integer">72</tax_in_cents>
 			<tax_type>usst</tax_type>
 			<tax_region>CA</tax_region>
@@ -608,6 +613,7 @@ func TestSubscriptions_Get(t *testing.T) {
 		TaxRegion:              "CA",
 		TaxRate:                0.0875,
 		NetTerms:               recurly.NewInt(0),
+		CustomerNotes:          "customer_notes_test_get",
 	}); diff != "" {
 		t.Fatal(diff)
 	}

@@ -77,6 +77,7 @@ type Subscription struct {
 	InvoiceCollection      *InvoiceCollection   `xml:"invoice_collection,omitempty"`
 	RemainingPauseCycles   int                  `xml:"remaining_pause_cycles,omitempty"`
 	CollectionMethod       string               `xml:"collection_method"`
+	CustomerNotes          string               `xml:"customer_notes,omitempty"`
 	AutoRenew              bool                 `xml:"auto_renew,omitempty"`
 	RenewalBillingCycles   NullInt              `xml:"renewal_billing_cycles"`
 	CustomFields           *CustomFields        `xml:"custom_fields,omitempty"`
