@@ -180,78 +180,14 @@ func (i *InvoiceCollection) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err
 	}
-	invoice := Invoice{
-		XMLName:               xml.Name{Local: "invoice"},
-		AccountCode:           string(v.ChargeInvoice.AccountCode),
-		Address:               v.ChargeInvoice.Address,
-		OriginalInvoiceNumber: int(v.ChargeInvoice.OriginalInvoiceNumber),
-		UUID:                    v.ChargeInvoice.UUID,
-		State:                   v.ChargeInvoice.State,
-		InvoiceNumberPrefix:     v.ChargeInvoice.InvoiceNumberPrefix,
-		InvoiceNumber:           v.ChargeInvoice.InvoiceNumber,
-		PONumber:                v.ChargeInvoice.PONumber,
-		VATNumber:               v.ChargeInvoice.VATNumber,
-		DiscountInCents:         v.ChargeInvoice.DiscountInCents,
-		SubtotalInCents:         v.ChargeInvoice.SubtotalInCents,
-		TaxInCents:              v.ChargeInvoice.TaxInCents,
-		TotalInCents:            v.ChargeInvoice.TotalInCents,
-		BalanceInCents:          v.ChargeInvoice.BalanceInCents,
-		Currency:                v.ChargeInvoice.Currency,
-		DueOn:                   v.ChargeInvoice.DueOn,
-		CreatedAt:               v.ChargeInvoice.CreatedAt,
-		UpdatedAt:               v.ChargeInvoice.UpdatedAt,
-		AttemptNextCollectionAt: v.ChargeInvoice.AttemptNextCollectionAt,
-		ClosedAt:                v.ChargeInvoice.ClosedAt,
-		Type:                    v.ChargeInvoice.Type,
-		Origin:                  v.ChargeInvoice.Origin,
-		TaxType:                 v.ChargeInvoice.TaxType,
-		TaxRegion:               v.ChargeInvoice.TaxRegion,
-		TaxRate:                 v.ChargeInvoice.TaxRate,
-		NetTerms:                v.ChargeInvoice.NetTerms,
-		CollectionMethod:        v.ChargeInvoice.CollectionMethod,
-		LineItems:               v.ChargeInvoice.LineItems,
-		Transactions:            v.ChargeInvoice.Transactions,
-		CreditPayments:          v.ChargeInvoice.CreditPayments,
-	}
-	var creditInvoices []Invoice
-	for _, ci := range v.CreditInvoices {
-		creditInvoices = append(creditInvoices, Invoice{
-			XMLName:               xml.Name{Local: "invoice"},
-			AccountCode:           string(ci.AccountCode),
-			Address:               ci.Address,
-			OriginalInvoiceNumber: int(ci.OriginalInvoiceNumber),
-			UUID:                    ci.UUID,
-			State:                   ci.State,
-			InvoiceNumberPrefix:     ci.InvoiceNumberPrefix,
-			InvoiceNumber:           ci.InvoiceNumber,
-			PONumber:                ci.PONumber,
-			VATNumber:               ci.VATNumber,
-			DiscountInCents:         ci.DiscountInCents,
-			SubtotalInCents:         ci.SubtotalInCents,
-			TaxInCents:              ci.TaxInCents,
-			TotalInCents:            ci.TotalInCents,
-			BalanceInCents:          ci.BalanceInCents,
-			Currency:                ci.Currency,
-			DueOn:                   ci.DueOn,
-			CreatedAt:               ci.CreatedAt,
-			UpdatedAt:               ci.UpdatedAt,
-			AttemptNextCollectionAt: ci.AttemptNextCollectionAt,
-			ClosedAt:                ci.ClosedAt,
-			Type:                    ci.Type,
-			Origin:                  ci.Origin,
-			TaxType:                 ci.TaxType,
-			TaxRegion:               ci.TaxRegion,
-			TaxRate:                 ci.TaxRate,
-			NetTerms:                ci.NetTerms,
-			CollectionMethod:        ci.CollectionMethod,
-			LineItems:               ci.LineItems,
-			Transactions:            ci.Transactions,
-			CreditPayments:          ci.CreditPayments,
-		})
+	chargeInvoice := v.ChargeInvoice.ToInvoice()
+	creditInvoices := make([]Invoice, len(v.CreditInvoices))
+	for index, ci := range v.CreditInvoices {
+		creditInvoices[index] = ci.ToInvoice()
 	}
 	*i = InvoiceCollection{
 		XMLName:        xml.Name{Local: "invoice_collection"},
-		ChargeInvoice:  &invoice,
+		ChargeInvoice:  &chargeInvoice,
 		CreditInvoices: creditInvoices,
 	}
 
@@ -291,6 +227,42 @@ type invoiceFields struct {
 	LineItems               []Adjustment    `xml:"line_items>adjustment,omitempty"`
 	Transactions            []Transaction   `xml:"transactions>transaction,omitempty"`
 	CreditPayments          []CreditPayment `xml:"credit_payments>credit_payment,omitempty"`
+}
+
+func (i invoiceFields) ToInvoice() Invoice {
+	return Invoice{
+		XMLName:               xml.Name{Local: "invoice"},
+		AccountCode:           string(i.AccountCode),
+		Address:               i.Address,
+		OriginalInvoiceNumber: int(i.OriginalInvoiceNumber),
+		UUID:                    i.UUID,
+		State:                   i.State,
+		InvoiceNumberPrefix:     i.InvoiceNumberPrefix,
+		InvoiceNumber:           i.InvoiceNumber,
+		PONumber:                i.PONumber,
+		VATNumber:               i.VATNumber,
+		DiscountInCents:         i.DiscountInCents,
+		SubtotalInCents:         i.SubtotalInCents,
+		TaxInCents:              i.TaxInCents,
+		TotalInCents:            i.TotalInCents,
+		BalanceInCents:          i.BalanceInCents,
+		Currency:                i.Currency,
+		DueOn:                   i.DueOn,
+		CreatedAt:               i.CreatedAt,
+		UpdatedAt:               i.UpdatedAt,
+		AttemptNextCollectionAt: i.AttemptNextCollectionAt,
+		ClosedAt:                i.ClosedAt,
+		Type:                    i.Type,
+		Origin:                  i.Origin,
+		TaxType:                 i.TaxType,
+		TaxRegion:               i.TaxRegion,
+		TaxRate:                 i.TaxRate,
+		NetTerms:                i.NetTerms,
+		CollectionMethod:        i.CollectionMethod,
+		LineItems:               i.LineItems,
+		Transactions:            i.Transactions,
+		CreditPayments:          i.CreditPayments,
+	}
 }
 
 // OfflinePayment is a payment received outside the system to be recorded in Recurly.

@@ -772,13 +772,13 @@ func TestInvoices_Create(t *testing.T) {
 			<charge_invoice href="https://your-subdomain.recurly.com/v2/invoices/1016">
 				<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
 				<address>
-				<address1>123 Main St.</address1>
-				<address2 nil="nil"/>
-				<city>San Francisco</city>
-				<state>CA</state>
-				<zip>94105</zip>
-				<country>US</country>
-				<phone nil="nil"/>
+					<address1>123 Main St.</address1>
+					<address2 nil="nil"/>
+					<city>San Francisco</city>
+					<state>CA</state>
+					<zip>94105</zip>
+					<country>US</country>
+					<phone nil="nil"/>
 				</address>
 				<uuid>43adb97640cc05dee0b10042e596307f</uuid>
 				<state>pending</state>
@@ -805,102 +805,99 @@ func TestInvoices_Create(t *testing.T) {
 				<tax_type>usst</tax_type>
 				<tax_region>CA</tax_region>
 				<line_items type="array">
-				<adjustment href="https://your-subdomain.recurly.com/v2/adjustments/43adb5a639dc950ff620de42e6be4141" type="charge">
-					<!-- Detail. -->
-				</adjustment>
+				  <adjustment href="https://your-subdomain.recurly.com/v2/adjustments/43adb5a639dc950ff620de42e6be4141" type="charge">
+  				</adjustment>
 				</line_items>
-				<transactions type="array">
-				</transactions>
+				<transactions type="array"></transactions>
 				<a name="mark_successful" href="https://your-subdomain.recurly.com/v2/invoices/1016/mark_successful" method="put"/>
 				<a name="mark_failed" href="https://your-subdomain.recurly.com/v2/invoices/1016/mark_failed" method="put"/>
 			</charge_invoice>
 			<credit_invoices type="array">
-<credit_invoice>
-                <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
-                <uuid>482eb168f7ac5016473390402eb6448a</uuid>
-                <state>open</state>
-                <invoice_number_prefix></invoice_number_prefix>
-                <tax_in_cents type="integer">0</tax_in_cents>
-                <total_in_cents type="integer">-4014</total_in_cents>
-                <currency>USD</currency>
-                <attempt_next_collection_at nil="nil"></attempt_next_collection_at>
-                <subtotal_before_discount_in_cents type="integer">-4450</subtotal_before_discount_in_cents>
-                <subtotal_in_cents type="integer">-4014</subtotal_in_cents>
-                <discount_in_cents type="integer">-436</discount_in_cents>
-                <due_on nil="nil"></due_on>
-                <balance_in_cents type="integer">-2444</balance_in_cents>
-                <type>credit</type>
-                <origin>immediate_change</origin>
-                <credit_payments type="array">
-                    <credit_payment>
-                        <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
-                        <uuid>482eb1693c5a55507831474cec93265d</uuid>
-                        <action>payment</action>
-                        <currency>USD</currency>
-                        <amount_in_cents type="integer">1570</amount_in_cents>
-                        <created_at nil="nil"></created_at>
-                        <updated_at nil="nil"></updated_at>
-                        <voided_at nil="nil"></voided_at>
-                    </credit_payment>
-                </credit_payments>
-                <net_terms nil="nil"></net_terms>
-                <collection_method nil="nil"></collection_method>
-                <po_number nil="nil"></po_number>
-                <terms_and_conditions nil="nil"></terms_and_conditions>
-                <line_items type="array">
-                    <adjustment type="credit">
-                        <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
-                        <uuid>482eb168b63e29b0df51b1450b980656</uuid>
-                        <state>pending</state>
-                        <accounting_code nil="nil"></accounting_code>
-                        <product_code>test</product_code>
-                        <origin>plan</origin>
-                        <unit_amount_in_cents type="integer">-3927</unit_amount_in_cents>
-                        <quantity type="integer">1</quantity>
-                        <quantity_remaining type="integer">1</quantity_remaining>
-                        <original_adjustment_uuid>481a8a852326da8cd8300f403eb2b41e</original_adjustment_uuid>
-                        <discount_in_cents type="integer">-436</discount_in_cents>
-                        <tax_in_cents type="integer">0</tax_in_cents>
-                        <total_in_cents type="integer">-3491</total_in_cents>
-                        <currency>USD</currency>
-                        <proration_rate type="float">0.8728</proration_rate>
-                        <taxable type="boolean">false</taxable>
-                        <start_date type="datetime">2018-10-29T12:57:03Z</start_date>
-                        <end_date type="datetime">2018-11-25T14:17:32Z</end_date>
-                        <revenue_schedule_type>evenly</revenue_schedule_type>
-                        <credit_reason_code>refund</credit_reason_code>
-                    </adjustment>
-                    <adjustment type="credit">
-                        <account href="https://your-subdomain.recurly.com/v2/accounts/5bd1c0dada7d01000d625d3b"/>
-                        <uuid>482eb168c8e74f1f1be6b14727a4c969</uuid>
-                        <state>pending</state>
-                        <description>3rd Screen</description>
-                        <accounting_code nil="nil"></accounting_code>
-                        <product_code>third-screen</product_code>
-                        <origin>add_on</origin>
-                        <unit_amount_in_cents type="integer">-523</unit_amount_in_cents>
-                        <quantity type="integer">1</quantity>
-                        <quantity_remaining type="integer">1</quantity_remaining>
-                        <original_adjustment_uuid>481a8b31d13e6577b52d3341119317cd</original_adjustment_uuid>
-                        <discount_in_cents type="integer">0</discount_in_cents>
-                        <tax_in_cents type="integer">0</tax_in_cents>
-                        <total_in_cents type="integer">-523</total_in_cents>
-                        <currency>USD</currency>
-                        <proration_rate type="float">0.8728</proration_rate>
-                        <taxable type="boolean">false</taxable>
-                        <start_date type="datetime">2018-10-29T12:57:03Z</start_date>
-                        <end_date type="datetime">2018-11-25T14:17:32Z</end_date>
-                        <created_at nil="nil"></created_at>
-                        <updated_at nil="nil"></updated_at>
-                        <revenue_schedule_type>evenly</revenue_schedule_type>
-                        <credit_reason_code>refund</credit_reason_code>
-                    </adjustment>
-                </line_items>
-                <transactions type="array">
-        </transactions>
-            </credit_invoice>
-			</credit_invoices>
-			</invoice_collection>`)
+        <credit_invoice>
+          <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
+          <uuid>482eb168f7ac5016473390402eb6448a</uuid>
+          <state>open</state>
+          <invoice_number_prefix></invoice_number_prefix>
+          <tax_in_cents type="integer">0</tax_in_cents>
+          <total_in_cents type="integer">-4014</total_in_cents>
+          <currency>USD</currency>
+          <attempt_next_collection_at nil="nil"></attempt_next_collection_at>
+          <subtotal_before_discount_in_cents type="integer">-4450</subtotal_before_discount_in_cents>
+          <subtotal_in_cents type="integer">-4014</subtotal_in_cents>
+          <discount_in_cents type="integer">-436</discount_in_cents>
+          <due_on nil="nil"></due_on>
+          <balance_in_cents type="integer">-2444</balance_in_cents>
+          <type>credit</type>
+          <origin>immediate_change</origin>
+          <credit_payments type="array">
+            <credit_payment>
+              <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
+              <uuid>482eb1693c5a55507831474cec93265d</uuid>
+              <action>payment</action>
+              <currency>USD</currency>
+              <amount_in_cents type="integer">1570</amount_in_cents>
+              <created_at nil="nil"></created_at>
+              <updated_at nil="nil"></updated_at>
+              <voided_at nil="nil"></voided_at>
+            </credit_payment>
+          </credit_payments>
+          <net_terms nil="nil"></net_terms>
+          <collection_method nil="nil"></collection_method>
+          <po_number nil="nil"></po_number>
+          <terms_and_conditions nil="nil"></terms_and_conditions>
+          <line_items type="array">
+            <adjustment type="credit">
+              <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
+              <uuid>482eb168b63e29b0df51b1450b980656</uuid>
+              <state>pending</state>
+              <accounting_code nil="nil"></accounting_code>
+              <product_code>test</product_code>
+              <origin>plan</origin>
+              <unit_amount_in_cents type="integer">-3927</unit_amount_in_cents>
+              <quantity type="integer">1</quantity>
+              <quantity_remaining type="integer">1</quantity_remaining>
+              <original_adjustment_uuid>481a8a852326da8cd8300f403eb2b41e</original_adjustment_uuid>
+              <discount_in_cents type="integer">-436</discount_in_cents>
+              <tax_in_cents type="integer">0</tax_in_cents>
+              <total_in_cents type="integer">-3491</total_in_cents>
+              <currency>USD</currency>
+              <proration_rate type="float">0.8728</proration_rate>
+              <taxable type="boolean">false</taxable>
+              <start_date type="datetime">2018-10-29T12:57:03Z</start_date>
+              <end_date type="datetime">2018-11-25T14:17:32Z</end_date>
+              <revenue_schedule_type>evenly</revenue_schedule_type>
+              <credit_reason_code>refund</credit_reason_code>
+            </adjustment>
+            <adjustment type="credit">
+              <account href="https://your-subdomain.recurly.com/v2/accounts/5bd1c0dada7d01000d625d3b"/>
+              <uuid>482eb168c8e74f1f1be6b14727a4c969</uuid>
+              <state>pending</state>
+              <description>3rd Screen</description>
+              <accounting_code nil="nil"></accounting_code>
+              <product_code>third-screen</product_code>
+              <origin>add_on</origin>
+              <unit_amount_in_cents type="integer">-523</unit_amount_in_cents>
+              <quantity type="integer">1</quantity>
+              <quantity_remaining type="integer">1</quantity_remaining>
+              <original_adjustment_uuid>481a8b31d13e6577b52d3341119317cd</original_adjustment_uuid>
+              <discount_in_cents type="integer">0</discount_in_cents>
+              <tax_in_cents type="integer">0</tax_in_cents>
+              <total_in_cents type="integer">-523</total_in_cents>
+              <currency>USD</currency>
+              <proration_rate type="float">0.8728</proration_rate>
+              <taxable type="boolean">false</taxable>
+              <start_date type="datetime">2018-10-29T12:57:03Z</start_date>
+              <end_date type="datetime">2018-11-25T14:17:32Z</end_date>
+              <created_at nil="nil"></created_at>
+              <updated_at nil="nil"></updated_at>
+              <revenue_schedule_type>evenly</revenue_schedule_type>
+              <credit_reason_code>refund</credit_reason_code>
+            </adjustment>
+          </line_items>
+          <transactions type="array"></transactions>
+         </credit_invoice>
+			 </credit_invoices>
+		 </invoice_collection>`)
 	})
 
 	resp, invoice, err := client.Invoices.Create("10", recurly.Invoice{})
