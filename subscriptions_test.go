@@ -947,23 +947,23 @@ func TestSubscriptions_Preview(t *testing.T) {
 		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><subscription>
 			<invoice_collection>
 				<charge_invoice href="">
-				<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
-				<uuid>43adfe52c21cbb221557a24940bcd7e5</uuid>
-				<state>pending</state>
+					<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
+					<uuid>43adfe52c21cbb221557a24940bcd7e5</uuid>
+					<state>pending</state>
 				</charge_invoice>
 				<credit_invoices type="array">
-           <credit_invoice>
-              <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
-              <uuid>43adfe52c21cbb221557a24940bcd7e5</uuid>
-              <state>open</state>
-              <total_in_cents type="integer">-4014</total_in_cents>
-              <currency>USD</currency>
-              <subtotal_in_cents type="integer">-4014</subtotal_in_cents>
-              <discount_in_cents type="integer">-436</discount_in_cents>
-              <balance_in_cents type="integer">-2444</balance_in_cents>
-              <type>credit</type>
-              <origin>immediate_change</origin>
-            </credit_invoice>
+					<credit_invoice>
+						<account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
+						<uuid>43adfe52c21cbb221557a24940bcd7e5</uuid>
+						<state>open</state>
+						<total_in_cents type="integer">-4014</total_in_cents>
+						<currency>USD</currency>
+						<subtotal_in_cents type="integer">-4014</subtotal_in_cents>
+						<discount_in_cents type="integer">-436</discount_in_cents>
+						<balance_in_cents type="integer">-2444</balance_in_cents>
+						<type>credit</type>
+						<origin>immediate_change</origin>
+					</credit_invoice>
 				</credit_invoices>
 			</invoice_collection>
 		</subscription>`)

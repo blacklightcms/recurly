@@ -118,39 +118,7 @@ func (i *Invoice) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err
 	}
-	*i = Invoice{
-		XMLName:               v.XMLName,
-		AccountCode:           string(v.AccountCode),
-		Address:               v.Address,
-		OriginalInvoiceNumber: int(v.OriginalInvoiceNumber),
-		UUID:                    v.UUID,
-		State:                   v.State,
-		InvoiceNumberPrefix:     v.InvoiceNumberPrefix,
-		InvoiceNumber:           v.InvoiceNumber,
-		PONumber:                v.PONumber,
-		VATNumber:               v.VATNumber,
-		DiscountInCents:         v.DiscountInCents,
-		SubtotalInCents:         v.SubtotalInCents,
-		TaxInCents:              v.TaxInCents,
-		TotalInCents:            v.TotalInCents,
-		BalanceInCents:          v.BalanceInCents,
-		Currency:                v.Currency,
-		DueOn:                   v.DueOn,
-		CreatedAt:               v.CreatedAt,
-		UpdatedAt:               v.UpdatedAt,
-		AttemptNextCollectionAt: v.AttemptNextCollectionAt,
-		ClosedAt:                v.ClosedAt,
-		Type:                    v.Type,
-		Origin:                  v.Origin,
-		TaxType:                 v.TaxType,
-		TaxRegion:               v.TaxRegion,
-		TaxRate:                 v.TaxRate,
-		NetTerms:                v.NetTerms,
-		CollectionMethod:        v.CollectionMethod,
-		LineItems:               v.LineItems,
-		Transactions:            v.Transactions,
-		CreditPayments:          v.CreditPayments,
-	}
+	*i = v.ToInvoice()
 
 	return nil
 }
