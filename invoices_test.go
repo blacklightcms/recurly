@@ -639,7 +639,7 @@ func TestInvoices_Get_TransactionsOrder(t *testing.T) {
 					<uuid>20150611</uuid>
 					<created_at type="datetime">2015-06-11T15:25:06Z</created_at>
 				</transaction>
-					<transaction href="https://your-subdomain.recurly.com/v2/transactions/20160101" type="credit_card">
+				<transaction href="https://your-subdomain.recurly.com/v2/transactions/20160101" type="credit_card">
 					<uuid>20160101</uuid>
 					<created_at type="datetime">2016-01-01T15:25:06Z</created_at>
 				</transaction>
