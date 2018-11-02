@@ -32,7 +32,8 @@ func TestAccounts_Encoding(t *testing.T) {
 		{v: recurly.Account{VATNumber: "123456789"}, expected: "<account><vat_number>123456789</vat_number></account>"},
 		{v: recurly.Account{TaxExempt: recurly.NewBool(true)}, expected: "<account><tax_exempt>true</tax_exempt></account>"},
 		{v: recurly.Account{TaxExempt: recurly.NewBool(false)}, expected: "<account><tax_exempt>false</tax_exempt></account>"},
-		{v: recurly.Account{AcceptLanguage: "en_US"}, expected: "<account><accept_language>en_US</accept_language></account>"},
+		{v: recurly.Account{AcceptLanguage: "en-US"}, expected: "<account><accept_language>en-US</accept_language></account>"},
+		{v: recurly.Account{PreferredLocale: "en-US"}, expected: "<account><preferred_locale>en-US</preferred_locale></account>"},
 		{v: recurly.Account{FirstName: "Larry", Address: recurly.Address{Address: "123 Main St.", City: "San Francisco", State: "CA", Zip: "94105", Country: "US"}}, expected: "<account><first_name>Larry</first_name><address><address1>123 Main St.</address1><city>San Francisco</city><state>CA</state><zip>94105</zip><country>US</country></address></account>"},
 		{v: recurly.Account{Code: "test@example.com", BillingInfo: &recurly.Billing{Token: "507c7f79bcf86cd7994f6c0e"}}, expected: "<account><account_code>test@example.com</account_code><billing_info><token_id>507c7f79bcf86cd7994f6c0e</token_id></billing_info></account>"},
 		{v: recurly.Account{HasPausedSubscription: true}, expected: "<account><has_paused_subscription>true</has_paused_subscription></account>"},
@@ -94,6 +95,7 @@ func TestAccounts_List(t *testing.T) {
 			    <phone nil="nil"></phone>
 			  </address>
 			  <accept_language nil="nil"></accept_language>
+			  <preferred_locale nil="nil"></preferred_locale>
 			  <hosted_login_token>a92468579e9c4231a6c0031c4716c01d</hosted_login_token>
 			  <created_at type="datetime">2011-10-25T12:00:00Z</created_at>
 			</account>
@@ -201,6 +203,7 @@ func TestAccounts_Get(t *testing.T) {
 			    <phone nil="nil"></phone>
 			  </address>
 			  <accept_language nil="nil"></accept_language>
+			  <preferred_locale nil="nil"></preferred_locale>
 			  <hosted_login_token>a92468579e9c4231a6c0031c4716c01d</hosted_login_token>
 			  <created_at type="datetime">2011-10-25T12:00:00Z</created_at>
 			  <custom_fields type="array">
