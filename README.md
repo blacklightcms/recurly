@@ -1,10 +1,13 @@
-# Go Recurly
+# Recurly
 Recurly is a Go (golang) API Client for the [Recurly](https://recurly.com/) API.
 
- [![Build Status](https://travis-ci.org/blacklightcms/go-recurly.svg?branch=master)](https://travis-ci.org/blacklightcms/go-recurly)  [![GoDoc](https://godoc.org/github.com/blacklightcms/go-recurly/recurly?status.svg)](https://godoc.org/github.com/blacklightcms/go-recurly/recurly)  
+ [![Build Status](https://travis-ci.org/blacklightcms/recurly.svg?branch=master)](https://travis-ci.org/blacklightcms/recurly)  [![GoDoc](https://godoc.org/github.com/blacklightcms/recurly?status.svg)](https://godoc.org/github.com/blacklightcms/recurly)
+
+## Announcement: Credit Invoice Release 
+As of v2.10, Recurly has released data structure and API changes to support the [credit invoice release](https://docs.recurly.com/docs/credit-invoices-release). All sites created after May 8, 2018, have this turned on automatically. Existing sites must turn it on no later than Nov 1, 2018. New features will be applicable once the feature is turned on; legacy (existing) invoices will continue to use some deprecated features until they are closed. Most new code can coexist with existing, allowing you to write code to support your transition smoothly. Note that the `new_dunning_event` webhook data structure will change and both may be sent while you have both legacy and new invoices with dunning events. Please review the `Parse` and `ParseDeprecated` methods if you listen for this webhook.  Deprecated code will be removed with any library updates no earlier than December 1, 2018. 
 
 ## References
- * [API Reference](http://godoc.org/github.com/blacklightcms/go-recurly/recurly)
+ * [API Reference](http://godoc.org/github.com/blacklightcms/recurly)
  * [Recurly API Documentation](https://dev.recurly.com/docs/)
  * [recurly.js Documentation](https://docs.recurly.com/js/)
  * Documentation and examples below. Unit tests also provide thorough examples.
@@ -12,42 +15,38 @@ Recurly is a Go (golang) API Client for the [Recurly](https://recurly.com/) API.
 ## Installation
 Install using the "go get" command:
 ```
-go get github.com/blacklightcms/go-recurly/recurly
+go get github.com/blacklightcms/recurly
 ```
 
 ### Example
 
 ```go
-import "github.com/blacklightcms/go-recurly/recurly"
+import "github.com/blacklightcms/recurly"
 ```
 
 Construct a new Recurly Client and then work off of that. For example, to list
 accounts:
 ```go
-client, err := recurly.NewClient("subdomain", "apiKey", nil)
-resp, accounts, err := client.Accounts.List({"per_page": 20})
+client := recurly.NewClient("subdomain", "apiKey", nil)
+resp, accounts, err := client.Accounts.List(recurly.Params{"per_page": 20})
 ```
 
 recurly.Response embeds http.Response and provides some convenience methods:
 ```go
 if resp.IsOK() {
     fmt.Println("Response was a 200-299 status code")
-}
-
-if resp.IsError() {
+} else if resp.IsError() {
     fmt.Println("Response was NOT a 200-299 status code")
 
     // Loop through errors (422 status code only)
-    for _, e := range resp.Errors() {
+    for _, e := range resp.Errors {
         fmt.Printf("Message: %s; Field: %s; Symbol: %s\n", e.Message, e.Field, e.Symbol)
     }
 }
 
 if resp.IsClientError() {
     fmt.Println("You messed up. Response was a 400-499 status code")
-}
-
-if resp.IsServerError() {
+} else if resp.IsServerError() {
     fmt.Println("Try again later. Response was a 500-599 status code")
 }
 
@@ -62,16 +61,18 @@ The basic usage format is to create a client, and then operate directly off of e
 of the services.
 
 The services are (each link to the GoDoc documentation):
- * [Accounts](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#AccountsService)
- * [Adjustments](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#AdjustmentsService)
- * [Billing](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#BillingService)
- * [Coupons](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#CouponsService)
- * [Redemptions](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#RedemptionsService)
- * [Invoices](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#InvoicesService)
- * [Plans](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#PlansService)
- * [AddOns](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#AddOnsService)
- * [Subscriptions](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#SubscriptionsService)
- * [Transactions](https://godoc.org/github.com/blacklightcms/go-recurly/recurly#TransactionsService)
+ * [Accounts](https://godoc.org/github.com/blacklightcms/recurly#AccountsService)
+ * [AddOns](https://godoc.org/github.com/blacklightcms/recurly#AddOnsService)
+ * [Adjustments](https://godoc.org/github.com/blacklightcms/recurly#AdjustmentsService)
+ * [Billing](https://godoc.org/github.com/blacklightcms/recurly#BillingService)
+ * [Coupons](https://godoc.org/github.com/blacklightcms/recurly#CouponsService)
+ * [CreditPayments](https://godoc.org/github.com/blacklightcms/recurly#CreditPaymentsService)
+ * [Invoices](https://godoc.org/github.com/blacklightcms/recurly#InvoicesService)
+ * [Plans](https://godoc.org/github.com/blacklightcms/recurly#PlansService)
+ * [Redemptions](https://godoc.org/github.com/blacklightcms/recurly#RedemptionsService)
+ * [Subscriptions](https://godoc.org/github.com/blacklightcms/recurly#SubscriptionsService)
+ * [Transactions](https://godoc.org/github.com/blacklightcms/recurly#TransactionsService)
+ * [Purchases](https://godoc.org/github.com/blacklightcms/recurly#PurchasesService)
 
 Each of the services correspond to their respective sections in the
 [Recurly API Documentation](https://dev.recurly.com/docs/).
@@ -84,7 +85,7 @@ resp, a, err := client.Accounts.Create(recurly.Account{
     Code: "1",
     FirstName: "Verena",
     LastName: "Example",
-    Email: "verena@example.com"
+    Email: "verena@example.com",
 })
 
 if resp.IsOK() {
@@ -121,7 +122,7 @@ if next == "" {
 }
 
 // Retrieve next page
-resp, accounts, err := client.Accounts.Get(recurly.Params{
+resp, accounts, err := client.Accounts.List(recurly.Params{
     "per_page": 10,
     "cursor": next,
 })
@@ -133,7 +134,7 @@ if prev == "" {
 }
 
 // Retrieve prev page
-resp, accounts, err := client.Accounts.Get(recurly.Params{
+resp, accounts, err := client.Accounts.List(recurly.Params{
     "per_page": 10,
     "cursor": prev,
 })
@@ -163,7 +164,7 @@ resp, b, err := client.Billing.UpdateWithToken("1", token)
 
 ### Create Billing with Credit Card
 ```go
-resp, b, err := client.Billing.Create("1", Billing{
+resp, b, err := client.Billing.Create("1", recurly.Billing{
     FirstName: "Verena",
     LastName:  "Example",
     Address:   "123 Main St.",
@@ -179,7 +180,7 @@ resp, b, err := client.Billing.Create("1", Billing{
 
 ### Create Billing With Bank account
 ```go
-resp, b, err := client.Billing.Create("134", Billing{
+resp, b, err := client.Billing.Create("134", recurly.Billing{
     FirstName:     "Verena",
     LastName:      "Example",
     Address:       "123 Main St.",
@@ -194,11 +195,10 @@ resp, b, err := client.Billing.Create("134", Billing{
 })
 ```
 
-### Creating Transactions and Subscriptions
-Transactions and subscriptions have different formats for creating and reading.
-Due to that, they have a special use case when creating -- there is a ```NewTransaction```
-and ```NewSubscription``` struct respectively. These structs are only used for
-creating.
+### Creating Subscriptions
+Subscriptions have different formats for creating and reading.
+Due to that, they have a special use case when creating -- a ```NewSubscription```
+struct respectively. `NewSubscription` structs are only used for creating.
 
 When updating a subscription, you should use the ```UpdateSubscription``` struct.
 All other creates/updates throughout use the same struct to create/update as to read.
@@ -207,24 +207,24 @@ All other creates/updates throughout use the same struct to create/update as to 
 // s will return a Subscription struct after creating using the
 // NewSubscription struct.
 resp, s, err := client.Subscriptions.Create(recurly.NewSubscription{
-    Code: "gold",
+    PlanCode: "gold",
     Currency: "EUR",
     Account: recurly.Account{
-        Code: "b6f5783",
-        Email: "verena@example.com",
+        Code:      "b6f5783",
+        Email:     "verena@example.com",
         FirstName: "Verena",
-        LastName: "Example",
+        LastName:  "Example",
         BillingInfo: &recurly.Billing{
-            Number: 4111111111111111,
-            Month: 12,
-            Year: 2017,
+            Number:            4111111111111111,
+            Month:             12,
+            Year:              2017,
             VerificationValue: 123,
-            Address: "400 Alabama St",
-            City: "San Francisco",
-            State: "CA",
-            Zip: "94110",
-        }
-    }
+            Address:           "400 Alabama St",
+            City:              "San Francisco",
+            State:             "CA",
+            Zip:               "94110",
+        },
+    },
 })
 ```
 
@@ -294,35 +294,6 @@ nt := recurly.NewTime(t) // time is now in UTC
 fmt.Println(t.String()) // 2015-08-03T19:11:33Z
 ```
 
-## HREF type
-The HREF type handles links returned from Recurly like this:
-```xml
-<subscriptions type="array">
-  <subscription href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96">
-    <account href="https://your-subdomain.recurly.com/v2/accounts/1"/>
-    <invoice href="https://your-subdomain.recurly.com/v2/invoices/1108"/>
-    <uuid>44f83d7cba354d5b84812419f923ea96</uuid>
-    <state>active</state>
-    <!-- ... -->
-  </subscription>
-</subscriptions>
-```
-
-In the ```Subscription``` struct, Account and Invoice are HREF types that will look like this:
-
-```go
-expected := Subscription{
-    Account: href{
-        HREF: "https://your-subdomain.recurly.com/v2/accounts/1",
-        Code: "1",
-    },
-    Invoice: href{
-        HREF: "https://your-subdomain.recurly.com/v2/invoices/1108",
-        Code: "1108",
-    },
-}
-```
-
 You can then use s.Account.Code to retrieve account info, or s.Invoice.Code to
 retrieve invoice info.
 
@@ -330,8 +301,8 @@ retrieve invoice info.
 In addition to the Errors property in the recurly.Response, response also
 contains a TransactionError field for Transaction Errors.
 
-Be sure to check resp.TransactionError for any API calls that may return a transaction
-error for additional info. The TransactionError struct is defined like this:
+Be sure to check `resp.TransactionError` for any API calls that may return a transaction
+error for additional info. The `TransactionError` struct is defined like this:
 ```go
 TransactionError struct {
 	XMLName          xml.Name `xml:"transaction_error"`
@@ -345,24 +316,50 @@ TransactionError struct {
 
 [Link to transaction error documentation](https://recurly.readme.io/v2.0/page/transaction-errors).
 
-## Roadmap
-The API should now be mostly stable. I'm going to leave this notice here for a bit
-in case any one in the community has comments or suggestions for improvements.
+## Using webhooks
+Initial webhook support is in place. The following webhooks are supported:
 
-~~The API is still being finalized and may change over the coming weeks. Here is
-what's coming before things stabilize:~~
- * ~~Support for paginating beyond the first page with cursors needs to be completed~~
- * ~~Coupons, coupon redemptions, invoices, and transactions. All other
- portions of the API are complete.~~
- * ~~Documentation and more usage examples.~~
- * ~~There is currently no support for updating billing info with a credit card or
- bank account directly. Using [recurly.js](https://docs.recurly.com/js/) token is the only supported method currently.
- Because the the token method using [recurly.js](https://docs.recurly.com/js/) is the recommended method, this
- is currently a low priority. The placeholder functions are already in place so
- this will not affect API stability of the library.~~
- * [Webhook](https://dev.recurly.com/page/webhooks) support. This will come last after API stability.
+Account Notifications
+ - `NewAccountNotification`
+ - `UpdatedAccountNotification`
+ - `CanceledAccountNotification`
+ - `BillingInfoUpdatedNotification`
+ - `BillingInfoUpdateFailedNotification`
 
-~~Once that notice is removed things will be stable.~~ Contributions are welcome.
+Subscription Notifications
+ - `NewSubscriptionNotification`
+ - `UpdatedSubscriptionNotification`
+ - `RenewedSubscriptionNotification`
+ - `ExpiredSubscriptionNotification`
+ - `CanceledSubscriptionNotification`
+ - `PausedSubscriptionNotification`
+ - `ResumedSubscriptionNotification`
+ - `ScheduledSubscriptionPauseNotification`
+ - `SubscriptionPauseModifiedNotification`
+ - `PausedSubscriptionRenewalNotification`
+ - `SubscriptionPauseCanceledNotification`
+ - `ReactivatedAccountNotification`
+
+ Invoice Notifications
+ - `NewInvoiceNotification`
+ - `PastDueInvoiceNotification`
+ - `ProcessingInvoiceNotification`
+ - `ClosedInvoiceNotification`
+
+Payment Notifications
+ - `SuccessfulPaymentNotification`
+ - `FailedPaymentNotification`
+ - `VoidPaymentNotification`
+ - `SuccessfulRefundNotification`
+ - `ScheduledPaymentNotification`
+ - `ProcessingPaymentNotification`
+ 
+ Dunning Event Notifications
+ - `NewDunningEventNotification`
+     
+Webhooks can be used by passing an `io.Reader` to `webhooks.Parse`, then using a switch statement with type assertions to determine the webhook returned.
+
+PRs are welcome for additional webhooks.
 
 ## License
-go-recurly is available under the [MIT License](http://opensource.org/licenses/MIT).
+recurly is available under the [MIT License](http://opensource.org/licenses/MIT).
