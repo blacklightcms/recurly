@@ -118,49 +118,17 @@ func (i *Invoice) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err
 	}
-	*i = Invoice{
-		XMLName:               v.XMLName,
-		AccountCode:           string(v.AccountCode),
-		Address:               v.Address,
-		OriginalInvoiceNumber: int(v.OriginalInvoiceNumber),
-		UUID:                    v.UUID,
-		State:                   v.State,
-		InvoiceNumberPrefix:     v.InvoiceNumberPrefix,
-		InvoiceNumber:           v.InvoiceNumber,
-		PONumber:                v.PONumber,
-		VATNumber:               v.VATNumber,
-		DiscountInCents:         v.DiscountInCents,
-		SubtotalInCents:         v.SubtotalInCents,
-		TaxInCents:              v.TaxInCents,
-		TotalInCents:            v.TotalInCents,
-		BalanceInCents:          v.BalanceInCents,
-		Currency:                v.Currency,
-		DueOn:                   v.DueOn,
-		CreatedAt:               v.CreatedAt,
-		UpdatedAt:               v.UpdatedAt,
-		AttemptNextCollectionAt: v.AttemptNextCollectionAt,
-		ClosedAt:                v.ClosedAt,
-		Type:                    v.Type,
-		Origin:                  v.Origin,
-		TaxType:                 v.TaxType,
-		TaxRegion:               v.TaxRegion,
-		TaxRate:                 v.TaxRate,
-		NetTerms:                v.NetTerms,
-		CollectionMethod:        v.CollectionMethod,
-		LineItems:               v.LineItems,
-		Transactions:            v.Transactions,
-		CreditPayments:          v.CreditPayments,
-	}
+	*i = v.ToInvoice()
 
 	return nil
 }
 
 // InvoiceCollection is the data type returned from Preview, Post,
 // MarkFailed, and inside PreviewSubscription, and PreviewSubscriptionChange.
-// In v2.12 this struct will include `credit_invoices`.
 type InvoiceCollection struct {
-	XMLName       xml.Name `xml:"invoice_collection"`
-	ChargeInvoice *Invoice `xml:"-"`
+	XMLName        xml.Name  `xml:"invoice_collection"`
+	ChargeInvoice  *Invoice  `xml:"-"`
+	CreditInvoices []Invoice `xml:"-"`
 }
 
 // UnmarshalXML unmarshals invoices and handles intermediary state during unmarshaling
@@ -172,46 +140,23 @@ func (i *InvoiceCollection) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 			XMLName xml.Name `xml:"charge_invoice,omitempty"`
 			invoiceFields
 		} `xml:"charge_invoice,omitempty"`
+		CreditInvoices []struct {
+			XMLName xml.Name `xml:"credit_invoice,omitempty"`
+			invoiceFields
+		} `xml:"credit_invoices>credit_invoice,omitempty"`
 	}
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err
 	}
-	invoice := Invoice{
-		XMLName:               xml.Name{Local: "invoice"},
-		AccountCode:           string(v.ChargeInvoice.AccountCode),
-		Address:               v.ChargeInvoice.Address,
-		OriginalInvoiceNumber: int(v.ChargeInvoice.OriginalInvoiceNumber),
-		UUID:                    v.ChargeInvoice.UUID,
-		State:                   v.ChargeInvoice.State,
-		InvoiceNumberPrefix:     v.ChargeInvoice.InvoiceNumberPrefix,
-		InvoiceNumber:           v.ChargeInvoice.InvoiceNumber,
-		PONumber:                v.ChargeInvoice.PONumber,
-		VATNumber:               v.ChargeInvoice.VATNumber,
-		DiscountInCents:         v.ChargeInvoice.DiscountInCents,
-		SubtotalInCents:         v.ChargeInvoice.SubtotalInCents,
-		TaxInCents:              v.ChargeInvoice.TaxInCents,
-		TotalInCents:            v.ChargeInvoice.TotalInCents,
-		BalanceInCents:          v.ChargeInvoice.BalanceInCents,
-		Currency:                v.ChargeInvoice.Currency,
-		DueOn:                   v.ChargeInvoice.DueOn,
-		CreatedAt:               v.ChargeInvoice.CreatedAt,
-		UpdatedAt:               v.ChargeInvoice.UpdatedAt,
-		AttemptNextCollectionAt: v.ChargeInvoice.AttemptNextCollectionAt,
-		ClosedAt:                v.ChargeInvoice.ClosedAt,
-		Type:                    v.ChargeInvoice.Type,
-		Origin:                  v.ChargeInvoice.Origin,
-		TaxType:                 v.ChargeInvoice.TaxType,
-		TaxRegion:               v.ChargeInvoice.TaxRegion,
-		TaxRate:                 v.ChargeInvoice.TaxRate,
-		NetTerms:                v.ChargeInvoice.NetTerms,
-		CollectionMethod:        v.ChargeInvoice.CollectionMethod,
-		LineItems:               v.ChargeInvoice.LineItems,
-		Transactions:            v.ChargeInvoice.Transactions,
-		CreditPayments:          v.ChargeInvoice.CreditPayments,
+	chargeInvoice := v.ChargeInvoice.ToInvoice()
+	creditInvoices := make([]Invoice, len(v.CreditInvoices))
+	for index, ci := range v.CreditInvoices {
+		creditInvoices[index] = ci.ToInvoice()
 	}
 	*i = InvoiceCollection{
-		XMLName:       xml.Name{Local: "invoice_collection"},
-		ChargeInvoice: &invoice,
+		XMLName:        xml.Name{Local: "invoice_collection"},
+		ChargeInvoice:  &chargeInvoice,
+		CreditInvoices: creditInvoices,
 	}
 
 	return nil
@@ -250,6 +195,42 @@ type invoiceFields struct {
 	LineItems               []Adjustment    `xml:"line_items>adjustment,omitempty"`
 	Transactions            []Transaction   `xml:"transactions>transaction,omitempty"`
 	CreditPayments          []CreditPayment `xml:"credit_payments>credit_payment,omitempty"`
+}
+
+func (i invoiceFields) ToInvoice() Invoice {
+	return Invoice{
+		XMLName:               xml.Name{Local: "invoice"},
+		AccountCode:           string(i.AccountCode),
+		Address:               i.Address,
+		OriginalInvoiceNumber: int(i.OriginalInvoiceNumber),
+		UUID:                    i.UUID,
+		State:                   i.State,
+		InvoiceNumberPrefix:     i.InvoiceNumberPrefix,
+		InvoiceNumber:           i.InvoiceNumber,
+		PONumber:                i.PONumber,
+		VATNumber:               i.VATNumber,
+		DiscountInCents:         i.DiscountInCents,
+		SubtotalInCents:         i.SubtotalInCents,
+		TaxInCents:              i.TaxInCents,
+		TotalInCents:            i.TotalInCents,
+		BalanceInCents:          i.BalanceInCents,
+		Currency:                i.Currency,
+		DueOn:                   i.DueOn,
+		CreatedAt:               i.CreatedAt,
+		UpdatedAt:               i.UpdatedAt,
+		AttemptNextCollectionAt: i.AttemptNextCollectionAt,
+		ClosedAt:                i.ClosedAt,
+		Type:                    i.Type,
+		Origin:                  i.Origin,
+		TaxType:                 i.TaxType,
+		TaxRegion:               i.TaxRegion,
+		TaxRate:                 i.TaxRate,
+		NetTerms:                i.NetTerms,
+		CollectionMethod:        i.CollectionMethod,
+		LineItems:               i.LineItems,
+		Transactions:            i.Transactions,
+		CreditPayments:          i.CreditPayments,
+	}
 }
 
 // OfflinePayment is a payment received outside the system to be recorded in Recurly.
