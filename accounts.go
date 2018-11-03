@@ -25,7 +25,7 @@ type Account struct {
 	HasPausedSubscription bool               `xml:"has_paused_subscription,omitempty"`
 	ShippingAddresses     *[]ShippingAddress `xml:"shipping_addresses>shipping_address,omitempty"`
 	CustomFields          *CustomFields      `xml:"custom_fields,omitempty"`
-	PreferredLocale       string      		 `xml:"preferred_locale,omitempty"`
+	PreferredLocale       string             `xml:"preferred_locale,omitempty"`
 }
 
 // AccountBalance is used for getting the account balance.
