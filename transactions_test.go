@@ -58,6 +58,11 @@ func TestTransactions_List(t *testing.T) {
         		<voidable type="boolean">true</voidable>
         		<refundable type="boolean">true</refundable>
         		<ip_address>127.0.0.1</ip_address>
+        		<gateway_type>stripe</gateway_type>
+        		<origin>api</origin>
+        		<description>Paid with check</description>
+        		<message>Manually entered transaction</message>
+        		<approval_code nil="nil"/>
         		<cvv_result code="M">Match</cvv_result>
         		<avs_result code="D">Street address and postal code match.</avs_result>
         		<avs_result_street nil="nil"/>
@@ -120,6 +125,10 @@ func TestTransactions_List(t *testing.T) {
 			Voidable:      recurly.NewBool(true),
 			Refundable:    recurly.NewBool(true),
 			IPAddress:     net.ParseIP("127.0.0.1"),
+			GatewayType:   "stripe",
+			Origin:        "api",
+			Description:   "Paid with check",
+			Message:       "Manually entered transaction",
 			CVVResult: recurly.CVVResult{
 				recurly.TransactionResult{
 					Code:    "M",
