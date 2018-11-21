@@ -27,6 +27,7 @@ func TestPurchases_Purchase_Encoding(t *testing.T) {
 				CustomerNotes:         "Some notes for the customer.",
 				TermsAndConditions:    "Our company terms and conditions.",
 				VATReverseChargeNotes: "Vat reverse charge notes.",
+				GatewayCode:           "test-gateway-code",
 				Account: recurly.Account{
 					Code: "c442b36c-c64f-41d7-b8e1-9c04e7a6ff82",
 					ShippingAddresses: &[]recurly.ShippingAddress{
@@ -86,6 +87,7 @@ func TestPurchases_Purchase_Encoding(t *testing.T) {
 				"<customer_notes>Some notes for the customer.</customer_notes>" +
 				"<terms_and_conditions>Our company terms and conditions.</terms_and_conditions>" +
 				"<vat_reverse_charge_notes>Vat reverse charge notes.</vat_reverse_charge_notes>" +
+				"<gateway_code>test-gateway-code</gateway_code>" +
 				"</purchase>",
 		},
 		{

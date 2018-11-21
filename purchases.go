@@ -19,4 +19,5 @@ type Purchase struct {
 	TermsAndConditions    string            `xml:"terms_and_conditions,omitempty"`
 	VATReverseChargeNotes string            `xml:"vat_reverse_charge_notes,omitempty"`
 	ShippingAddressID     int64             `xml:"shipping_address_id,omitempty"`
+	GatewayCode           string            `xml:"gateway_code,omitempty"`
 }
