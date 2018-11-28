@@ -42,6 +42,11 @@ type Transaction struct {
 	AVSResultPostal  string            `xml:"avs_result_postal,omitempty"` // Read only
 	CreatedAt        NullTime          `xml:"created_at,omitempty"`        // Read only
 	Account          Account           `xml:"details>account"`             // Read only
+	GatewayType      string            `xml:"gateway_type,omitempty"`      // Read only
+	Origin           string            `xml:"origin,omitempty"`            // Read only
+	Message          string            `xml:"message,omitempty"`           // Read only
+	ApprovalCode     string            `xml:"approval_code,omitempty"`     // Read only
+
 }
 
 // TransactionError is an error encounted from your payment gateway that
@@ -78,6 +83,10 @@ func (t Transaction) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		Refundable    NullBool `xml:"refundable,omitempty"`
 		IPAddress     net.IP   `xml:"ip_address,omitempty"`
 		Account       Account  `xml:"account"`
+		GatewayType   string   `xml:"gateway_type,omitempty"`
+		Origin        string   `xml:"origin,omitempty"`
+		Message       string   `xml:"message,omitempty"`
+		ApprovalCode  string   `xml:"approval_code,omitempty"`
 	}{
 		Action:        t.Action,
 		AmountInCents: t.AmountInCents,
@@ -95,6 +104,10 @@ func (t Transaction) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		Refundable:    t.Refundable,
 		IPAddress:     t.IPAddress,
 		Account:       t.Account,
+		GatewayType:   t.GatewayType,
+		Origin:        t.Origin,
+		Message:       t.Message,
+		ApprovalCode:  t.ApprovalCode,
 	}
 	e.Encode(dst)
 	return nil
