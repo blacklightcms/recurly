@@ -87,7 +87,7 @@ func (s *transactionsImpl) Create(t Transaction) (*Response, *Transaction, error
 	var dst Transaction
 	resp, err := s.client.do(req, &dst)
 	if err != nil {
-		return resp, nil, err
+		return nil, nil, err
 	}
 	// If there is an error set the response transaction as the returned transaction
 	// so that the caller has access to TransactionError.
