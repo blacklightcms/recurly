@@ -79,9 +79,14 @@ func (s *subscriptionsImpl) Create(sub NewSubscription) (*Response, *NewSubscrip
 	var dst NewSubscriptionResponse
 	var subscription Subscription
 	resp, err := s.client.do(req, &subscription)
+	if err != nil {
+		return nil, nil, err
+	}
+
 	if subscription.UUID != "" { // If subscription not present, dst.Subscription should be nil
 		dst.Subscription = &subscription
 	}
+
 	if resp.transaction != nil {
 		dst.Transaction = resp.transaction
 	}
