@@ -3,9 +3,6 @@ Recurly is a Go (golang) API Client for the [Recurly](https://recurly.com/) API.
 
  [![Build Status](https://travis-ci.org/blacklightcms/recurly.svg?branch=master)](https://travis-ci.org/blacklightcms/recurly)  [![GoDoc](https://godoc.org/github.com/blacklightcms/recurly?status.svg)](https://godoc.org/github.com/blacklightcms/recurly)
 
-## Announcement: Credit Invoice Release 
-As of v2.10, Recurly has released data structure and API changes to support the [credit invoice release](https://docs.recurly.com/docs/credit-invoices-release). All sites created after May 8, 2018, have this turned on automatically. Existing sites must turn it on no later than Nov 1, 2018. New features will be applicable once the feature is turned on; legacy (existing) invoices will continue to use some deprecated features until they are closed. Most new code can coexist with existing, allowing you to write code to support your transition smoothly. Note that the `new_dunning_event` webhook data structure will change and both may be sent while you have both legacy and new invoices with dunning events. Please review the `Parse` and `ParseDeprecated` methods if you listen for this webhook.  Deprecated code will be removed with any library updates no earlier than December 1, 2018. 
-
 ## References
  * [API Reference](http://godoc.org/github.com/blacklightcms/recurly)
  * [Recurly API Documentation](https://dev.recurly.com/docs/)

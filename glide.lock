@@ -1,5 +1,5 @@
-hash: c0d2160cf2a67fa1545e09954ca323aaed003ca9d32f16cab4420564b7da3c60
-updated: 2018-05-30T22:19:34.596651-04:00
+hash: 26bd4cfa3a700d34a3e16fb00b639da3b81f17b5a539d2dcd2aadf7d489ac4a8
+updated: 2018-12-27T16:54:57.834231-06:00
 imports: []
 testImports:
 - name: github.com/google/go-cmp
