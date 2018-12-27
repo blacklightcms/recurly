@@ -16,13 +16,6 @@ func Parse(r io.Reader) (interface{}, error) {
 	return parse(r, nameToNotification)
 }
 
-// ParseDeprecated parses an incoming webhook and returns the notification
-// for previous webhook notifications.
-// Will be deprecated after credit invoices feature is turned on.
-func ParseDeprecated(r io.Reader) (interface{}, error) {
-	return parse(r, nameToNotificationDeprecated)
-}
-
 // parse parses an incoming webhook and returns the notification.
 func parse(r io.Reader, fn func(s string) (interface{}, error)) (interface{}, error) {
 	if closer, ok := r.(io.Closer); ok {
@@ -65,30 +58,10 @@ func nameToNotification(name string) (interface{}, error) {
 		return &CreditInvoiceNotification{Type: name}, nil
 	case NewCreditPayment, VoidedCreditPayment:
 		return &CreditPaymentNotification{Type: name}, nil
-	case NewInvoice, PastDueInvoice, ProcessingInvoice, ClosedInvoice:
-		return &InvoiceNotification{Type: name}, nil
 	case SuccessfulPayment, FailedPayment, VoidPayment, SuccessfulRefund, ScheduledPayment, ProcessingPayment:
 		return &PaymentNotification{Type: name}, nil
 	case NewDunningEvent:
 		return &NewDunningEventNotification{Type: name}, nil
-	}
-	return nil, ErrUnknownNotification{name: name}
-}
-
-// nameToNotificationDeprecated returns interfaces for webhooks prior to
-// the credit invoices feature.
-func nameToNotificationDeprecated(name string) (interface{}, error) {
-	switch name {
-	case BillingInfoUpdated, NewAccount, UpdatedAccount, CanceledAccount, BillingInfoUpdateFailed:
-		return &AccountNotification{Type: name}, nil
-	case NewSubscription, UpdatedSubscription, RenewedSubscription, ExpiredSubscription, CanceledSubscription, ReactivatedAccount:
-		return &SubscriptionNotification{Type: name}, nil
-	case NewInvoice, PastDueInvoice, ProcessingInvoice, ClosedInvoice:
-		return &InvoiceNotification{Type: name}, nil
-	case SuccessfulPayment, FailedPayment, VoidPayment, SuccessfulRefund, ScheduledPayment, ProcessingPayment:
-		return &PaymentNotification{Type: name}, nil
-	case NewDunningEvent:
-		return &NewDunningEventDeprecatedNotification{Type: name}, nil
 	}
 	return nil, ErrUnknownNotification{name: name}
 }

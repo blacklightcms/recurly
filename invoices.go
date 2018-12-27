@@ -18,10 +18,6 @@ const (
 	CreditInvoiceStateProcessing = "processing" // ACH/bank refund processing
 	CreditInvoiceStateClosed     = "closed"
 	CreditInvoiceStateVoided     = "voided"
-
-	// Deprecated
-	InvoiceStateOpenDeprecated      = "open"
-	InvoiceStateCollectedDeprecated = "collected"
 )
 
 // Collection method constants.

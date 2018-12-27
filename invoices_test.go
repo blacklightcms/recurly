@@ -39,7 +39,7 @@ func TestInvoices_List(t *testing.T) {
 				<subscription href="https://your-subdomain.recurly.com/v2/accounts/1/subscriptions"/>
 				<original_invoice href="https://your-subdomain.recurly.com/v2/invoices/938571" />
 				<uuid>421f7b7d414e4c6792938e7c49d552e9</uuid>
-				<state>open</state>
+				<state>pending</state>
 				<invoice_number_prefix></invoice_number_prefix>
 				<invoice_number type="integer">1005</invoice_number>
 				<po_number nil="nil"></po_number>
@@ -121,20 +121,20 @@ func TestInvoices_List(t *testing.T) {
 			Country: "US",
 		},
 		OriginalInvoiceNumber: 938571,
-		UUID:                  "421f7b7d414e4c6792938e7c49d552e9",
-		State:                 recurly.InvoiceStateOpenDeprecated,
-		InvoiceNumber:         1005,
-		DiscountInCents:       17,
-		SubtotalInCents:       1200,
-		TaxInCents:            0,
-		TotalInCents:          1200,
-		Currency:              "USD",
-		CreatedAt:             recurly.NewTimeFromString("2011-08-25T12:00:00Z"),
-		TaxType:               "usst",
-		TaxRegion:             "CA",
-		TaxRate:               float64(0),
-		NetTerms:              recurly.NewInt(0),
-		CollectionMethod:      "automatic",
+		UUID:             "421f7b7d414e4c6792938e7c49d552e9",
+		State:            recurly.ChargeInvoiceStatePending,
+		InvoiceNumber:    1005,
+		DiscountInCents:  17,
+		SubtotalInCents:  1200,
+		TaxInCents:       0,
+		TotalInCents:     1200,
+		Currency:         "USD",
+		CreatedAt:        recurly.NewTimeFromString("2011-08-25T12:00:00Z"),
+		TaxType:          "usst",
+		TaxRegion:        "CA",
+		TaxRate:          float64(0),
+		NetTerms:         recurly.NewInt(0),
+		CollectionMethod: "automatic",
 		CreditPayments: []recurly.CreditPayment{{
 			XMLName:               xml.Name{Local: "credit_payment"},
 			AccountCode:           "1",
@@ -198,7 +198,7 @@ func TestInvoices_ListAccount(t *testing.T) {
 				</address>
 				<subscription href="https://your-subdomain.recurly.com/v2/accounts/1/subscriptions"/>
 				<uuid>421f7b7d414e4c6792938e7c49d552e9</uuid>
-				<state>open</state>
+				<state>pending</state>
 				<invoice_number_prefix></invoice_number_prefix>
 				<invoice_number type="integer">1005</invoice_number>
 				<po_number nil="nil"></po_number>
@@ -266,7 +266,7 @@ func TestInvoices_ListAccount(t *testing.T) {
 				Country: "US",
 			},
 			UUID:             "421f7b7d414e4c6792938e7c49d552e9",
-			State:            recurly.InvoiceStateOpenDeprecated,
+			State:            recurly.ChargeInvoiceStatePending,
 			InvoiceNumber:    1005,
 			SubtotalInCents:  1200,
 			TaxInCents:       0,

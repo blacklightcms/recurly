@@ -156,7 +156,6 @@ type NewSubscription struct {
 	StartsAt                NullTime             `xml:"starts_at,omitempty"`
 	TotalBillingCycles      int                  `xml:"total_billing_cycles,omitempty"`
 	RenewalBillingCycles    NullInt              `xml:"renewal_billing_cycles"`
-	FirstRenewalDate        NullTime             `xml:"first_renewal_date,omitempty"` // Deprecated, use NextBillDate
 	NextBillDate            NullTime             `xml:"next_bill_date,omitempty"`
 	CollectionMethod        string               `xml:"collection_method,omitempty"`
 	AutoRenew               bool                 `xml:"auto_renew,omitempty"`
