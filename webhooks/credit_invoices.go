@@ -24,18 +24,26 @@ type CreditInvoiceNotification struct {
 	Invoice CreditInvoice `xml:"invoice"`
 }
 
+// https://dev.recurly.com/page/webhooks#section-credit-invoice-schema
 // CreditInvoice represents the credit invoice object sent in webhooks.
 type CreditInvoice struct {
-	XMLName             xml.Name         `xml:"invoice"`
-	SubscriptionUUIDs   []string         `xml:"subscription_ids>subscription_id"`
-	UUID                string           `xml:"uuid"`
-	State               string           `xml:"state"`
-	Origin              string           `xml:"origin"`
-	InvoiceNumberPrefix string           `xml:"invoice_number_prefix"`
-	InvoiceNumber       int              `xml:"invoice_number"`
-	BalanceInCents      int              `xml:"balance_in_cents"`
-	TotalInCents        int              `xml:"total_in_cents"`
-	Currency            string           `xml:"currency"`
-	CreatedAt           recurly.NullTime `xml:"created_at"`
-	ClosedAt            recurly.NullTime `xml:"closed_at"`
+	XMLName                       xml.Name         `xml:"invoice"`
+	SubscriptionUUIDs             []string         `xml:"subscription_ids>subscription_id"`
+	UUID                          string           `xml:"uuid"`
+	State                         string           `xml:"state"`
+	Origin                        string           `xml:"origin"`
+	InvoiceNumberPrefix           string           `xml:"invoice_number_prefix"`
+	InvoiceNumber                 int              `xml:"invoice_number"`
+	VATNumber                     string           `xml:"vat_number"`
+	BalanceInCents                int              `xml:"balance_in_cents"`
+	TotalInCents                  int              `xml:"total_in_cents"`
+	TaxInCents                    int              `xml:"tax_in_cents"`
+	SubtotalInCents               int              `xml:"subtotal_in_cents"`
+	SubTotalBeforeDiscountInCents int              `xml:"subtotal_before_discount_in_cents"`
+	DiscountInCents               int              `xml:"discount_in_cents"`
+	Currency                      string           `xml:"currency"`
+	CreatedAt                     recurly.NullTime `xml:"created_at"`
+	UpdatedAt                     recurly.NullTime `xml:"updated_at"`
+	ClosedAt                      recurly.NullTime `xml:"closed_at"`
+	CustomNotes                   string           `xml:"customer_notes"`
 }

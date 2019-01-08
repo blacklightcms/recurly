@@ -24,22 +24,31 @@ type ChargeInvoiceNotification struct {
 	Invoice ChargeInvoice `xml:"invoice"`
 }
 
+// https://dev.recurly.com/page/webhooks#section-charge-invoice-schema
 // ChargeInvoice represents the charge invoice object sent in webhooks.
 type ChargeInvoice struct {
-	XMLName             xml.Name         `xml:"invoice"`
-	SubscriptionUUIDs   []string         `xml:"subscription_ids>subscription_id"`
-	UUID                string           `xml:"uuid"`
-	State               string           `xml:"state"`
-	Origin              string           `xml:"origin"`
-	InvoiceNumberPrefix string           `xml:"invoice_number_prefix"`
-	InvoiceNumber       int              `xml:"invoice_number"`
-	PONumber            string           `xml:"po_number"`
-	VATNumber           string           `xml:"vat_number"`
-	BalanceInCents      int              `xml:"balance_in_cents"`
-	TotalInCents        int              `xml:"total_in_cents"`
-	Currency            string           `xml:"currency"`
-	CreatedAt           recurly.NullTime `xml:"created_at"`
-	ClosedAt            recurly.NullTime `xml:"closed_at"`
-	NetTerms            recurly.NullInt  `xml:"net_terms"`
-	CollectionMethod    string           `xml:"collection_method"`
+	XMLName                       xml.Name         `xml:"invoice"`
+	SubscriptionUUIDs             []string         `xml:"subscription_ids>subscription_id"`
+	UUID                          string           `xml:"uuid"`
+	State                         string           `xml:"state"`
+	Origin                        string           `xml:"origin"`
+	InvoiceNumberPrefix           string           `xml:"invoice_number_prefix"`
+	InvoiceNumber                 int              `xml:"invoice_number"`
+	PONumber                      string           `xml:"po_number"`
+	VATNumber                     string           `xml:"vat_number"`
+	BalanceInCents                int              `xml:"balance_in_cents"`
+	TotalInCents                  int              `xml:"total_in_cents"`
+	TaxInCents                    int              `xml:"tax_in_cents"`
+	DiscountInCents               int              `xml:"discount_in_cents"`
+	SubtotalInCents               int              `xml:"subtotal_in_cents"`
+	SubTotalBeforeDiscountInCents int              `xml:"subtotal_before_discount_in_cents"`
+	Currency                      string           `xml:"currency"`
+	CreatedAt                     recurly.NullTime `xml:"created_at"`
+	UpdatedAt                     recurly.NullTime `xml:"updated_at"`
+	ClosedAt                      recurly.NullTime `xml:"closed_at"`
+	DueOn                         recurly.NullTime `xml:"due_on"`
+	NetTerms                      recurly.NullInt  `xml:"net_terms"`
+	CollectionMethod              string           `xml:"collection_method"`
+	CustomNotes                   string           `xml:"customer_notes"`
+	TermsAndConditions            string           `xml:"terms_and_conditions"`
 }
