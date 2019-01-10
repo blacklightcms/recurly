@@ -148,7 +148,7 @@ func TestParse_ChargeInvoiceNotification(t *testing.T) {
 			CreatedAt:                     recurly.NewTime(created),
 			UpdatedAt:                     recurly.NewTime(created),
 			DueOn:                         recurly.NewTime(dueOn),
-			CustomNotes:                   "Thanks for your business!",
+			CustomerNotes:                 "Thanks for your business!",
 			TermsAndConditions:            "Payment can be made out to Acme, Co.",
 		},
 	}); diff != "" {
@@ -992,7 +992,7 @@ func TestParse_NewDunningEventNotification(t *testing.T) {
 			TotalInCents:                  4500,
 			SubtotalInCents:               4500,
 			SubTotalBeforeDiscountInCents: 4500,
-			CustomNotes:                   "Thanks for your business!",
+			CustomerNotes:                 "Thanks for your business!",
 			NetTerms:                      recurly.NullInt{Valid: true, Int: 30},
 			CollectionMethod:              recurly.CollectionMethodManual,
 		},
