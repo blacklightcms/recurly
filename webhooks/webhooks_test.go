@@ -118,6 +118,7 @@ func TestParse_CanceledAccountNotification(t *testing.T) {
 
 func TestParse_ChargeInvoiceNotification(t *testing.T) {
 	created, _ := time.Parse(recurly.DateTimeFormat, "2018-02-13T16:00:04Z")
+	dueOn, _ := time.Parse(recurly.DateTimeFormat, "2018-03-16T15:00:04Z")
 	xmlFile := MustOpenFile("testdata/charge_invoice_notification.xml")
 	result, err := webhooks.Parse(xmlFile)
 	if err != nil {
@@ -131,18 +132,24 @@ func TestParse_ChargeInvoiceNotification(t *testing.T) {
 			Code:    "1234",
 		},
 		Invoice: webhooks.ChargeInvoice{
-			XMLName:           xml.Name{Local: "invoice"},
-			UUID:              "42feb03ce368c0e1ead35d4bfa89b82e",
-			State:             recurly.ChargeInvoiceStatePending,
-			Origin:            recurly.ChargeInvoiceOriginRenewal,
-			SubscriptionUUIDs: []string{"40b8f5e99df03b8684b99d4993b6e089"},
-			InvoiceNumber:     2405,
-			Currency:          "USD",
-			BalanceInCents:    100000,
-			TotalInCents:      100000,
-			NetTerms:          recurly.NullInt{Int: 30, Valid: true},
-			CollectionMethod:  recurly.CollectionMethodManual,
-			CreatedAt:         recurly.NewTime(created),
+			XMLName:                       xml.Name{Local: "invoice"},
+			UUID:                          "42feb03ce368c0e1ead35d4bfa89b82e",
+			State:                         recurly.ChargeInvoiceStatePending,
+			Origin:                        recurly.ChargeInvoiceOriginRenewal,
+			SubscriptionUUIDs:             []string{"40b8f5e99df03b8684b99d4993b6e089"},
+			InvoiceNumber:                 2405,
+			Currency:                      "USD",
+			BalanceInCents:                100000,
+			TotalInCents:                  100000,
+			SubtotalInCents:               100000,
+			SubTotalBeforeDiscountInCents: 100000,
+			NetTerms:                      recurly.NullInt{Int: 30, Valid: true},
+			CollectionMethod:              recurly.CollectionMethodManual,
+			CreatedAt:                     recurly.NewTime(created),
+			UpdatedAt:                     recurly.NewTime(created),
+			DueOn:                         recurly.NewTime(dueOn),
+			CustomerNotes:                 "Thanks for your business!",
+			TermsAndConditions:            "Payment can be made out to Acme, Co.",
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -164,17 +171,22 @@ func TestParse_CreditInvoiceNotification(t *testing.T) {
 			Code:    "1234",
 		},
 		Invoice: webhooks.CreditInvoice{
-			XMLName:           xml.Name{Local: "invoice"},
-			UUID:              "42fb74de65e9395eb004614144a7b91f",
-			State:             recurly.CreditInvoiceStateClosed,
-			Origin:            recurly.CreditInvoiceOriginWriteOff,
-			SubscriptionUUIDs: []string{"42fb74ba9efe4c6981c2064436a4e9cd"},
-			InvoiceNumber:     2404,
-			Currency:          "USD",
-			BalanceInCents:    0,
-			TotalInCents:      -4882,
-			CreatedAt:         recurly.NewTime(d),
-			ClosedAt:          recurly.NewTime(d),
+			XMLName:                       xml.Name{Local: "invoice"},
+			UUID:                          "42fb74de65e9395eb004614144a7b91f",
+			State:                         recurly.CreditInvoiceStateClosed,
+			Origin:                        recurly.CreditInvoiceOriginWriteOff,
+			SubscriptionUUIDs:             []string{"42fb74ba9efe4c6981c2064436a4e9cd"},
+			InvoiceNumber:                 2404,
+			Currency:                      "USD",
+			BalanceInCents:                0,
+			TotalInCents:                  -4882,
+			TaxInCents:                    -382,
+			SubtotalInCents:               -4500,
+			SubTotalBeforeDiscountInCents: -5000,
+			DiscountInCents:               -500,
+			CreatedAt:                     recurly.NewTime(d),
+			UpdatedAt:                     recurly.NewTime(d),
+			ClosedAt:                      recurly.NewTime(d),
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -944,8 +956,10 @@ func TestParse_ScheduledPaymentNotification(t *testing.T) {
 
 func TestParse_NewDunningEventNotification(t *testing.T) {
 	createdTs, _ := time.Parse(recurly.DateTimeFormat, "2018-01-09T16:47:43Z")
+	updatedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-02-12T16:50:23Z")
 	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2017-11-09T16:47:30Z")
 	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-02-09T16:47:30Z")
+	dueOnTs, _ := time.Parse(recurly.DateTimeFormat, "2018-02-09T16:47:43Z")
 	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-09T16:47:30Z")
 	xmlFile := MustOpenFile("testdata/new_dunning_event_notification.xml")
 	if result, err := webhooks.Parse(xmlFile); err != nil {
@@ -964,18 +978,23 @@ func TestParse_NewDunningEventNotification(t *testing.T) {
 			CompanyName: "Company, Inc.",
 		},
 		Invoice: webhooks.ChargeInvoice{
-			XMLName:           xml.Name{Local: "invoice"},
-			UUID:              "424a9d4a2174b4f39bc776426aa19c32",
-			SubscriptionUUIDs: []string{"4110792b3b01967d854f674b7282f542"},
-			State:             "past_due",
-			Origin:            "renewal",
-			Currency:          "USD",
-			CreatedAt:         recurly.NullTime{Time: &createdTs},
-			BalanceInCents:    4000,
-			InvoiceNumber:     1813,
-			TotalInCents:      4500,
-			NetTerms:          recurly.NullInt{Valid: true, Int: 30},
-			CollectionMethod:  recurly.CollectionMethodManual,
+			XMLName:                       xml.Name{Local: "invoice"},
+			UUID:                          "424a9d4a2174b4f39bc776426aa19c32",
+			SubscriptionUUIDs:             []string{"4110792b3b01967d854f674b7282f542"},
+			State:                         "past_due",
+			Origin:                        "renewal",
+			Currency:                      "USD",
+			CreatedAt:                     recurly.NullTime{Time: &createdTs},
+			UpdatedAt:                     recurly.NullTime{Time: &updatedTs},
+			DueOn:                         recurly.NullTime{Time: &dueOnTs},
+			BalanceInCents:                4000,
+			InvoiceNumber:                 1813,
+			TotalInCents:                  4500,
+			SubtotalInCents:               4500,
+			SubTotalBeforeDiscountInCents: 4500,
+			CustomerNotes:                 "Thanks for your business!",
+			NetTerms:                      recurly.NullInt{Valid: true, Int: 30},
+			CollectionMethod:              recurly.CollectionMethodManual,
 		},
 		Subscription: recurly.Subscription{
 			XMLName: xml.Name{Local: "subscription"},
