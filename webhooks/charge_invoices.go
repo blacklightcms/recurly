@@ -24,8 +24,8 @@ type ChargeInvoiceNotification struct {
 	Invoice ChargeInvoice `xml:"invoice"`
 }
 
-// https://dev.recurly.com/page/webhooks#section-charge-invoice-schema
 // ChargeInvoice represents the charge invoice object sent in webhooks.
+// https://dev.recurly.com/page/webhooks#section-charge-invoice-schema
 type ChargeInvoice struct {
 	XMLName                       xml.Name         `xml:"invoice"`
 	SubscriptionUUIDs             []string         `xml:"subscription_ids>subscription_id"`
@@ -49,6 +49,6 @@ type ChargeInvoice struct {
 	DueOn                         recurly.NullTime `xml:"due_on"`
 	NetTerms                      recurly.NullInt  `xml:"net_terms"`
 	CollectionMethod              string           `xml:"collection_method"`
-	CustomNotes                   string           `xml:"customer_notes"`
+	CustomerNotes                 string           `xml:"customer_notes"`
 	TermsAndConditions            string           `xml:"terms_and_conditions"`
 }

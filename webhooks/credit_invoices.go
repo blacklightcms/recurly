@@ -24,8 +24,8 @@ type CreditInvoiceNotification struct {
 	Invoice CreditInvoice `xml:"invoice"`
 }
 
-// https://dev.recurly.com/page/webhooks#section-credit-invoice-schema
 // CreditInvoice represents the credit invoice object sent in webhooks.
+// https://dev.recurly.com/page/webhooks#section-credit-invoice-schema
 type CreditInvoice struct {
 	XMLName                       xml.Name         `xml:"invoice"`
 	SubscriptionUUIDs             []string         `xml:"subscription_ids>subscription_id"`
@@ -45,5 +45,5 @@ type CreditInvoice struct {
 	CreatedAt                     recurly.NullTime `xml:"created_at"`
 	UpdatedAt                     recurly.NullTime `xml:"updated_at"`
 	ClosedAt                      recurly.NullTime `xml:"closed_at"`
-	CustomNotes                   string           `xml:"customer_notes"`
+	CustomerNotes                 string           `xml:"customer_notes"`
 }
