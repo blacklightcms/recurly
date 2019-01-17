@@ -180,6 +180,7 @@ type UpdateSubscription struct {
 	XMLName              xml.Name             `xml:"subscription"`
 	Timeframe            string               `xml:"timeframe,omitempty"`
 	PlanCode             string               `xml:"plan_code,omitempty"`
+	CouponCode           string               `xml:"coupon_code,omitempty"`
 	Quantity             int                  `xml:"quantity,omitempty"`
 	UnitAmountInCents    int                  `xml:"unit_amount_in_cents,omitempty"`
 	RenewalBillingCycles NullInt              `xml:"renewal_billing_cycles"`
