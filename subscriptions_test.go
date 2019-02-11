@@ -290,6 +290,10 @@ func TestSubscriptions_UpdateSubscription_Encoding(t *testing.T) {
 			expected: "<subscription><plan_code>new-code</plan_code></subscription>",
 		},
 		{
+			v:        recurly.UpdateSubscription{CouponCode: "coupon-code"},
+			expected: "<subscription><coupon_code>coupon-code</coupon_code></subscription>",
+		},
+		{
 			v:        recurly.UpdateSubscription{Quantity: 14, AutoRenew: true, RenewalBillingCycles: recurly.NullInt{Valid: true, Int: 2}},
 			expected: "<subscription><quantity>14</quantity><renewal_billing_cycles>2</renewal_billing_cycles><auto_renew>true</auto_renew></subscription>",
 		},
