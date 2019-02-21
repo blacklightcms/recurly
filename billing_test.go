@@ -344,6 +344,44 @@ func TestBilling_Create_WithBankAccount(t *testing.T) {
 	}
 }
 
+func TestBilling_CreateWithAmazonBillingAgreement(t *testing.T) {
+	setup()
+	defer teardown()
+
+	mux.HandleFunc("/v2/accounts/414/billing_info", func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != "POST" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		var given bytes.Buffer
+		given.ReadFrom(r.Body)
+		expected := "<billing_info><first_name>Amadeus</first_name><last_name>Cho</last_name><address1>1 Avengers Tower</address1><city>New York</city><state>NY</state><zip>10001</zip><country>US</country><amazon_billing_agreement_id>C01-0000000-0000000</amazon_billing_agreement_id><amazon_region>us</amazon_region></billing_info>"
+		if expected != given.String() {
+			t.Fatalf("unexpected input: %v", given.String())
+		}
+
+		w.WriteHeader(200)
+		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><billing_info></billing_info>`)
+	})
+
+	resp, _, err := client.Billing.Create("414", recurly.Billing{
+		FirstName:         "Amadeus",
+		LastName:          "Cho",
+		Address:           "1 Avengers Tower",
+		City:              "New York",
+		State:             "NY",
+		Zip:               "10001",
+		Country:           "US",
+		AmazonAgreementID: "C01-0000000-0000000",
+		AmazonRegion:      "us",
+	})
+
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	} else if resp.IsError() {
+		t.Fatal("expected creating billing info to return OK")
+	}
+}
+
 func TestBilling_Update_WithToken(t *testing.T) {
 	setup()
 	defer teardown()

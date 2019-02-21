@@ -52,6 +52,7 @@ type Billing struct {
 
 	// Amazon
 	AmazonAgreementID string `xml:"amazon_billing_agreement_id,omitempty"`
+	AmazonRegion      string `xml:"amazon_region,omitempty"`
 
 	// Bank Account
 	// Note: routing numbers and account numbers may start with zeros, so need
@@ -66,7 +67,7 @@ type Billing struct {
 	Token string `xml:"token_id,omitempty"`
 }
 
-// UnmarshalXML is a customer XML unmarshaler for billing info that supports
+// UnmarshalXML is a custom XML unmarshaler for billing info that supports
 // unmarshaling null fields without errors.
 func (b *Billing) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v struct {
@@ -98,6 +99,7 @@ func (b *Billing) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 
 		// Amazon
 		AmazonAgreementID string `xml:"amazon_billing_agreement_id,omitempty"`
+		AmazonRegion      string `xml:"amazon_region,omitempty"`
 
 		// Bank Account
 		// Note: routing numbers and account numbers may start with zeros, so need
@@ -135,6 +137,7 @@ func (b *Billing) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 
 		PaypalAgreementID: v.PaypalAgreementID,
 		AmazonAgreementID: v.AmazonAgreementID,
+		AmazonRegion:      v.AmazonRegion,
 
 		NameOnAccount: v.NameOnAccount,
 		RoutingNumber: v.RoutingNumber,
