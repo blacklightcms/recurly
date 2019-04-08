@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/blacklightcms/recurly"
+	"github.com/splice/recurly"
 )
 
 func TestResponse_ConvenienceMethods(t *testing.T) {

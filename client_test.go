@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 
-	"github.com/blacklightcms/recurly"
+	"github.com/splice/recurly"
 )
 
 var (

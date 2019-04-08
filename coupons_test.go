@@ -9,8 +9,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/blacklightcms/recurly"
 	"github.com/google/go-cmp/cmp"
+	"github.com/splice/recurly"
 )
 
 // TestCouponsEncoding ensures structs are encoded to XML properly.
@@ -207,7 +207,7 @@ func TestCoupons_Get(t *testing.T) {
 			t.Fatalf("unexpected method: %s", r.Method)
 		}
 		w.WriteHeader(200)
-		io.WriteString(w, `<?xml version="1.0" encoding="UTF-8"?>             
+		io.WriteString(w, `<?xml version="1.0" encoding="UTF-8"?>
             <coupon href="https://your-subdomain.recurly.com/v2/coupons/special">
              	<redemptions href="https://your-subdomain.recurly.com/v2/coupons/special/redemptions"/>
              	<id type="integer">2151093486799579392</id>

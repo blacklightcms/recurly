@@ -8,7 +8,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/blacklightcms/recurly"
+	"github.com/splice/recurly"
 	"github.com/google/go-cmp/cmp"
 )
 
