@@ -6,17 +6,17 @@ import "encoding/xml"
 // https://dev.recurly.com/docs/lookup-a-coupon
 type Coupon struct {
 	XMLName                  xml.Name    `xml:"coupon"`
-	ID                       uint64      `xml:"id"`
+	ID                       uint64      `xml:"id,omitempty"`
 	Code                     string      `xml:"coupon_code"`
-	Type                     string      `xml:"coupon_type"`
+	Type                     string      `xml:"coupon_type,omitempty"`
 	Name                     string      `xml:"name"`
-	RedemptionResource       string      `xml:"redemption_resource"`
-	State                    string      `xml:"state"`
-	SingleUse                bool        `xml:"single_use"`
-	AppliesToAllPlans        bool        `xml:"applies_to_all_plans"`
-	Duration                 string      `xml:"duration"`
+	RedemptionResource       string      `xml:"redemption_resource,omitempty"`
+	State                    string      `xml:"state,omitempty"`
+	SingleUse                bool        `xml:"single_use,omitempty"`
+	AppliesToAllPlans        bool        `xml:"applies_to_all_plans,omitempty"`
+	Duration                 string      `xml:"duration,omitempty"`
 	DiscountType             string      `xml:"discount_type"`
-	AppliesToNonPlanCharges  bool        `xml:"applies_to_non_plan_charges"`
+	AppliesToNonPlanCharges  bool        `xml:"applies_to_non_plan_charges,omitempty"`
 	Description              string      `xml:"description,omitempty"`
 	InvoiceDescription       string      `xml:"invoice_description,omitempty"`
 	DiscountPercent          NullInt     `xml:"discount_percent,omitempty"`

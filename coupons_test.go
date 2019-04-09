@@ -25,7 +25,7 @@ func TestCoupons_Encoding(t *testing.T) {
 	}{
 		{
 			v:        recurly.Coupon{XMLName: xml.Name{Local: "coupon"}},
-			expected: "<coupon><id>0</id><coupon_code></coupon_code><coupon_type></coupon_type><name></name><redemption_resource></redemption_resource><state></state><single_use>false</single_use><applies_to_all_plans>false</applies_to_all_plans><duration></duration><discount_type></discount_type><applies_to_non_plan_charges>false</applies_to_non_plan_charges><plan_codes></plan_codes></coupon>",
+			expected: "<coupon><coupon_code></coupon_code><name></name><discount_type></discount_type><plan_codes></plan_codes></coupon>",
 		},
 		{
 			v: recurly.Coupon{
@@ -34,7 +34,7 @@ func TestCoupons_Encoding(t *testing.T) {
 				Name:         "Special 10% off",
 				DiscountType: "percent",
 			},
-			expected: "<coupon><id>0</id><coupon_code>special</coupon_code><coupon_type></coupon_type><name>Special 10% off</name><redemption_resource></redemption_resource><state></state><single_use>false</single_use><applies_to_all_plans>false</applies_to_all_plans><duration></duration><discount_type>percent</discount_type><applies_to_non_plan_charges>false</applies_to_non_plan_charges><plan_codes></plan_codes></coupon>",
+			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><plan_codes></plan_codes></coupon>",
 		},
 		{
 			v: recurly.Coupon{
@@ -46,7 +46,7 @@ func TestCoupons_Encoding(t *testing.T) {
 				Description:        "Save 10%",
 				DiscountType:       "percent",
 			},
-			expected: "<coupon><id>0</id><coupon_code>special</coupon_code><coupon_type></coupon_type><name>Special 10% off</name><redemption_resource>account</redemption_resource><state>redeemable</state><single_use>false</single_use><applies_to_all_plans>false</applies_to_all_plans><duration></duration><discount_type>percent</discount_type><applies_to_non_plan_charges>false</applies_to_non_plan_charges><description>Save 10%</description><plan_codes></plan_codes></coupon>",
+			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><redemption_resource>account</redemption_resource><state>redeemable</state><discount_type>percent</discount_type><description>Save 10%</description><plan_codes></plan_codes></coupon>",
 		},
 		{
 			v: recurly.Coupon{
@@ -61,7 +61,7 @@ func TestCoupons_Encoding(t *testing.T) {
 				AppliesToAllPlans:  true,
 				DiscountPercent:    recurly.NewInt(10),
 			},
-			expected: "<coupon><id>0</id><coupon_code>special</coupon_code><coupon_type></coupon_type><name>Special 10% off</name><redemption_resource>account</redemption_resource><state>redeemable</state><single_use>true</single_use><applies_to_all_plans>true</applies_to_all_plans><duration></duration><discount_type>percent</discount_type><applies_to_non_plan_charges>false</applies_to_non_plan_charges><description>Save 10%</description><discount_percent>10</discount_percent><plan_codes></plan_codes></coupon>",
+			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><redemption_resource>account</redemption_resource><state>redeemable</state><single_use>true</single_use><applies_to_all_plans>true</applies_to_all_plans><discount_type>percent</discount_type><description>Save 10%</description><discount_percent>10</discount_percent><plan_codes></plan_codes></coupon>",
 		},
 		{
 			v: recurly.Coupon{
@@ -74,7 +74,7 @@ func TestCoupons_Encoding(t *testing.T) {
 				MaxRedemptions:           recurly.NewInt(2),
 				MaxRedemptionsPerAccount: recurly.NewInt(1),
 			},
-			expected: "<coupon><id>0</id><coupon_code>special</coupon_code><coupon_type>single_code</coupon_type><name>Special 10% off</name><redemption_resource></redemption_resource><state></state><single_use>false</single_use><applies_to_all_plans>false</applies_to_all_plans><duration></duration><discount_type>dollars</discount_type><applies_to_non_plan_charges>false</applies_to_non_plan_charges><discount_in_cents><USD>100</USD></discount_in_cents><max_redemptions>2</max_redemptions><max_redemptions_per_account>1</max_redemptions_per_account><plan_codes></plan_codes></coupon>",
+			expected: "<coupon><coupon_code>special</coupon_code><coupon_type>single_code</coupon_type><name>Special 10% off</name><discount_type>dollars</discount_type><discount_in_cents><USD>100</USD></discount_in_cents><max_redemptions>2</max_redemptions><max_redemptions_per_account>1</max_redemptions_per_account><plan_codes></plan_codes></coupon>",
 		},
 		{
 			v: recurly.Coupon{
@@ -85,7 +85,7 @@ func TestCoupons_Encoding(t *testing.T) {
 				TemporalUnit:   "day",
 				TemporalAmount: recurly.NewInt(28),
 			},
-			expected: "<coupon><id>0</id><coupon_code>special</coupon_code><coupon_type></coupon_type><name>Special 10% off</name><redemption_resource></redemption_resource><state></state><single_use>false</single_use><applies_to_all_plans>false</applies_to_all_plans><duration>temporal</duration><discount_type></discount_type><applies_to_non_plan_charges>false</applies_to_non_plan_charges><temporal_unit>day</temporal_unit><temporal_amount>28</temporal_amount><plan_codes></plan_codes></coupon>",
+			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><duration>temporal</duration><discount_type></discount_type><temporal_unit>day</temporal_unit><temporal_amount>28</temporal_amount><plan_codes></plan_codes></coupon>",
 		},
 		{
 			v: recurly.Coupon{
@@ -97,7 +97,7 @@ func TestCoupons_Encoding(t *testing.T) {
 				RedeemByDate:      recurly.NewTime(redeem),
 				PlanCodes:         []string{"gold", "silver"},
 			},
-			expected: "<coupon><id>0</id><coupon_code>special</coupon_code><coupon_type></coupon_type><name>Special 10% off</name><redemption_resource></redemption_resource><state></state><single_use>false</single_use><applies_to_all_plans>true</applies_to_all_plans><duration></duration><discount_type>percent</discount_type><applies_to_non_plan_charges>false</applies_to_non_plan_charges><redeem_by_date>2014-01-01T07:00:00Z</redeem_by_date><plan_codes><plan_code>gold</plan_code><plan_code>silver</plan_code></plan_codes></coupon>",
+			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><applies_to_all_plans>true</applies_to_all_plans><discount_type>percent</discount_type><redeem_by_date>2014-01-01T07:00:00Z</redeem_by_date><plan_codes><plan_code>gold</plan_code><plan_code>silver</plan_code></plan_codes></coupon>",
 		},
 	}
 
@@ -207,7 +207,7 @@ func TestCoupons_Get(t *testing.T) {
 			t.Fatalf("unexpected method: %s", r.Method)
 		}
 		w.WriteHeader(200)
-		io.WriteString(w, `<?xml version="1.0" encoding="UTF-8"?>             
+		io.WriteString(w, `<?xml version="1.0" encoding="UTF-8"?>
             <coupon href="https://your-subdomain.recurly.com/v2/coupons/special">
              	<redemptions href="https://your-subdomain.recurly.com/v2/coupons/special/redemptions"/>
              	<id type="integer">2151093486799579392</id>
