@@ -16,7 +16,7 @@ type Response struct {
 	Errors []Error
 
 	// transaction holds the transaction returned with a transaction error.
-	transaction *Transaction
+	Transaction *Transaction
 }
 
 var (
