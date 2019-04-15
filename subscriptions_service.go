@@ -87,8 +87,8 @@ func (s *subscriptionsImpl) Create(sub NewSubscription) (*Response, *NewSubscrip
 		dst.Subscription = &subscription
 	}
 
-	if resp.transaction != nil {
-		dst.Transaction = resp.transaction
+	if resp.Transaction != nil {
+		dst.Transaction = resp.Transaction
 	}
 
 	return resp, &dst, err
