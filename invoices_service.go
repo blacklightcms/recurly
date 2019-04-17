@@ -203,7 +203,7 @@ func (s *invoicesImpl) RefundVoidOpenAmount(invoiceNumber int, amountInCents int
 		AmountInCents int      `xml:"amount_in_cents,omitempty"`
 		RefundMethod  string   `xml:"refund_method,omitempty"`
 	}{
-		AmountInCents: amountInCents, // Amount is required
+		AmountInCents: amountInCents, // Amount defaults to remaining refundable amount on the original invoice
 		RefundMethod:  refundMethod,  // Refund method defaults to "credit_first"
 	}
 	req, err := s.client.newRequest("POST", action, nil, data)
