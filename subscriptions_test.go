@@ -298,6 +298,10 @@ func TestSubscriptions_UpdateSubscription_Encoding(t *testing.T) {
 			expected: "<subscription><quantity>14</quantity><renewal_billing_cycles>2</renewal_billing_cycles><auto_renew>true</auto_renew></subscription>",
 		},
 		{
+			v:        recurly.UpdateSubscription{RemainingBillingCycles: recurly.NullInt{Valid: true, Int: 0}},
+			expected: "<subscription><remaining_billing_cycles>0</remaining_billing_cycles></subscription>",
+		},
+		{
 			v:        recurly.UpdateSubscription{UnitAmountInCents: 3500},
 			expected: "<subscription><unit_amount_in_cents>3500</unit_amount_in_cents></subscription>",
 		},
