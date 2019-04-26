@@ -79,8 +79,8 @@ type Subscription struct {
 	CollectionMethod       string               `xml:"collection_method"`
 	CustomerNotes          string               `xml:"customer_notes,omitempty"`
 	AutoRenew              bool                 `xml:"auto_renew,omitempty"`
-	RenewalBillingCycles   NullInt              `xml:"renewal_billing_cycles"`
-	RemainingBillingCycles NullInt              `xml:"remaining_billing_cycles"`
+	RenewalBillingCycles   NullInt              `xml:"renewal_billing_cycles,omitempty"`
+	RemainingBillingCycles NullInt              `xml:"remaining_billing_cycles,omitempty"`
 	CustomFields           *CustomFields        `xml:"custom_fields,omitempty"`
 }
 
