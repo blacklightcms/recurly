@@ -79,7 +79,8 @@ type Subscription struct {
 	CollectionMethod       string               `xml:"collection_method"`
 	CustomerNotes          string               `xml:"customer_notes,omitempty"`
 	AutoRenew              bool                 `xml:"auto_renew,omitempty"`
-	RenewalBillingCycles   NullInt              `xml:"renewal_billing_cycles"`
+	RenewalBillingCycles   NullInt              `xml:"renewal_billing_cycles,omitempty"`
+	RemainingBillingCycles NullInt              `xml:"remaining_billing_cycles,omitempty"`
 	CustomFields           *CustomFields        `xml:"custom_fields,omitempty"`
 }
 
@@ -177,18 +178,19 @@ type NewSubscriptionResponse struct {
 
 // UpdateSubscription is used to update subscriptions
 type UpdateSubscription struct {
-	XMLName              xml.Name             `xml:"subscription"`
-	Timeframe            string               `xml:"timeframe,omitempty"`
-	PlanCode             string               `xml:"plan_code,omitempty"`
-	CouponCode           string               `xml:"coupon_code,omitempty"`
-	Quantity             int                  `xml:"quantity,omitempty"`
-	UnitAmountInCents    int                  `xml:"unit_amount_in_cents,omitempty"`
-	RenewalBillingCycles NullInt              `xml:"renewal_billing_cycles"`
-	CollectionMethod     string               `xml:"collection_method,omitempty"`
-	AutoRenew            bool                 `xml:"auto_renew,omitempty"`
-	NetTerms             NullInt              `xml:"net_terms,omitempty"`
-	PONumber             string               `xml:"po_number,omitempty"`
-	SubscriptionAddOns   *[]SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
+	XMLName                xml.Name             `xml:"subscription"`
+	Timeframe              string               `xml:"timeframe,omitempty"`
+	PlanCode               string               `xml:"plan_code,omitempty"`
+	CouponCode             string               `xml:"coupon_code,omitempty"`
+	Quantity               int                  `xml:"quantity,omitempty"`
+	UnitAmountInCents      int                  `xml:"unit_amount_in_cents,omitempty"`
+	RenewalBillingCycles   NullInt              `xml:"renewal_billing_cycles,omitempty"`
+	RemainingBillingCycles NullInt              `xml:"remaining_billing_cycles,omitempty"`
+	CollectionMethod       string               `xml:"collection_method,omitempty"`
+	AutoRenew              bool                 `xml:"auto_renew,omitempty"`
+	NetTerms               NullInt              `xml:"net_terms,omitempty"`
+	PONumber               string               `xml:"po_number,omitempty"`
+	SubscriptionAddOns     *[]SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
 }
 
 // SubscriptionNotes is used to update a subscription's notes.
