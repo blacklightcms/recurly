@@ -184,7 +184,7 @@ type UpdateSubscription struct {
 	CouponCode             string               `xml:"coupon_code,omitempty"`
 	Quantity               int                  `xml:"quantity,omitempty"`
 	UnitAmountInCents      int                  `xml:"unit_amount_in_cents,omitempty"`
-	RenewalBillingCycles   NullInt              `xml:"renewal_billing_cycles"`
+	RenewalBillingCycles   NullInt              `xml:"renewal_billing_cycles,omitempty"`
 	RemainingBillingCycles NullInt              `xml:"remaining_billing_cycles,omitempty"`
 	CollectionMethod       string               `xml:"collection_method,omitempty"`
 	AutoRenew              bool                 `xml:"auto_renew,omitempty"`
