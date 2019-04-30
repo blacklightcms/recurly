@@ -191,6 +191,7 @@ type UpdateSubscription struct {
 	NetTerms               NullInt              `xml:"net_terms,omitempty"`
 	PONumber               string               `xml:"po_number,omitempty"`
 	SubscriptionAddOns     *[]SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
+	CustomFields           *CustomFields        `xml:"custom_fields,omitempty"`
 }
 
 // SubscriptionNotes is used to update a subscription's notes.
