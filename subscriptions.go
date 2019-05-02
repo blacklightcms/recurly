@@ -193,7 +193,6 @@ type UpdateSubscription struct {
 	PONumber               string               `xml:"po_number,omitempty"`
 	SubscriptionAddOns     *[]SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
 	GatewayCode            string               `xml:"gateway_code,omitempty"`
-	CustomerNotes          string               `xml:"customer_notes,omitempty"`
 	CustomFields           *CustomFields        `xml:"custom_fields,omitempty"`
 }
 
