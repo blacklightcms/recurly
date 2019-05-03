@@ -63,8 +63,8 @@ func TestPurchases_Purchase_Encoding(t *testing.T) {
 						Description:       "Description of this adjustment",
 					},
 				},
-				Subscriptions: []recurly.NewSubscription{
-					recurly.NewSubscription{PlanCode: "plan1"},
+				Subscriptions: []recurly.PurchaseSubscription{
+					recurly.PurchaseSubscription{PlanCode: "plan1"},
 				},
 				CouponCodes: []string{"coupon1", "coupon2"},
 				GiftCard:    "ABC1234",
@@ -83,7 +83,7 @@ func TestPurchases_Purchase_Encoding(t *testing.T) {
 				"<currency>USD</currency>" +
 				"<gift_card><redemption_code>ABC1234</redemption_code></gift_card>" +
 				"<coupon_codes><coupon_code>coupon1</coupon_code><coupon_code>coupon2</coupon_code></coupon_codes>" +
-				"<subscriptions><subscription><plan_code>plan1</plan_code><account></account><currency></currency></subscription></subscriptions>" +
+				"<subscriptions><subscription><plan_code>plan1</plan_code></subscription></subscriptions>" +
 				"<customer_notes>Some notes for the customer.</customer_notes>" +
 				"<terms_and_conditions>Our company terms and conditions.</terms_and_conditions>" +
 				"<vat_reverse_charge_notes>Vat reverse charge notes.</vat_reverse_charge_notes>" +
