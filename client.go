@@ -137,6 +137,13 @@ func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 	defer resp.Body.Close()
 
 	response := &Response{Response: resp}
+	if resp.StatusCode == http.StatusNoContent {
+		// Return early for 204 No Content. Otherwise if v is not nil
+		// an EOF error will occur when decoding an empty response
+		// body.
+		return response, nil
+	}
+
 	decoder := xml.NewDecoder(resp.Body)
 	if response.IsError() { // Parse validation errors
 		if response.StatusCode == http.StatusUnprocessableEntity {
@@ -195,7 +202,7 @@ func (c *Client) do(req *http.Request, v interface{}) (*Response, error) {
 
 	if v != nil {
 		if w, ok := v.(io.Writer); ok {
-			io.Copy(w, resp.Body)
+			_, err = io.Copy(w, resp.Body)
 		} else {
 			err = decoder.Decode(&v)
 		}
