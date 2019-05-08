@@ -3,6 +3,7 @@ package recurly_test
 import (
 	"net/http"
 	"net/http/httptest"
+	"testing"
 
 	"github.com/blacklightcms/recurly"
 )
@@ -32,4 +33,28 @@ func setup() {
 
 func teardown() {
 	server.Close()
+}
+
+// Ensure a 204 No Content is handled properly.
+func TestClient_NoContent(t *testing.T) {
+	setup()
+	defer teardown()
+
+	var invoked bool
+	mux.HandleFunc("/v2/transactions", func(w http.ResponseWriter, r *http.Request) {
+		invoked = true
+		if r.Method != "POST" {
+			t.Fatalf("unexpected method: %s", r.Method)
+		}
+		w.WriteHeader(http.StatusNoContent)
+	})
+
+	resp, _, err := client.Transactions.Create(recurly.Transaction{})
+	if err != nil {
+		t.Fatal(err)
+	} else if !invoked {
+		t.Fatal("expected handler to be invoked")
+	} else if resp.StatusCode != http.StatusNoContent {
+		t.Fatalf("unexpected status code: %d", resp.StatusCode)
+	}
 }
