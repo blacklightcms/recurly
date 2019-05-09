@@ -74,7 +74,7 @@ type ErrUnknownNotification struct {
 
 // Error implements the error interface.
 func (e ErrUnknownNotification) Error() string {
-	return fmt.Sprintf("unknown notification: %s", e.name)
+	return fmt.Sprintf("unknown notification: %q", e.name)
 }
 
 // Name returns the name of the unknown notification.

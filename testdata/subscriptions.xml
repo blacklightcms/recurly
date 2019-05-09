@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<subscriptions type="array">
+   <subscription href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96">
+      <account href="https://your-subdomain.recurly.com/v2/accounts/1" />
+      <invoice href="https://your-subdomain.recurly.com/v2/invoices/1108" />
+      <plan href="https://your-subdomain.recurly.com/v2/plans/gold">
+         <plan_code>gold</plan_code>
+         <name>Gold plan</name>
+      </plan>
+      <uuid>44f83d7cba354d5b84812419f923ea96</uuid>
+      <state>active</state>
+      <unit_amount_in_cents type="integer">800</unit_amount_in_cents>
+      <currency>EUR</currency>
+      <quantity type="integer">1</quantity>
+      <activated_at type="datetime">2011-05-27T07:00:00Z</activated_at>
+      <canceled_at nil="nil" />
+      <expires_at nil="nil" />
+      <current_period_started_at type="datetime">2011-06-27T07:00:00Z</current_period_started_at>
+      <current_period_ends_at type="datetime">2011-07-27T07:00:00Z</current_period_ends_at>
+      <trial_started_at nil="nil" />
+      <trial_ends_at nil="nil" />
+      <customer_notes>customer_notes_test_get</customer_notes>
+      <tax_in_cents type="integer">72</tax_in_cents>
+      <tax_type>usst</tax_type>
+      <tax_region>CA</tax_region>
+      <tax_rate type="float">0.0875</tax_rate>
+      <po_number nil="nil" />
+      <net_terms type="integer">0</net_terms>
+      <subscription_add_ons>
+         <subscription_add_on>
+            <add_on_type>fixed</add_on_type>
+            <add_on_code>add-on-one</add_on_code>
+            <unit_amount_in_cents type="integer">1000</unit_amount_in_cents>
+            <quantity type="integer">2</quantity>
+         </subscription_add_on>
+      </subscription_add_ons>
+      <pending_subscription type="subscription">
+         <plan href="https://blacklighttest.recurly.com/v2/plans/integrationtestcode">
+            <plan_code>gold</plan_code>
+            <name>Gold plan</name>
+         </plan>
+         <unit_amount_in_cents type="integer">50000</unit_amount_in_cents>
+         <quantity type="integer">1</quantity>
+         <subscription_add_ons type="array">
+            <subscription_add_on>
+               <add_on_type>fixed</add_on_type>
+               <add_on_code>add-on-one</add_on_code>
+               <unit_amount_in_cents type="integer">1100</unit_amount_in_cents>
+               <quantity type="integer">1</quantity>
+            </subscription_add_on>
+            <subscription_add_on>
+               <add_on_type>fixed</add_on_type>
+               <add_on_code>add-on-two</add_on_code>
+               <quantity type="integer">1</quantity>
+            </subscription_add_on>
+         </subscription_add_ons>
+      </pending_subscription>
+      <custom_fields type="array">
+         <custom_field>
+            <name>device_id</name>
+            <value>KIWTL-WER-ZXMRD</value>
+         </custom_field>
+         <custom_field>
+            <name>purchase_date</name>
+            <value>2017-01-23</value>
+         </custom_field>
+      </custom_fields>
+      <invoice_collection>
+         <charge_invoice href="">
+            <account href="https://your-subdomain.recurly.com/v2/accounts/1" />
+            <uuid>43adfe52c21cbb221557a24940bcd7e5</uuid>
+            <state>pending</state>
+         </charge_invoice>
+         <credit_invoices type="array">
+            <credit_invoice>
+               <account href="https://your-subdomain.recurly.com/v2/accounts/1" />
+               <uuid>43adfe52c21cbb221557a24940bcd7e5</uuid>
+               <state>open</state>
+               <total_in_cents type="integer">-4014</total_in_cents>
+               <currency>USD</currency>
+               <subtotal_in_cents type="integer">-4014</subtotal_in_cents>
+               <discount_in_cents type="integer">-436</discount_in_cents>
+               <balance_in_cents type="integer">-2444</balance_in_cents>
+               <type>credit</type>
+               <origin>immediate_change</origin>
+            </credit_invoice>
+         </credit_invoices>
+      </invoice_collection>
+      <a name="cancel" href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/cancel" method="put" />
+      <a name="terminate" href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/terminate" method="put" />
+      <a name="postpone" href="https://your-subdomain.recurly.com/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/postpone" method="put" />
+   </subscription>
+</subscriptions>

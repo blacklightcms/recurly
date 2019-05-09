@@ -1,46 +1,117 @@
 package recurly
 
 import (
+	"context"
 	"encoding/xml"
+	"fmt"
+	"net/http"
 	"sort"
+	"strconv"
 	"strings"
+	"time"
 )
 
-// SanitizeUUID returns the uuid without dashes.
-func SanitizeUUID(id string) string {
-	return strings.TrimSpace(strings.Replace(id, "-", "", -1))
+// SubscriptionsService manages the interactions for subscriptions.
+type SubscriptionsService interface {
+	// List returns a pager to paginate subscription. PagerOptions are used to
+	// optionally filter the results.
+	//
+	// https://dev.recurly.com/docs/list-subscriptions
+	List(opts *PagerOptions) *SubscriptionsPager
+
+	// ListAccount returns a pager to paginate subscriptions for an account.
+	// PagerOptions are used to optionally filter the results.
+	//
+	// https://dev.recurly.com/docs/list-accounts-subscriptions
+	ListAccount(accountCode string, opts *PagerOptions) *SubscriptionsPager
+
+	// Get retrieves a subscription. If the subscription does not exist,
+	// a nil subscription and nil error are returned.
+	//
+	// https://dev.recurly.com/docs/lookup-subscription-details
+	Get(ctx context.Context, uuid string) (*Subscription, error)
+
+	// Create creates a subscription. You can optionally include subscription
+	// add ons. See Recurly's documentation for specfics.
+	//
+	// https://dev.recurly.com/docs/create-subscription
+	// https://dev.recurly.com/docs/subscription-add-ons
+	Create(ctx context.Context, sub NewSubscription) (*Subscription, error)
+
+	// Preview returns a preview for a new subscription applied to an account.
+	//
+	// https://dev.recurly.com/docs/preview-subscription
+	Preview(ctx context.Context, sub NewSubscription) (*Subscription, error)
+
+	// Update updates a subscription that takes place immediately or at renewal
+	// based on sub.Timeframe. You can optionally send subscription add ons.
+	// If the subscription has add ons and you omit, the subscription will
+	// be updated and all add ons will be removed.
+	//
+	// https://dev.recurly.com/docs/update-subscription
+	// https://dev.recurly.com/docs/update-subscription-with-add-ons
+	Update(ctx context.Context, uuid string, sub UpdateSubscription) (*Subscription, error)
+
+	// UpdateNotes updates a subscription's invoice notes before the next renewal.
+	// Updating notes will not trigger the renewal.
+	//
+	// https://dev.recurly.com/docs/update-subscription-notes
+	UpdateNotes(ctx context.Context, uuid string, n SubscriptionNotes) (*Subscription, error)
+
+	// PreviewChange previews a subscription change applied to an account without
+	// committing a subscription change or posting an invoice.
+	//
+	// https://dev.recurly.com/docs/preview-subscription-change
+	PreviewChange(ctx context.Context, uuid string, sub UpdateSubscription) (*Subscription, error)
+
+	// Cancel cancels a subscription so it remains active and then expires at
+	// the end of the current bill cycle.
+	//
+	// https://dev.recurly.com/docs/cancel-subscription
+	Cancel(ctx context.Context, uuid string) (*Subscription, error)
+
+	// Reactive reactivates a canceled subscription so it renews at the end
+	// of the current bill cycle.
+	//
+	// https://dev.recurly.com/docs/reactivate-canceled-subscription
+	Reactivate(ctx context.Context, uuid string) (*Subscription, error)
+
+	// Terminate terminates a subscription and refunds according to refundType.
+	// Valid values for refundType: 'partial', 'full', or 'none'.
+	// See Recurly's documentation for more details.
+	//
+	// https://dev.recurly.com/docs/terminate-subscription
+	Terminate(ctx context.Context, uuid string, refundType string) (*Subscription, error)
+
+	// Pause schedules a pause or updates remaining pause cycles for a subscription.
+	//
+	// https://dev.recurly.com/docs/pause-subscription
+	Pause(ctx context.Context, uuid string, cycles int) (*Subscription, error)
+
+	// Postpone changes the next bill date (for an active subscription) or
+	// changes when the trial expires (for subscriptions in trial period).
+	// See Recurly's documentation for details.
+	//
+	// https://dev.recurly.com/docs/postpone-subscription
+	Postpone(ctx context.Context, uuid string, dt time.Time, bulk bool) (*Subscription, error)
+
+	// Resume reactivates a paused subscription, starting a new billing cycle.
+	//
+	// https://dev.recurly.com/docs/resume-subscription
+	Resume(ctx context.Context, uuid string) (*Subscription, error)
 }
 
+// Subscription state constants.
+// https://docs.recurly.com/docs/subscriptions
 const (
-	// SubscriptionStateActive represents subscriptions that are valid for the
-	// current time. This includes subscriptions in a trial period
-	SubscriptionStateActive = "active"
-
-	// SubscriptionStateCanceled are subscriptions that are valid for
-	// the current time but will not renew because a cancelation was requested
+	SubscriptionStateActive   = "active"
 	SubscriptionStateCanceled = "canceled"
-
-	// SubscriptionStateExpired are subscriptions that have expired and are no longer valid
-	SubscriptionStateExpired = "expired"
-
-	// SubscriptionStateFuture are subscriptions that will start in the
-	// future, they are not active yet
-	SubscriptionStateFuture = "future"
-
-	// SubscriptionStateInTrial are subscriptions that are active or canceled
-	// and are in a trial period
-	SubscriptionStateInTrial = "in_trial"
-
-	// SubscriptionStateLive are all subscriptions that are not expired
-	SubscriptionStateLive = "live"
-
-	// SubscriptionStatePastDue are subscriptions that are active or canceled
-	// and have a past-due invoice
-	SubscriptionStatePastDue = "past_due"
-
-	// SubscriptionStatePaused are subscriptions that are in a paused state
-	// and will not be billed for the set RemainingPauseCycles
-	SubscriptionStatePaused = "paused"
+	SubscriptionStateExpired  = "expired"
+	SubscriptionStateFuture   = "future"
+	SubscriptionStateInTrial  = "in_trial"
+	SubscriptionStateLive     = "live"
+	SubscriptionStatePastDue  = "past_due"
+	SubscriptionStatePaused   = "paused"
 )
 
 // Subscription represents an individual subscription.
@@ -85,38 +156,53 @@ type Subscription struct {
 	CustomFields           *CustomFields        `xml:"custom_fields,omitempty"`
 }
 
+// NewSubscription is used to create new subscriptions.
+type NewSubscription struct {
+	XMLName                 xml.Name             `xml:"subscription"`
+	PlanCode                string               `xml:"plan_code"`
+	Account                 Account              `xml:"account"`
+	SubscriptionAddOns      *[]SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
+	CouponCode              string               `xml:"coupon_code,omitempty"`
+	UnitAmountInCents       NullInt              `xml:"unit_amount_in_cents,omitempty"`
+	Currency                string               `xml:"currency"`
+	Quantity                int                  `xml:"quantity,omitempty"`
+	TrialEndsAt             NullTime             `xml:"trial_ends_at,omitempty"`
+	StartsAt                NullTime             `xml:"starts_at,omitempty"`
+	TotalBillingCycles      int                  `xml:"total_billing_cycles,omitempty"`
+	RenewalBillingCycles    NullInt              `xml:"renewal_billing_cycles"`
+	NextBillDate            NullTime             `xml:"next_bill_date,omitempty"`
+	CollectionMethod        string               `xml:"collection_method,omitempty"`
+	AutoRenew               bool                 `xml:"auto_renew,omitempty"`
+	NetTerms                NullInt              `xml:"net_terms,omitempty"`
+	PONumber                string               `xml:"po_number,omitempty"`
+	Bulk                    bool                 `xml:"bulk,omitempty"`
+	TermsAndConditions      string               `xml:"terms_and_conditions,omitempty"`
+	CustomerNotes           string               `xml:"customer_notes,omitempty"`
+	VATReverseChargeNotes   string               `xml:"vat_reverse_charge_notes,omitempty"`
+	BankAccountAuthorizedAt NullTime             `xml:"bank_account_authorized_at,omitempty"`
+	GatewayCode             string               `xml:"gateway_code,omitempty"`
+	CustomFields            *CustomFields        `xml:"custom_fields,omitempty"`
+}
+
 // UnmarshalXML unmarshals transactions and handles intermediary state during unmarshaling
 // for types like href.
 func (s *Subscription) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	type subscriptionAlias Subscription
 	var v struct {
 		subscriptionAlias
-		XMLName       xml.Name   `xml:"subscription"`
-		AccountCode   hrefString `xml:"account"`
-		InvoiceNumber hrefInt    `xml:"invoice"`
+		XMLName       xml.Name `xml:"subscription"`
+		AccountCode   href     `xml:"account"`
+		InvoiceNumber href     `xml:"invoice"`
 	}
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err
 	}
+
 	*s = Subscription(v.subscriptionAlias)
 	s.XMLName = v.XMLName
-	s.AccountCode = string(v.AccountCode)
-	s.InvoiceNumber = int(v.InvoiceNumber)
-
+	s.AccountCode = v.AccountCode.LastPartOfPath()
+	s.InvoiceNumber, _ = strconv.Atoi(v.InvoiceNumber.LastPartOfPath())
 	return nil
-}
-
-// MakeUpdate creates an UpdateSubscription with values that need to be passed
-// on update to be retained (meaning nil/zero values will delete that value).
-// After calling MakeUpdate you should modify the struct with your updates.
-// Once you're ready you can call client.Subscriptions.Update
-func (s Subscription) MakeUpdate() UpdateSubscription {
-	return UpdateSubscription{
-		// NetTerms need to be copied over because on update they default to 0.
-		// This ensures the NetTerms don't get overridden.
-		NetTerms:           s.NetTerms,
-		SubscriptionAddOns: &s.SubscriptionAddOns,
-	}
 }
 
 type NestedPlan struct {
@@ -144,65 +230,34 @@ type PendingSubscription struct {
 	SubscriptionAddOns []SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
 }
 
-// NewSubscription is used to create new subscriptions.
-type NewSubscription struct {
-	XMLName                 xml.Name             `xml:"subscription"`
-	PlanCode                string               `xml:"plan_code"`
-	Account                 Account              `xml:"account"`
-	SubscriptionAddOns      *[]SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
-	CouponCode              string               `xml:"coupon_code,omitempty"`
-	UnitAmountInCents       int                  `xml:"unit_amount_in_cents,omitempty"`
-	Currency                string               `xml:"currency"`
-	Quantity                int                  `xml:"quantity,omitempty"`
-	TrialEndsAt             NullTime             `xml:"trial_ends_at,omitempty"`
-	StartsAt                NullTime             `xml:"starts_at,omitempty"`
-	TotalBillingCycles      int                  `xml:"total_billing_cycles,omitempty"`
-	RenewalBillingCycles    NullInt              `xml:"renewal_billing_cycles"`
-	NextBillDate            NullTime             `xml:"next_bill_date,omitempty"`
-	CollectionMethod        string               `xml:"collection_method,omitempty"`
-	AutoRenew               bool                 `xml:"auto_renew,omitempty"`
-	NetTerms                NullInt              `xml:"net_terms,omitempty"`
-	PONumber                string               `xml:"po_number,omitempty"`
-	Bulk                    bool                 `xml:"bulk,omitempty"`
-	TermsAndConditions      string               `xml:"terms_and_conditions,omitempty"`
-	CustomerNotes           string               `xml:"customer_notes,omitempty"`
-	VATReverseChargeNotes   string               `xml:"vat_reverse_charge_notes,omitempty"`
-	BankAccountAuthorizedAt NullTime             `xml:"bank_account_authorized_at,omitempty"`
-	GatewayCode             string               `xml:"gateway_code,omitempty"`
-	CustomFields            *CustomFields        `xml:"custom_fields,omitempty"`
-}
-
-// NewSubscriptionResponse is used to unmarshal either the subscription or the transaction.
-type NewSubscriptionResponse struct {
-	Subscription *Subscription
-	Transaction  *Transaction // UnprocessableEntity errors return only the transaction
-}
-
 // UpdateSubscription is used to update subscriptions
 type UpdateSubscription struct {
 	XMLName                xml.Name             `xml:"subscription"`
 	Timeframe              string               `xml:"timeframe,omitempty"`
 	PlanCode               string               `xml:"plan_code,omitempty"`
-	CouponCode             string               `xml:"coupon_code,omitempty"`
 	Quantity               int                  `xml:"quantity,omitempty"`
-	UnitAmountInCents      int                  `xml:"unit_amount_in_cents,omitempty"`
-	RenewalBillingCycles   NullInt              `xml:"renewal_billing_cycles,omitempty"`
-	RemainingBillingCycles NullInt              `xml:"remaining_billing_cycles,omitempty"`
+	UnitAmountInCents      NullInt              `xml:"unit_amount_in_cents,omitempty"`
 	CollectionMethod       string               `xml:"collection_method,omitempty"`
-	AutoRenew              bool                 `xml:"auto_renew,omitempty"`
 	NetTerms               NullInt              `xml:"net_terms,omitempty"`
 	PONumber               string               `xml:"po_number,omitempty"`
 	SubscriptionAddOns     *[]SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
+	CouponCode             string               `xml:"coupon_code,omitempty"`
+	RevenueScheduleType    string               `xml:"revenue_schedule_type,omitempty"`
+	RemainingBillingCycles NullInt              `xml:"remaining_billing_cycles,omitempty"`
+	ImportedTrial          NullBool             `xml:"imported_trial,omitempty"`
+	RenewalBillingCycles   NullInt              `xml:"renewal_billing_cycles,omitempty"`
+	AutoRenew              NullBool             `xml:"auto_renew,omitempty"`
 	CustomFields           *CustomFields        `xml:"custom_fields,omitempty"`
 }
 
 // SubscriptionNotes is used to update a subscription's notes.
 type SubscriptionNotes struct {
-	XMLName               xml.Name `xml:"subscription"`
-	TermsAndConditions    string   `xml:"terms_and_conditions,omitempty"`
-	GatewayCode           string   `xml:"gateway_code,omitempty"`
-	CustomerNotes         string   `xml:"customer_notes,omitempty"`
-	VATReverseChargeNotes string   `xml:"vat_reverse_charge_notes,omitempty"`
+	XMLName               xml.Name      `xml:"subscription"`
+	TermsAndConditions    string        `xml:"terms_and_conditions,omitempty"`
+	CustomerNotes         string        `xml:"customer_notes,omitempty"`
+	VATReverseChargeNotes string        `xml:"vat_reverse_charge_notes,omitempty"`
+	GatewayCode           string        `xml:"gateway_code,omitempty"`
+	CustomFields          *CustomFields `xml:"custom_fields,omitempty"`
 }
 
 // CustomFields represents custom key value pairs.
@@ -213,21 +268,18 @@ type CustomFields map[string]string
 // UnmarshalXML unmarshals custom_fields.
 func (c *CustomFields) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v struct {
-		XMLName xml.Name `xml:"custom_fields"`
-		Fields  []struct {
-			Name  string `xml:"name"`
-			Value string `xml:"value"`
-		} `xml:"custom_field"`
+		XMLName xml.Name      `xml:"custom_fields"`
+		Fields  []customField `xml:"custom_field"`
 	}
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err
 	}
+
 	m := make(map[string]string, len(v.Fields))
 	for _, f := range v.Fields {
 		m[f.Name] = f.Value
 	}
 	*c = m
-
 	return nil
 }
 
@@ -237,28 +289,265 @@ func (c CustomFields) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		return nil
 	}
 
-	type xmlMapEntry struct {
-		XMLName struct{} `xml:"custom_field"`
-		Name    string   `xml:"name"`
-		Value   string   `xml:"value"`
-	}
-
 	e.EncodeToken(xml.StartElement{Name: xml.Name{Local: "custom_fields"}})
+	e.Encode(c.xmlFields())
+	e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "custom_fields"}})
+	return nil
+}
 
-	// Ensure key field order, otherwise causes rendered xml can have order difference
-	var keys []string
+type customField struct {
+	XMLName struct{} `xml:"custom_field"`
+	Name    string   `xml:"name"`
+	Value   string   `xml:"value"`
+}
+
+// xmlFields returns []customField from CustomFields. Results sorted for testing.
+func (c CustomFields) xmlFields() []customField {
+	var i int
+	fields := make([]customField, len(c))
 	for k := range c {
-		keys = append(keys, k)
-	}
-	sort.Strings(keys)
-
-	for _, k := range keys {
-		n := &xmlMapEntry{
+		fields[i] = customField{
 			Name:  k,
 			Value: c[k],
 		}
-		e.Encode(n)
+		i++
 	}
-	e.EncodeToken(xml.EndElement{Name: xml.Name{Local: "custom_fields"}})
-	return nil
+	sort.Slice(fields, func(i, j int) bool {
+		return fields[i].Name < fields[j].Name
+	})
+	return fields
+}
+
+// SubscriptionsPager paginates subscriptions.
+type SubscriptionsPager struct {
+	*pager
+}
+
+// Fetch fetches the next set of results.
+func (p *SubscriptionsPager) Fetch(ctx context.Context) ([]Subscription, error) {
+	var dst struct {
+		XMLName       xml.Name       `xml:"subscriptions"`
+		Subscriptions []Subscription `xml:"subscription"`
+	}
+	if err := p.fetch(ctx, &dst); err != nil {
+		return nil, err
+	}
+	return dst.Subscriptions, nil
+}
+
+// FetchAll paginates all records and returns a cumulative list.
+func (p *SubscriptionsPager) FetchAll(ctx context.Context) ([]Subscription, error) {
+	p.setMaxPerPage()
+
+	var all []Subscription
+	for p.Next() {
+		v, err := p.Fetch(ctx)
+		if err != nil {
+			return nil, err
+		}
+		all = append(all, v...)
+	}
+	return all, nil
+}
+
+var _ SubscriptionsService = &subscriptionsImpl{}
+
+// subscriptionsImpl implements SubscriptionsService.
+type subscriptionsImpl serviceImpl
+
+func (s *subscriptionsImpl) List(opts *PagerOptions) *SubscriptionsPager {
+	return &SubscriptionsPager{
+		pager: s.client.newPager("GET", "/subscriptions", opts),
+	}
+}
+
+func (s *subscriptionsImpl) ListAccount(accountCode string, opts *PagerOptions) *SubscriptionsPager {
+	path := fmt.Sprintf("/accounts/%s/subscriptions", accountCode)
+	return &SubscriptionsPager{
+		pager: s.client.newPager("GET", path, opts),
+	}
+}
+
+func (s *subscriptionsImpl) Get(ctx context.Context, uuid string) (*Subscription, error) {
+	path := fmt.Sprintf("/subscriptions/%s", sanitizeUUID(uuid))
+	req, err := s.client.newRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var dst Subscription
+	if _, err := s.client.do(ctx, req, &dst); err != nil {
+		if e, ok := err.(*ClientError); ok && e.Response.StatusCode == http.StatusNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &dst, nil
+}
+
+func (s *subscriptionsImpl) Create(ctx context.Context, sub NewSubscription) (*Subscription, error) {
+	req, err := s.client.newRequest("POST", "/subscriptions", sub)
+	if err != nil {
+		return nil, err
+	}
+
+	var dst Subscription
+	if _, err := s.client.do(ctx, req, &dst); err != nil {
+		return nil, err
+	}
+	return &dst, err
+}
+
+func (s *subscriptionsImpl) Preview(ctx context.Context, sub NewSubscription) (*Subscription, error) {
+	req, err := s.client.newRequest("POST", "/subscriptions/preview", sub)
+	if err != nil {
+		return nil, err
+	}
+
+	var dst Subscription
+	if _, err := s.client.do(ctx, req, &dst); err != nil {
+		return nil, err
+	}
+	return &dst, err
+}
+
+func (s *subscriptionsImpl) Update(ctx context.Context, uuid string, sub UpdateSubscription) (*Subscription, error) {
+	path := fmt.Sprintf("/subscriptions/%s", sanitizeUUID(uuid))
+	req, err := s.client.newRequest("PUT", path, sub)
+	if err != nil {
+		return nil, err
+	}
+
+	var dst Subscription
+	if _, err := s.client.do(ctx, req, &dst); err != nil {
+		return nil, err
+	}
+	return &dst, err
+}
+
+func (s *subscriptionsImpl) UpdateNotes(ctx context.Context, uuid string, n SubscriptionNotes) (*Subscription, error) {
+	path := fmt.Sprintf("/subscriptions/%s/notes", sanitizeUUID(uuid))
+	req, err := s.client.newRequest("PUT", path, n)
+	if err != nil {
+		return nil, err
+	}
+
+	var dst Subscription
+	if _, err := s.client.do(ctx, req, &dst); err != nil {
+		return nil, err
+	}
+	return &dst, err
+}
+
+func (s *subscriptionsImpl) PreviewChange(ctx context.Context, uuid string, sub UpdateSubscription) (*Subscription, error) {
+	path := fmt.Sprintf("/subscriptions/%s/preview", sanitizeUUID(uuid))
+	req, err := s.client.newRequest("POST", path, sub)
+	if err != nil {
+		return nil, err
+	}
+
+	var dst Subscription
+	if _, err := s.client.do(ctx, req, &dst); err != nil {
+		return nil, err
+	}
+	return &dst, err
+}
+
+func (s *subscriptionsImpl) Cancel(ctx context.Context, uuid string) (*Subscription, error) {
+	path := fmt.Sprintf("/subscriptions/%s/cancel", sanitizeUUID(uuid))
+	req, err := s.client.newRequest("PUT", path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var dst Subscription
+	if _, err := s.client.do(ctx, req, &dst); err != nil {
+		return nil, err
+	}
+	return &dst, err
+}
+
+func (s *subscriptionsImpl) Reactivate(ctx context.Context, uuid string) (*Subscription, error) {
+	path := fmt.Sprintf("/subscriptions/%s/reactivate", sanitizeUUID(uuid))
+	req, err := s.client.newRequest("PUT", path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var dst Subscription
+	if _, err := s.client.do(ctx, req, &dst); err != nil {
+		return nil, err
+	}
+	return &dst, err
+}
+
+func (s *subscriptionsImpl) Terminate(ctx context.Context, uuid string, refundType string) (*Subscription, error) {
+	path := fmt.Sprintf("/subscriptions/%s/terminate", sanitizeUUID(uuid))
+	req, err := s.client.newQueryRequest("PUT", path, query{
+		"refund": refundType,
+	}, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var dst Subscription
+	if _, err := s.client.do(ctx, req, &dst); err != nil {
+		return nil, err
+	}
+	return &dst, nil
+}
+
+func (s *subscriptionsImpl) Pause(ctx context.Context, uuid string, cycles int) (*Subscription, error) {
+	path := fmt.Sprintf("/subscriptions/%s/pause", sanitizeUUID(uuid))
+	req, err := s.client.newRequest("PUT", path, struct {
+		XMLName              xml.Name `xml:"subscription"`
+		RemainingPauseCycles int      `xml:"remaining_pause_cycles"`
+	}{
+		RemainingPauseCycles: cycles,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	var dst Subscription
+	if _, err := s.client.do(ctx, req, &dst); err != nil {
+		return nil, err
+	}
+	return &dst, err
+}
+
+func (s *subscriptionsImpl) Postpone(ctx context.Context, uuid string, dt time.Time, bulk bool) (*Subscription, error) {
+	path := fmt.Sprintf("/subscriptions/%s/postpone", sanitizeUUID(uuid))
+	req, err := s.client.newQueryRequest("PUT", path, query{
+		"bulk":              bulk,
+		"next_renewal_date": dt,
+	}, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var dst Subscription
+	if _, err := s.client.do(ctx, req, &dst); err != nil {
+		return nil, err
+	}
+	return &dst, err
+}
+
+func (s *subscriptionsImpl) Resume(ctx context.Context, uuid string) (*Subscription, error) {
+	path := fmt.Sprintf("/subscriptions/%s/resume", sanitizeUUID(uuid))
+	req, err := s.client.newRequest("PUT", path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var dst Subscription
+	if _, err := s.client.do(ctx, req, &dst); err != nil {
+		return nil, err
+	}
+	return &dst, err
+}
+
+// sanitizeUUID returns the uuid without dashes.
+func sanitizeUUID(id string) string {
+	return strings.TrimSpace(strings.Replace(id, "-", "", -1))
 }

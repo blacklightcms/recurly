@@ -1,8 +1,45 @@
 package recurly
 
-import "encoding/xml"
+import (
+	"context"
+	"encoding/xml"
+	"fmt"
+	"net/http"
+)
 
-// Plan represents an individual plan on your site.
+// PlansService manages the interactions for plans.
+type PlansService interface {
+	// List returns a pager to paginate plans. PagerOptions are used to optionally
+	// filter the results.
+	//
+	// https://dev.recurly.com/docs/list-plans
+	List(opts *PagerOptions) *PlansPager
+
+	// Get retrieves a plan. If the plan does not exist,
+	// a nil plan and nil error are returned.
+	//
+	// https://dev.recurly.com/docs/lookup-plan-details
+	Get(ctx context.Context, code string) (*Plan, error)
+
+	// Create a new subscription plan.
+	//
+	// https://dev.recurly.com/docs/create-plan
+	Create(ctx context.Context, p Plan) (*Plan, error)
+
+	// Update the pricing or details for a plan. Existing subscriptions will
+	// remain at the previous renewal amounts.
+	//
+	// https://dev.recurly.com/docs/update-plan
+	Update(ctx context.Context, code string, p Plan) (*Plan, error)
+
+	// Delete makes a plan inactive. New subscriptions cannot be created
+	// from inactive plans.
+	//
+	// https://dev.recurly.com/docs/delete-plan
+	Delete(ctx context.Context, code string) error
+}
+
+// Plan tells Recurly how often and how much to charge your customers.
 type Plan struct {
 	XMLName                  xml.Name   `xml:"plan"`
 	Code                     string     `xml:"plan_code,omitempty"`
@@ -28,4 +65,102 @@ type Plan struct {
 	AutoRenew                bool       `xml:"auto_renew,omitempty"`
 	UnitAmountInCents        UnitAmount `xml:"unit_amount_in_cents"`
 	SetupFeeInCents          UnitAmount `xml:"setup_fee_in_cents,omitempty"`
+}
+
+// PlansPager paginates accounts.
+type PlansPager struct {
+	*pager
+}
+
+// Fetch fetches the next set of results.
+func (p *PlansPager) Fetch(ctx context.Context) ([]Plan, error) {
+	var dst struct {
+		XMLName xml.Name `xml:"plans"`
+		Plans   []Plan   `xml:"plan"`
+	}
+	if err := p.fetch(ctx, &dst); err != nil {
+		return nil, err
+	}
+	return dst.Plans, nil
+}
+
+// FetchAll paginates all records and returns a cumulative list.
+func (p *PlansPager) FetchAll(ctx context.Context) ([]Plan, error) {
+	p.setMaxPerPage()
+
+	var all []Plan
+	for p.Next() {
+		v, err := p.Fetch(ctx)
+		if err != nil {
+			return nil, err
+		}
+		all = append(all, v...)
+	}
+	return all, nil
+}
+
+var _ PlansService = &plansImpl{}
+
+// plansImpl implements PlansService.
+type plansImpl serviceImpl
+
+func (s *plansImpl) List(opts *PagerOptions) *PlansPager {
+	return &PlansPager{
+		pager: s.client.newPager("GET", "/plans", opts),
+	}
+}
+
+func (s *plansImpl) Get(ctx context.Context, code string) (*Plan, error) {
+	path := fmt.Sprintf("/plans/%s", code)
+	req, err := s.client.newRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var dst Plan
+	if _, err := s.client.do(ctx, req, &dst); err != nil {
+		if e, ok := err.(*ClientError); ok && e.Response.StatusCode == http.StatusNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &dst, nil
+}
+
+func (s *plansImpl) Create(ctx context.Context, p Plan) (*Plan, error) {
+	req, err := s.client.newRequest("POST", "/plans", p)
+	if err != nil {
+		return nil, err
+	}
+
+	var dst Plan
+	if _, err := s.client.do(ctx, req, &dst); err != nil {
+		return nil, err
+	}
+	return &dst, nil
+}
+
+func (s *plansImpl) Update(ctx context.Context, code string, p Plan) (*Plan, error) {
+	path := fmt.Sprintf("/plans/%s", code)
+	req, err := s.client.newRequest("PUT", path, p)
+	if err != nil {
+		return nil, err
+	}
+
+	var dst Plan
+	if _, err := s.client.do(ctx, req, &dst); err != nil {
+		return nil, err
+	}
+	return &dst, nil
+}
+
+func (s *plansImpl) Delete(ctx context.Context, code string) error {
+	path := fmt.Sprintf("/plans/%s", code)
+	req, err := s.client.newRequest("DELETE", path, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.client.do(ctx, req, nil)
+	return err
 }

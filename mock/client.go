@@ -6,15 +6,13 @@ import (
 	"github.com/blacklightcms/recurly"
 )
 
-// NewClient returns a new instance of *recury.Client with the
+// NewClient returns a new instance of *recurly.Client with the
 // services assigned to mocks.
 func NewClient(httpClient *http.Client) *recurly.Client {
-	if httpClient == nil {
-		httpClient = http.DefaultClient
+	client := recurly.NewClient("a", "b")
+	if httpClient != nil {
+		client.Client = httpClient
 	}
-
-	client := recurly.NewClient("a", "b", httpClient)
-	client.BaseURL = "https://127.0.0.1/" // Safeguard only
 
 	// Attach mock implementations.
 	client.Accounts = &AccountsService{}
@@ -26,6 +24,7 @@ func NewClient(httpClient *http.Client) *recurly.Client {
 	client.Plans = &PlansService{}
 	client.AddOns = &AddOnsService{}
 	client.Subscriptions = &SubscriptionsService{}
+	client.ShippingAddresses = &ShippingAddressesService{}
 	client.Transactions = &TransactionsService{}
 	client.CreditPayments = &CreditPaymentsService{}
 	client.Purchases = &PurchasesService{}
