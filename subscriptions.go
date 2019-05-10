@@ -81,6 +81,7 @@ type Subscription struct {
 	AutoRenew              bool                 `xml:"auto_renew,omitempty"`
 	RenewalBillingCycles   NullInt              `xml:"renewal_billing_cycles,omitempty"`
 	RemainingBillingCycles NullInt              `xml:"remaining_billing_cycles,omitempty"`
+	GatewayCode            string               `xml:"gateway_code,omitempty"`
 	CustomFields           *CustomFields        `xml:"custom_fields,omitempty"`
 }
 
@@ -192,7 +193,6 @@ type UpdateSubscription struct {
 	NetTerms               NullInt              `xml:"net_terms,omitempty"`
 	PONumber               string               `xml:"po_number,omitempty"`
 	SubscriptionAddOns     *[]SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
-	GatewayCode            string               `xml:"gateway_code,omitempty"`
 	CustomFields           *CustomFields        `xml:"custom_fields,omitempty"`
 }
 
@@ -200,6 +200,7 @@ type UpdateSubscription struct {
 type SubscriptionNotes struct {
 	XMLName               xml.Name `xml:"subscription"`
 	TermsAndConditions    string   `xml:"terms_and_conditions,omitempty"`
+	GatewayCode           string   `xml:"gateway_code,omitempty"`
 	CustomerNotes         string   `xml:"customer_notes,omitempty"`
 	VATReverseChargeNotes string   `xml:"vat_reverse_charge_notes,omitempty"`
 }
