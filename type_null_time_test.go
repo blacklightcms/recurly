@@ -15,14 +15,14 @@ func TestNulTime(t *testing.T) {
 	t1, _ := time.Parse(DateTimeFormat, "2011-10-25T12:00:00-07:00")
 	given1 := NewTime(t1)
 	utc1 := t1.UTC()
-	expected1 := NullTime{Time: &utc1}
+	expected1 := NullTime{Time: utc1, Valid: true}
 
 	t2 := t1.AddDate(0, 3, 7)
 	given2 := NewTime(t2)
 	utc2 := t2.UTC()
-	expected2 := NullTime{Time: &utc2}
+	expected2 := NullTime{Time: utc2, Valid: true}
 
-	given3 := NullTime{Time: nil}
+	given3 := NullTime{}
 
 	if given3.String() != "" {
 		t.Fatalf("expected nil time to print empty string, given %s", given3.String())

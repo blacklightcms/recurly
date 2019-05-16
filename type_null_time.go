@@ -11,14 +11,15 @@ const DateTimeFormat = "2006-01-02T15:04:05Z07:00"
 
 // NullTime is used for properly handling time.Time types that could be null.
 type NullTime struct {
-	*time.Time
-	Raw string `xml:",innerxml"`
+	Time  time.Time
+	Valid bool
+	Raw   string `xml:",innerxml"`
 }
 
 // NewTime generates a new NullTime.
 func NewTime(t time.Time) NullTime {
 	t = t.UTC()
-	return NullTime{Time: &t}
+	return NullTime{Time: t, Valid: true}
 }
 
 // NewTimeFromString generates a new NullTime based on a
@@ -26,7 +27,7 @@ func NewTime(t time.Time) NullTime {
 // This is primarily used in unit testing.
 func NewTimeFromString(str string) NullTime {
 	t, _ := time.Parse(DateTimeFormat, str)
-	return NullTime{Time: &t}
+	return NullTime{Time: t, Valid: true}
 }
 
 // UnmarshalXML unmarshals an int properly, as well as marshaling an empty string to nil.
@@ -39,7 +40,8 @@ func (t *NullTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 			return err
 		}
 
-		*t = NewTime(parsed)
+		t.Time = parsed
+		t.Valid = true
 	}
 
 	return nil
@@ -48,28 +50,30 @@ func (t *NullTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 // MarshalJSON method has to be added here due to embeded interface json marshal issue in Go
 // with panic on nil time field
 func (t NullTime) MarshalJSON() ([]byte, error) {
-	if t.Time != nil {
-		return json.Marshal(t.Time)
+	if !t.Valid {
+		return []byte("null"), nil
 	}
-	return []byte("null"), nil
+
+	return json.Marshal(t.Time)
 }
 
 // MarshalXML marshals times into their proper format. Otherwise nothing is
 // marshaled. All times are sent in UTC.
 func (t NullTime) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	if t.Time != nil {
-		e.EncodeElement(t.String(), start)
+	if !t.Valid {
+		return nil
 	}
 
+	e.EncodeElement(t.String(), start)
 	return nil
 }
 
 // String returns a string representation of the time in UTC using the
 // DateTimeFormat constant as the format.
 func (t NullTime) String() string {
-	if t.Time != nil {
-		return t.Time.UTC().Format(DateTimeFormat)
+	if !t.Valid {
+		return ""
 	}
 
-	return ""
+	return t.Time.UTC().Format(DateTimeFormat)
 }

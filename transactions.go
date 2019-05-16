@@ -193,5 +193,5 @@ func (s Transactions) Swap(i, j int) {
 }
 
 func (s Transactions) Less(i, j int) bool {
-	return s[i].CreatedAt.Time.Before(*s[j].CreatedAt.Time)
+	return s[i].CreatedAt.Time.Before(s[j].CreatedAt.Time)
 }
