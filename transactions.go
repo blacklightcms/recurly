@@ -124,7 +124,7 @@ type Transactions []Transaction
 // Sort sorts transactions in ascending order.
 func (t Transactions) Sort() {
 	sort.Slice(t, func(i, j int) bool {
-		return t[i].CreatedAt.Time.Before(*t[j].CreatedAt.Time)
+		return t[i].CreatedAt.Time().Before(t[j].CreatedAt.Time())
 	})
 }
 

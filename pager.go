@@ -112,7 +112,7 @@ func (p *pager) setMaxPerPage() {
 
 // PagerOptions are used to send pagination parameters with paginated requests.
 type PagerOptions struct {
-	// Results per page. If not provides, Recurly defaults to 50.
+	// Results per page. If not provided, Recurly defaults to 50.
 	PerPage int
 
 	// The field to sort by (e.g. created_at). See Recurly's documentation.
@@ -157,7 +157,7 @@ func (q query) append(u *url.URL) {
 				vals.Add(key, v.UTC().Format(DateTimeFormat))
 			}
 		case NullTime:
-			if v.Time != nil && !v.IsZero() {
+			if _, ok := v.Value(); ok {
 				vals.Add(key, v.String())
 			}
 		case bool:
@@ -179,13 +179,9 @@ func (p PagerOptions) append(u *url.URL) {
 	if p.PerPage > 0 {
 		p.query["per_page"] = p.PerPage
 	}
-	if p.BeginTime.Time != nil && !p.BeginTime.IsZero() {
-		p.query["begin_time"] = p.BeginTime
-	}
-	if p.EndTime.Time != nil && !p.EndTime.IsZero() {
-		p.query["end_time"] = p.BeginTime
-	}
 
+	p.query["begin_time"] = p.BeginTime.String()
+	p.query["end_time"] = p.EndTime.String()
 	p.query["sort"] = p.Sort
 	p.query["order"] = p.Order
 	p.query["state"] = p.State

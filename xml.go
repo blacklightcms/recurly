@@ -12,28 +12,40 @@ import (
 
 // NullBool is able to marshal or unmarshal bools to XML in order to differentiate
 // between false as a value and false as a zero-value.
-//
-// Do not initialize as a struct, use NewBool().
 type NullBool struct {
-	Bool  bool
-	Valid bool
+	value bool
+	valid bool
 }
 
-// NewBool creates a new NullBool.
+// NewBool returns NullBool with a valid value of b.
 func NewBool(b bool) NullBool {
 	return NullBool{
-		Bool:  b,
-		Valid: true,
+		value: b,
+		valid: true,
 	}
 }
 
-// Is checks to see if the boolean is valid and equivalent.
-func (n NullBool) Is(b bool) bool { return n.Valid && n.Bool == b }
+// Bool returns the bool value, regardless of validity. Use Value() if
+// you need to know whether the value is valid.
+func (n NullBool) Bool() bool {
+	return n.value
+}
 
-// MarshalJSON marshals an bool based on whether valid is true.
+// Value returns the value of NullBool. The value should only be considered
+// valid if ok returns true.
+func (n NullBool) Value() (value bool, ok bool) {
+	return n.value, n.valid
+}
+
+// Equal compares the equality of two NullBools.
+func (n NullBool) Equal(v NullBool) bool {
+	return n.value == v.value && n.valid == v.valid
+}
+
+// MarshalJSON marshals a bool based on whether valid is true.
 func (n NullBool) MarshalJSON() ([]byte, error) {
-	if n.Valid {
-		return json.Marshal(n.Bool)
+	if n.valid {
+		return json.Marshal(n.value)
 	}
 	return []byte("null"), nil
 }
@@ -42,8 +54,11 @@ func (n NullBool) MarshalJSON() ([]byte, error) {
 func (n *NullBool) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v string
 	if err := d.DecodeElement(&v, &start); err == nil {
-		val, _ := strconv.ParseBool(v)
-		*n = NullBool{Bool: val, Valid: true}
+		if val, err := strconv.ParseBool(v); err == nil {
+			*n = NewBool(val)
+		} else {
+			*n = NullBool{valid: false}
+		}
 	}
 	return nil
 }
@@ -51,29 +66,44 @@ func (n *NullBool) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 // MarshalXML marshals NullBools to XML. Otherwise nothing is
 // marshaled.
 func (n NullBool) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	if n.Valid {
-		e.EncodeElement(n.Bool, start)
+	if n.valid {
+		return e.EncodeElement(n.value, start)
 	}
 	return nil
 }
 
 // NullInt is used for properly handling int types that could be null.
-//
-// Do not initialize as a struct, use NewInt().
 type NullInt struct {
-	Int   int
-	Valid bool
+	value int
+	valid bool
 }
 
-// NewInt builds a new NullInt struct.
+// NewInt returns NullInt with a valid value of i.
 func NewInt(i int) NullInt {
-	return NullInt{Int: i, Valid: true}
+	return NullInt{value: i, valid: true}
+}
+
+// Int returns the int value, regardless of validity. Use Value() if
+// you need to know whether the value is valid.
+func (n NullInt) Int() int {
+	return n.value
+}
+
+// Value returns the value of NullInt. The value should only be considered
+// valid if ok returns true.
+func (n NullInt) Value() (value int, ok bool) {
+	return n.value, n.valid
+}
+
+// Equal compares the equality of two NullInt.
+func (n NullInt) Equal(v NullInt) bool {
+	return n.value == v.value && n.valid == v.valid
 }
 
 // MarshalJSON marshals an int based on whether valid is true.
 func (n NullInt) MarshalJSON() ([]byte, error) {
-	if n.Valid {
-		return json.Marshal(n.Int)
+	if n.valid {
+		return json.Marshal(n.value)
 	}
 	return []byte("null"), nil
 }
@@ -89,15 +119,15 @@ func (n *NullInt) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	} else if strings.EqualFold(v.Nil, "nil") || strings.EqualFold(v.Nil, "true") {
 		return nil
 	}
-	*n = NullInt{Int: v.Int, Valid: true}
+	*n = NewInt(v.Int)
 	return nil
 }
 
 // MarshalXML marshals NullInts greater than zero to XML. Otherwise nothing is
 // marshaled.
 func (n NullInt) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	if n.Valid {
-		e.EncodeElement(n.Int, start)
+	if n.valid {
+		return e.EncodeElement(n.value, start)
 	}
 	return nil
 }
@@ -106,59 +136,74 @@ func (n NullInt) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 const DateTimeFormat = "2006-01-02T15:04:05Z07:00"
 
 // NullTime is used for properly handling time.Time types that could be null.
-//
-// Do not initialize as a struct, use NewTime().
 type NullTime struct {
-	*time.Time
-	Raw string `xml:",innerxml"`
+	value time.Time
+	valid bool
 }
 
-// NewTime generates a new NullTime.
+// NewTime returns NullTime with a valid value of t. The NullTime value
+// will be considered invalid if t.IsZero() returns true.
 func NewTime(t time.Time) NullTime {
+	if t.IsZero() {
+		return NullTime{}
+	}
 	t = t.UTC()
-	return NullTime{Time: &t}
+	return NullTime{value: t, valid: true}
+}
+
+// Time returns the time value, regardless of validity. Use Value() if
+// you need to know whether the value is valid.
+func (n NullTime) Time() time.Time {
+	return n.value
+}
+
+// Value returns the value of NullTime. The value should only be considered
+// valid if ok returns true.
+func (n NullTime) Value() (value time.Time, ok bool) {
+	return n.value, n.valid
+}
+
+// Equal compares the equality of two NullTime.
+func (n NullTime) Equal(v NullTime) bool {
+	return n.value.Equal(v.value) && n.valid == v.valid
 }
 
 // UnmarshalXML unmarshals an int properly, as well as marshaling an empty string to nil.
-func (t *NullTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+func (n *NullTime) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var v string
-	err := d.DecodeElement(&v, &start)
-	if err == nil && v != "" {
+	if err := d.DecodeElement(&v, &start); err == nil && v != "" {
 		parsed, err := time.Parse(DateTimeFormat, v)
 		if err != nil {
 			return err
 		}
-
-		*t = NewTime(parsed)
+		*n = NewTime(parsed)
 	}
-
 	return nil
 }
 
 // MarshalJSON method has to be added here due to embeded interface json marshal issue in Go
 // with panic on nil time field
-func (t NullTime) MarshalJSON() ([]byte, error) {
-	if t.Time != nil {
-		return json.Marshal(t.Time)
+func (n NullTime) MarshalJSON() ([]byte, error) {
+	if n.valid {
+		return json.Marshal(n.value)
 	}
 	return []byte("null"), nil
 }
 
 // MarshalXML marshals times into their proper format. Otherwise nothing is
 // marshaled. All times are sent in UTC.
-func (t NullTime) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	if t.Time != nil {
-		e.EncodeElement(t.String(), start)
+func (n NullTime) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if n.valid {
+		return e.EncodeElement(n.String(), start)
 	}
-
 	return nil
 }
 
 // String returns a string representation of the time in UTC using the
 // DateTimeFormat constant as the format.
-func (t NullTime) String() string {
-	if t.Time != nil {
-		return t.Time.UTC().Format(DateTimeFormat)
+func (n NullTime) String() string {
+	if n.valid {
+		return n.value.UTC().Format(DateTimeFormat)
 	}
 	return ""
 }

@@ -10,21 +10,32 @@ import (
 )
 
 func TestXML_NullBool(t *testing.T) {
-	if b := recurly.NewBool(true); !b.Is(true) {
-		t.Fatal("expected true")
-	} else if b.Is(false) {
-		t.Fatal("expected false")
-	} else if diff := cmp.Diff(b, recurly.NullBool{Bool: true, Valid: true}); diff != "" {
-		t.Fatal(diff)
-	}
+	t.Run("ZeroValue", func(t *testing.T) {
+		var b recurly.NullBool
+		if value, ok := b.Value(); value != false {
+			t.Fatal("expected false")
+		} else if ok {
+			t.Fatal("expected ok to be false")
+		}
+	})
 
-	if b := recurly.NewBool(false); !b.Is(false) {
-		t.Fatal("expected true")
-	} else if b.Is(true) {
-		t.Fatal("expected false")
-	} else if diff := cmp.Diff(b, recurly.NullBool{Bool: false, Valid: true}); diff != "" {
-		t.Fatal(diff)
-	}
+	t.Run("True", func(t *testing.T) {
+		b := recurly.NewBool(true)
+		if value, ok := b.Value(); value != true {
+			t.Fatal("expected true")
+		} else if !ok {
+			t.Fatal("expected ok to be true")
+		}
+	})
+
+	t.Run("False", func(t *testing.T) {
+		b := recurly.NewBool(false)
+		if value, ok := b.Value(); value != false {
+			t.Fatal("expected false")
+		} else if !ok {
+			t.Fatal("expected ok to be true")
+		}
+	})
 
 	type testStruct struct {
 		XMLName xml.Name         `xml:"test"`
@@ -33,18 +44,14 @@ func TestXML_NullBool(t *testing.T) {
 
 	t.Run("Encode", func(t *testing.T) {
 		for i, tt := range []struct {
-			b      bool
-			valid  bool
+			value  recurly.NullBool
 			expect string
 		}{
-			{b: true, valid: true, expect: `<test><b>true</b></test>`},
-			{b: false, valid: true, expect: `<test><b>false</b></test>`},
-			{b: true, valid: false, expect: `<test></test>`},
-			{b: false, valid: false, expect: `<test></test>`},
+			{value: recurly.NewBool(true), expect: `<test><b>true</b></test>`},
+			{value: recurly.NewBool(false), expect: `<test><b>false</b></test>`},
+			{expect: `<test></test>`}, // zero value
 		} {
-			value := recurly.NewBool(tt.b)
-			value.Valid = tt.valid
-			if xml, err := xml.Marshal(testStruct{Value: value}); err != nil {
+			if xml, err := xml.Marshal(testStruct{Value: tt.value}); err != nil {
 				t.Fatalf("%d %#v", i, err)
 			} else if string(xml) != tt.expect {
 				t.Fatalf("%d %s", i, string(xml))
@@ -59,7 +66,7 @@ func TestXML_NullBool(t *testing.T) {
 		}{
 			{expect: recurly.NewBool(true), input: `<test><b>true</b></test>`},
 			{expect: recurly.NewBool(false), input: `<test><b>false</b></test>`},
-			{expect: recurly.NullBool{Bool: false, Valid: false}, input: `<test></test>`},
+			{input: `<test></test>`},
 		} {
 			var dst testStruct
 			if err := xml.Unmarshal([]byte(tt.input), &dst); err != nil {
@@ -77,8 +84,7 @@ func TestXML_NullBool(t *testing.T) {
 		}{
 			{b: recurly.NewBool(true), expect: "true"},
 			{b: recurly.NewBool(false), expect: "false"},
-			{b: recurly.NullBool{Bool: true, Valid: false}, expect: "null"},
-			{b: recurly.NullBool{Bool: false, Valid: false}, expect: "null"},
+			{expect: "null"}, // zero value
 		} {
 			if b, err := json.Marshal(tt.b); err != nil {
 				t.Fatalf("%d %#v", i, err)
@@ -91,13 +97,17 @@ func TestXML_NullBool(t *testing.T) {
 
 func TestXML_NullInt(t *testing.T) {
 	b := recurly.NewInt(1)
-	if diff := cmp.Diff(b, recurly.NullInt{Int: 1, Valid: true}); diff != "" {
-		t.Fatal(diff)
+	if value, ok := b.Value(); !ok {
+		t.Fatal("expected ok to be true")
+	} else if value != 1 {
+		t.Fatalf("unexpected value: %d", value)
 	}
 
 	b = recurly.NewInt(0)
-	if diff := cmp.Diff(b, recurly.NullInt{Int: 0, Valid: true}); diff != "" {
-		t.Fatal(diff)
+	if value, ok := b.Value(); !ok {
+		t.Fatal("expected ok to be true")
+	} else if value != 0 {
+		t.Fatalf("unexpected value: %d", value)
 	}
 
 	type testStruct struct {
@@ -107,18 +117,15 @@ func TestXML_NullInt(t *testing.T) {
 
 	t.Run("Encode", func(t *testing.T) {
 		for i, tt := range []struct {
-			i      int
-			valid  bool
+			value  recurly.NullInt
 			expect string
 		}{
-			{i: 1, valid: true, expect: `<test><i>1</i></test>`},
-			{i: 0, valid: true, expect: `<test><i>0</i></test>`},
-			{i: 1, valid: false, expect: `<test></test>`},
-			{i: 0, valid: false, expect: `<test></test>`},
+			{value: recurly.NewInt(1), expect: `<test><i>1</i></test>`},
+			{value: recurly.NewInt(0), expect: `<test><i>0</i></test>`},
+			{value: recurly.NewInt(-1), expect: `<test><i>-1</i></test>`},
+			{expect: `<test></test>`}, // zero value
 		} {
-			value := recurly.NewInt(tt.i)
-			value.Valid = tt.valid
-			if xml, err := xml.Marshal(testStruct{Value: value}); err != nil {
+			if xml, err := xml.Marshal(testStruct{Value: tt.value}); err != nil {
 				t.Fatalf("%d %#v", i, err)
 			} else if string(xml) != tt.expect {
 				t.Fatalf("%d %s", i, string(xml))
@@ -133,7 +140,7 @@ func TestXML_NullInt(t *testing.T) {
 		}{
 			{expect: recurly.NewInt(1), input: `<test><i>1</i></test>`},
 			{expect: recurly.NewInt(0), input: `<test><i>0</i></test>`},
-			{expect: recurly.NullInt{Int: 0, Valid: false}, input: `<test></test>`},
+			{input: `<test></test>`}, // zero value
 		} {
 			var dst testStruct
 			if err := xml.Unmarshal([]byte(tt.input), &dst); err != nil {
@@ -149,8 +156,10 @@ func TestXML_NullTime(t *testing.T) {
 	v := MustParseTime("2011-10-25T12:00:00Z")
 
 	rt := recurly.NewTime(v)
-	if diff := cmp.Diff(rt, recurly.NullTime{Time: &v}); diff != "" {
-		t.Fatal(diff)
+	if value, ok := rt.Value(); !ok {
+		t.Fatal("expected ok to be true")
+	} else if !value.Equal(v) {
+		t.Fatalf("unexpected value: %v", value)
 	}
 
 	t.Run("Encode", func(t *testing.T) {

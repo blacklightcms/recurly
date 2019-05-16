@@ -283,7 +283,7 @@ func TestAccounts_List(t *testing.T) {
 			"order":      []string{"asc"},
 			"state":      []string{"active"},
 			"begin_time": []string{"2011-10-17T17:24:53Z"},
-			"end_time":   []string{"2011-10-17T17:24:53Z"},
+			"end_time":   []string{"2011-10-18T17:24:53Z"},
 		}); diff != "" {
 			t.Fatal(diff)
 		}
@@ -299,7 +299,7 @@ func TestAccounts_List(t *testing.T) {
 		Order:     "asc",
 		State:     "active",
 		BeginTime: recurly.NewTime(MustParseTime("2011-10-17T17:24:53Z")),
-		EndTime:   recurly.NewTime(MustParseTime("2011-10-17T17:24:53Z")),
+		EndTime:   recurly.NewTime(MustParseTime("2011-10-18T17:24:53Z")),
 	})
 
 	for pager.Next() {

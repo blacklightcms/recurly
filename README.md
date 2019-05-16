@@ -52,12 +52,54 @@ Please go through [examples](https://godoc.org/github.com/blacklightcms/recurly#
 
 There are a few high-level notes below that will be helpful in getting the most out of this library.
 
+- [Null Types](#null-types)
+- [Error Handling](#error-handling)
+- [Get Methods](#get-methods)
+- [Pagination](#pagination)
+
+## Null Types
+In some cases, Recurly requires values to be sent if valid, but the XML tag to be omitted if not valid.
+
+If you want to create a subscription with a price of `$0`, using an `int` type with an `omitempty` XML tag the value would never actually be sent. `0` is the zero value for an `int`.
+
+You want this:
+
+```xml
+<subscription>
+   <unit_amount_in_cents>0</unit_amount_in_cents>
+</subscription>
+```
+
+But instead send this:
+
+```xml
+<subscription></subscription>
+```
+
+For `int`, `bool`, and `time.Time` types, null types provide a way to differentiate between zero values 
+and real values. Let's look at integers:
+
+Zero as a valid value:
+```go
+v := recurly.NewInt(0)
+i := v.Int() // returns 0
+i, ok := v.Value() // returns 0, true
+```
+
+Zero as an invalid value:
+```go
+// Zero value, int value is 0 but flagged as invalid
+var nullInt recurly.NullInt
+i := nullInt.Int() // returns 0
+i, ok := nullInt.Value() // returns 0, false
+```
+
+
 ## Error Handling
 There are four important error types to know about. While you can generally just check for a non-nil 
-error, this section will cover more advanced error usage you can implement where it makes sense for 
-your application.
+error (`if err != nil`), this section will cover more advanced error usage you can implement where it makes sense for your application.
 
-### `ClientError`
+### ClientError
 `ClientError` is returned for all 400-level responses with the exception of
 1) `429 Too Many Requests`. See `RateLimitError`.
 2) `422 Unprocessable Entity` with a failed transaction. See `TransactionFailedError`.
@@ -84,25 +126,7 @@ if err != nil {
 }
 ```
 
-### `ServerError` 
-`ServerError` operates the same way as `ClientError`, except it's for 500-level responses and only 
-contains the `*http.Response`. This allows you to differentiate retriable errors from bad requests. You generally can just capture this as a generic error unless you explicitly want to look for something specific.
-
-### `RateLimitError` 
-`RateLimitError` is returned when your request has exceeded your rate limit. It contains 
-information on the rate limit and when the limit will reset.  You generally can just capture this as a generic error unless you explicitly want to look for something specific.
-
-```go
-a, err := client.Accounts.Get(ctx, "1")
-if err != nil {
-    if e, ok := err.(*recurly.RateLimitError); ok {
-        // e.Rate.Limit holds the total request limit during the 5 minute window
-        // e.Reset holds the time when the current window will completely reset
-    }
-}
-```
-
-### `TransactionFailedError`
+### TransactionFailedError
 `TransactionFailedError` is returned for any endpoint where a transaction was attempted and failed. 
 It is recommended that you check for this error when using any endpoint that 
 creates a transaction.
@@ -114,6 +138,28 @@ if e, ok := err.(*recurly.TransactionFailedError); ok {
     // e.TransactionError holds the specific error. See godoc for specific fields.
 } else if err != nil {
     // Handle all other errors
+}
+```
+
+### ServerError
+`ServerError` operates the same way as `ClientError`, except it's for 500-level responses and only 
+contains the `*http.Response`. This allows you to differentiate retriable errors from bad requests. 
+
+> NOTE: You will generally just capture this as a generic error (`if err != nil`) unless you need to look for something specific.
+
+### RateLimitError
+`RateLimitError` is returned when your request has exceeded your rate limit. It contains 
+information on the rate limit and when the limit will reset.
+
+> NOTE: You will generally just capture this as a generic error (`if err != nil`) unless you need to look for something specific.
+
+```go
+a, err := client.Accounts.Get(ctx, "1")
+if err != nil {
+    if e, ok := err.(*recurly.RateLimitError); ok {
+        // e.Rate.Limit holds the total request limit during the 5 minute window
+        // e.Reset holds the time when the current window will completely reset
+    }
 }
 ```
 
@@ -136,8 +182,7 @@ if err != nil {
 ```
 
 ### Get Methods
-When retrieving an individual item (such as an account, invoice, subscription): if the item is not found, a nil item and nil error will be returned. This is an exception, and the only place where a 404 will not 
-return a `ClientError`.
+When retrieving an individual item (such as an account, invoice, subscription): if the item is not found, a nil item and nil error will be returned. This is standard for all functions named `Get()`. All other functions would return a `ClientError` when encountering a `404 Not Found` status code.
 
 ```go
 a, err := client.Accounts.Get(ctx, "1")
@@ -149,7 +194,9 @@ if err != nil {
 ```
 
 ### Pagination
-Pagination of any item always works the same way. Here is an example of how to paginate accounts.
+Any function named `List()` or `List*()` is a pagination function. They all return a pager which standardizes how pagination works.
+
+In those cases, pagination always works the same way. Here is an example of how to paginate accounts:
 
 ```go
 // Initialize a pager with any pagination options needed.
