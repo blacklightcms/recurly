@@ -548,6 +548,9 @@ func (s *subscriptionsImpl) Resume(ctx context.Context, uuid string) (*Subscript
 }
 
 // sanitizeUUID returns the uuid without dashes.
-func sanitizeUUID(id string) string {
-	return strings.TrimSpace(strings.Replace(id, "-", "", -1))
+func sanitizeUUID(uuid string) string {
+	if !strings.Contains(uuid, "-") {
+		return uuid
+	}
+	return strings.TrimSpace(strings.Replace(uuid, "-", "", -1))
 }
