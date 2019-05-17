@@ -83,6 +83,25 @@ func TestTransactions_Get(t *testing.T) {
 		}
 	})
 
+	// Retrieving a failed transaction should hold the transaction errors.
+	t.Run("TransactionFailed", func(t *testing.T) {
+		client, s := NewServer()
+		defer s.Close()
+
+		s.HandleFunc("GET", "/v2/transactions/a13acd8fe4294916b79aec87b7ea441f", func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write(MustOpenFile("transaction_failed.xml"))
+		}, t)
+
+		if transaction, err := client.Transactions.Get(context.Background(), "a13acd8f-e429-4916-b79a-ec87b7ea441f"); err != nil {
+			t.Fatal(err)
+		} else if diff := cmp.Diff(transaction, NewTestTransactionFailed()); diff != "" {
+			t.Fatal(diff)
+		} else if !s.Invoked {
+			t.Fatal("expected fn invocation")
+		}
+	})
+
 	// Ensure a 404 returns nil values.
 	t.Run("ErrNotFound", func(t *testing.T) {
 		client, s := NewServer()
@@ -150,6 +169,54 @@ func NewTestTransaction() *recurly.Transaction {
 				Month:     11,
 				FirstSix:  "411111",
 				LastFour:  "1111",
+			},
+		},
+	}
+}
+
+// Returns a Transaction corresponding to testdata/transaction_failed.xml
+// as well as the transaction portion of testdata/errors_transaction_failed.xml.
+func NewTestTransactionFailed() *recurly.Transaction {
+	return &recurly.Transaction{
+		UUID:          "3d1c6aa86e3d447eb0f3b4a6e3e074d9",
+		Action:        "purchase",
+		AmountInCents: 4900,
+		TaxInCents:    0,
+		Currency:      "USD",
+		Status:        "declined",
+		Test:          true,
+		Voidable:      recurly.NewBool(false),
+		Refundable:    recurly.NewBool(false),
+		TransactionError: &recurly.TransactionError{
+			XMLName:          xml.Name{Local: "transaction_error"},
+			ErrorCode:        "fraud_security_code",
+			ErrorCategory:    "fraud",
+			MerchantMessage:  "The payment gateway declined the transaction because the security code (CVV) did not match.",
+			CustomerMessage:  "The security code you entered does not match. Please update the CVV and try again.",
+			GatewayErrorCode: "301",
+		},
+		CVVResult: recurly.CVVResult{
+			Code:    "N",
+			Message: "No Match",
+		},
+		AVSResult: recurly.AVSResult{
+			Code:    "D",
+			Message: "Street address and postal code match.",
+		},
+		AVSResultStreet: "Y",
+		AVSResultPostal: "Y",
+		CreatedAt:       recurly.NewTime(MustParseTime("2011-10-17T17:24:53Z")),
+		Account: recurly.Account{
+			XMLName: xml.Name{Local: "account"},
+			Code:    "1",
+			Email:   "verena@example.com",
+			BillingInfo: &recurly.Billing{
+				XMLName:  xml.Name{Local: "billing_info"},
+				CardType: "Visa",
+				Year:     2015,
+				Month:    11,
+				FirstSix: "400000",
+				LastFour: "0101",
 			},
 		},
 	}

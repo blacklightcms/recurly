@@ -397,41 +397,7 @@ func TestClient_TransactionFailedError(t *testing.T) {
 		GatewayErrorCode: "301",
 	}); diff != "" {
 		t.Fatal(diff)
-	} else if diff := cmp.Diff(e.Transaction, &recurly.Transaction{
-		UUID:          "3d1c6aa86e3d447eb0f3b4a6e3e074d9",
-		Action:        "purchase",
-		AmountInCents: 4900,
-		TaxInCents:    0,
-		Currency:      "USD",
-		Status:        "declined",
-		Test:          true,
-		Voidable:      recurly.NewBool(false),
-		Refundable:    recurly.NewBool(false),
-		CVVResult: recurly.CVVResult{
-			Code:    "N",
-			Message: "No Match",
-		},
-		AVSResult: recurly.AVSResult{
-			Code:    "D",
-			Message: "Street address and postal code match.",
-		},
-		AVSResultStreet: "Y",
-		AVSResultPostal: "Y",
-		CreatedAt:       recurly.NewTime(MustParseTime("2011-10-17T17:24:53Z")),
-		Account: recurly.Account{
-			XMLName: xml.Name{Local: "account"},
-			Code:    "1",
-			Email:   "verena@example.com",
-			BillingInfo: &recurly.Billing{
-				XMLName:  xml.Name{Local: "billing_info"},
-				CardType: "Visa",
-				Year:     2015,
-				Month:    11,
-				FirstSix: "400000",
-				LastFour: "0101",
-			},
-		},
-	}); diff != "" {
+	} else if diff := cmp.Diff(e.Transaction, NewTestTransactionFailed()); diff != "" {
 		t.Fatal(diff)
 	}
 }
