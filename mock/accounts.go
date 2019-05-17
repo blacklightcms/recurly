@@ -31,8 +31,8 @@ type AccountsService struct {
 	OnReopen      func(ctx context.Context, code string) error
 	ReopenInvoked bool
 
-	OnNotes      func(code string, opts *recurly.PagerOptions) *recurly.NotesPager
-	NotesInvoked bool
+	OnListNotes      func(code string, opts *recurly.PagerOptions) *recurly.NotesPager
+	ListNotesInvoked bool
 }
 
 func (m *AccountsService) List(opts *recurly.PagerOptions) *recurly.AccountsPager {
@@ -70,7 +70,7 @@ func (m *AccountsService) Reopen(ctx context.Context, code string) error {
 	return m.OnReopen(ctx, code)
 }
 
-func (m *AccountsService) Notes(code string, opts *recurly.PagerOptions) *recurly.NotesPager {
-	m.NotesInvoked = true
-	return m.OnNotes(code, opts)
+func (m *AccountsService) ListNotes(code string, opts *recurly.PagerOptions) *recurly.NotesPager {
+	m.ListNotesInvoked = true
+	return m.OnListNotes(code, opts)
 }

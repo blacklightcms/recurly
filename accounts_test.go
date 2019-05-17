@@ -450,7 +450,7 @@ func TestAccounts_ListNotes(t *testing.T) {
 		w.Write(MustOpenFile("notes.xml"))
 	}, t)
 
-	pager := client.Accounts.Notes("1", nil)
+	pager := client.Accounts.ListNotes("1", nil)
 	for pager.Next() {
 		n, err := pager.Fetch(context.Background())
 		if err != nil {

@@ -48,11 +48,11 @@ type AccountsService interface {
 	// https://dev.recurly.com/docs/reopen-account
 	Reopen(ctx context.Context, accountCode string) error
 
-	// Notes returns a pager to paginate notes for an account. PagerOptions is used
+	// ListNotes returns a pager to paginate notes for an account. PagerOptions is used
 	// to optionally filter the results.
 	//
 	// https://dev.recurly.com/docs/list-account-notes
-	Notes(accountCode string, params *PagerOptions) *NotesPager
+	ListNotes(accountCode string, params *PagerOptions) *NotesPager
 }
 
 // Account constants.
@@ -281,7 +281,7 @@ func (s *accountsImpl) Reopen(ctx context.Context, code string) error {
 	return err
 }
 
-func (s *accountsImpl) Notes(accountCode string, params *PagerOptions) *NotesPager {
+func (s *accountsImpl) ListNotes(accountCode string, params *PagerOptions) *NotesPager {
 	path := fmt.Sprintf("/accounts/%s/notes", accountCode)
 	return &NotesPager{
 		pager: s.client.newPager("GET", path, params),
