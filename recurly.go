@@ -22,6 +22,12 @@ const apiVersion = "2.18"
 // uaVersion is the userAgent sent to Recurly so they can track usage of this library.
 const uaVersion = "2019-05-15"
 
+// HTTPDoer is used for making HTTP requests. This implementation is generally
+// a *http.Client.
+type HTTPDoer interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 // Client manages communication with the Recurly API.
 type Client struct {
 	// apiKey is your account's API key used for authentication.
@@ -36,7 +42,10 @@ type Client struct {
 	userAgent string
 
 	// Client is the HTTP Client used to communicate with the API.
-	Client *http.Client
+	// By default this uses http.DefaultClient, so there are no timeouts
+	// configured. It's recommended you set your own HTTP client with
+	// reasonable timeouts for your application.
+	Client HTTPDoer
 
 	// Services used for talking with different parts of the Recurly API
 	Accounts          AccountsService
@@ -59,6 +68,9 @@ type serviceImpl struct {
 }
 
 // NewClient returns a new instance of *Client.
+// By default this uses http.DefaultClient, so there are no timeouts configured.
+// It's recommended you set your own HTTP client with reasonable timeouts
+// for your application.
 func NewClient(subDomain, apiKey string) *Client {
 	baseEndpoint, _ := url.Parse(fmt.Sprintf("https://%s.recurly.com/", subDomain))
 	client := &Client{
