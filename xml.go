@@ -25,6 +25,14 @@ func NewBool(b bool) NullBool {
 	}
 }
 
+// NewBoolPtr returns a new bool from a pointer.
+func NewBoolPtr(b *bool) NullBool {
+	if b == nil {
+		return NullBool{}
+	}
+	return NewBool(*b)
+}
+
 // Bool returns the bool value, regardless of validity. Use Value() if
 // you need to know whether the value is valid.
 func (n NullBool) Bool() bool {
@@ -81,6 +89,14 @@ type NullInt struct {
 // NewInt returns NullInt with a valid value of i.
 func NewInt(i int) NullInt {
 	return NullInt{value: i, valid: true}
+}
+
+// NewIntPtr returns a new bool from a pointer.
+func NewIntPtr(i *int) NullInt {
+	if i == nil {
+		return NullInt{}
+	}
+	return NewInt(*i)
 }
 
 // Int returns the int value, regardless of validity. Use Value() if
@@ -149,6 +165,14 @@ func NewTime(t time.Time) NullTime {
 	}
 	t = t.UTC()
 	return NullTime{value: t, valid: true}
+}
+
+// NewTimePtr returns NullTime from a pointer.
+func NewTimePtr(t *time.Time) NullTime {
+	if t == nil || t.IsZero() {
+		return NullTime{}
+	}
+	return NewTime(*t)
 }
 
 // Time returns the time value, regardless of validity. Use Value() if

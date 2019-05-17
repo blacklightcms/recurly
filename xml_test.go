@@ -12,28 +12,28 @@ import (
 func TestXML_NullBool(t *testing.T) {
 	t.Run("ZeroValue", func(t *testing.T) {
 		var b recurly.NullBool
-		if value, ok := b.Value(); value != false {
-			t.Fatal("expected false")
-		} else if ok {
+		if value, ok := b.Value(); ok {
 			t.Fatal("expected ok to be false")
+		} else if value != false {
+			t.Fatal("expected false")
 		}
 	})
 
 	t.Run("True", func(t *testing.T) {
 		b := recurly.NewBool(true)
-		if value, ok := b.Value(); value != true {
-			t.Fatal("expected true")
-		} else if !ok {
+		if value, ok := b.Value(); !ok {
 			t.Fatal("expected ok to be true")
+		} else if value != true {
+			t.Fatal("expected true")
 		}
 	})
 
 	t.Run("False", func(t *testing.T) {
 		b := recurly.NewBool(false)
-		if value, ok := b.Value(); value != false {
-			t.Fatal("expected false")
-		} else if !ok {
+		if value, ok := b.Value(); !ok {
 			t.Fatal("expected ok to be true")
+		} else if value != false {
+			t.Fatal("expected false")
 		}
 	})
 
@@ -95,16 +95,36 @@ func TestXML_NullBool(t *testing.T) {
 	})
 }
 
-func TestXML_NullInt(t *testing.T) {
-	b := recurly.NewInt(1)
+func TestXML_NullBoolPtr(t *testing.T) {
+	boolVal := true
+
+	b := recurly.NewBoolPtr(&boolVal)
 	if value, ok := b.Value(); !ok {
+		t.Fatal("expected ok to be true")
+	} else if value != true {
+		t.Fatal("expected true")
+	}
+}
+
+func TestXML_NullInt(t *testing.T) {
+	t.Run("ZeroValue", func(t *testing.T) {
+		var i recurly.NullInt
+		if value, ok := i.Value(); ok {
+			t.Fatal("expected ok to be false")
+		} else if value != 0 {
+			t.Fatalf("unexpected value: %d", value)
+		}
+	})
+
+	i := recurly.NewInt(1)
+	if value, ok := i.Value(); !ok {
 		t.Fatal("expected ok to be true")
 	} else if value != 1 {
 		t.Fatalf("unexpected value: %d", value)
 	}
 
-	b = recurly.NewInt(0)
-	if value, ok := b.Value(); !ok {
+	i = recurly.NewInt(0)
+	if value, ok := i.Value(); !ok {
 		t.Fatal("expected ok to be true")
 	} else if value != 0 {
 		t.Fatalf("unexpected value: %d", value)
@@ -152,7 +172,33 @@ func TestXML_NullInt(t *testing.T) {
 	})
 }
 
+func TestXML_NullIntPtr(t *testing.T) {
+	i := recurly.NewIntPtr(nil)
+	if value, ok := i.Value(); ok {
+		t.Fatal("expected ok to be false")
+	} else if value != 0 {
+		t.Fatalf("unexpected value: %d", value)
+	}
+
+	intVal := 1
+	i = recurly.NewIntPtr(&intVal)
+	if value, ok := i.Value(); !ok {
+		t.Fatal("expected ok to be true")
+	} else if value != 1 {
+		t.Fatalf("unexpected value: %d", value)
+	}
+}
+
 func TestXML_NullTime(t *testing.T) {
+	t.Run("ZeroValue", func(t *testing.T) {
+		var rt recurly.NullTime
+		if value, ok := rt.Value(); ok {
+			t.Fatal("expected ok to be false")
+		} else if !value.IsZero() {
+			t.Fatalf("expected zero time: %s", value.String())
+		}
+	})
+
 	v := MustParseTime("2011-10-25T12:00:00Z")
 
 	rt := recurly.NewTime(v)
@@ -218,4 +264,21 @@ func TestXML_NullTime(t *testing.T) {
 			t.Fatal(diff)
 		}
 	})
+}
+
+func TestXML_NullTimePtr(t *testing.T) {
+	rt := recurly.NewTimePtr(nil)
+	if value, ok := rt.Value(); ok {
+		t.Fatal("expected ok to be false")
+	} else if !value.IsZero() {
+		t.Fatalf("expected zero time: %s", value.String())
+	}
+
+	v := MustParseTime("2011-10-25T12:00:00Z")
+	rt = recurly.NewTimePtr(&v)
+	if value, ok := rt.Value(); !ok {
+		t.Fatal("expected ok to be true")
+	} else if !value.Equal(v) {
+		t.Fatalf("unexpected value: %v", value)
+	}
 }
