@@ -16,13 +16,13 @@ type TransactionsService interface {
 	// optionally filter the results.
 	//
 	// https://dev.recurly.com/docs/list-transactions
-	List(opts *PagerOptions) *TransactionsPager
+	List(opts *PagerOptions) Pager
 
 	// ListAccount returns a pager to paginate transactions for an account.
 	// PagerOptions are used to optionally filter the results.
 	//
 	// https://dev.recurly.com/docs/list-accounts-transactions
-	ListAccount(accountCode string, opts *PagerOptions) *TransactionsPager
+	ListAccount(accountCode string, opts *PagerOptions) Pager
 
 	// Get retrieves a transaction. If the transaction does not exist,
 	// a nil transaction and nil error are returned.
@@ -129,54 +129,18 @@ func (t Transactions) Sort() {
 	})
 }
 
-// TransactionsPager paginates accounts.
-type TransactionsPager struct {
-	*pager
-}
-
-// Fetch fetches the next set of results.
-func (p *TransactionsPager) Fetch(ctx context.Context) ([]Transaction, error) {
-	var dst struct {
-		XMLName      xml.Name      `xml:"transactions"`
-		Transactions []Transaction `xml:"transaction"`
-	}
-	if err := p.fetch(ctx, &dst); err != nil {
-		return nil, err
-	}
-	return dst.Transactions, nil
-}
-
-// FetchAll paginates all records and returns a cumulative list.
-func (p *TransactionsPager) FetchAll(ctx context.Context) ([]Transaction, error) {
-	p.setMaxPerPage()
-
-	var all []Transaction
-	for p.Next() {
-		v, err := p.Fetch(ctx)
-		if err != nil {
-			return nil, err
-		}
-		all = append(all, v...)
-	}
-	return all, nil
-}
-
 var _ TransactionsService = &transactionsImpl{}
 
 // transactionsImpl implements TransactionsService.
 type transactionsImpl serviceImpl
 
-func (s *transactionsImpl) List(opts *PagerOptions) *TransactionsPager {
-	return &TransactionsPager{
-		pager: s.client.newPager("GET", "/transactions", opts),
-	}
+func (s *transactionsImpl) List(opts *PagerOptions) Pager {
+	return s.client.newPager("GET", "/transactions", opts)
 }
 
-func (s *transactionsImpl) ListAccount(accountCode string, opts *PagerOptions) *TransactionsPager {
+func (s *transactionsImpl) ListAccount(accountCode string, opts *PagerOptions) Pager {
 	path := fmt.Sprintf("/accounts/%s/transactions", accountCode)
-	return &TransactionsPager{
-		pager: s.client.newPager("GET", path, opts),
-	}
+	return s.client.newPager("GET", path, opts)
 }
 
 func (s *transactionsImpl) Get(ctx context.Context, uuid string) (*Transaction, error) {

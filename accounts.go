@@ -14,7 +14,7 @@ type AccountsService interface {
 	// filter the results.
 	//
 	// https://dev.recurly.com/docs/list-accounts
-	List(opts *PagerOptions) *AccountsPager
+	List(opts *PagerOptions) Pager
 
 	// Get retrieves an account. If the account does not exist,
 	// a nil account and nil error is returned.
@@ -52,7 +52,7 @@ type AccountsService interface {
 	// to optionally filter the results.
 	//
 	// https://dev.recurly.com/docs/list-account-notes
-	ListNotes(accountCode string, params *PagerOptions) *NotesPager
+	ListNotes(accountCode string, params *PagerOptions) Pager
 }
 
 // Account constants.
@@ -126,79 +126,13 @@ type Note struct {
 	CreatedAt time.Time `xml:"created_at,omitempty"`
 }
 
-// AccountsPager paginates accounts.
-type AccountsPager struct {
-	*pager
-}
-
-// Fetch fetches the next set of results.
-func (p *AccountsPager) Fetch(ctx context.Context) ([]Account, error) {
-	var dst struct {
-		XMLName  xml.Name  `xml:"accounts"`
-		Accounts []Account `xml:"account"`
-	}
-	if err := p.fetch(ctx, &dst); err != nil {
-		return nil, err
-	}
-	return dst.Accounts, nil
-}
-
-// FetchAll paginates all records and returns a cumulative list.
-func (p *AccountsPager) FetchAll(ctx context.Context) ([]Account, error) {
-	p.setMaxPerPage()
-
-	var all []Account
-	for p.Next() {
-		v, err := p.Fetch(ctx)
-		if err != nil {
-			return nil, err
-		}
-		all = append(all, v...)
-	}
-	return all, nil
-}
-
-// NotesPager paginates notes.
-type NotesPager struct {
-	*pager
-}
-
-// Fetch fetches the next set of results.
-func (p *NotesPager) Fetch(ctx context.Context) ([]Note, error) {
-	var dst struct {
-		XMLName xml.Name `xml:"notes"`
-		Notes   []Note   `xml:"note"`
-	}
-	if err := p.fetch(ctx, &dst); err != nil {
-		return nil, err
-	}
-	return dst.Notes, nil
-}
-
-// FetchAll paginates all records and returns a cumulative list.
-func (p *NotesPager) FetchAll(ctx context.Context) ([]Note, error) {
-	p.setMaxPerPage()
-
-	var all []Note
-	for p.Next() {
-		v, err := p.Fetch(ctx)
-		if err != nil {
-			return nil, err
-		}
-		all = append(all, v...)
-	}
-	return all, nil
-}
-
 var _ AccountsService = &accountsImpl{}
 
 // accountsImpl implements AccountsService.
 type accountsImpl serviceImpl
 
-func (s *accountsImpl) List(opts *PagerOptions) *AccountsPager {
-	return &AccountsPager{
-		pager: s.client.newPager("GET", "/accounts", opts),
-	}
+func (s *accountsImpl) List(opts *PagerOptions) Pager {
+	return s.client.newPager("GET", "/accounts", opts)
 }
 
 func (s *accountsImpl) Get(ctx context.Context, code string) (*Account, error) {
@@ -281,9 +215,7 @@ func (s *accountsImpl) Reopen(ctx context.Context, code string) error {
 	return err
 }
 
-func (s *accountsImpl) ListNotes(accountCode string, params *PagerOptions) *NotesPager {
+func (s *accountsImpl) ListNotes(accountCode string, params *PagerOptions) Pager {
 	path := fmt.Sprintf("/accounts/%s/notes", accountCode)
-	return &NotesPager{
-		pager: s.client.newPager("GET", path, params),
-	}
+	return s.client.newPager("GET", path, params)
 }

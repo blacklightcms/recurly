@@ -10,7 +10,7 @@ var _ recurly.AddOnsService = &AddOnsService{}
 
 // AddOnsService manages the interactions for add ons.
 type AddOnsService struct {
-	OnList      func(planCode string, opts *recurly.PagerOptions) *recurly.AddOnsPager
+	OnList      func(planCode string, opts *recurly.PagerOptions) recurly.Pager
 	ListInvoked bool
 
 	OnGet      func(ctx context.Context, planCode string, code string) (*recurly.AddOn, error)
@@ -26,7 +26,7 @@ type AddOnsService struct {
 	DeleteInvoked bool
 }
 
-func (m *AddOnsService) List(planCode string, opts *recurly.PagerOptions) *recurly.AddOnsPager {
+func (m *AddOnsService) List(planCode string, opts *recurly.PagerOptions) recurly.Pager {
 	m.ListInvoked = true
 	return m.OnList(planCode, opts)
 }

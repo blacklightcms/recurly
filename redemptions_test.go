@@ -22,7 +22,8 @@ func TestRedemptions_ListAccount(t *testing.T) {
 
 	pager := client.Redemptions.ListAccount("1", nil)
 	for pager.Next() {
-		if redemptions, err := pager.Fetch(context.Background()); err != nil {
+		var redemptions []recurly.Redemption
+		if err := pager.Fetch(context.Background(), &redemptions); err != nil {
 			t.Fatal(err)
 		} else if !s.Invoked {
 			t.Fatal("expected s to be invoked")
@@ -48,7 +49,8 @@ func TestRedemptions_ListInvoice(t *testing.T) {
 
 	pager := client.Redemptions.ListInvoice(1010, nil)
 	for pager.Next() {
-		if redemptions, err := pager.Fetch(context.Background()); err != nil {
+		var redemptions []recurly.Redemption
+		if err := pager.Fetch(context.Background(), &redemptions); err != nil {
 			t.Fatal(err)
 		} else if !s.Invoked {
 			t.Fatal("expected s to be invoked")
@@ -74,7 +76,8 @@ func TestRedemptions_ListSubscription(t *testing.T) {
 
 	pager := client.Redemptions.ListSubscription("37bfef7a-8e44-cfc3-817b-7a43eba8a6e6", nil) // UUID should be sanitized
 	for pager.Next() {
-		if redemptions, err := pager.Fetch(context.Background()); err != nil {
+		var redemptions []recurly.Redemption
+		if err := pager.Fetch(context.Background(), &redemptions); err != nil {
 			t.Fatal(err)
 		} else if !s.Invoked {
 			t.Fatal("expected s to be invoked")

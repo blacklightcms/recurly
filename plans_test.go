@@ -261,7 +261,8 @@ func TestPlans_List(t *testing.T) {
 
 	pager := client.Plans.List(nil)
 	for pager.Next() {
-		if plans, err := pager.Fetch(context.Background()); err != nil {
+		var plans []recurly.Plan
+		if err := pager.Fetch(context.Background(), &plans); err != nil {
 			t.Fatal(err)
 		} else if !s.Invoked {
 			t.Fatal("expected s to be invoked")

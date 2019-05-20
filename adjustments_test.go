@@ -143,7 +143,8 @@ func TestAdjustments_ListAccount(t *testing.T) {
 
 	pager := client.Adjustments.ListAccount("1", nil)
 	for pager.Next() {
-		if a, err := pager.Fetch(context.Background()); err != nil {
+		var a []recurly.Adjustment
+		if err := pager.Fetch(context.Background(), &a); err != nil {
 			t.Fatal(err)
 		} else if !s.Invoked {
 			t.Fatal("expected s to be invoked")

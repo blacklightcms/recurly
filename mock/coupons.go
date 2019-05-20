@@ -10,7 +10,7 @@ var _ recurly.CouponsService = &CouponsService{}
 
 // CouponsService manages the interactions for coupons.
 type CouponsService struct {
-	OnList      func(opts *recurly.PagerOptions) *recurly.CouponsPager
+	OnList      func(opts *recurly.PagerOptions) recurly.Pager
 	ListInvoked bool
 
 	OnGet      func(ctx context.Context, code string) (*recurly.Coupon, error)
@@ -28,11 +28,11 @@ type CouponsService struct {
 	OnDelete      func(ctx context.Context, code string) error
 	DeleteInvoked bool
 
-	OnGenerate      func(ctx context.Context, code string, n int) (*recurly.CouponsPager, error)
+	OnGenerate      func(ctx context.Context, code string, n int) (recurly.Pager, error)
 	GenerateInvoked bool
 }
 
-func (m *CouponsService) List(opts *recurly.PagerOptions) *recurly.CouponsPager {
+func (m *CouponsService) List(opts *recurly.PagerOptions) recurly.Pager {
 	m.ListInvoked = true
 	return m.OnList(opts)
 }
@@ -62,7 +62,7 @@ func (m *CouponsService) Delete(ctx context.Context, code string) error {
 	return m.OnDelete(ctx, code)
 }
 
-func (m *CouponsService) Generate(ctx context.Context, code string, n int) (*recurly.CouponsPager, error) {
+func (m *CouponsService) Generate(ctx context.Context, code string, n int) (recurly.Pager, error) {
 	m.GenerateInvoked = true
 	return m.OnGenerate(ctx, code, n)
 }

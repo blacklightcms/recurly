@@ -9,7 +9,7 @@ import (
 var _ recurly.ShippingAddressesService = &ShippingAddressesService{}
 
 type ShippingAddressesService struct {
-	OnListAccount      func(accountCode string, opts *recurly.PagerOptions) *recurly.ShippingAddressesPager
+	OnListAccount      func(accountCode string, opts *recurly.PagerOptions) recurly.Pager
 	ListAccountInvoked bool
 
 	OnCreate      func(ctx context.Context, accountCode string, address recurly.ShippingAddress) (*recurly.ShippingAddress, error)
@@ -22,7 +22,7 @@ type ShippingAddressesService struct {
 	DeleteInvoked bool
 }
 
-func (s *ShippingAddressesService) ListAccount(accountCode string, opts *recurly.PagerOptions) *recurly.ShippingAddressesPager {
+func (s *ShippingAddressesService) ListAccount(accountCode string, opts *recurly.PagerOptions) recurly.Pager {
 	s.ListAccountInvoked = true
 	return s.OnListAccount(accountCode, opts)
 }

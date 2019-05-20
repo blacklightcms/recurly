@@ -13,7 +13,7 @@ type AddOnsService interface {
 	// optionally filter the results.
 	//
 	// https://dev.recurly.com/docs/list-add-ons-for-a-plan
-	List(planCode string, opts *PagerOptions) *AddOnsPager
+	List(planCode string, opts *PagerOptions) Pager
 
 	// Get retrieves an add-on. If the add-on does not exist,
 	// a nil account and nil error is returned.
@@ -73,48 +73,14 @@ func (u UnitAmount) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return nil
 }
 
-// AddOnsPager paginates add-ons.
-type AddOnsPager struct {
-	*pager
-}
-
-// Fetch fetches the next set of results.
-func (p *AddOnsPager) Fetch(ctx context.Context) ([]AddOn, error) {
-	var dst struct {
-		XMLName xml.Name `xml:"add_ons"`
-		AddOns  []AddOn  `xml:"add_on"`
-	}
-	if err := p.fetch(ctx, &dst); err != nil {
-		return nil, err
-	}
-	return dst.AddOns, nil
-}
-
-// FetchAll paginates all records and returns a cumulative list.
-func (p *AddOnsPager) FetchAll(ctx context.Context) ([]AddOn, error) {
-	p.setMaxPerPage()
-
-	var all []AddOn
-	for p.Next() {
-		v, err := p.Fetch(ctx)
-		if err != nil {
-			return nil, err
-		}
-		all = append(all, v...)
-	}
-	return all, nil
-}
-
 var _ AddOnsService = &addOnsImpl{}
 
 // addOnsImpl implements AddOnsService.
 type addOnsImpl serviceImpl
 
-func (s *addOnsImpl) List(planCode string, opts *PagerOptions) *AddOnsPager {
+func (s *addOnsImpl) List(planCode string, opts *PagerOptions) Pager {
 	path := fmt.Sprintf("/plans/%s/add_ons", planCode)
-	return &AddOnsPager{
-		pager: s.client.newPager("GET", path, opts),
-	}
+	return s.client.newPager("GET", path, opts)
 }
 
 func (s *addOnsImpl) Get(ctx context.Context, planCode string, code string) (*AddOn, error) {

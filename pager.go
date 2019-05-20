@@ -2,12 +2,34 @@ package recurly
 
 import (
 	"context"
+	"encoding/xml"
 	"errors"
 	"fmt"
 	"net/url"
 	"strconv"
 	"time"
 )
+
+// Pager paginates records.
+type Pager interface {
+	// Count returns a total count of the request. Calling this function
+	// more than once will return the value from the first call.
+	Count(ctx context.Context) (int, error)
+
+	// Next prepares returns true if there is a next result expected, or false if
+	// there is no next result.
+	Next() bool
+
+	// Fetch fetches results of a single page and populates dst with the results.
+	// For use in a for loop with Next().
+	Fetch(ctx context.Context, dst interface{}) error
+
+	// FetchAll fetches all of the pages recurly has available for the result
+	// set and populates dst with the results.
+	FetchAll(ctx context.Context, dst interface{}) error
+}
+
+var _ Pager = &pager{}
 
 // pager paginates API calls.
 type pager struct {
@@ -39,8 +61,6 @@ func (c *Client) newPager(method, path string, opts *PagerOptions) *pager {
 	}
 }
 
-// Count returns a total count of the request. Calling this function
-// more than once will return the value from the first call.
 func (p *pager) Count(ctx context.Context) (int, error) {
 	if p.count != nil {
 		return *p.count, nil
@@ -66,15 +86,13 @@ func (p *pager) Count(ctx context.Context) (int, error) {
 	}
 }
 
-// Next prepares returns true if there is a next result expected, or false if
-// there is no next result.
 func (p *pager) Next() bool {
 	return p.expectResults
 }
 
 // fetch retrieves the results and populates dst, setting the next
 // cursor.
-func (p *pager) fetch(ctx context.Context, dst interface{}) error {
+func (p *pager) Fetch(ctx context.Context, dst interface{}) error {
 	select {
 	default:
 	case <-ctx.Done():
@@ -91,7 +109,23 @@ func (p *pager) fetch(ctx context.Context, dst interface{}) error {
 		return err
 	}
 
-	resp, err := p.client.do(ctx, req, dst)
+	var unmarshaler struct {
+		XMLName         xml.Name
+		Account         []Account         `xml:"account"`
+		Adjustment      []Adjustment      `xml:"adjustment"`
+		AddOn           []AddOn           `xml:"add_on"`
+		Coupon          []Coupon          `xml:"coupon"`
+		CreditPayment   []CreditPayment   `xml:"credit_payment"`
+		Invoice         []Invoice         `xml:"invoice"`
+		Note            []Note            `xml:"note"`
+		Plan            []Plan            `xml:"plan"`
+		Redemption      []Redemption      `xml:"redemption"`
+		ShippingAddress []ShippingAddress `xml:"shipping_address"`
+		Subscription    []Subscription    `xml:"subscription"`
+		Transaction     []Transaction     `xml:"transaction"`
+	}
+
+	resp, err := p.client.do(ctx, req, &unmarshaler)
 	if err != nil {
 		p.cursor = ""
 		p.expectResults = false
@@ -99,15 +133,171 @@ func (p *pager) fetch(ctx context.Context, dst interface{}) error {
 	} else if p.cursor = resp.NextCursor; p.cursor == "" {
 		p.expectResults = false
 	}
+
+	// note: this may be a good candidate for a code generator.
+	switch v := dst.(type) {
+	case *[]Account:
+		*v = unmarshaler.Account
+	case *[]Adjustment:
+		*v = unmarshaler.Adjustment
+	case *[]AddOn:
+		*v = unmarshaler.AddOn
+	case *[]Coupon:
+		*v = unmarshaler.Coupon
+	case *[]CreditPayment:
+		*v = unmarshaler.CreditPayment
+	case *[]Invoice:
+		*v = unmarshaler.Invoice
+	case *[]Note:
+		*v = unmarshaler.Note
+	case *[]Plan:
+		*v = unmarshaler.Plan
+	case *[]Redemption:
+		*v = unmarshaler.Redemption
+	case *[]ShippingAddress:
+		*v = unmarshaler.ShippingAddress
+	case *[]Subscription:
+		*v = unmarshaler.Subscription
+	case *[]Transaction:
+		*v = unmarshaler.Transaction
+	default:
+		return fmt.Errorf("unknown type used for pagination: %T", dst)
+	}
+
 	return nil
 }
 
-// setMaxPerPage sets the request to return the maximum number of results per page
-// recurly will provide. This is useful for FetchAll() requests where it's best
-// to limit the total number of HTTP requests made to retrieve all of the
-// results.
-func (p *pager) setMaxPerPage() {
+func (p *pager) FetchAll(ctx context.Context, dst interface{}) error {
+	// Reduce HTTP calls needed by setting pagination to Recurly's max of 200.
 	p.opts.PerPage = 200
+
+	// note: this may be a good candidate for a code generator.
+	switch v := dst.(type) {
+	case *[]Account:
+		var all []Account
+		for p.Next() {
+			var dst []Account
+			if err := p.Fetch(ctx, &dst); err != nil {
+				return err
+			}
+			all = append(all, dst...)
+		}
+		*v = all
+	case *[]Adjustment:
+		var all []Adjustment
+		for p.Next() {
+			var dst []Adjustment
+			if err := p.Fetch(ctx, &dst); err != nil {
+				return err
+			}
+			all = append(all, dst...)
+		}
+		*v = all
+	case *[]AddOn:
+		var all []AddOn
+		for p.Next() {
+			var dst []AddOn
+			if err := p.Fetch(ctx, &dst); err != nil {
+				return err
+			}
+			all = append(all, dst...)
+		}
+		*v = all
+	case *[]Coupon:
+		var all []Coupon
+		for p.Next() {
+			var dst []Coupon
+			if err := p.Fetch(ctx, &dst); err != nil {
+				return err
+			}
+			all = append(all, dst...)
+		}
+		*v = all
+	case *[]CreditPayment:
+		var all []CreditPayment
+		for p.Next() {
+			var dst []CreditPayment
+			if err := p.Fetch(ctx, &dst); err != nil {
+				return err
+			}
+			all = append(all, dst...)
+		}
+		*v = all
+	case *[]Invoice:
+		var all []Invoice
+		for p.Next() {
+			var dst []Invoice
+			if err := p.Fetch(ctx, &dst); err != nil {
+				return err
+			}
+			all = append(all, dst...)
+		}
+		*v = all
+	case *[]Note:
+		var all []Note
+		for p.Next() {
+			var dst []Note
+			if err := p.Fetch(ctx, &dst); err != nil {
+				return err
+			}
+			all = append(all, dst...)
+		}
+		*v = all
+	case *[]Plan:
+		var all []Plan
+		for p.Next() {
+			var dst []Plan
+			if err := p.Fetch(ctx, &dst); err != nil {
+				return err
+			}
+			all = append(all, dst...)
+		}
+		*v = all
+	case *[]Redemption:
+		var all []Redemption
+		for p.Next() {
+			var dst []Redemption
+			if err := p.Fetch(ctx, &dst); err != nil {
+				return err
+			}
+			all = append(all, dst...)
+		}
+		*v = all
+	case *[]ShippingAddress:
+		var all []ShippingAddress
+		for p.Next() {
+			var dst []ShippingAddress
+			if err := p.Fetch(ctx, &dst); err != nil {
+				return err
+			}
+			all = append(all, dst...)
+		}
+		*v = all
+	case *[]Subscription:
+		var all []Subscription
+		for p.Next() {
+			var dst []Subscription
+			if err := p.Fetch(ctx, &dst); err != nil {
+				return err
+			}
+			all = append(all, dst...)
+		}
+		*v = all
+	case *[]Transaction:
+		var all []Transaction
+		for p.Next() {
+			var dst []Transaction
+			if err := p.Fetch(ctx, &dst); err != nil {
+				return err
+			}
+			all = append(all, dst...)
+		}
+		*v = all
+	default:
+		return fmt.Errorf("unknown type used for pagination: %T", dst)
+	}
+
+	return nil
 }
 
 // PagerOptions are used to send pagination parameters with paginated requests.

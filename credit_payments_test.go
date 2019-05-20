@@ -23,7 +23,8 @@ func TestCreditPayments_List(t *testing.T) {
 
 	pager := client.CreditPayments.List(nil)
 	for pager.Next() {
-		if pmts, err := pager.Fetch(context.Background()); err != nil {
+		var pmts []recurly.CreditPayment
+		if err := pager.Fetch(context.Background(), &pmts); err != nil {
 			t.Fatal(err)
 		} else if !s.Invoked {
 			t.Fatal("expected s to be invoked")
@@ -49,7 +50,8 @@ func TestCreditPayments_ListAccount(t *testing.T) {
 
 	pager := client.CreditPayments.ListAccount("1", nil)
 	for pager.Next() {
-		if pmts, err := pager.Fetch(context.Background()); err != nil {
+		var pmts []recurly.CreditPayment
+		if err := pager.Fetch(context.Background(), &pmts); err != nil {
 			t.Fatal(err)
 		} else if !s.Invoked {
 			t.Fatal("expected s to be invoked")

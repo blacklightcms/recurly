@@ -10,7 +10,7 @@ var _ recurly.AccountsService = &AccountsService{}
 
 // AccountsService manages the interactions for accounts.
 type AccountsService struct {
-	OnList      func(opts *recurly.PagerOptions) *recurly.AccountsPager
+	OnList      func(opts *recurly.PagerOptions) recurly.Pager
 	ListInvoked bool
 
 	OnGet      func(ctx context.Context, code string) (*recurly.Account, error)
@@ -31,11 +31,11 @@ type AccountsService struct {
 	OnReopen      func(ctx context.Context, code string) error
 	ReopenInvoked bool
 
-	OnListNotes      func(code string, opts *recurly.PagerOptions) *recurly.NotesPager
+	OnListNotes      func(code string, opts *recurly.PagerOptions) recurly.Pager
 	ListNotesInvoked bool
 }
 
-func (m *AccountsService) List(opts *recurly.PagerOptions) *recurly.AccountsPager {
+func (m *AccountsService) List(opts *recurly.PagerOptions) recurly.Pager {
 	m.ListInvoked = true
 	return m.OnList(opts)
 }
@@ -70,7 +70,7 @@ func (m *AccountsService) Reopen(ctx context.Context, code string) error {
 	return m.OnReopen(ctx, code)
 }
 
-func (m *AccountsService) ListNotes(code string, opts *recurly.PagerOptions) *recurly.NotesPager {
+func (m *AccountsService) ListNotes(code string, opts *recurly.PagerOptions) recurly.Pager {
 	m.ListNotesInvoked = true
 	return m.OnListNotes(code, opts)
 }

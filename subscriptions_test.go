@@ -629,7 +629,8 @@ func TestSubscriptions_List(t *testing.T) {
 
 	pager := client.Subscriptions.List(nil)
 	for pager.Next() {
-		if subscriptions, err := pager.Fetch(context.Background()); err != nil {
+		var subscriptions []recurly.Subscription
+		if err := pager.Fetch(context.Background(), &subscriptions); err != nil {
 			t.Fatal(err)
 		} else if !s.Invoked {
 			t.Fatal("expected s to be invoked")
@@ -655,7 +656,8 @@ func TestSubscriptions_ListAccount(t *testing.T) {
 
 	pager := client.Subscriptions.ListAccount("1", nil)
 	for pager.Next() {
-		if subscriptions, err := pager.Fetch(context.Background()); err != nil {
+		var subscriptions []recurly.Subscription
+		if err := pager.Fetch(context.Background(), &subscriptions); err != nil {
 			t.Fatal(err)
 		} else if !s.Invoked {
 			t.Fatal("expected s to be invoked")

@@ -23,7 +23,8 @@ func TestShippingAddresses_ListAccount(t *testing.T) {
 
 	pager := client.ShippingAddresses.ListAccount("1", nil)
 	for pager.Next() {
-		if addresses, err := pager.Fetch(context.Background()); err != nil {
+		var addresses []recurly.ShippingAddress
+		if err := pager.Fetch(context.Background(), &addresses); err != nil {
 			t.Fatal(err)
 		} else if !s.Invoked {
 			t.Fatal("expected s to be invoked")

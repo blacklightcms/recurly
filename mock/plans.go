@@ -10,7 +10,7 @@ var _ recurly.PlansService = &PlansService{}
 
 // PlansService manages the interactions for plans.
 type PlansService struct {
-	OnList      func(opts *recurly.PagerOptions) *recurly.PlansPager
+	OnList      func(opts *recurly.PagerOptions) recurly.Pager
 	ListInvoked bool
 
 	OnGet      func(ctx context.Context, code string) (*recurly.Plan, error)
@@ -26,7 +26,7 @@ type PlansService struct {
 	DeleteInvoked bool
 }
 
-func (m *PlansService) List(opts *recurly.PagerOptions) *recurly.PlansPager {
+func (m *PlansService) List(opts *recurly.PagerOptions) recurly.Pager {
 	m.ListInvoked = true
 	return m.OnList(opts)
 }

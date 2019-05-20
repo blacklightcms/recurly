@@ -10,7 +10,7 @@ var _ recurly.AdjustmentsService = &AdjustmentsService{}
 
 // AdjustmentsService manages the interactions for adjustments.
 type AdjustmentsService struct {
-	OnListAccount      func(accountCode string, opts *recurly.PagerOptions) *recurly.AdjustmentsPager
+	OnListAccount      func(accountCode string, opts *recurly.PagerOptions) recurly.Pager
 	ListAccountInvoked bool
 
 	OnGet      func(ctx context.Context, uuid string) (*recurly.Adjustment, error)
@@ -23,7 +23,7 @@ type AdjustmentsService struct {
 	DeleteInvoked bool
 }
 
-func (m *AdjustmentsService) ListAccount(accountCode string, opts *recurly.PagerOptions) *recurly.AdjustmentsPager {
+func (m *AdjustmentsService) ListAccount(accountCode string, opts *recurly.PagerOptions) recurly.Pager {
 	m.ListAccountInvoked = true
 	return m.OnListAccount(accountCode, opts)
 }

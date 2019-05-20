@@ -212,8 +212,8 @@ if err != nil {
 
 // Or iterate through each of the pages
 for pager.Next() {
-    a, err := pager.Fetch(ctx)
-    if err != nil {
+    var a []recurly.Account
+    if err := pager.Fetch(ctx, &a); err != nil {
         return err
     }
     // Do something with a
@@ -224,8 +224,8 @@ You can also let the library paginate for you and return all of the results in a
 
 ```go
 pager := client.Accounts.List(nil)
-a, err := pager.FetchAll(ctx)
-if err != nil {
+var a []recurly.Account
+if err := pager.FetchAll(ctx); err != nil {
     return err
 }
 ```

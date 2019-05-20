@@ -303,7 +303,8 @@ func TestAccounts_List(t *testing.T) {
 	})
 
 	for pager.Next() {
-		if a, err := pager.Fetch(context.Background()); err != nil {
+		var a []recurly.Account
+		if err := pager.Fetch(context.Background(), &a); err != nil {
 			t.Fatal(err)
 		} else if !s.Invoked {
 			t.Fatal("expected s to be invoked")
@@ -452,8 +453,8 @@ func TestAccounts_ListNotes(t *testing.T) {
 
 	pager := client.Accounts.ListNotes("1", nil)
 	for pager.Next() {
-		n, err := pager.Fetch(context.Background())
-		if err != nil {
+		var n []recurly.Note
+		if err := pager.Fetch(context.Background(), &n); err != nil {
 			t.Fatal(err)
 		} else if !s.Invoked {
 			t.Fatal("expected s to be invoked")

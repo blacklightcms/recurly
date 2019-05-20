@@ -17,13 +17,13 @@ type SubscriptionsService interface {
 	// optionally filter the results.
 	//
 	// https://dev.recurly.com/docs/list-subscriptions
-	List(opts *PagerOptions) *SubscriptionsPager
+	List(opts *PagerOptions) Pager
 
 	// ListAccount returns a pager to paginate subscriptions for an account.
 	// PagerOptions are used to optionally filter the results.
 	//
 	// https://dev.recurly.com/docs/list-accounts-subscriptions
-	ListAccount(accountCode string, opts *PagerOptions) *SubscriptionsPager
+	ListAccount(accountCode string, opts *PagerOptions) Pager
 
 	// Get retrieves a subscription. If the subscription does not exist,
 	// a nil subscription and nil error are returned.
@@ -318,54 +318,18 @@ func (c CustomFields) xmlFields() []customField {
 	return fields
 }
 
-// SubscriptionsPager paginates subscriptions.
-type SubscriptionsPager struct {
-	*pager
-}
-
-// Fetch fetches the next set of results.
-func (p *SubscriptionsPager) Fetch(ctx context.Context) ([]Subscription, error) {
-	var dst struct {
-		XMLName       xml.Name       `xml:"subscriptions"`
-		Subscriptions []Subscription `xml:"subscription"`
-	}
-	if err := p.fetch(ctx, &dst); err != nil {
-		return nil, err
-	}
-	return dst.Subscriptions, nil
-}
-
-// FetchAll paginates all records and returns a cumulative list.
-func (p *SubscriptionsPager) FetchAll(ctx context.Context) ([]Subscription, error) {
-	p.setMaxPerPage()
-
-	var all []Subscription
-	for p.Next() {
-		v, err := p.Fetch(ctx)
-		if err != nil {
-			return nil, err
-		}
-		all = append(all, v...)
-	}
-	return all, nil
-}
-
 var _ SubscriptionsService = &subscriptionsImpl{}
 
 // subscriptionsImpl implements SubscriptionsService.
 type subscriptionsImpl serviceImpl
 
-func (s *subscriptionsImpl) List(opts *PagerOptions) *SubscriptionsPager {
-	return &SubscriptionsPager{
-		pager: s.client.newPager("GET", "/subscriptions", opts),
-	}
+func (s *subscriptionsImpl) List(opts *PagerOptions) Pager {
+	return s.client.newPager("GET", "/subscriptions", opts)
 }
 
-func (s *subscriptionsImpl) ListAccount(accountCode string, opts *PagerOptions) *SubscriptionsPager {
+func (s *subscriptionsImpl) ListAccount(accountCode string, opts *PagerOptions) Pager {
 	path := fmt.Sprintf("/accounts/%s/subscriptions", accountCode)
-	return &SubscriptionsPager{
-		pager: s.client.newPager("GET", path, opts),
-	}
+	return s.client.newPager("GET", path, opts)
 }
 
 func (s *subscriptionsImpl) Get(ctx context.Context, uuid string) (*Subscription, error) {

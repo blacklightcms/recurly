@@ -15,7 +15,7 @@ type CouponsService interface {
 	// List returns a pager to paginate coupons. PagerOptions are used to optionally
 	// filter the results.
 	// https://dev.recurly.com/docs/list-active-coupons
-	List(opts *PagerOptions) *CouponsPager
+	List(opts *PagerOptions) Pager
 
 	// Get retrieves a coupon. If the coupon does not exist,
 	// a nil coupon and nil error is returned.
@@ -53,9 +53,9 @@ type CouponsService interface {
 	// up to 200 unique codes at a time. The endpoint can be called
 	// multiple times to create the number of coupon codes you need.
 	//
-	// The response will return a CouponsPager to view the unique codes.
+	// The response will return a Pager to view the unique codes.
 	// https://dev.recurly.com/docs/generate-unique-codes
-	Generate(ctx context.Context, code string, n int) (*CouponsPager, error)
+	Generate(ctx context.Context, code string, n int) (Pager, error)
 }
 
 // Coupon represents an individual coupon on your site.
@@ -111,51 +111,13 @@ type couponEditableFields struct {
 	MaxRedemptionsPerAccount NullInt  `xml:"max_redemptions_per_account"`
 }
 
-// CouponsPager paginates coupons.
-type CouponsPager struct {
-	*pager
-}
-
-// Fetch fetches the next set of results.
-func (p *CouponsPager) Fetch(ctx context.Context) ([]Coupon, error) {
-	var dst struct {
-		// This pager needs to process both 'coupons' and 'unique_coupon_codes'
-		// as the top-level XML tags. We intentionally don't set the xml
-		// tag name so it works with both.
-		// See the Generate() method for specifics.
-		XMLName xml.Name
-		Coupons []Coupon `xml:"coupon"`
-	}
-	if err := p.fetch(ctx, &dst); err != nil {
-		return nil, err
-	}
-	return dst.Coupons, nil
-}
-
-// FetchAll paginates all records and returns a cumulative list.
-func (p *CouponsPager) FetchAll(ctx context.Context) ([]Coupon, error) {
-	p.setMaxPerPage()
-
-	var all []Coupon
-	for p.Next() {
-		v, err := p.Fetch(ctx)
-		if err != nil {
-			return nil, err
-		}
-		all = append(all, v...)
-	}
-	return all, nil
-}
-
 var _ CouponsService = &couponsImpl{}
 
 // couponsImpl implements CouponsService.
 type couponsImpl serviceImpl
 
-func (s *couponsImpl) List(opts *PagerOptions) *CouponsPager {
-	return &CouponsPager{
-		pager: s.client.newPager("GET", "/coupons", opts),
-	}
+func (s *couponsImpl) List(opts *PagerOptions) Pager {
+	return s.client.newPager("GET", "/coupons", opts)
 }
 
 func (s *couponsImpl) Get(ctx context.Context, code string) (*Coupon, error) {
@@ -227,7 +189,7 @@ func (s *couponsImpl) Delete(ctx context.Context, code string) error {
 	return err
 }
 
-func (s *couponsImpl) Generate(ctx context.Context, code string, n int) (*CouponsPager, error) {
+func (s *couponsImpl) Generate(ctx context.Context, code string, n int) (Pager, error) {
 	path := fmt.Sprintf("/coupons/%s/generate", code)
 	req, err := s.client.newRequest("POST", path, struct {
 		XMLName             xml.Name `xml:"coupon"`
@@ -256,6 +218,5 @@ func (s *couponsImpl) Generate(ctx context.Context, code string, n int) (*Coupon
 	pager := s.client.newPager("GET", u.Path, nil)
 	pager.opts.PerPage, _ = strconv.Atoi(u.Query().Get("per_page"))
 	pager.cursor = u.Query().Get("cursor")
-
-	return &CouponsPager{pager: pager}, nil
+	return pager, nil
 }

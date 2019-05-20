@@ -12,19 +12,19 @@ type RedemptionsService interface {
 	// PagerOptions are used to optionally filter the results.
 	//
 	// https://dev.recurly.com/docs/coupon-redemption-object
-	ListAccount(accountCode string, opts *PagerOptions) *RedemptionsPager
+	ListAccount(accountCode string, opts *PagerOptions) Pager
 
 	// ListInvoice returns a pager to paginate redemptions for an invoice.
 	// PagerOptions are used to optionally filter the results.
 	//
 	// https://dev.recurly.com/docs/lookup-a-coupon-redemption-on-an-invoice
-	ListInvoice(invoiceNumber int, opts *PagerOptions) *RedemptionsPager
+	ListInvoice(invoiceNumber int, opts *PagerOptions) Pager
 
 	// ListInvoice returns a pager to paginate redemptions for an invoice.
 	// PagerOptions are used to optionally filter the results.
 	//
 	// https://dev.recurly.com/docs/lookup-a-coupon-redemption-on-a-subscription
-	ListSubscription(uuid string, opts *PagerOptions) *RedemptionsPager
+	ListSubscription(uuid string, opts *PagerOptions) Pager
 
 	// Redeem redeems a coupon on an existing customer's account to apply to
 	// their next invoice. r.AccountCode and r.Currency are required fields.
@@ -110,62 +110,24 @@ type CouponRedemption struct {
 	SubscriptionUUID string   `xml:"subscription_uuid,omitempty"` // optional, redeem to subscription
 }
 
-// RedemptionsPager paginates redemptions.
-type RedemptionsPager struct {
-	*pager
-}
-
-// Fetch fetches the next set of results.
-func (p *RedemptionsPager) Fetch(ctx context.Context) ([]Redemption, error) {
-	var dst struct {
-		XMLName     xml.Name     `xml:"redemptions"`
-		Redemptions []Redemption `xml:"redemption"`
-	}
-	if err := p.fetch(ctx, &dst); err != nil {
-		return nil, err
-	}
-	return dst.Redemptions, nil
-}
-
-// FetchAll paginates all records and returns a cumulative list.
-func (p *RedemptionsPager) FetchAll(ctx context.Context) ([]Redemption, error) {
-	p.setMaxPerPage()
-
-	var all []Redemption
-	for p.Next() {
-		v, err := p.Fetch(ctx)
-		if err != nil {
-			return nil, err
-		}
-		all = append(all, v...)
-	}
-	return all, nil
-}
-
 var _ RedemptionsService = &redemptionsImpl{}
 
 // redemptionsImpl implements RedemptionsService.
 type redemptionsImpl serviceImpl
 
-func (s *redemptionsImpl) ListAccount(accountCode string, opts *PagerOptions) *RedemptionsPager {
+func (s *redemptionsImpl) ListAccount(accountCode string, opts *PagerOptions) Pager {
 	path := fmt.Sprintf("/accounts/%s/redemptions", accountCode)
-	return &RedemptionsPager{
-		pager: s.client.newPager("GET", path, opts),
-	}
+	return s.client.newPager("GET", path, opts)
 }
 
-func (s *redemptionsImpl) ListInvoice(invoiceNumber int, opts *PagerOptions) *RedemptionsPager {
+func (s *redemptionsImpl) ListInvoice(invoiceNumber int, opts *PagerOptions) Pager {
 	path := fmt.Sprintf("/invoices/%d/redemptions", invoiceNumber)
-	return &RedemptionsPager{
-		pager: s.client.newPager("GET", path, opts),
-	}
+	return s.client.newPager("GET", path, opts)
 }
 
-func (s *redemptionsImpl) ListSubscription(uuid string, opts *PagerOptions) *RedemptionsPager {
+func (s *redemptionsImpl) ListSubscription(uuid string, opts *PagerOptions) Pager {
 	path := fmt.Sprintf("/subscriptions/%s/redemptions", sanitizeUUID(uuid))
-	return &RedemptionsPager{
-		pager: s.client.newPager("GET", path, opts),
-	}
+	return s.client.newPager("GET", path, opts)
 }
 
 func (s *redemptionsImpl) Redeem(ctx context.Context, code string, r CouponRedemption) (*Redemption, error) {

@@ -13,7 +13,7 @@ type PlansService interface {
 	// filter the results.
 	//
 	// https://dev.recurly.com/docs/list-plans
-	List(opts *PagerOptions) *PlansPager
+	List(opts *PagerOptions) Pager
 
 	// Get retrieves a plan. If the plan does not exist,
 	// a nil plan and nil error are returned.
@@ -67,47 +67,13 @@ type Plan struct {
 	SetupFeeInCents          UnitAmount `xml:"setup_fee_in_cents,omitempty"`
 }
 
-// PlansPager paginates accounts.
-type PlansPager struct {
-	*pager
-}
-
-// Fetch fetches the next set of results.
-func (p *PlansPager) Fetch(ctx context.Context) ([]Plan, error) {
-	var dst struct {
-		XMLName xml.Name `xml:"plans"`
-		Plans   []Plan   `xml:"plan"`
-	}
-	if err := p.fetch(ctx, &dst); err != nil {
-		return nil, err
-	}
-	return dst.Plans, nil
-}
-
-// FetchAll paginates all records and returns a cumulative list.
-func (p *PlansPager) FetchAll(ctx context.Context) ([]Plan, error) {
-	p.setMaxPerPage()
-
-	var all []Plan
-	for p.Next() {
-		v, err := p.Fetch(ctx)
-		if err != nil {
-			return nil, err
-		}
-		all = append(all, v...)
-	}
-	return all, nil
-}
-
 var _ PlansService = &plansImpl{}
 
 // plansImpl implements PlansService.
 type plansImpl serviceImpl
 
-func (s *plansImpl) List(opts *PagerOptions) *PlansPager {
-	return &PlansPager{
-		pager: s.client.newPager("GET", "/plans", opts),
-	}
+func (s *plansImpl) List(opts *PagerOptions) Pager {
+	return s.client.newPager("GET", "/plans", opts)
 }
 
 func (s *plansImpl) Get(ctx context.Context, code string) (*Plan, error) {

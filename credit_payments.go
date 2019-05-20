@@ -13,13 +13,13 @@ type CreditPaymentsService interface {
 	// filter the results.
 	//
 	// https://dev.recurly.com/docs/list-credit-payments
-	List(opts *PagerOptions) *CreditPaymentsPager
+	List(opts *PagerOptions) Pager
 
 	// ListAccount returns a pager to paginate credit payments for an account.
 	// PagerOptions are used to optionally filter the results.
 	//
 	// https://dev.recurly.com/docs/list-credit-payments
-	ListAccount(accountCode string, opts *PagerOptions) *CreditPaymentsPager
+	ListAccount(accountCode string, opts *PagerOptions) Pager
 
 	// Get retrieves a credit payment. If the credit payment does not exist,
 	// a nil credit payment and nil error are returned.
@@ -84,54 +84,18 @@ func (c *CreditPayment) UnmarshalXML(d *xml.Decoder, start xml.StartElement) err
 	return nil
 }
 
-// CreditPaymentsPager paginates credit payments.
-type CreditPaymentsPager struct {
-	*pager
-}
-
-// Fetch fetches the next set of results.
-func (p *CreditPaymentsPager) Fetch(ctx context.Context) ([]CreditPayment, error) {
-	var dst struct {
-		XMLName        xml.Name        `xml:"credit_payments"`
-		CreditPayments []CreditPayment `xml:"credit_payment"`
-	}
-	if err := p.fetch(ctx, &dst); err != nil {
-		return nil, err
-	}
-	return dst.CreditPayments, nil
-}
-
-// FetchAll paginates all records and returns a cumulative list.
-func (p *CreditPaymentsPager) FetchAll(ctx context.Context) ([]CreditPayment, error) {
-	p.setMaxPerPage()
-
-	var all []CreditPayment
-	for p.Next() {
-		v, err := p.Fetch(ctx)
-		if err != nil {
-			return nil, err
-		}
-		all = append(all, v...)
-	}
-	return all, nil
-}
-
 var _ CreditPaymentsService = &creditInvoicesImpl{}
 
 // creditInvoicesImpl implements CreditPaymentsService.
 type creditInvoicesImpl serviceImpl
 
-func (s *creditInvoicesImpl) List(opts *PagerOptions) *CreditPaymentsPager {
-	return &CreditPaymentsPager{
-		pager: s.client.newPager("GET", "/credit_payments", opts),
-	}
+func (s *creditInvoicesImpl) List(opts *PagerOptions) Pager {
+	return s.client.newPager("GET", "/credit_payments", opts)
 }
 
-func (s *creditInvoicesImpl) ListAccount(accountCode string, opts *PagerOptions) *CreditPaymentsPager {
+func (s *creditInvoicesImpl) ListAccount(accountCode string, opts *PagerOptions) Pager {
 	path := fmt.Sprintf("/accounts/%s/credit_payments", accountCode)
-	return &CreditPaymentsPager{
-		pager: s.client.newPager("GET", path, opts),
-	}
+	return s.client.newPager("GET", path, opts)
 }
 
 func (s *creditInvoicesImpl) Get(ctx context.Context, uuid string) (*CreditPayment, error) {

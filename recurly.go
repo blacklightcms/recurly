@@ -380,7 +380,9 @@ func (e *RateLimitError) Error() string {
 // ClientError occurs when Recurly returns 400-499 status code.
 // There are two known exceptions to this:
 // 1) 429 Too Many Requests. See RateLimitError.
-// 2) 422 Unprocessable Entity with a failed transaction. See TransactionFailedError.
+// 2) 422 Unprocessable Entity if a failed transaction occurred. See TransactionFailedError.
+// All other 422 responses not related to failed transactions will return
+// ClientError.
 type ClientError struct {
 	Response *http.Response
 

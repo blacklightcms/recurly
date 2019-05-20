@@ -11,10 +11,10 @@ var _ recurly.InvoicesService = &InvoicesService{}
 
 // InvoicesService manages the interactions for invoices.
 type InvoicesService struct {
-	OnList      func(opts *recurly.PagerOptions) *recurly.InvoicesPager
+	OnList      func(opts *recurly.PagerOptions) recurly.Pager
 	ListInvoked bool
 
-	OnListAccount      func(accountCode string, opts *recurly.PagerOptions) *recurly.InvoicesPager
+	OnListAccount      func(accountCode string, opts *recurly.PagerOptions) recurly.Pager
 	ListAccountInvoked bool
 
 	OnGet      func(ctx context.Context, invoiceNumber int) (*recurly.Invoice, error)
@@ -51,12 +51,12 @@ type InvoicesService struct {
 	RecordPaymentInvoked bool
 }
 
-func (m *InvoicesService) List(opts *recurly.PagerOptions) *recurly.InvoicesPager {
+func (m *InvoicesService) List(opts *recurly.PagerOptions) recurly.Pager {
 	m.ListInvoked = true
 	return m.OnList(opts)
 }
 
-func (m *InvoicesService) ListAccount(accountCode string, opts *recurly.PagerOptions) *recurly.InvoicesPager {
+func (m *InvoicesService) ListAccount(accountCode string, opts *recurly.PagerOptions) recurly.Pager {
 	m.ListAccountInvoked = true
 	return m.OnListAccount(accountCode, opts)
 }

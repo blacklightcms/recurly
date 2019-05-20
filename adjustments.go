@@ -13,7 +13,7 @@ type AdjustmentsService interface {
 	// used to optionally filter the results.
 	//
 	// https://dev.recurly.com/docs/list-an-accounts-adjustments
-	ListAccount(accountCode string, opts *PagerOptions) *AdjustmentsPager
+	ListAccount(accountCode string, opts *PagerOptions) Pager
 
 	// Get retrieves an adjustment. If the add on does not exist,
 	// a nil account and nil error is returned.
@@ -157,48 +157,14 @@ type TaxDetail struct {
 	TaxInCents int      `xml:"tax_in_cents,omitempty"`
 }
 
-// AdjustmentsPager paginates adjustments.
-type AdjustmentsPager struct {
-	*pager
-}
-
-// Fetch fetches the next set of results.
-func (p *AdjustmentsPager) Fetch(ctx context.Context) ([]Adjustment, error) {
-	var dst struct {
-		XMLName     xml.Name     `xml:"adjustments"`
-		Adjustments []Adjustment `xml:"adjustment"`
-	}
-	if err := p.fetch(ctx, &dst); err != nil {
-		return nil, err
-	}
-	return dst.Adjustments, nil
-}
-
-// FetchAll paginates all records and returns a cumulative list.
-func (p *AdjustmentsPager) FetchAll(ctx context.Context) ([]Adjustment, error) {
-	p.setMaxPerPage()
-
-	var all []Adjustment
-	for p.Next() {
-		v, err := p.Fetch(ctx)
-		if err != nil {
-			return nil, err
-		}
-		all = append(all, v...)
-	}
-	return all, nil
-}
-
 var _ AdjustmentsService = &adjustmentsImpl{}
 
 // adjustmentsImpl implements AdjustmentsService.
 type adjustmentsImpl serviceImpl
 
-func (s *adjustmentsImpl) ListAccount(accountCode string, opts *PagerOptions) *AdjustmentsPager {
+func (s *adjustmentsImpl) ListAccount(accountCode string, opts *PagerOptions) Pager {
 	path := fmt.Sprintf("/accounts/%s/adjustments", accountCode)
-	return &AdjustmentsPager{
-		pager: s.client.newPager("GET", path, opts),
-	}
+	return s.client.newPager("GET", path, opts)
 }
 
 func (s *adjustmentsImpl) Get(ctx context.Context, uuid string) (*Adjustment, error) {

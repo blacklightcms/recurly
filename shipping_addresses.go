@@ -12,7 +12,7 @@ type ShippingAddressesService interface {
 	// PagerOptions are used to optionally filter the results.
 	//
 	// https://dev.recurly.com/docs/list-accounts-shipping-address
-	ListAccount(accountCode string, opts *PagerOptions) *ShippingAddressesPager
+	ListAccount(accountCode string, opts *PagerOptions) Pager
 
 	// Create creates a new shipping address on an existing account.
 	// Note: A shipping address can also be created via Accounts.Create()
@@ -53,48 +53,14 @@ type ShippingAddress struct {
 	UpdatedAt NullTime `xml:"updated_at,omitempty"`
 }
 
-// ShippingAddressesPager paginates shipping addresses.
-type ShippingAddressesPager struct {
-	*pager
-}
-
-// Fetch fetches the next set of results.
-func (p *ShippingAddressesPager) Fetch(ctx context.Context) ([]ShippingAddress, error) {
-	var dst struct {
-		XMLName          xml.Name          `xml:"shipping_addresses"`
-		ShippingAddresss []ShippingAddress `xml:"shipping_address"`
-	}
-	if err := p.fetch(ctx, &dst); err != nil {
-		return nil, err
-	}
-	return dst.ShippingAddresss, nil
-}
-
-// FetchAll paginates all records and returns a cumulative list.
-func (p *ShippingAddressesPager) FetchAll(ctx context.Context) ([]ShippingAddress, error) {
-	p.setMaxPerPage()
-
-	var all []ShippingAddress
-	for p.Next() {
-		v, err := p.Fetch(ctx)
-		if err != nil {
-			return nil, err
-		}
-		all = append(all, v...)
-	}
-	return all, nil
-}
-
 var _ ShippingAddressesService = &shippingAddressesImpl{}
 
 // shippingAddressessImpl implements ShippingAddressesService.
 type shippingAddressesImpl serviceImpl
 
-func (s *shippingAddressesImpl) ListAccount(accountCode string, opts *PagerOptions) *ShippingAddressesPager {
+func (s *shippingAddressesImpl) ListAccount(accountCode string, opts *PagerOptions) Pager {
 	path := fmt.Sprintf("accounts/%s/shipping_addresses", accountCode)
-	return &ShippingAddressesPager{
-		pager: s.client.newPager("GET", path, opts),
-	}
+	return s.client.newPager("GET", path, opts)
 }
 
 func (s *shippingAddressesImpl) Create(ctx context.Context, accountCode string, shippingAddress ShippingAddress) (*ShippingAddress, error) {

@@ -11,10 +11,10 @@ var _ recurly.SubscriptionsService = &SubscriptionsService{}
 
 // SubscriptionsService mocks the subscription service.
 type SubscriptionsService struct {
-	OnList      func(opts *recurly.PagerOptions) *recurly.SubscriptionsPager
+	OnList      func(opts *recurly.PagerOptions) recurly.Pager
 	ListInvoked bool
 
-	OnListAccount      func(accountCode string, opts *recurly.PagerOptions) *recurly.SubscriptionsPager
+	OnListAccount      func(accountCode string, opts *recurly.PagerOptions) recurly.Pager
 	ListAccountInvoked bool
 
 	OnGet      func(ctx context.Context, uuid string) (*recurly.Subscription, error)
@@ -54,12 +54,12 @@ type SubscriptionsService struct {
 	ResumeInvoked bool
 }
 
-func (m *SubscriptionsService) List(opts *recurly.PagerOptions) *recurly.SubscriptionsPager {
+func (m *SubscriptionsService) List(opts *recurly.PagerOptions) recurly.Pager {
 	m.ListInvoked = true
 	return m.OnList(opts)
 }
 
-func (m *SubscriptionsService) ListAccount(accountCode string, opts *recurly.PagerOptions) *recurly.SubscriptionsPager {
+func (m *SubscriptionsService) ListAccount(accountCode string, opts *recurly.PagerOptions) recurly.Pager {
 	m.ListAccountInvoked = true
 	return m.OnListAccount(accountCode, opts)
 }

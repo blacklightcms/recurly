@@ -202,7 +202,8 @@ func TestCoupons_List(t *testing.T) {
 
 	pager := client.Coupons.List(nil)
 	for pager.Next() {
-		if coupons, err := pager.Fetch(context.Background()); err != nil {
+		var coupons []recurly.Coupon
+		if err := pager.Fetch(context.Background(), &coupons); err != nil {
 			t.Fatal(err)
 		} else if !s.Invoked {
 			t.Fatal("expected s to be invoked")
@@ -452,7 +453,8 @@ func TestCoupons_Generate(t *testing.T) {
 
 	// Test pager.
 	for pager.Next() {
-		if coupons, err := pager.Fetch(context.Background()); err != nil {
+		var coupons []recurly.Coupon
+		if err := pager.Fetch(context.Background(), &coupons); err != nil {
 			t.Fatal(err)
 		} else if !s.Invoked {
 			t.Fatal("expected s to be invoked")

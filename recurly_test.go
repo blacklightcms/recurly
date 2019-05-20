@@ -171,7 +171,8 @@ func TestClient(t *testing.T) {
 		})
 
 		pager.Next()
-		if _, err := pager.Fetch(context.Background()); err != nil {
+		var a []recurly.Account
+		if err := pager.Fetch(context.Background(), &a); err != nil {
 			t.Fatal(err)
 		}
 	})

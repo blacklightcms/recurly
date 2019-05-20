@@ -14,13 +14,13 @@ type InvoicesService interface {
 	// filter the results.
 	//
 	// https://dev.recurly.com/docs/list-invoices
-	List(opts *PagerOptions) *InvoicesPager
+	List(opts *PagerOptions) Pager
 
 	// ListAccount returns a pager to paginate invoices for an account. Params
 	// are used to optionally filter the results.
 	//
 	// https://dev.recurly.com/docs/list-an-accounts-invoices
-	ListAccount(accountCode string, opts *PagerOptions) *InvoicesPager
+	ListAccount(accountCode string, opts *PagerOptions) Pager
 
 	// Get retrieves an invoice. If the invoice does not exist,
 	// a nil invoice and nil error are returned.
@@ -355,54 +355,18 @@ type VoidLineItem struct {
 	Prorate  NullBool `xml:"prorate,omitempty"`
 }
 
-// InvoicesPager paginates invoices.
-type InvoicesPager struct {
-	*pager
-}
-
-// Fetch fetches the next set of results.
-func (p *InvoicesPager) Fetch(ctx context.Context) ([]Invoice, error) {
-	var dst struct {
-		XMLName  xml.Name  `xml:"invoices"`
-		Invoices []Invoice `xml:"invoice"`
-	}
-	if err := p.fetch(ctx, &dst); err != nil {
-		return nil, err
-	}
-	return dst.Invoices, nil
-}
-
-// FetchAll paginates all records and returns a cumulative list.
-func (p *InvoicesPager) FetchAll(ctx context.Context) ([]Invoice, error) {
-	p.setMaxPerPage()
-
-	var all []Invoice
-	for p.Next() {
-		v, err := p.Fetch(ctx)
-		if err != nil {
-			return nil, err
-		}
-		all = append(all, v...)
-	}
-	return all, nil
-}
-
 var _ InvoicesService = &invoicesImpl{}
 
 // invoicesImpl implements InvoicesService.
 type invoicesImpl serviceImpl
 
-func (s *invoicesImpl) List(opts *PagerOptions) *InvoicesPager {
-	return &InvoicesPager{
-		pager: s.client.newPager("GET", "/invoices", opts),
-	}
+func (s *invoicesImpl) List(opts *PagerOptions) Pager {
+	return s.client.newPager("GET", "/invoices", opts)
 }
 
-func (s *invoicesImpl) ListAccount(accountCode string, opts *PagerOptions) *InvoicesPager {
+func (s *invoicesImpl) ListAccount(accountCode string, opts *PagerOptions) Pager {
 	path := fmt.Sprintf("/accounts/%s/invoices", accountCode)
-	return &InvoicesPager{
-		pager: s.client.newPager("GET", path, opts),
-	}
+	return s.client.newPager("GET", path, opts)
 }
 
 func (s *invoicesImpl) Get(ctx context.Context, invoiceNumber int) (*Invoice, error) {

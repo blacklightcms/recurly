@@ -24,7 +24,8 @@ func TestInvoices_List(t *testing.T) {
 
 	pager := client.Invoices.List(nil)
 	for pager.Next() {
-		if invoices, err := pager.Fetch(context.Background()); err != nil {
+		var invoices []recurly.Invoice
+		if err := pager.Fetch(context.Background(), &invoices); err != nil {
 			t.Fatal(err)
 		} else if !s.Invoked {
 			t.Fatal("expected s to be invoked")
@@ -50,7 +51,8 @@ func TestInvoices_ListAccount(t *testing.T) {
 
 	pager := client.Invoices.ListAccount("1", nil)
 	for pager.Next() {
-		if invoices, err := pager.Fetch(context.Background()); err != nil {
+		var invoices []recurly.Invoice
+		if err := pager.Fetch(context.Background(), &invoices); err != nil {
 			t.Fatal(err)
 		} else if !s.Invoked {
 			t.Fatal("expected s to be invoked")
