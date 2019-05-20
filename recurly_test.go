@@ -306,6 +306,7 @@ func TestClient_ClientErrors(t *testing.T) {
 					<?xml version="1.0" encoding="UTF-8"?>
 					<errors>
 						<error field="model_name.field_name" symbol="not_a_number" lang="en-US">is not a number</error>
+						<error field="subscription.base" symbol="already_subscribed">You already have a subscription to this plan.</error>
 					</errors>
 				`))
 			}, t)
@@ -321,11 +322,18 @@ func TestClient_ClientErrors(t *testing.T) {
 				t.Fatal("expected *http.Response")
 			} else if e.Response.StatusCode != http.StatusUnprocessableEntity {
 				t.Fatalf("unexpected status code: %d", e.Response.StatusCode)
-			} else if diff := cmp.Diff(e.ValidationErrors, []recurly.ValidationError{{
-				Field:       "model_name.field_name",
-				Symbol:      "not_a_number",
-				Description: "is not a number",
-			}}); diff != "" {
+			} else if diff := cmp.Diff(e.ValidationErrors, []recurly.ValidationError{
+				{
+					Field:       "model_name.field_name",
+					Symbol:      "not_a_number",
+					Description: "is not a number",
+				},
+				{
+					Field:       "subscription.base",
+					Symbol:      "already_subscribed",
+					Description: "You already have a subscription to this plan.",
+				},
+			}); diff != "" {
 				t.Fatal(diff)
 			}
 		})

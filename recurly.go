@@ -335,12 +335,15 @@ func (r *response) parseClientError(v interface{}) error {
 		}
 
 		clientErr := &ClientError{Response: r.Response}
-		if e.Error.Description != "" || e.Error.Field != "" || e.Error.Symbol != "" {
-			clientErr.ValidationErrors = []ValidationError{{
-				Description: e.Error.Description,
-				Field:       e.Error.Field,
-				Symbol:      e.Error.Symbol,
-			}}
+		if len(e.Errors) > 0 {
+			clientErr.ValidationErrors = make([]ValidationError, len(e.Errors))
+			for i := range e.Errors {
+				clientErr.ValidationErrors[i] = ValidationError{
+					Description: e.Errors[i].Description,
+					Field:       e.Errors[i].Field,
+					Symbol:      e.Errors[i].Symbol,
+				}
+			}
 		}
 		return clientErr
 	}
@@ -481,7 +484,7 @@ type xmlSingleError struct {
 // xmlMultiErrors is a collection of various errors.
 type xmlMultiErrors struct {
 	XMLName xml.Name `xml:"errors"`
-	Error   struct {
+	Errors  []struct {
 		Description string `xml:",innerxml"`
 		Field       string `xml:"field,attr"`
 		Symbol      string `xml:"symbol,attr"`
