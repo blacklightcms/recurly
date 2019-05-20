@@ -39,6 +39,14 @@ func (n NullBool) Bool() bool {
 	return n.value
 }
 
+// BoolPtr returns a pointer to the bool value, or nil if the value is not valid.
+func (n NullBool) BoolPtr() *bool {
+	if n.valid {
+		return &n.value
+	}
+	return nil
+}
+
 // Value returns the value of NullBool. The value should only be considered
 // valid if ok returns true.
 func (n NullBool) Value() (value bool, ok bool) {
@@ -103,6 +111,14 @@ func NewIntPtr(i *int) NullInt {
 // you need to know whether the value is valid.
 func (n NullInt) Int() int {
 	return n.value
+}
+
+// IntPtr returns a pointer to the int value, or nil if the value is not valid.
+func (n NullInt) IntPtr() *int {
+	if n.valid {
+		return &n.value
+	}
+	return nil
 }
 
 // Value returns the value of NullInt. The value should only be considered
@@ -179,6 +195,14 @@ func NewTimePtr(t *time.Time) NullTime {
 // you need to know whether the value is valid.
 func (n NullTime) Time() time.Time {
 	return n.value
+}
+
+// TimePtr returns a pointer to the time.Time value, or nil if the value is not valid.
+func (n NullTime) TimePtr() *time.Time {
+	if n.valid {
+		return &n.value
+	}
+	return nil
 }
 
 // Value returns the value of NullTime. The value should only be considered

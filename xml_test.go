@@ -17,6 +17,12 @@ func TestXML_NullBool(t *testing.T) {
 		} else if value != false {
 			t.Fatal("expected false")
 		}
+
+		if b.Bool() != false {
+			t.Fatalf("unexpected value: %t", b.Bool())
+		} else if ptr := b.BoolPtr(); ptr != nil {
+			t.Fatalf("expected nil: %#v", ptr)
+		}
 	})
 
 	t.Run("True", func(t *testing.T) {
@@ -26,6 +32,14 @@ func TestXML_NullBool(t *testing.T) {
 		} else if value != true {
 			t.Fatal("expected true")
 		}
+
+		if b.Bool() != true {
+			t.Fatalf("unexpected value: %t", b.Bool())
+		} else if ptr := b.BoolPtr(); ptr == nil {
+			t.Fatal("expected non-nil value")
+		} else if *ptr != true {
+			t.Fatalf("unexpected value: %#v", ptr)
+		}
 	})
 
 	t.Run("False", func(t *testing.T) {
@@ -34,6 +48,14 @@ func TestXML_NullBool(t *testing.T) {
 			t.Fatal("expected ok to be true")
 		} else if value != false {
 			t.Fatal("expected false")
+		}
+
+		if b.Bool() != false {
+			t.Fatalf("unexpected value: %t", b.Bool())
+		} else if ptr := b.BoolPtr(); ptr == nil {
+			t.Fatal("expected non-nil value")
+		} else if *ptr != false {
+			t.Fatalf("unexpected value: %#v", ptr)
 		}
 	})
 
@@ -114,6 +136,12 @@ func TestXML_NullInt(t *testing.T) {
 		} else if value != 0 {
 			t.Fatalf("unexpected value: %d", value)
 		}
+
+		if i.Int() != 0 {
+			t.Fatalf("unexpected value: %d", i.Int())
+		} else if ptr := i.IntPtr(); ptr != nil {
+			t.Fatalf("expected nil: %#v", ptr)
+		}
 	})
 
 	i := recurly.NewInt(1)
@@ -123,11 +151,27 @@ func TestXML_NullInt(t *testing.T) {
 		t.Fatalf("unexpected value: %d", value)
 	}
 
+	if i.Int() != 1 {
+		t.Fatalf("unexpected value: %d", i.Int())
+	} else if ptr := i.IntPtr(); ptr == nil {
+		t.Fatal("expected non-nil value")
+	} else if *ptr != 1 {
+		t.Fatalf("unexpected value: %#v", ptr)
+	}
+
 	i = recurly.NewInt(0)
 	if value, ok := i.Value(); !ok {
 		t.Fatal("expected ok to be true")
 	} else if value != 0 {
 		t.Fatalf("unexpected value: %d", value)
+	}
+
+	if i.Int() != 0 {
+		t.Fatalf("unexpected value: %d", i.Int())
+	} else if ptr := i.IntPtr(); ptr == nil {
+		t.Fatal("expected non-nil value")
+	} else if *ptr != 0 {
+		t.Fatalf("unexpected value: %#v", ptr)
 	}
 
 	type testStruct struct {
@@ -197,6 +241,12 @@ func TestXML_NullTime(t *testing.T) {
 		} else if !value.IsZero() {
 			t.Fatalf("expected zero time: %s", value.String())
 		}
+
+		if !rt.Time().IsZero() {
+			t.Fatalf("unexpected value: %#v", rt.Time())
+		} else if ptr := rt.TimePtr(); ptr != nil {
+			t.Fatalf("expected nil value: %#v", ptr)
+		}
 	})
 
 	v := MustParseTime("2011-10-25T12:00:00Z")
@@ -206,6 +256,14 @@ func TestXML_NullTime(t *testing.T) {
 		t.Fatal("expected ok to be true")
 	} else if !value.Equal(v) {
 		t.Fatalf("unexpected value: %v", value)
+	}
+
+	if !rt.Time().Equal(v) {
+		t.Fatalf("unexpected value: %#v", rt.Time())
+	} else if ptr := rt.TimePtr(); ptr == nil {
+		t.Fatal("expected non-nil value")
+	} else if !ptr.Equal(v) {
+		t.Fatalf("unexpected value: %#v", ptr)
 	}
 
 	t.Run("Encode", func(t *testing.T) {
