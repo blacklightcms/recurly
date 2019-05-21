@@ -475,11 +475,11 @@ func (s *invoicesImpl) MarkFailed(ctx context.Context, invoiceNumber int) (*Invo
 		return nil, err
 	}
 
-	var dst Invoice
+	var dst InvoiceCollection
 	if _, err := s.client.do(ctx, req, &dst); err != nil {
 		return nil, err
 	}
-	return &dst, nil
+	return dst.ChargeInvoice, nil
 }
 
 func (s *invoicesImpl) RefundVoidLineItems(ctx context.Context, invoiceNumber int, refund InvoiceLineItemsRefund) (*Invoice, error) {

@@ -244,7 +244,7 @@ func TestInvoices_MarkFailed(t *testing.T) {
 
 	s.HandleFunc("PUT", "/v2/invoices/1010/mark_failed", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write(MustOpenFile("invoice.xml"))
+		w.Write(MustOpenFile("invoice_collection.xml"))
 	}, t)
 
 	if invoice, err := client.Invoices.MarkFailed(context.Background(), 1010); !s.Invoked {
