@@ -16,7 +16,7 @@ type AddOnsService interface {
 	List(planCode string, opts *PagerOptions) Pager
 
 	// Get retrieves an add-on. If the add-on does not exist,
-	// a nil account and nil error is returned.
+	// a nil add-on and nil error are returned.
 	//
 	// https://dev.recurly.com/docs/lookup-an-add-on
 	Get(ctx context.Context, planCode string, code string) (*AddOn, error)

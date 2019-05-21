@@ -14,16 +14,19 @@ import (
 type CouponsService interface {
 	// List returns a pager to paginate coupons. PagerOptions are used to optionally
 	// filter the results.
+	//
 	// https://dev.recurly.com/docs/list-active-coupons
 	List(opts *PagerOptions) Pager
 
 	// Get retrieves a coupon. If the coupon does not exist,
-	// a nil coupon and nil error is returned.
+	// a nil coupon and nil error are returned.
+	//
 	// https://dev.recurly.com/docs/lookup-a-coupon
 	Get(ctx context.Context, code string) (*Coupon, error)
 
 	// Create creates a new coupon. Please note: coupons cannot be updated
 	// after being created.
+	//
 	// https://dev.recurly.com/docs/create-coupon
 	Create(ctx context.Context, c Coupon) (*Coupon, error)
 
@@ -45,6 +48,7 @@ type CouponsService interface {
 	Restore(ctx context.Context, code string, c Coupon) (*Coupon, error)
 
 	// Delete expires a coupon so customers can no longer redeem it.
+	//
 	// https://dev.recurly.com/docs/deactivate-coupon
 	Delete(ctx context.Context, code string) error
 
@@ -61,7 +65,7 @@ type CouponsService interface {
 // Coupon represents an individual coupon on your site.
 type Coupon struct {
 	XMLName                  xml.Name    `xml:"coupon"`
-	ID                       int         `xml:"id,omitempty"`
+	ID                       int64       `xml:"id,omitempty"`
 	Code                     string      `xml:"coupon_code"`
 	Type                     string      `xml:"coupon_type,omitempty"`
 	Name                     string      `xml:"name"`

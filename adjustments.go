@@ -16,7 +16,7 @@ type AdjustmentsService interface {
 	ListAccount(accountCode string, opts *PagerOptions) Pager
 
 	// Get retrieves an adjustment. If the add on does not exist,
-	// a nil account and nil error is returned.
+	// a nil adjustment and nil error are returned.
 	//
 	// NOTE: Link below is from v2.9, the last documented version showing
 	// this endpoint. The endpoint appears to still be valid in v2.19, waiting
