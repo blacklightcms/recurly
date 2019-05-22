@@ -180,7 +180,13 @@ type NewSubscription struct {
 	CustomerNotes           string               `xml:"customer_notes,omitempty"`
 	VATReverseChargeNotes   string               `xml:"vat_reverse_charge_notes,omitempty"`
 	BankAccountAuthorizedAt NullTime             `xml:"bank_account_authorized_at,omitempty"`
+	RevenueScheduleType     string               `xml:"revenue_schedule_type,omitempty"`
+	ShippingAddress         *ShippingAddress     `xml:"shipping_address,omitempty"`
+	ShippingAddressID       int64                `xml:"shipping_address_id,omitempty"`
+	ImportedTrial           NullBool             `xml:"imported_trial,omitempty"`
 	GatewayCode             string               `xml:"gateway_code,omitempty"`
+	ShippingMethodCode      string               `xml:"shipping_method_code,omitempty"`
+	ShippingAmountInCents   NullInt              `xml:"shipping_amount_in_cents,omitempty"`
 	CustomFields            *CustomFields        `xml:"custom_fields,omitempty"`
 }
 

@@ -17,7 +17,9 @@ import (
 )
 
 // apiVersion is the API version in use by this client.
-const apiVersion = "2.18"
+// NOTE: v2.19:
+//		- Parent/child accounts not yet implemented.
+const apiVersion = "2.20"
 
 // uaVersion is the userAgent sent to Recurly so they can track usage of this library.
 const uaVersion = "2019-05-15"
@@ -50,17 +52,18 @@ type Client struct {
 	// Services used for talking with different parts of the Recurly API
 	Accounts          AccountsService
 	Adjustments       AdjustmentsService
+	AddOns            AddOnsService
 	Billing           BillingService
 	Coupons           CouponsService
-	Redemptions       RedemptionsService
+	CreditPayments    CreditPaymentsService
 	Invoices          InvoicesService
 	Plans             PlansService
-	AddOns            AddOnsService
+	Purchases         PurchasesService
+	Redemptions       RedemptionsService
 	ShippingAddresses ShippingAddressesService
+	ShippingMethods   ShippingMethodsService
 	Subscriptions     SubscriptionsService
 	Transactions      TransactionsService
-	CreditPayments    CreditPaymentsService
-	Purchases         PurchasesService
 }
 
 type serviceImpl struct {
@@ -71,8 +74,8 @@ type serviceImpl struct {
 // By default this uses http.DefaultClient, so there are no timeouts configured.
 // It's recommended you set your own HTTP client with reasonable timeouts
 // for your application.
-func NewClient(subDomain, apiKey string) *Client {
-	baseEndpoint, _ := url.Parse(fmt.Sprintf("https://%s.recurly.com/", subDomain))
+func NewClient(subdomain, apiKey string) *Client {
+	baseEndpoint, _ := url.Parse(fmt.Sprintf("https://%s.recurly.com/", subdomain))
 	client := &Client{
 		Client: http.DefaultClient,
 
@@ -90,17 +93,18 @@ func NewClient(subDomain, apiKey string) *Client {
 
 	client.Accounts = &accountsImpl{client: client}
 	client.Adjustments = &adjustmentsImpl{client: client}
+	client.AddOns = &addOnsImpl{client: client}
 	client.Billing = &billingImpl{client: client}
 	client.Coupons = &couponsImpl{client: client}
-	client.Redemptions = &redemptionsImpl{client: client}
+	client.CreditPayments = &creditInvoicesImpl{client: client}
 	client.Invoices = &invoicesImpl{client: client}
 	client.Plans = &plansImpl{client: client}
-	client.AddOns = &addOnsImpl{client: client}
-	client.Subscriptions = &subscriptionsImpl{client: client}
-	client.ShippingAddresses = &shippingAddressesImpl{client: client}
-	client.Transactions = &transactionsImpl{client: client}
-	client.CreditPayments = &creditInvoicesImpl{client: client}
 	client.Purchases = &purchasesImpl{client: client}
+	client.Redemptions = &redemptionsImpl{client: client}
+	client.ShippingAddresses = &shippingAddressesImpl{client: client}
+	client.ShippingMethods = &shippingMethodsImpl{client: client}
+	client.Subscriptions = &subscriptionsImpl{client: client}
+	client.Transactions = &transactionsImpl{client: client}
 	return client
 }
 

@@ -121,6 +121,7 @@ func (p *pager) Fetch(ctx context.Context, dst interface{}) error {
 		Plan            []Plan            `xml:"plan"`
 		Redemption      []Redemption      `xml:"redemption"`
 		ShippingAddress []ShippingAddress `xml:"shipping_address"`
+		ShippingMethod  []ShippingMethod  `xml:"shipping_method"`
 		Subscription    []Subscription    `xml:"subscription"`
 		Transaction     []Transaction     `xml:"transaction"`
 	}
@@ -156,6 +157,8 @@ func (p *pager) Fetch(ctx context.Context, dst interface{}) error {
 		*v = unmarshaler.Redemption
 	case *[]ShippingAddress:
 		*v = unmarshaler.ShippingAddress
+	case *[]ShippingMethod:
+		*v = unmarshaler.ShippingMethod
 	case *[]Subscription:
 		*v = unmarshaler.Subscription
 	case *[]Transaction:
@@ -267,6 +270,16 @@ func (p *pager) FetchAll(ctx context.Context, dst interface{}) error {
 		var all []ShippingAddress
 		for p.Next() {
 			var dst []ShippingAddress
+			if err := p.Fetch(ctx, &dst); err != nil {
+				return err
+			}
+			all = append(all, dst...)
+		}
+		*v = all
+	case *[]ShippingMethod:
+		var all []ShippingMethod
+		for p.Next() {
+			var dst []ShippingMethod
 			if err := p.Fetch(ctx, &dst); err != nil {
 				return err
 			}

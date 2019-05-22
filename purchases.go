@@ -49,6 +49,7 @@ type PurchasesService interface {
 
 // Purchase represents an individual checkout holding at least one
 // subscription OR one adjustment.
+// NOTE: Adjustments cannot contain a Currency field. Use Purchase.Currency instead.
 type Purchase struct {
 	XMLName               xml.Name               `xml:"purchase"`
 	Account               Account                `xml:"account,omitempty"`
@@ -63,26 +64,38 @@ type Purchase struct {
 	CustomerNotes         string                 `xml:"customer_notes,omitempty"`
 	TermsAndConditions    string                 `xml:"terms_and_conditions,omitempty"`
 	VATReverseChargeNotes string                 `xml:"vat_reverse_charge_notes,omitempty"`
-	ShippingAddressID     int                    `xml:"shipping_address_id,omitempty"`
+	ShippingAddressID     int64                  `xml:"shipping_address_id,omitempty"`
 	GatewayCode           string                 `xml:"gateway_code,omitempty"`
+	ShippingFees          *[]ShippingFee         `xml:"shipping_fees>shipping_fee,omitempty"`
 }
 
 // PurchaseSubscription represents a subscription to purchase some new subscription.
-// Fields are moved to purchase object level because Recurly does not accept these
-// fields at the subscription level.
+// This is different from the Subscription struct in that only fields allowed to
+// be used with the purchases API are available.
 type PurchaseSubscription struct {
-	XMLName              xml.Name             `xml:"subscription"`
-	PlanCode             string               `xml:"plan_code"`
-	SubscriptionAddOns   *[]SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
-	UnitAmountInCents    NullInt              `xml:"unit_amount_in_cents,omitempty"`
-	Quantity             int                  `xml:"quantity,omitempty"`
-	TrialEndsAt          NullTime             `xml:"trial_ends_at,omitempty"`
-	StartsAt             NullTime             `xml:"starts_at,omitempty"`
-	TotalBillingCycles   int                  `xml:"total_billing_cycles,omitempty"`
-	RenewalBillingCycles NullInt              `xml:"renewal_billing_cycles,omitempty"`
-	NextBillDate         NullTime             `xml:"next_bill_date,omitempty"`
-	AutoRenew            bool                 `xml:"auto_renew,omitempty"`
-	CustomFields         *CustomFields        `xml:"custom_fields,omitempty"`
+	XMLName               xml.Name             `xml:"subscription"`
+	PlanCode              string               `xml:"plan_code"`
+	SubscriptionAddOns    *[]SubscriptionAddOn `xml:"subscription_add_ons>subscription_add_on,omitempty"`
+	UnitAmountInCents     NullInt              `xml:"unit_amount_in_cents,omitempty"`
+	Quantity              int                  `xml:"quantity,omitempty"`
+	TrialEndsAt           NullTime             `xml:"trial_ends_at,omitempty"`
+	StartsAt              NullTime             `xml:"starts_at,omitempty"`
+	TotalBillingCycles    int                  `xml:"total_billing_cycles,omitempty"`
+	RenewalBillingCycles  NullInt              `xml:"renewal_billing_cycles,omitempty"`
+	NextBillDate          NullTime             `xml:"next_bill_date,omitempty"`
+	AutoRenew             bool                 `xml:"auto_renew,omitempty"`
+	CustomFields          *CustomFields        `xml:"custom_fields,omitempty"`
+	ShippingAddress       *ShippingAddress     `xml:"shipping_address,omitempty"`
+	ShippingAddressID     int64                `xml:"shipping_address_id,omitempty"`
+	ShippingMethodCode    string               `xml:"shipping_method_code,omitempty"`
+	ShippingAmountInCents NullInt              `xml:"shipping_amount_in_cents,omitempty"`
+}
+
+// ShippingFee holds shipping fees for a purchase.
+type ShippingFee struct {
+	XMLName               xml.Name `xml:"shipping_fee"`
+	ShippingMethodCode    string   `xml:"shipping_method_code,omitempty"`
+	ShippingAmountInCents NullInt  `xml:"shipping_amount_in_cents,omitempty"`
 }
 
 var _ PurchasesService = &purchasesImpl{}

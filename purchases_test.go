@@ -48,6 +48,42 @@ func TestPurchases_Purchase_Encoding(t *testing.T) {
 				</purchase>
 			`),
 		},
+		{
+			v: recurly.Purchase{
+				ShippingFees: &[]recurly.ShippingFee{
+					{
+						ShippingMethodCode:    "foo",
+						ShippingAmountInCents: recurly.NewInt(0),
+					},
+					{
+						ShippingMethodCode:    "bar",
+						ShippingAmountInCents: recurly.NewInt(10),
+					},
+				},
+				ShippingAddressID: 1,
+			},
+			expected: MustCompactString(`
+				<purchase>
+					<account></account>
+					<adjustments></adjustments>
+					<currency></currency>
+					<gift_card></gift_card>
+					<coupon_codes></coupon_codes>
+					<subscriptions></subscriptions>
+					<shipping_address_id>1</shipping_address_id>
+					<shipping_fees>
+						<shipping_fee>
+							<shipping_method_code>foo</shipping_method_code>
+							<shipping_amount_in_cents>0</shipping_amount_in_cents>
+						</shipping_fee>
+						<shipping_fee>
+							<shipping_method_code>bar</shipping_method_code>
+							<shipping_amount_in_cents>10</shipping_amount_in_cents>
+						</shipping_fee>
+					</shipping_fees>
+				</purchase>
+			`),
+		},
 	}
 
 	for i, tt := range tests {
