@@ -19,7 +19,7 @@ type PurchasesService interface {
 	// https://dev.recurly.com/docs/preview-purchase
 	Preview(ctx context.Context, p Purchase) (*InvoiceCollection, error)
 
-	// Authorize creates a pending purchase that chan be activated at a later
+	// Authorize creates a pending purchase that can be activated at a later
 	// time once payment has been completed on an external source (e.g. Adyen's
 	// Hosted Payment Pages).
 	//

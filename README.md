@@ -1,11 +1,11 @@
 # Recurly Client for Go
 
- [![Build Status](https://travis-ci.org/blacklightcms/recurly.svg?branch=master)](https://travis-ci.org/blacklightcms/recurly)  [![GoDoc](https://godoc.org/github.com/blacklightcms/recurly?status.svg)](https://godoc.org/github.com/blacklightcms/recurly)
+ [![Build Status](https://travis-ci.org/blacklightcms/recurly.svg?branch=master)](https://travis-ci.org/blacklightcms/recurly)  [![GoDoc](https://godoc.org/github.com/blacklightcms/recurly?status.svg)](https://godoc.org/github.com/blacklightcms/recurly/)
 
  Recurly is a Go (golang) API Client for the [Recurly](https://recurly.com/) API. It is actively maintained, unit tested, and uses no external dependencies. The vast majority of the API is implemented.
 
  Supports:
-  - Recurly API `v2.19`
+  - Recurly API `v2.20`
   - Accounts
   - Add Ons
   - Adjustments
@@ -17,6 +17,7 @@
   - Purchases
   - Redemptions
   - Shipping Addresses
+  - Shipping Methods
   - Subscriptions
   - Transactions
 
@@ -33,8 +34,13 @@ import "github.com/blacklightcms/recurly"
 ```
 
 Resources:
- - [API Docs](https://godoc.org/github.com/blacklightcms/recurly)
- - [Examples](https://godoc.org/github.com/blacklightcms/recurly#pkg-examples)
+ - [API Docs](https://godoc.org/github.com/blacklightcms/recurly/)
+ - [Examples](https://godoc.org/github.com/blacklightcms/recurly/#pkg-examples)
+
+## Note on v1 and breaking changes
+If migrating from a previous version of the library, there was a large refactor with breaking changes released to address some design issues with the library. See the [migration guide](https://github.com/blacklightcms/recurly/wiki/v1-Migration-Guide) for steps on how to migrate to the latest version.
+
+This is recommended for all users.
 
 ## Quickstart
 
@@ -48,189 +54,151 @@ a, err := client.Accounts.Get(context.Background(), "1")
 ```
 
 ## Examples and How To
-Please go through [examples](https://godoc.org/github.com/blacklightcms/recurly#pkg-examples) for detailed examples of using this package.
+Please go through [examples](https://godoc.org/github.com/blacklightcms/recurly/#pkg-examples) for detailed examples of using this package.
 
-There are a few high-level notes below that will be helpful in getting the most out of this library.
+The examples explain important cases like:
 
-- [Null Types](#null-types)
-- [Error Handling](#error-handling)
-- [Get Methods](#get-methods)
-- [Pagination](#pagination)
+- Null Types
+- Error Handling
+- Get Methods
+- Pagination
 
-## Null Types
-In some cases, Recurly requires values to be sent if valid, but the XML tag to be omitted if not valid.
+Here are a few snippets to demonstrate library usage.
 
-If you want to create a subscription with a price of `$0`, using an `int` type with an `omitempty` XML tag the value would never actually be sent. `0` is the zero value for an `int`.
-
-You want this:
-
-```xml
-<subscription>
-   <unit_amount_in_cents>0</unit_amount_in_cents>
-</subscription>
-```
-
-But instead send this:
-
-```xml
-<subscription></subscription>
-```
-
-For `int`, `bool`, and `time.Time` types, null types provide a way to differentiate between zero values 
-and real values. Let's look at integers:
-
-Zero as a valid value:
+### Create Account
 ```go
-v := recurly.NewInt(0)
-i := v.Int() // returns 0
-i, ok := v.Value() // returns 0, true
-```
-
-Zero as an invalid value:
-```go
-// Zero value, int value is 0 but flagged as invalid
-var nullInt recurly.NullInt
-i := nullInt.Int() // returns 0
-i, ok := nullInt.Value() // returns 0, false
-```
-
-
-## Error Handling
-There are four important error types to know about. While you can generally just check for a non-nil 
-error (`if err != nil`), this section will cover more advanced error usage you can implement where it makes sense for your application.
-
-### ClientError
-`ClientError` is returned for all 400-level responses with the exception of
-1) `429 Too Many Requests`. See `RateLimitError`.
-2) `422 Unprocessable Entity` with a failed transaction. See `TransactionFailedError`.
-
-Inspecting this error can be useful when you are looking for specific status codes 
-and/or you want to look at any validation errors from Recurly.
-
-```go
-sub, err := client.Invoices.Create(ctx, "1", recurly.Invoice{...})
-if err != nil {
-    if e, ok := err.(*recurly.ClientError); ok {
-        // e.ValidationErrors contains any validation errors from Recurly
-
-        // Use e.Is() to see if any of the errors contain <symbol>will_not_invoice</symbol> (for example)
-        if e.Is("will_not_invoice") {
-            // ...
-        }
-
-        // e.Response contains the *http.Response. You can check the status code as well.
-        if e.Response.Code == http.StatusBadRequest {
-            // ...
-        }
-    }
-}
-```
-
-### TransactionFailedError
-`TransactionFailedError` is returned for any endpoint where a transaction was attempted and failed. 
-It is recommended that you check for this error when using any endpoint that 
-creates a transaction.
-
-```go
-_, err := client.Purchases.Create(ctx, recurly.Purchase{...})
-if e, ok := err.(*recurly.TransactionFailedError); ok {
-    // e.Transaction holds the failed transaction (if available)
-    // e.TransactionError holds the specific error. See godoc for specific fields.
-} else if err != nil {
-    // Handle all other errors
-}
-```
-
-### ServerError
-`ServerError` operates the same way as `ClientError`, except it's for 500-level responses and only 
-contains the `*http.Response`. This allows you to differentiate retriable errors from bad requests. 
-
-> NOTE: You will generally just capture this as a generic error (`if err != nil`) unless you need to look for something specific.
-
-### RateLimitError
-`RateLimitError` is returned when your request has exceeded your rate limit. It contains 
-information on the rate limit and when the limit will reset.
-
-> NOTE: You will generally just capture this as a generic error (`if err != nil`) unless you need to look for something specific.
-
-```go
-a, err := client.Accounts.Get(ctx, "1")
-if err != nil {
-    if e, ok := err.(*recurly.RateLimitError); ok {
-        // e.Rate.Limit holds the total request limit during the 5 minute window
-        // e.Reset holds the time when the current window will completely reset
-    }
-}
-```
-
-You can easily combine these if checking multiple errors using a type switch:
-
-```go
-_, err := client.Purchases.Create(ctx, recurly.Purchase{...})
-if err != nil {
-    switch err := err.(type) {
-    case *recurly.TransactionFailedErr:
-        // Determine why the transaction failed
-    case *recurly.ClientError:
-        // Inspect error for details of what went wrong
-    case *recurly.ServerError:
-        // Retryable
-    default:
-        return err
-    }
-}
-```
-
-### Get Methods
-When retrieving an individual item (such as an account, invoice, subscription): if the item is not found, a nil item and nil error will be returned. This is standard for all functions named `Get()`. All other functions would return a `ClientError` when encountering a `404 Not Found` status code.
-
-```go
-a, err := client.Accounts.Get(ctx, "1")
-if err != nil {
-    return err
-} else if a == nil {
-    // Account not found
-}
-```
-
-### Pagination
-Any function named `List()` or `List*()` is a pagination function. They all return a pager which standardizes how pagination works.
-
-In those cases, pagination always works the same way. Here is an example of how to paginate accounts:
-
-```go
-// Initialize a pager with any pagination options needed.
-pager := client.Accounts.List(&recurly.PagerOptions{
-    State: recurly.AccountStateActive,
+account, err := client.Accounts.Create(ctx, recurly.Account{
+    Code: "1",
+    FirstName: "Verena",
+    LastName: "Example",
+    Email: "verena@example.com",
 })
+```
 
-// Count the records (if desired)
-count, err := pager.Count(ctx)
+> **NOTE**: An account can also be created along a subscription by embedding the 
+> account in the subscription during creation. The purchases API also supports 
+> this, and likely other endpoints. See Recurly's documentation for details.
+
+### Get Account
+```go
+account, err := client.Accounts.Get(ctx, "1")
 if err != nil {
     return err
-}
-
-// Or iterate through each of the pages
-for pager.Next() {
-    var a []recurly.Account
-    if err := pager.Fetch(ctx, &a); err != nil {
-        return err
-    }
-    // Do something with a
+} else if account == nil {
+    // account not found
+    // Note: this nil, nil response on 404s is unique to Get() methods
+    // See GoDoc for details.
 }
 ```
 
-You can also let the library paginate for you and return all of the results in a slice.
+### Create Billing Info
+```go
+// Using token obtained with recurly.js
+// If you want to set billing info directly, omit the token and set the
+// corresponding fields on the recurly.Billing struct.
+billing, err := client.Billing.Create("1", recurly.Billing{
+    Token: token,
+})
+```
+> **NOTE**: See the error handling section in GoDoc for how to handle transaction errors
+
+### Creating Purchases
 
 ```go
-pager := client.Accounts.List(nil)
-var a []recurly.Account
-if err := pager.FetchAll(ctx); err != nil {
+purchase, err := c.Client.Purchases.Create(ctx, recurly.Purchase{
+    Account: recurly.Account{
+	    Code: "1",
+    },
+    Adjustments: []recurly.Adjustment{{
+	    UnitAmountInCents: recurly.NewInt(100),
+	    Description:       "Purchase Description",
+	    ProductCode:       "product_code",
+    }},
+    CollectionMethod: recurly.CollectionMethodAutomatic,
+    Currency:         "USD",
+})
+if err != nil {
+    // NOTE: See GoDoc for how to handle failed transaction errors
+}
+```
+
+> **NOTE**: The purchases API supports subscriptions, adjustments, shipping addresses,
+> shipping fees, and more. This is one of many possible examples. See the underlying
+> structs and [Recurly's documentation](https://dev.recurly.com/docs/create-purchase) for more info.
+
+### Creating Subscriptions
+```go
+subscription, err := client.Subscriptions.Create(ctx, recurly.NewSubscription{
+    PlanCode: "gold",
+    Currency: "USD",
+    Account: recurly.Account{
+        // Note: Set the Code for an existing account
+        // To create a new account, omit Code but provide other fields
+    },
+})
+if err != nil {
+    // NOTE: See GoDoc for how to handle failed transaction errors
     return err
 }
 ```
+> **NOTE**: Recurly offers several other ways to create subscriptions, often embedded 
+> within other requests (such as the `Purchases.Create()` call). See Recurly's 
+> documentation for more details.
 
-## Migration
-If migrating from a previous version of the library, there was a large refactor with breaking changes released to address some design issues with the library. See the migration guide for steps on how to migrate to the latest version.
+## Webhooks
+This library supports webhooks via the `webhooks` sub package. 
 
-This is recommended for all users.
+The usage is to parse the webhook from a reader, then use a switch statement 
+to determine the type of webhook received.
+
+```go
+// import "github.com/blacklightcms/recurly/webhooks"
+
+hook, err := webhooks.Parse(r)
+if e, ok := err.(*webhooks.ErrUnknownNotification); ok {
+    // e.Name() holds the name of the notification
+} else if err != nil {
+    // all other errors
+}
+
+// Use a switch statement to determine the type of webhook received.
+switch h := hook.(type) {
+case *webhooks.AccountNotification:
+    // h.Account
+case *webhooks.PaymentNotification:
+    // h.Account
+    // h.Transaction
+case *webhooks.SubscriptionNotification:
+    // h.Account
+    // h.Subscription
+default:
+    // webhook not listed above
+}
+```
+
+## Testing
+Once you've imported this library into your application, you will want to add tests.
+
+Internally this library sets up a test HTTPs server and validates methods, paths, 
+query strings, request body, and returns XML. You will not need to worry about those internals
+when testing your own code that uses this library.
+
+Instead we recommend using the `mock` package. The `mock` package provides mocks 
+for all of the different services in this library.
+
+For examples of how to test your code using mocks, visit the [GoDoc examples](https://godoc.org/github.com/blacklightcms/recurly/mock/).
+
+## Contributing
+
+We use [`dep`](https://github.com/golang/dep) for dependency management. If you 
+do not have it installed, see the [installation instructions](https://github.com/golang/dep#installation).
+
+To contribute: fork and clone the repository, `cd` into the directory, and run:
+
+```shell
+dep ensure
+```
+
+That will ensure you have [`google/go-cmp`](https://github.com/google/go-cmp) which is used to run tests.
+
+If you plan on submitting a patch, please write tests for it.

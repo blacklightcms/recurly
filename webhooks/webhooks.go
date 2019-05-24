@@ -12,12 +12,15 @@ type notificationName struct {
 }
 
 // Parse parses an incoming webhook and returns the notification.
+// If r implements the io.Closer interface, it will be closed.
+//
+// NOTE: It is important to validate the source of the webhook before trusting
+// it came from Recurly. Please see Recurly's documentation about the IP
+// addresses to expect and/or setting up HTTP Basic Authentication to verify
+// the request came from Recurly's servers.
+//
+// https://docs.recurly.com/docs/webhooks
 func Parse(r io.Reader) (interface{}, error) {
-	return parse(r, nameToNotification)
-}
-
-// parse parses an incoming webhook and returns the notification.
-func parse(r io.Reader, fn func(s string) (interface{}, error)) (interface{}, error) {
 	if closer, ok := r.(io.Closer); ok {
 		defer closer.Close()
 	}
@@ -32,7 +35,7 @@ func parse(r io.Reader, fn func(s string) (interface{}, error)) (interface{}, er
 		return nil, err
 	}
 
-	dst, err := fn(n.XMLName.Local)
+	dst, err := nameToNotification(n.XMLName.Local)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +69,7 @@ func nameToNotification(name string) (interface{}, error) {
 	return nil, ErrUnknownNotification{name: name}
 }
 
-// ErrUnknownNotification is used when the incoming webhook does not match a
+// ErrUnknownNotification is returned when the incoming webhook does not match a
 // predefined notification type. It implements the error interface.
 type ErrUnknownNotification struct {
 	name string
