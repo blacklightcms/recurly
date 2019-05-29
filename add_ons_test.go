@@ -204,7 +204,7 @@ func TestUnitAmount(t *testing.T) {
 }
 
 func TestAddOns_List(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int
@@ -232,7 +232,7 @@ func TestAddOns_List(t *testing.T) {
 
 func TestAddOns_Get(t *testing.T) {
 	t.Run("OK", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/plans/gold/add_ons/ipaddresses", func(w http.ResponseWriter, r *http.Request) {
@@ -251,7 +251,7 @@ func TestAddOns_Get(t *testing.T) {
 
 	// Ensure a 404 returns nil values.
 	t.Run("ErrNotFound", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/plans/gold/add_ons/ipaddresses", func(w http.ResponseWriter, r *http.Request) {
@@ -269,7 +269,7 @@ func TestAddOns_Get(t *testing.T) {
 }
 
 func TestAddOns_Create(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/plans/gold/add_ons", func(w http.ResponseWriter, r *http.Request) {
@@ -287,7 +287,7 @@ func TestAddOns_Create(t *testing.T) {
 }
 
 func TestAddOns_Update(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/plans/gold/add_ons/ipaddresses", func(w http.ResponseWriter, r *http.Request) {
@@ -305,7 +305,7 @@ func TestAddOns_Update(t *testing.T) {
 }
 
 func TestAddOns_Delete(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("DELETE", "/v2/plans/gold/add_ons/ipaddresses", func(w http.ResponseWriter, r *http.Request) {

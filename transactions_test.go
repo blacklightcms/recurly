@@ -13,7 +13,7 @@ import (
 )
 
 func TestTransactions_List(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int
@@ -40,7 +40,7 @@ func TestTransactions_List(t *testing.T) {
 }
 
 func TestTransactions_ListAccount(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int
@@ -68,7 +68,7 @@ func TestTransactions_ListAccount(t *testing.T) {
 
 func TestTransactions_Get(t *testing.T) {
 	t.Run("OK", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/transactions/a13acd8fe4294916b79aec87b7ea441f", func(w http.ResponseWriter, r *http.Request) {
@@ -87,7 +87,7 @@ func TestTransactions_Get(t *testing.T) {
 
 	// Retrieving a failed transaction should hold the transaction errors.
 	t.Run("TransactionFailed", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/transactions/a13acd8fe4294916b79aec87b7ea441f", func(w http.ResponseWriter, r *http.Request) {
@@ -106,7 +106,7 @@ func TestTransactions_Get(t *testing.T) {
 
 	// Ensure a 404 returns nil values.
 	t.Run("ErrNotFound", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/transactions/a13acd8fe4294916b79aec87b7ea441f", func(w http.ResponseWriter, r *http.Request) {

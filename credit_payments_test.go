@@ -11,7 +11,7 @@ import (
 )
 
 func TestCreditPayments_List(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int
@@ -38,7 +38,7 @@ func TestCreditPayments_List(t *testing.T) {
 }
 
 func TestCreditPayments_ListAccount(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int
@@ -66,7 +66,7 @@ func TestCreditPayments_ListAccount(t *testing.T) {
 
 func TestCreditPayments_Get(t *testing.T) {
 	t.Run("OK", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/credit_payments/2cc95aa62517e56d5bec3a48afa1b3b9", func(w http.ResponseWriter, r *http.Request) {
@@ -85,7 +85,7 @@ func TestCreditPayments_Get(t *testing.T) {
 
 	// Ensure a 404 returns nil values.
 	t.Run("ErrNotFound", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/credit_payments/2cc95aa62517e56d5bec3a48afa1b3b9", func(w http.ResponseWriter, r *http.Request) {

@@ -617,7 +617,7 @@ func TestSubscriptions_UpdateSubscription_Encoding(t *testing.T) {
 }
 
 func TestSubscriptions_List(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int
@@ -644,7 +644,7 @@ func TestSubscriptions_List(t *testing.T) {
 }
 
 func TestSubscriptions_ListAccount(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int
@@ -672,7 +672,7 @@ func TestSubscriptions_ListAccount(t *testing.T) {
 
 func TestSubscriptions_Get(t *testing.T) {
 	t.Run("OK", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/subscriptions/44f83d7cba354d5b84812419f923ea96", func(w http.ResponseWriter, r *http.Request) {
@@ -691,7 +691,7 @@ func TestSubscriptions_Get(t *testing.T) {
 
 	// Ensure a 404 returns nil values.
 	t.Run("ErrNotFound", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/subscriptions/44f83d7cba354d5b84812419f923ea96", func(w http.ResponseWriter, r *http.Request) {
@@ -709,7 +709,7 @@ func TestSubscriptions_Get(t *testing.T) {
 }
 
 func TestSubscriptions_Create(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/subscriptions", func(w http.ResponseWriter, r *http.Request) {
@@ -727,7 +727,7 @@ func TestSubscriptions_Create(t *testing.T) {
 }
 
 func TestSubscriptions_Preview(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/subscriptions/preview", func(w http.ResponseWriter, r *http.Request) {
@@ -745,7 +745,7 @@ func TestSubscriptions_Preview(t *testing.T) {
 }
 
 func TestSubscriptions_Update(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/subscriptions/44f83d7cba354d5b84812419f923ea96", func(w http.ResponseWriter, r *http.Request) {
@@ -763,7 +763,7 @@ func TestSubscriptions_Update(t *testing.T) {
 }
 
 func TestSubscriptions_UpdateNotes(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/notes", func(w http.ResponseWriter, r *http.Request) {
@@ -781,7 +781,7 @@ func TestSubscriptions_UpdateNotes(t *testing.T) {
 }
 
 func TestSubscriptions_PreviewChange(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/preview", func(w http.ResponseWriter, r *http.Request) {
@@ -799,7 +799,7 @@ func TestSubscriptions_PreviewChange(t *testing.T) {
 }
 
 func TestSubscriptions_Cancel(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/cancel", func(w http.ResponseWriter, r *http.Request) {
@@ -817,7 +817,7 @@ func TestSubscriptions_Cancel(t *testing.T) {
 }
 
 func TestSubscriptions_Reactivate(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/reactivate", func(w http.ResponseWriter, r *http.Request) {
@@ -836,7 +836,7 @@ func TestSubscriptions_Reactivate(t *testing.T) {
 
 func TestSubscriptions_Terminate(t *testing.T) {
 	t.Run("Partial", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("PUT", "/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/terminate", func(w http.ResponseWriter, r *http.Request) {
@@ -857,7 +857,7 @@ func TestSubscriptions_Terminate(t *testing.T) {
 	})
 
 	t.Run("Full", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("PUT", "/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/terminate", func(w http.ResponseWriter, r *http.Request) {
@@ -878,7 +878,7 @@ func TestSubscriptions_Terminate(t *testing.T) {
 	})
 
 	t.Run("None", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("PUT", "/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/terminate", func(w http.ResponseWriter, r *http.Request) {
@@ -900,7 +900,7 @@ func TestSubscriptions_Terminate(t *testing.T) {
 }
 
 func TestSubscriptions_Pause(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/pause", func(w http.ResponseWriter, r *http.Request) {
@@ -925,7 +925,7 @@ func TestSubscriptions_Pause(t *testing.T) {
 }
 
 func TestSubscriptions_Postpone(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/postpone", func(w http.ResponseWriter, r *http.Request) {
@@ -948,7 +948,7 @@ func TestSubscriptions_Postpone(t *testing.T) {
 }
 
 func TestSubscriptions_Resume(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/resume", func(w http.ResponseWriter, r *http.Request) {

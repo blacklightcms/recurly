@@ -10,7 +10,7 @@ import (
 )
 
 func TestRedemptions_ListAccount(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int
@@ -37,7 +37,7 @@ func TestRedemptions_ListAccount(t *testing.T) {
 }
 
 func TestRedemptions_ListInvoice(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int
@@ -64,7 +64,7 @@ func TestRedemptions_ListInvoice(t *testing.T) {
 }
 
 func TestRedemptions_ListSubscription(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int
@@ -92,7 +92,7 @@ func TestRedemptions_ListSubscription(t *testing.T) {
 
 func TestRedemptions_Redeem(t *testing.T) {
 	t.Run("OK", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("POST", "/v2/coupons/special/redeem", func(w http.ResponseWriter, r *http.Request) {
@@ -121,7 +121,7 @@ func TestRedemptions_Redeem(t *testing.T) {
 	})
 
 	t.Run("Subscription", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("POST", "/v2/coupons/special/redeem", func(w http.ResponseWriter, r *http.Request) {
@@ -153,7 +153,7 @@ func TestRedemptions_Redeem(t *testing.T) {
 }
 
 func TestRedemptions_Delete(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("DELETE", "/v2/accounts/1/redemption", func(w http.ResponseWriter, r *http.Request) {

@@ -255,7 +255,7 @@ func TestAddress_Encoding(t *testing.T) {
 // pager -- this test is the only paginated test that asserts the params being sent
 // properly. It also sends a cursor to ensure Next() and Fetch() work properly.
 func TestAccounts_List(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int
@@ -320,7 +320,7 @@ func TestAccounts_List(t *testing.T) {
 
 func TestAccounts_Get(t *testing.T) {
 	t.Run("OK", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/accounts/1", func(w http.ResponseWriter, r *http.Request) {
@@ -339,7 +339,7 @@ func TestAccounts_Get(t *testing.T) {
 
 	// Ensure a 404 returns nil values.
 	t.Run("ErrNotFound", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/accounts/1", func(w http.ResponseWriter, r *http.Request) {
@@ -357,7 +357,7 @@ func TestAccounts_Get(t *testing.T) {
 }
 
 func TestAccounts_Balance(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("GET", "/v2/accounts/1/balance", func(w http.ResponseWriter, r *http.Request) {
@@ -375,7 +375,7 @@ func TestAccounts_Balance(t *testing.T) {
 }
 
 func TestAccounts_Create(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/accounts", func(w http.ResponseWriter, r *http.Request) {
@@ -393,7 +393,7 @@ func TestAccounts_Create(t *testing.T) {
 }
 
 func TestAccounts_Update(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/accounts/1", func(w http.ResponseWriter, r *http.Request) {
@@ -411,7 +411,7 @@ func TestAccounts_Update(t *testing.T) {
 }
 
 func TestAccounts_Close(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("DELETE", "/v2/accounts/1", func(w http.ResponseWriter, r *http.Request) {
@@ -426,7 +426,7 @@ func TestAccounts_Close(t *testing.T) {
 }
 
 func TestAccounts_Reopen(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/accounts/1/reopen", func(w http.ResponseWriter, r *http.Request) {
@@ -441,7 +441,7 @@ func TestAccounts_Reopen(t *testing.T) {
 }
 
 func TestAccounts_ListNotes(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int

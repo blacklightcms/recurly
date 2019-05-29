@@ -38,6 +38,38 @@ func Example_AccountsService_Create() {
 	}
 }
 
+func ExampleNewTestServer() {
+	client, s := recurly.NewTestServer()
+	defer s.Close()
+
+	// NOTE: This example doesn't have access to *testing.T so it passes nil
+	// as the last argument to s.HandlFunc(). When setting up your tests,
+	// be sure to pass *testing.T instead of nil.
+	s.HandleFunc("GET", "/v2/accounts/1", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`
+		<?xml version="1.0" encoding="UTF-8"?>
+		<account href="https://your-subdomain.recurly.com/v2/accounts/1">
+		   <email>verena@example.com</email>
+		   <first_name>Verena</first_name>
+		   <last_name>Example</last_name>
+		</account>
+		`))
+	}, nil)
+
+	a, _ := client.Accounts.Get(context.Background(), "1")
+	fmt.Printf("%t\n", s.Invoked)
+	fmt.Printf("%t\n", a.FirstName == "Verena")
+	fmt.Printf("%t\n", a.LastName == "Example")
+	fmt.Printf("%t\n", a.Email == "verena@example.com")
+
+	// Output:
+	// true
+	// true
+	// true
+	// true
+}
+
 func ExampleNullBool() {
 	b := recurly.NewBool(true)
 	fmt.Println(b.Bool())

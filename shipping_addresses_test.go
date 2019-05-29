@@ -11,7 +11,7 @@ import (
 )
 
 func TestShippingAddresses_ListAccount(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int
@@ -38,7 +38,7 @@ func TestShippingAddresses_ListAccount(t *testing.T) {
 }
 
 func TestShippingAddresses_Create(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/accounts/1/shipping_addresses", func(w http.ResponseWriter, r *http.Request) {
@@ -56,7 +56,7 @@ func TestShippingAddresses_Create(t *testing.T) {
 }
 
 func TestShippingAddresses_Update(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/accounts/1/shipping_addresses/2438622711411416831", func(w http.ResponseWriter, r *http.Request) {
@@ -74,7 +74,7 @@ func TestShippingAddresses_Update(t *testing.T) {
 }
 
 func TestShippingAddresses_Delete(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("DELETE", "/v2/accounts/1/shipping_addresses/2438622711411416831", func(w http.ResponseWriter, r *http.Request) {

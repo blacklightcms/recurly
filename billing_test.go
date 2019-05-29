@@ -180,7 +180,7 @@ func TestBilling_Type(t *testing.T) {
 
 func TestBilling_Get(t *testing.T) {
 	t.Run("OK", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/accounts/1/billing_info", func(w http.ResponseWriter, r *http.Request) {
@@ -200,7 +200,7 @@ func TestBilling_Get(t *testing.T) {
 	// ACH customers may not have billing info. This asserts that nil values for
 	// many of the fields are safely ignored without parse errors.
 	t.Run("ACH", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/accounts/1/billing_info", func(w http.ResponseWriter, r *http.Request) {
@@ -241,7 +241,7 @@ func TestBilling_Get(t *testing.T) {
 
 	// Ensure a 404 returns nil values.
 	t.Run("ErrNotFound", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/accounts/1/billing_info", func(w http.ResponseWriter, r *http.Request) {
@@ -260,7 +260,7 @@ func TestBilling_Get(t *testing.T) {
 
 func TestBilling_Create(t *testing.T) {
 	t.Run("Token", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("POST", "/v2/accounts/1/billing_info", func(w http.ResponseWriter, r *http.Request) {
@@ -285,7 +285,7 @@ func TestBilling_Create(t *testing.T) {
 	})
 
 	t.Run("BillingInfo", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("POST", "/v2/accounts/1/billing_info", func(w http.ResponseWriter, r *http.Request) {
@@ -332,7 +332,7 @@ func TestBilling_Create(t *testing.T) {
 
 func TestBilling_Update(t *testing.T) {
 	t.Run("Token", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("PUT", "/v2/accounts/1/billing_info", func(w http.ResponseWriter, r *http.Request) {
@@ -357,7 +357,7 @@ func TestBilling_Update(t *testing.T) {
 	})
 
 	t.Run("InvalidToken", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("PUT", "/v2/accounts/1/billing_info", func(w http.ResponseWriter, r *http.Request) {
@@ -387,7 +387,7 @@ func TestBilling_Update(t *testing.T) {
 	})
 
 	t.Run("BillingInfo", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("PUT", "/v2/accounts/1/billing_info", func(w http.ResponseWriter, r *http.Request) {
@@ -433,7 +433,7 @@ func TestBilling_Update(t *testing.T) {
 }
 
 func TestBilling_Clear(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("DELETE", "/v2/accounts/1/billing_info", func(w http.ResponseWriter, r *http.Request) {

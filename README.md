@@ -188,6 +188,8 @@ for all of the different services in this library.
 
 For examples of how to test your code using mocks, visit the [GoDoc examples](https://godoc.org/github.com/blacklightcms/recurly/mock/).
 
+> **NOTE**: If you need to go beyond mocks and test requests/responses, `testing.go` exports `TestServer`. This is how the library tests itself. See the GoDoc or the `*_test.go` files for usage examples.
+
 ## Contributing
 
 We use [`dep`](https://github.com/golang/dep) for dependency management. If you 

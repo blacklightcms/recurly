@@ -3,16 +3,12 @@ package recurly_test
 import (
 	"bytes"
 	"context"
-	"crypto/tls"
 	"encoding/base64"
 	"encoding/xml"
 	"fmt"
 	"io"
 	"io/ioutil"
-	"net"
 	"net/http"
-	"net/http/httptest"
-	"net/url"
 	"regexp"
 	"strings"
 	"testing"
@@ -21,59 +17,6 @@ import (
 	"github.com/blacklightcms/recurly"
 	"github.com/google/go-cmp/cmp"
 )
-
-var dialer = &net.Dialer{
-	Timeout:   100 * time.Millisecond,
-	KeepAlive: 500 * time.Millisecond,
-	DualStack: true,
-}
-
-// Server is a test server used for testing.
-type Server struct {
-	server *httptest.Server
-	mux    *http.ServeMux
-
-	Invoked bool
-}
-
-// NewServer returns an instance of *recurly.Client and *Server, with the
-// client resolving to the test server.
-func NewServer() (*recurly.Client, *Server) {
-	s := &Server{
-		mux: http.NewServeMux(),
-	}
-	s.server = httptest.NewTLSServer(s.mux)
-
-	client := recurly.NewClient("test", "abc")
-	client.Client = &http.Client{
-		Timeout: 100 * time.Millisecond,
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
-				u, _ := url.Parse(s.server.URL)
-				return dialer.DialContext(ctx, network, u.Host)
-			},
-		},
-	}
-	return client, s
-}
-
-// HandleFunc sets up an HTTP handler where the HTTP method is asserted.
-// fn is the handler, and all invocation will set s.Invoked to true.
-func (s *Server) HandleFunc(method string, pattern string, fn http.HandlerFunc, t *testing.T) {
-	s.mux.HandleFunc(pattern, func(w http.ResponseWriter, r *http.Request) {
-		s.Invoked = true
-		if r.Method != method {
-			t.Fatalf("unexpected method: %s", r.Method)
-		}
-		fn(w, r)
-	})
-}
-
-// Close closes the server.
-func (s *Server) Close() {
-	s.server.Close()
-}
 
 // MustOpenFile opens a file in the testdata directory.
 func MustOpenFile(file string) []byte {
@@ -140,13 +83,13 @@ func MustReadAllString(r io.ReadCloser) string {
 func TestClient(t *testing.T) {
 	// Tests a GET method.
 	t.Run("GET", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		timestamp := MustParseTime("2011-10-17T17:24:53Z")
 		s.HandleFunc("GET", "/v2/accounts", func(w http.ResponseWriter, r *http.Request) {
 			// API key should be base64 encoded.
-			encoded := base64.StdEncoding.EncodeToString([]byte("abc"))
+			encoded := base64.StdEncoding.EncodeToString([]byte("foo"))
 
 			if r.Host != "test.recurly.com" {
 				t.Fatalf("unexpected host: %q", r.Host)
@@ -179,7 +122,7 @@ func TestClient(t *testing.T) {
 
 	// Tests a POST method to ensure the request body is sent.
 	t.Run("POST", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("POST", "/v2/accounts", func(w http.ResponseWriter, r *http.Request) {
@@ -206,7 +149,7 @@ func TestClient_ClientErrors(t *testing.T) {
 	t.Run("404", func(t *testing.T) {
 		// 404 response with validation errors
 		t.Run("OK", func(t *testing.T) {
-			client, s := NewServer()
+			client, s := recurly.NewTestServer()
 			defer s.Close()
 
 			s.HandleFunc("POST", "/v2/accounts", func(w http.ResponseWriter, r *http.Request) {
@@ -235,7 +178,7 @@ func TestClient_ClientErrors(t *testing.T) {
 
 		// 404 response with empty body
 		t.Run("EmptyBody", func(t *testing.T) {
-			client, s := NewServer()
+			client, s := recurly.NewTestServer()
 			defer s.Close()
 
 			s.HandleFunc("POST", "/v2/accounts", func(w http.ResponseWriter, r *http.Request) {
@@ -262,7 +205,7 @@ func TestClient_ClientErrors(t *testing.T) {
 	t.Run("422", func(t *testing.T) {
 		// Ensure a top-level <error> tag is properly handled.
 		t.Run("SingleError", func(t *testing.T) {
-			client, s := NewServer()
+			client, s := recurly.NewTestServer()
 			defer s.Close()
 
 			s.HandleFunc("POST", "/v2/accounts", func(w http.ResponseWriter, r *http.Request) {
@@ -297,7 +240,7 @@ func TestClient_ClientErrors(t *testing.T) {
 
 		// Ensure a top-level <errors> tag is properly handled.
 		t.Run("MultiErrors", func(t *testing.T) {
-			client, s := NewServer()
+			client, s := recurly.NewTestServer()
 			defer s.Close()
 
 			s.HandleFunc("POST", "/v2/accounts", func(w http.ResponseWriter, r *http.Request) {
@@ -378,7 +321,7 @@ func TestClient_ClientErrors(t *testing.T) {
 
 // Ensure transaction errors return TransactionFailedError.
 func TestClient_TransactionFailedError(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/accounts", func(w http.ResponseWriter, r *http.Request) {
@@ -412,7 +355,7 @@ func TestClient_TransactionFailedError(t *testing.T) {
 }
 
 func TestClient_ServerErrors(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/accounts", func(w http.ResponseWriter, r *http.Request) {

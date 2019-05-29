@@ -249,7 +249,7 @@ func TestPlans_Encoding(t *testing.T) {
 }
 
 func TestPlans_List(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int
@@ -277,7 +277,7 @@ func TestPlans_List(t *testing.T) {
 
 func TestPlans_Get(t *testing.T) {
 	t.Run("OK", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/plans/gold", func(w http.ResponseWriter, r *http.Request) {
@@ -296,7 +296,7 @@ func TestPlans_Get(t *testing.T) {
 
 	// Ensure a 404 returns nil values.
 	t.Run("ErrNotFound", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/plans/gold", func(w http.ResponseWriter, r *http.Request) {
@@ -314,7 +314,7 @@ func TestPlans_Get(t *testing.T) {
 }
 
 func TestPlans_Create(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/plans", func(w http.ResponseWriter, r *http.Request) {
@@ -332,7 +332,7 @@ func TestPlans_Create(t *testing.T) {
 }
 
 func TestPlans_Update(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/plans/gold", func(w http.ResponseWriter, r *http.Request) {
@@ -350,7 +350,7 @@ func TestPlans_Update(t *testing.T) {
 }
 
 func TestPlans_Delete(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("DELETE", "/v2/plans/gold", func(w http.ResponseWriter, r *http.Request) {

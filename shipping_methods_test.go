@@ -12,7 +12,7 @@ import (
 
 func TestShippingMethods_Get(t *testing.T) {
 	t.Run("OK", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/shipping_methods/fast_fast_fast", func(w http.ResponseWriter, r *http.Request) {
@@ -31,7 +31,7 @@ func TestShippingMethods_Get(t *testing.T) {
 
 	// Ensure a 404 returns nil values.
 	t.Run("ErrNotFound", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/shipping_methods/fast_fast_fast", func(w http.ResponseWriter, r *http.Request) {
@@ -49,7 +49,7 @@ func TestShippingMethods_Get(t *testing.T) {
 }
 
 func TestShippingMethods_List(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int

@@ -12,7 +12,7 @@ import (
 )
 
 func TestInvoices_List(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int
@@ -39,7 +39,7 @@ func TestInvoices_List(t *testing.T) {
 }
 
 func TestInvoices_ListAccount(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int
@@ -67,7 +67,7 @@ func TestInvoices_ListAccount(t *testing.T) {
 
 func TestInvoices_Get(t *testing.T) {
 	t.Run("OK", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/invoices/5558", func(w http.ResponseWriter, r *http.Request) {
@@ -86,7 +86,7 @@ func TestInvoices_Get(t *testing.T) {
 
 	// Ensure a 404 returns nil values.
 	t.Run("ErrNotFound", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/invoices/5558", func(w http.ResponseWriter, r *http.Request) {
@@ -105,7 +105,7 @@ func TestInvoices_Get(t *testing.T) {
 
 func TestInvoices_GetPDF(t *testing.T) {
 	t.Run("OK", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/invoices/5558", func(w http.ResponseWriter, r *http.Request) {
@@ -130,7 +130,7 @@ func TestInvoices_GetPDF(t *testing.T) {
 
 	// Ensure a 404 returns nil values.
 	t.Run("ErrNotFound", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/invoices/5558", func(w http.ResponseWriter, r *http.Request) {
@@ -148,7 +148,7 @@ func TestInvoices_GetPDF(t *testing.T) {
 }
 
 func TestInvoices_Preview(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/accounts/1/invoices/preview", func(w http.ResponseWriter, r *http.Request) {
@@ -166,7 +166,7 @@ func TestInvoices_Preview(t *testing.T) {
 }
 
 func TestInvoices_Create(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/accounts/1/invoices", func(w http.ResponseWriter, r *http.Request) {
@@ -203,7 +203,7 @@ func TestInvoices_Create(t *testing.T) {
 }
 
 func TestInvoices_Collect(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/invoices/1010/collect", func(w http.ResponseWriter, r *http.Request) {
@@ -221,7 +221,7 @@ func TestInvoices_Collect(t *testing.T) {
 }
 
 func TestInvoices_MarkPaid(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/invoices/1010/mark_successful", func(w http.ResponseWriter, r *http.Request) {
@@ -239,7 +239,7 @@ func TestInvoices_MarkPaid(t *testing.T) {
 }
 
 func TestInvoices_MarkFailed(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/invoices/1010/mark_failed", func(w http.ResponseWriter, r *http.Request) {
@@ -257,7 +257,7 @@ func TestInvoices_MarkFailed(t *testing.T) {
 }
 
 func TestInvoices_RefundVoidOpenAmount(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/invoices/1010/refund", func(w http.ResponseWriter, r *http.Request) {
@@ -296,7 +296,7 @@ func TestInvoices_RefundVoidOpenAmount(t *testing.T) {
 }
 
 func TestInvoices_RefundVoidLineItems(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/invoices/1010/refund", func(w http.ResponseWriter, r *http.Request) {
@@ -361,7 +361,7 @@ func TestInvoices_RefundVoidLineItems(t *testing.T) {
 }
 
 func TestInvoices_VoidCreditInvoice(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/invoices/1010/void", func(w http.ResponseWriter, r *http.Request) {
@@ -379,7 +379,7 @@ func TestInvoices_VoidCreditInvoice(t *testing.T) {
 }
 
 func TestInvoices_RecordPayment(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/invoices/1010/transactions", func(w http.ResponseWriter, r *http.Request) {

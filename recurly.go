@@ -21,8 +21,9 @@ import (
 //		- Parent/child accounts not yet implemented.
 const apiVersion = "2.20"
 
-// uaVersion is the userAgent sent to Recurly so they can track usage of this library.
-const uaVersion = "2019-05-15"
+// uaVersion is the userAgent version sent to Recurly so they can track usage
+// of this library.
+const uaVersion = "1.0.0"
 
 // HTTPDoer is used for making HTTP requests. This implementation is generally
 // a *http.Client.
@@ -223,10 +224,10 @@ type response struct {
 
 // NewResponse creates a new Response for the provided http.Response.
 func newResponse(r *http.Response) *response {
-	response := &response{Response: r}
-	response.populatePageCursors()
-	response.populateRateLimit()
-	return response
+	resp := &response{Response: r}
+	resp.populatePageCursors()
+	resp.populateRateLimit()
+	return resp
 }
 
 func (r *response) populatePageCursors() {

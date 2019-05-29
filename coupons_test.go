@@ -190,7 +190,7 @@ func TestCoupons_Encoding(t *testing.T) {
 }
 
 func TestCoupons_List(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int
@@ -218,7 +218,7 @@ func TestCoupons_List(t *testing.T) {
 
 func TestCoupons_Get(t *testing.T) {
 	t.Run("OK", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/coupons/special", func(w http.ResponseWriter, r *http.Request) {
@@ -237,7 +237,7 @@ func TestCoupons_Get(t *testing.T) {
 
 	// Ensure a 404 returns nil values.
 	t.Run("ErrNotFound", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/coupons/special", func(w http.ResponseWriter, r *http.Request) {
@@ -255,7 +255,7 @@ func TestCoupons_Get(t *testing.T) {
 }
 
 func TestCoupons_Create(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/coupons", func(w http.ResponseWriter, r *http.Request) {
@@ -273,7 +273,7 @@ func TestCoupons_Create(t *testing.T) {
 }
 
 func TestCoupons_Update(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/coupons/special", func(w http.ResponseWriter, r *http.Request) {
@@ -322,7 +322,7 @@ func TestCoupons_Update(t *testing.T) {
 
 func TestCoupons_Restore(t *testing.T) {
 	t.Run("Edits", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("PUT", "/v2/coupons/special/restore", func(w http.ResponseWriter, r *http.Request) {
@@ -370,7 +370,7 @@ func TestCoupons_Restore(t *testing.T) {
 	})
 
 	t.Run("NoEdits", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("PUT", "/v2/coupons/special/restore", func(w http.ResponseWriter, r *http.Request) {
@@ -395,7 +395,7 @@ func TestCoupons_Restore(t *testing.T) {
 }
 
 func TestCoupons_Delete(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("DELETE", "/v2/coupons/special", func(w http.ResponseWriter, r *http.Request) {
@@ -410,7 +410,7 @@ func TestCoupons_Delete(t *testing.T) {
 }
 
 func TestCoupons_Generate(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/coupons/special/generate", func(w http.ResponseWriter, r *http.Request) {

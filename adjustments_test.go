@@ -131,7 +131,7 @@ func TestAdjustments_Encoding(t *testing.T) {
 }
 
 func TestAdjustments_ListAccount(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int
@@ -159,7 +159,7 @@ func TestAdjustments_ListAccount(t *testing.T) {
 
 func TestAdjustments_Get(t *testing.T) {
 	t.Run("OK", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/adjustments/626db120a84102b1809909071c701c60", func(w http.ResponseWriter, r *http.Request) {
@@ -178,7 +178,7 @@ func TestAdjustments_Get(t *testing.T) {
 
 	// Ensure a 404 returns nil values.
 	t.Run("ErrNotFound", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("GET", "/v2/adjustments/626db120a84102b1809909071c701c60", func(w http.ResponseWriter, r *http.Request) {
@@ -197,7 +197,7 @@ func TestAdjustments_Get(t *testing.T) {
 
 func TestAdjustments_Create(t *testing.T) {
 	t.Run("OK", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("POST", "/v2/accounts/1/adjustments", func(w http.ResponseWriter, r *http.Request) {
@@ -215,7 +215,7 @@ func TestAdjustments_Create(t *testing.T) {
 	})
 
 	t.Run("Credit", func(t *testing.T) {
-		client, s := NewServer()
+		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("POST", "/v2/accounts/1/adjustments", func(w http.ResponseWriter, r *http.Request) {
@@ -247,7 +247,7 @@ func TestAdjustments_Create(t *testing.T) {
 }
 
 func TestAdjustments_Delete(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("DELETE", "/v2/adjustments/945a4cb9afd64300b97b138407a51aef", func(w http.ResponseWriter, r *http.Request) {

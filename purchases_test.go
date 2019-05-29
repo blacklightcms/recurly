@@ -99,7 +99,7 @@ func TestPurchases_Purchase_Encoding(t *testing.T) {
 }
 
 func TestPurchases_Create(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/purchases", func(w http.ResponseWriter, r *http.Request) {
@@ -117,7 +117,7 @@ func TestPurchases_Create(t *testing.T) {
 }
 
 func TestPurchases_Preview(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/purchases/preview", func(w http.ResponseWriter, r *http.Request) {
@@ -135,7 +135,7 @@ func TestPurchases_Preview(t *testing.T) {
 }
 
 func TestPurchases_Authorize(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/purchases/authorize", func(w http.ResponseWriter, r *http.Request) {
@@ -153,7 +153,7 @@ func TestPurchases_Authorize(t *testing.T) {
 }
 
 func TestPurchases_Pending(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/purchases/pending", func(w http.ResponseWriter, r *http.Request) {
@@ -171,7 +171,7 @@ func TestPurchases_Pending(t *testing.T) {
 }
 
 func TestPurchases_Capture(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/purchases/a13acd8fe4294916b79aec87b7ea441f/capture", func(w http.ResponseWriter, r *http.Request) {
@@ -189,7 +189,7 @@ func TestPurchases_Capture(t *testing.T) {
 }
 
 func TestPurchases_Cancel(t *testing.T) {
-	client, s := NewServer()
+	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	s.HandleFunc("POST", "/v2/purchases/a13acd8fe4294916b79aec87b7ea441f/cancel", func(w http.ResponseWriter, r *http.Request) {
