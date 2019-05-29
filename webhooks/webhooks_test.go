@@ -12,11 +12,8 @@ import (
 )
 
 func TestParse_BillingInfoUpdatedNotification(t *testing.T) {
-	xmlFile := MustOpenFile("testdata/billing_info_updated_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.AccountNotification); !ok {
+	result := MustParseFile("testdata/billing_info_updated_notification.xml")
+	if n, ok := result.(*webhooks.AccountNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.AccountNotification{
 		Type: webhooks.BillingInfoUpdated,
@@ -33,11 +30,8 @@ func TestParse_BillingInfoUpdatedNotification(t *testing.T) {
 }
 
 func TestParse_BillingInfoUpdateFailedNotification(t *testing.T) {
-	xmlFile := MustOpenFile("testdata/billing_info_update_failed_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.AccountNotification); !ok {
+	result := MustParseFile("testdata/billing_info_update_failed_notification.xml")
+	if n, ok := result.(*webhooks.AccountNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.AccountNotification{
 		Type: webhooks.BillingInfoUpdateFailed,
@@ -54,11 +48,8 @@ func TestParse_BillingInfoUpdateFailedNotification(t *testing.T) {
 }
 
 func TestParse_NewAccountNotification(t *testing.T) {
-	xmlFile := MustOpenFile("testdata/new_account_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.AccountNotification); !ok {
+	result := MustParseFile("testdata/new_account_notification.xml")
+	if n, ok := result.(*webhooks.AccountNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.AccountNotification{
 		Type: webhooks.NewAccount,
@@ -75,11 +66,8 @@ func TestParse_NewAccountNotification(t *testing.T) {
 }
 
 func TestParse_UpdatedAccountNotification(t *testing.T) {
-	xmlFile := MustOpenFile("testdata/updated_account_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.AccountNotification); !ok {
+	result := MustParseFile("testdata/updated_account_notification.xml")
+	if n, ok := result.(*webhooks.AccountNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.AccountNotification{
 		Type: webhooks.UpdatedAccount,
@@ -96,11 +84,8 @@ func TestParse_UpdatedAccountNotification(t *testing.T) {
 }
 
 func TestParse_CanceledAccountNotification(t *testing.T) {
-	xmlFile := MustOpenFile("testdata/canceled_account_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.AccountNotification); !ok {
+	result := MustParseFile("testdata/canceled_account_notification.xml")
+	if n, ok := result.(*webhooks.AccountNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.AccountNotification{
 		Type: webhooks.CanceledAccount,
@@ -117,13 +102,8 @@ func TestParse_CanceledAccountNotification(t *testing.T) {
 }
 
 func TestParse_ChargeInvoiceNotification(t *testing.T) {
-	created, _ := time.Parse(recurly.DateTimeFormat, "2018-02-13T16:00:04Z")
-	dueOn, _ := time.Parse(recurly.DateTimeFormat, "2018-03-16T15:00:04Z")
-	xmlFile := MustOpenFile("testdata/charge_invoice_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.ChargeInvoiceNotification); !ok {
+	result := MustParseFile("testdata/charge_invoice_notification.xml")
+	if n, ok := result.(*webhooks.ChargeInvoiceNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.ChargeInvoiceNotification{
 		Type: webhooks.NewChargeInvoice,
@@ -143,11 +123,11 @@ func TestParse_ChargeInvoiceNotification(t *testing.T) {
 			TotalInCents:                  100000,
 			SubtotalInCents:               100000,
 			SubTotalBeforeDiscountInCents: 100000,
-			NetTerms:                      recurly.NullInt{Int: 30, Valid: true},
+			NetTerms:                      recurly.NewInt(30),
 			CollectionMethod:              recurly.CollectionMethodManual,
-			CreatedAt:                     recurly.NewTime(created),
-			UpdatedAt:                     recurly.NewTime(created),
-			DueOn:                         recurly.NewTime(dueOn),
+			CreatedAt:                     recurly.NewTime(MustParseTime("2018-02-13T16:00:04Z")),
+			UpdatedAt:                     recurly.NewTime(MustParseTime("2018-02-13T16:00:04Z")),
+			DueOn:                         recurly.NewTime(MustParseTime("2018-03-16T15:00:04Z")),
 			CustomerNotes:                 "Thanks for your business!",
 			TermsAndConditions:            "Payment can be made out to Acme, Co.",
 		},
@@ -157,12 +137,8 @@ func TestParse_ChargeInvoiceNotification(t *testing.T) {
 }
 
 func TestParse_CreditInvoiceNotification(t *testing.T) {
-	d, _ := time.Parse(recurly.DateTimeFormat, "2018-02-13T00:56:22Z")
-	xmlFile := MustOpenFile("testdata/credit_invoice_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.CreditInvoiceNotification); !ok {
+	result := MustParseFile("testdata/credit_invoice_notification.xml")
+	if n, ok := result.(*webhooks.CreditInvoiceNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.CreditInvoiceNotification{
 		Type: webhooks.NewCreditInvoice,
@@ -184,9 +160,9 @@ func TestParse_CreditInvoiceNotification(t *testing.T) {
 			SubtotalInCents:               -4500,
 			SubTotalBeforeDiscountInCents: -5000,
 			DiscountInCents:               -500,
-			CreatedAt:                     recurly.NewTime(d),
-			UpdatedAt:                     recurly.NewTime(d),
-			ClosedAt:                      recurly.NewTime(d),
+			CreatedAt:                     recurly.NewTime(MustParseTime("2018-02-13T00:56:22Z")),
+			UpdatedAt:                     recurly.NewTime(MustParseTime("2018-02-13T00:56:22Z")),
+			ClosedAt:                      recurly.NewTime(MustParseTime("2018-02-13T00:56:22Z")),
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -194,12 +170,8 @@ func TestParse_CreditInvoiceNotification(t *testing.T) {
 }
 
 func TestParse_CreditPaymentNotification(t *testing.T) {
-	d, _ := time.Parse(recurly.DateTimeFormat, "2018-02-12T18:55:20Z")
-	xmlFile := MustOpenFile("testdata/credit_payment_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.CreditPaymentNotification); !ok {
+	result := MustParseFile("testdata/credit_payment_notification.xml")
+	if n, ok := result.(*webhooks.CreditPaymentNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.CreditPaymentNotification{
 		Type: webhooks.NewCreditPayment,
@@ -214,7 +186,7 @@ func TestParse_CreditPaymentNotification(t *testing.T) {
 			AmountInCents:          3579,
 			OriginalInvoiceNumber:  2389,
 			AppliedToInvoiceNumber: 2390,
-			CreatedAt:              recurly.NewTime(d),
+			CreatedAt:              recurly.NewTime(MustParseTime("2018-02-12T18:55:20Z")),
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -222,17 +194,8 @@ func TestParse_CreditPaymentNotification(t *testing.T) {
 }
 
 func TestParse_NewSubscriptionNotification(t *testing.T) {
-	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:03Z")
-	canceledTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:43Z")
-	expiresTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-24T22:05:03Z")
-	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:03Z")
-	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-24T22:05:03Z")
-
-	xmlFile := MustOpenFile("testdata/new_subscription_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
+	result := MustParseFile("testdata/new_subscription_notification.xml")
+	if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.SubscriptionNotification{
 		Type: webhooks.NewSubscription,
@@ -253,11 +216,11 @@ func TestParse_NewSubscriptionNotification(t *testing.T) {
 			State:                  "active",
 			Quantity:               2,
 			TotalAmountInCents:     17000,
-			ActivatedAt:            recurly.NewTime(activatedTs),
-			CanceledAt:             recurly.NewTime(canceledTs),
-			ExpiresAt:              recurly.NewTime(expiresTs),
-			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
-			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+			ActivatedAt:            recurly.NewTime(MustParseTime("2010-09-23T22:05:03Z")),
+			CanceledAt:             recurly.NewTime(MustParseTime("2010-09-23T22:05:43Z")),
+			ExpiresAt:              recurly.NewTime(MustParseTime("2010-09-24T22:05:03Z")),
+			CurrentPeriodStartedAt: recurly.NewTime(MustParseTime("2010-09-23T22:05:03Z")),
+			CurrentPeriodEndsAt:    recurly.NewTime(MustParseTime("2010-09-24T22:05:03Z")),
 			CollectionMethod:       recurly.CollectionMethodAutomatic,
 		},
 	}); diff != "" {
@@ -266,17 +229,8 @@ func TestParse_NewSubscriptionNotification(t *testing.T) {
 }
 
 func TestParse_UpdatedSubscriptionNotification(t *testing.T) {
-	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:03Z")
-	canceledTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:43Z")
-	expiresTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-24T22:05:03Z")
-	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:03Z")
-	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-24T22:05:03Z")
-
-	xmlFile := MustOpenFile("testdata/updated_subscription_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
+	result := MustParseFile("testdata/updated_subscription_notification.xml")
+	if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.SubscriptionNotification{
 		Type: webhooks.UpdatedSubscription,
@@ -297,11 +251,11 @@ func TestParse_UpdatedSubscriptionNotification(t *testing.T) {
 			State:                  "active",
 			Quantity:               1,
 			TotalAmountInCents:     200,
-			ActivatedAt:            recurly.NewTime(activatedTs),
-			CanceledAt:             recurly.NewTime(canceledTs),
-			ExpiresAt:              recurly.NewTime(expiresTs),
-			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
-			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+			ActivatedAt:            recurly.NewTime(MustParseTime("2010-09-23T22:05:03Z")),
+			CanceledAt:             recurly.NewTime(MustParseTime("2010-09-23T22:05:43Z")),
+			ExpiresAt:              recurly.NewTime(MustParseTime("2010-09-24T22:05:03Z")),
+			CurrentPeriodStartedAt: recurly.NewTime(MustParseTime("2010-09-23T22:05:03Z")),
+			CurrentPeriodEndsAt:    recurly.NewTime(MustParseTime("2010-09-24T22:05:03Z")),
 			CollectionMethod:       recurly.CollectionMethodAutomatic,
 		},
 	}); diff != "" {
@@ -310,15 +264,8 @@ func TestParse_UpdatedSubscriptionNotification(t *testing.T) {
 }
 
 func TestParse_RenewedSubscriptionNotification(t *testing.T) {
-	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-07-22T20:42:05Z")
-	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-22T20:42:05Z")
-	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2010-10-22T20:42:05Z")
-
-	xmlFile := MustOpenFile("testdata/renewed_subscription_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
+	result := MustParseFile("testdata/renewed_subscription_notification.xml")
+	if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.SubscriptionNotification{
 		Type: webhooks.RenewedSubscription,
@@ -340,9 +287,9 @@ func TestParse_RenewedSubscriptionNotification(t *testing.T) {
 			State:                  "active",
 			Quantity:               1,
 			TotalAmountInCents:     9900,
-			ActivatedAt:            recurly.NewTime(activatedTs),
-			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
-			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+			ActivatedAt:            recurly.NewTime(MustParseTime("2010-07-22T20:42:05Z")),
+			CurrentPeriodStartedAt: recurly.NewTime(MustParseTime("2010-09-22T20:42:05Z")),
+			CurrentPeriodEndsAt:    recurly.NewTime(MustParseTime("2010-10-22T20:42:05Z")),
 			CollectionMethod:       recurly.CollectionMethodAutomatic,
 		},
 	}); diff != "" {
@@ -351,17 +298,8 @@ func TestParse_RenewedSubscriptionNotification(t *testing.T) {
 }
 
 func TestParse_ExpiredSubscriptionNotification(t *testing.T) {
-	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:03Z")
-	canceledTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:43Z")
-	expiresTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-24T22:05:03Z")
-	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:03Z")
-	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-24T22:05:03Z")
-
-	xmlFile := MustOpenFile("testdata/expired_subscription_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
+	result := MustParseFile("testdata/expired_subscription_notification.xml")
+	if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.SubscriptionNotification{
 		Type: webhooks.ExpiredSubscription,
@@ -382,11 +320,11 @@ func TestParse_ExpiredSubscriptionNotification(t *testing.T) {
 			State:                  "expired",
 			Quantity:               1,
 			TotalAmountInCents:     200,
-			ActivatedAt:            recurly.NewTime(activatedTs),
-			CanceledAt:             recurly.NewTime(canceledTs),
-			ExpiresAt:              recurly.NewTime(expiresTs),
-			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
-			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+			ActivatedAt:            recurly.NewTime(MustParseTime("2010-09-23T22:05:03Z")),
+			CanceledAt:             recurly.NewTime(MustParseTime("2010-09-23T22:05:43Z")),
+			ExpiresAt:              recurly.NewTime(MustParseTime("2010-09-24T22:05:03Z")),
+			CurrentPeriodStartedAt: recurly.NewTime(MustParseTime("2010-09-23T22:05:03Z")),
+			CurrentPeriodEndsAt:    recurly.NewTime(MustParseTime("2010-09-24T22:05:03Z")),
 			CollectionMethod:       recurly.CollectionMethodAutomatic,
 		},
 	}); diff != "" {
@@ -395,17 +333,8 @@ func TestParse_ExpiredSubscriptionNotification(t *testing.T) {
 }
 
 func TestParse_CanceledSubscriptionNotification(t *testing.T) {
-	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:03Z")
-	canceledTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:43Z")
-	expiresTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-24T22:05:03Z")
-	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-23T22:05:03Z")
-	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-24T22:05:03Z")
-
-	xmlFile := MustOpenFile("testdata/canceled_subscription_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
+	result := MustParseFile("testdata/canceled_subscription_notification.xml")
+	if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.SubscriptionNotification{
 		Type: webhooks.CanceledSubscription,
@@ -426,11 +355,11 @@ func TestParse_CanceledSubscriptionNotification(t *testing.T) {
 			State:                  "canceled",
 			Quantity:               1,
 			TotalAmountInCents:     200,
-			ActivatedAt:            recurly.NewTime(activatedTs),
-			CanceledAt:             recurly.NewTime(canceledTs),
-			ExpiresAt:              recurly.NewTime(expiresTs),
-			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
-			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+			ActivatedAt:            recurly.NewTime(MustParseTime("2010-09-23T22:05:03Z")),
+			CanceledAt:             recurly.NewTime(MustParseTime("2010-09-23T22:05:43Z")),
+			ExpiresAt:              recurly.NewTime(MustParseTime("2010-09-24T22:05:03Z")),
+			CurrentPeriodStartedAt: recurly.NewTime(MustParseTime("2010-09-23T22:05:03Z")),
+			CurrentPeriodEndsAt:    recurly.NewTime(MustParseTime("2010-09-24T22:05:03Z")),
 			CollectionMethod:       recurly.CollectionMethodAutomatic,
 		},
 	}); diff != "" {
@@ -439,17 +368,8 @@ func TestParse_CanceledSubscriptionNotification(t *testing.T) {
 }
 
 func TestParse_PausedSubscriptionNotification(t *testing.T) {
-	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-09T17:01:59Z")
-	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-10T22:12:08Z")
-	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-11T22:12:08Z")
-	pausedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-10T22:12:08Z")
-	resumeTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-20T22:12:08Z")
-
-	xmlFile := MustOpenFile("testdata/subscription_paused_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
+	result := MustParseFile("testdata/subscription_paused_notification.xml")
+	if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.SubscriptionNotification{
 		Type: webhooks.PausedSubscription,
@@ -470,11 +390,11 @@ func TestParse_PausedSubscriptionNotification(t *testing.T) {
 			State:                  "paused",
 			Quantity:               10,
 			TotalAmountInCents:     10000,
-			ActivatedAt:            recurly.NewTime(activatedTs),
-			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
-			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
-			PausedAt:               recurly.NewTime(pausedTs),
-			ResumeAt:               recurly.NewTime(resumeTs),
+			ActivatedAt:            recurly.NewTime(MustParseTime("2018-03-09T17:01:59Z")),
+			CurrentPeriodStartedAt: recurly.NewTime(MustParseTime("2018-03-10T22:12:08Z")),
+			CurrentPeriodEndsAt:    recurly.NewTime(MustParseTime("2018-03-11T22:12:08Z")),
+			PausedAt:               recurly.NewTime(MustParseTime("2018-03-10T22:12:08Z")),
+			ResumeAt:               recurly.NewTime(MustParseTime("2018-03-20T22:12:08Z")),
 			RemainingPauseCycles:   9,
 		},
 	}); diff != "" {
@@ -483,15 +403,8 @@ func TestParse_PausedSubscriptionNotification(t *testing.T) {
 }
 
 func TestParse_ResumedSubscriptionNotification(t *testing.T) {
-	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-09T17:01:59Z")
-	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-20T17:50:27Z")
-	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-21T17:50:27Z")
-
-	xmlFile := MustOpenFile("testdata/subscription_resumed_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
+	result := MustParseFile("testdata/subscription_resumed_notification.xml")
+	if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.SubscriptionNotification{
 		Type: webhooks.ResumedSubscription,
@@ -512,9 +425,9 @@ func TestParse_ResumedSubscriptionNotification(t *testing.T) {
 			State:                  "active",
 			Quantity:               10,
 			TotalAmountInCents:     10000,
-			ActivatedAt:            recurly.NewTime(activatedTs),
-			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
-			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+			ActivatedAt:            recurly.NewTime(MustParseTime("2018-03-09T17:01:59Z")),
+			CurrentPeriodStartedAt: recurly.NewTime(MustParseTime("2018-03-20T17:50:27Z")),
+			CurrentPeriodEndsAt:    recurly.NewTime(MustParseTime("2018-03-21T17:50:27Z")),
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -522,17 +435,8 @@ func TestParse_ResumedSubscriptionNotification(t *testing.T) {
 }
 
 func TestParse_ScheduledSubscriptionPausedNotification(t *testing.T) {
-	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-09T22:12:36Z")
-	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-09T22:12:36Z")
-	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2019-03-09T22:12:36Z")
-	pausedTs, _ := time.Parse(recurly.DateTimeFormat, "2019-03-09T22:12:36Z")
-	resumeTs, _ := time.Parse(recurly.DateTimeFormat, "2024-03-09T22:12:36Z")
-
-	xmlFile := MustOpenFile("testdata/scheduled_subscription_pause_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
+	result := MustParseFile("testdata/scheduled_subscription_pause_notification.xml")
+	if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.SubscriptionNotification{
 		Type: webhooks.ScheduledPauseSubscription,
@@ -553,11 +457,11 @@ func TestParse_ScheduledSubscriptionPausedNotification(t *testing.T) {
 			State:                  "active",
 			Quantity:               1,
 			TotalAmountInCents:     709,
-			ActivatedAt:            recurly.NewTime(activatedTs),
-			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
-			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
-			PausedAt:               recurly.NewTime(pausedTs),
-			ResumeAt:               recurly.NewTime(resumeTs),
+			ActivatedAt:            recurly.NewTime(MustParseTime("2018-03-09T22:12:36Z")),
+			CurrentPeriodStartedAt: recurly.NewTime(MustParseTime("2018-03-09T22:12:36Z")),
+			CurrentPeriodEndsAt:    recurly.NewTime(MustParseTime("2019-03-09T22:12:36Z")),
+			PausedAt:               recurly.NewTime(MustParseTime("2019-03-09T22:12:36Z")),
+			ResumeAt:               recurly.NewTime(MustParseTime("2024-03-09T22:12:36Z")),
 			RemainingPauseCycles:   5,
 		},
 	}); diff != "" {
@@ -566,17 +470,8 @@ func TestParse_ScheduledSubscriptionPausedNotification(t *testing.T) {
 }
 
 func TestParse_SubscriptionPauseModifiedNotification(t *testing.T) {
-	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-09T17:01:59Z")
-	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-09T13:33:09Z")
-	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-09T13:38:22Z")
-	pausedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-09T13:38:22Z")
-	resumeTs, _ := time.Parse(recurly.DateTimeFormat, "2023-03-09T13:38:22Z")
-
-	xmlFile := MustOpenFile("testdata/subscription_pause_modified_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
+	result := MustParseFile("testdata/subscription_pause_modified_notification.xml")
+	if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.SubscriptionNotification{
 		Type: webhooks.ModifiedPauseSubscription,
@@ -597,11 +492,11 @@ func TestParse_SubscriptionPauseModifiedNotification(t *testing.T) {
 			State:                  "active",
 			Quantity:               1,
 			TotalAmountInCents:     709,
-			ActivatedAt:            recurly.NewTime(activatedTs),
-			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
-			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
-			PausedAt:               recurly.NewTime(pausedTs),
-			ResumeAt:               recurly.NewTime(resumeTs),
+			ActivatedAt:            recurly.NewTime(MustParseTime("2018-03-09T17:01:59Z")),
+			CurrentPeriodStartedAt: recurly.NewTime(MustParseTime("2018-03-09T13:33:09Z")),
+			CurrentPeriodEndsAt:    recurly.NewTime(MustParseTime("2018-03-09T13:38:22Z")),
+			PausedAt:               recurly.NewTime(MustParseTime("2018-03-09T13:38:22Z")),
+			ResumeAt:               recurly.NewTime(MustParseTime("2023-03-09T13:38:22Z")),
 			RemainingPauseCycles:   5,
 		},
 	}); diff != "" {
@@ -610,17 +505,8 @@ func TestParse_SubscriptionPauseModifiedNotification(t *testing.T) {
 }
 
 func TestParse_PausedSubscriptionRenewalNotification(t *testing.T) {
-	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-09T17:01:59Z")
-	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-18T17:50:27Z")
-	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-19T17:50:27Z")
-	pausedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-10T22:12:08Z")
-	resumeTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-20T17:50:27Z")
-
-	xmlFile := MustOpenFile("testdata/paused_subscription_renewal_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
+	result := MustParseFile("testdata/paused_subscription_renewal_notification.xml")
+	if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.SubscriptionNotification{
 		Type: webhooks.PausedRenewalSubscription,
@@ -641,11 +527,11 @@ func TestParse_PausedSubscriptionRenewalNotification(t *testing.T) {
 			State:                  "paused",
 			Quantity:               10,
 			TotalAmountInCents:     10000,
-			ActivatedAt:            recurly.NewTime(activatedTs),
-			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
-			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
-			PausedAt:               recurly.NewTime(pausedTs),
-			ResumeAt:               recurly.NewTime(resumeTs),
+			ActivatedAt:            recurly.NewTime(MustParseTime("2018-03-09T17:01:59Z")),
+			CurrentPeriodStartedAt: recurly.NewTime(MustParseTime("2018-03-18T17:50:27Z")),
+			CurrentPeriodEndsAt:    recurly.NewTime(MustParseTime("2018-03-19T17:50:27Z")),
+			PausedAt:               recurly.NewTime(MustParseTime("2018-03-10T22:12:08Z")),
+			ResumeAt:               recurly.NewTime(MustParseTime("2018-03-20T17:50:27Z")),
 			RemainingPauseCycles:   1,
 		},
 	}); diff != "" {
@@ -653,15 +539,8 @@ func TestParse_PausedSubscriptionRenewalNotification(t *testing.T) {
 	}
 }
 func TestParse_SubscriptionPauseCanceledNotification(t *testing.T) {
-	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-09T22:12:36Z")
-	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-09T22:12:36Z")
-	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2019-03-09T22:12:36Z")
-
-	xmlFile := MustOpenFile("testdata/subscription_pause_canceled_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
+	result := MustParseFile("testdata/subscription_pause_canceled_notification.xml")
+	if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.SubscriptionNotification{
 		Type: webhooks.PauseCanceledSubscription,
@@ -682,24 +561,17 @@ func TestParse_SubscriptionPauseCanceledNotification(t *testing.T) {
 			State:                  "active",
 			Quantity:               1,
 			TotalAmountInCents:     2000,
-			ActivatedAt:            recurly.NewTime(activatedTs),
-			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
-			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+			ActivatedAt:            recurly.NewTime(MustParseTime("2018-03-09T22:12:36Z")),
+			CurrentPeriodStartedAt: recurly.NewTime(MustParseTime("2018-03-09T22:12:36Z")),
+			CurrentPeriodEndsAt:    recurly.NewTime(MustParseTime("2019-03-09T22:12:36Z")),
 		},
 	}); diff != "" {
 		t.Fatal(diff)
 	}
 }
 func TestParse_ReactivatedAccountNotification(t *testing.T) {
-	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-07-22T20:42:05Z")
-	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2010-09-22T20:42:05Z")
-	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2010-10-22T20:42:05Z")
-
-	xmlFile := MustOpenFile("testdata/reactivated_account_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
-	if err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
+	result := MustParseFile("testdata/reactivated_account_notification.xml")
+	if n, ok := result.(*webhooks.SubscriptionNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.SubscriptionNotification{
 		Type: webhooks.ReactivatedAccount,
@@ -720,9 +592,9 @@ func TestParse_ReactivatedAccountNotification(t *testing.T) {
 			State:                  "active",
 			Quantity:               1,
 			TotalAmountInCents:     9900,
-			ActivatedAt:            recurly.NewTime(activatedTs),
-			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
-			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+			ActivatedAt:            recurly.NewTime(MustParseTime("2010-07-22T20:42:05Z")),
+			CurrentPeriodStartedAt: recurly.NewTime(MustParseTime("2010-09-22T20:42:05Z")),
+			CurrentPeriodEndsAt:    recurly.NewTime(MustParseTime("2010-10-22T20:42:05Z")),
 			CollectionMethod:       recurly.CollectionMethodAutomatic,
 		},
 	}); diff != "" {
@@ -731,10 +603,8 @@ func TestParse_ReactivatedAccountNotification(t *testing.T) {
 }
 
 func TestParse_SuccessfulPaymentNotification(t *testing.T) {
-	xmlFile := MustOpenFile("testdata/successful_payment_notification.xml")
-	if result, err := webhooks.Parse(xmlFile); err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.PaymentNotification); !ok {
+	result := MustParseFile("testdata/successful_payment_notification.xml")
+	if n, ok := result.(*webhooks.PaymentNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.PaymentNotification{
 		Type: webhooks.SuccessfulPayment,
@@ -758,9 +628,9 @@ func TestParse_SuccessfulPaymentNotification(t *testing.T) {
 			Message:       "Bogus Gateway: Forced success",
 			Reference:     "reference",
 			Source:        "subscription",
-			Test:          recurly.NullBool{Valid: true, Bool: true},
-			Voidable:      recurly.NullBool{Valid: true, Bool: true},
-			Refundable:    recurly.NullBool{Valid: true, Bool: true},
+			Test:          recurly.NewBool(true),
+			Voidable:      recurly.NewBool(true),
+			Refundable:    recurly.NewBool(true),
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -768,10 +638,8 @@ func TestParse_SuccessfulPaymentNotification(t *testing.T) {
 }
 
 func TestParse_FailedPaymentNotification(t *testing.T) {
-	xmlFile := MustOpenFile("testdata/failed_payment_notification.xml")
-	if result, err := webhooks.Parse(xmlFile); err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.PaymentNotification); !ok {
+	result := MustParseFile("testdata/failed_payment_notification.xml")
+	if n, ok := result.(*webhooks.PaymentNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.PaymentNotification{
 		Type: webhooks.FailedPayment,
@@ -797,9 +665,9 @@ func TestParse_FailedPaymentNotification(t *testing.T) {
 			FailureType:      "Declined by the gateway",
 			Reference:        "reference",
 			Source:           "subscription",
-			Test:             recurly.NullBool{Valid: true, Bool: true},
-			Voidable:         recurly.NullBool{Valid: true, Bool: false},
-			Refundable:       recurly.NullBool{Valid: true, Bool: false},
+			Test:             recurly.NewBool(true),
+			Voidable:         recurly.NewBool(false),
+			Refundable:       recurly.NewBool(false),
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -807,10 +675,8 @@ func TestParse_FailedPaymentNotification(t *testing.T) {
 }
 
 func TestParse_VoidPaymentNotification(t *testing.T) {
-	xmlFile := MustOpenFile("testdata/void_payment_notification.xml")
-	if result, err := webhooks.Parse(xmlFile); err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.PaymentNotification); !ok {
+	result := MustParseFile("testdata/void_payment_notification.xml")
+	if n, ok := result.(*webhooks.PaymentNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.PaymentNotification{
 		Type: webhooks.VoidPayment,
@@ -834,9 +700,9 @@ func TestParse_VoidPaymentNotification(t *testing.T) {
 			Message:          "Test Gateway: Successful test transaction",
 			Reference:        "reference",
 			Source:           "subscription",
-			Test:             recurly.NullBool{Valid: true, Bool: true},
-			Voidable:         recurly.NullBool{Valid: true, Bool: true},
-			Refundable:       recurly.NullBool{Valid: true, Bool: true},
+			Test:             recurly.NewBool(true),
+			Voidable:         recurly.NewBool(true),
+			Refundable:       recurly.NewBool(true),
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -844,10 +710,8 @@ func TestParse_VoidPaymentNotification(t *testing.T) {
 }
 
 func TestParse_SuccessfulRefundNotification(t *testing.T) {
-	xmlFile := MustOpenFile("testdata/successful_refund_notification.xml")
-	if result, err := webhooks.Parse(xmlFile); err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.PaymentNotification); !ok {
+	result := MustParseFile("testdata/successful_refund_notification.xml")
+	if n, ok := result.(*webhooks.PaymentNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.PaymentNotification{
 		Type: webhooks.SuccessfulRefund,
@@ -871,9 +735,9 @@ func TestParse_SuccessfulRefundNotification(t *testing.T) {
 			Message:          "Bogus Gateway: Forced success",
 			Reference:        "reference",
 			Source:           "subscription",
-			Test:             recurly.NullBool{Valid: true, Bool: true},
-			Voidable:         recurly.NullBool{Valid: true, Bool: true},
-			Refundable:       recurly.NullBool{Valid: true, Bool: true},
+			Test:             recurly.NewBool(true),
+			Voidable:         recurly.NewBool(true),
+			Refundable:       recurly.NewBool(true),
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -881,10 +745,8 @@ func TestParse_SuccessfulRefundNotification(t *testing.T) {
 }
 
 func TestParse_ProcessingPaymentNotification(t *testing.T) {
-	xmlFile := MustOpenFile("testdata/processing_payment_notification.xml")
-	if result, err := webhooks.Parse(xmlFile); err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.PaymentNotification); !ok {
+	result := MustParseFile("testdata/processing_payment_notification.xml")
+	if n, ok := result.(*webhooks.PaymentNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.PaymentNotification{
 		Type: webhooks.ProcessingPayment,
@@ -908,9 +770,9 @@ func TestParse_ProcessingPaymentNotification(t *testing.T) {
 			Message:          "Bogus Gateway: Forced success",
 			Reference:        "",
 			Source:           "subscription",
-			Test:             recurly.NullBool{Valid: true, Bool: true},
-			Voidable:         recurly.NullBool{Valid: true, Bool: true},
-			Refundable:       recurly.NullBool{Valid: true, Bool: true},
+			Test:             recurly.NewBool(true),
+			Voidable:         recurly.NewBool(true),
+			Refundable:       recurly.NewBool(true),
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -918,10 +780,8 @@ func TestParse_ProcessingPaymentNotification(t *testing.T) {
 }
 
 func TestParse_ScheduledPaymentNotification(t *testing.T) {
-	xmlFile := MustOpenFile("testdata/scheduled_payment_notification.xml")
-	if result, err := webhooks.Parse(xmlFile); err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.PaymentNotification); !ok {
+	result := MustParseFile("testdata/scheduled_payment_notification.xml")
+	if n, ok := result.(*webhooks.PaymentNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.PaymentNotification{
 		Type: webhooks.ScheduledPayment,
@@ -945,9 +805,9 @@ func TestParse_ScheduledPaymentNotification(t *testing.T) {
 			Message:          "Bogus Gateway: Forced success",
 			Reference:        "",
 			Source:           "subscription",
-			Test:             recurly.NullBool{Valid: true, Bool: true},
-			Voidable:         recurly.NullBool{Valid: true, Bool: true},
-			Refundable:       recurly.NullBool{Valid: true, Bool: true},
+			Test:             recurly.NewBool(true),
+			Voidable:         recurly.NewBool(true),
+			Refundable:       recurly.NewBool(true),
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -955,16 +815,8 @@ func TestParse_ScheduledPaymentNotification(t *testing.T) {
 }
 
 func TestParse_NewDunningEventNotification(t *testing.T) {
-	createdTs, _ := time.Parse(recurly.DateTimeFormat, "2018-01-09T16:47:43Z")
-	updatedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-02-12T16:50:23Z")
-	activatedTs, _ := time.Parse(recurly.DateTimeFormat, "2017-11-09T16:47:30Z")
-	startedTs, _ := time.Parse(recurly.DateTimeFormat, "2018-02-09T16:47:30Z")
-	dueOnTs, _ := time.Parse(recurly.DateTimeFormat, "2018-02-09T16:47:43Z")
-	endsTs, _ := time.Parse(recurly.DateTimeFormat, "2018-03-09T16:47:30Z")
-	xmlFile := MustOpenFile("testdata/new_dunning_event_notification.xml")
-	if result, err := webhooks.Parse(xmlFile); err != nil {
-		t.Fatal(err)
-	} else if n, ok := result.(*webhooks.NewDunningEventNotification); !ok {
+	result := MustParseFile("testdata/new_dunning_event_notification.xml")
+	if n, ok := result.(*webhooks.NewDunningEventNotification); !ok {
 		t.Fatalf("unexpected type: %T, result", n)
 	} else if diff := cmp.Diff(n, &webhooks.NewDunningEventNotification{
 		Type: webhooks.NewDunningEvent,
@@ -984,16 +836,16 @@ func TestParse_NewDunningEventNotification(t *testing.T) {
 			State:                         "past_due",
 			Origin:                        "renewal",
 			Currency:                      "USD",
-			CreatedAt:                     recurly.NullTime{Time: &createdTs},
-			UpdatedAt:                     recurly.NullTime{Time: &updatedTs},
-			DueOn:                         recurly.NullTime{Time: &dueOnTs},
+			CreatedAt:                     recurly.NewTime(MustParseTime("2018-01-09T16:47:43Z")),
+			UpdatedAt:                     recurly.NewTime(MustParseTime("2018-02-12T16:50:23Z")),
+			DueOn:                         recurly.NewTime(MustParseTime("2018-02-09T16:47:43Z")),
 			BalanceInCents:                4000,
 			InvoiceNumber:                 1813,
 			TotalInCents:                  4500,
 			SubtotalInCents:               4500,
 			SubTotalBeforeDiscountInCents: 4500,
 			CustomerNotes:                 "Thanks for your business!",
-			NetTerms:                      recurly.NullInt{Valid: true, Int: 30},
+			NetTerms:                      recurly.NewInt(30),
 			CollectionMethod:              recurly.CollectionMethodManual,
 		},
 		Subscription: recurly.Subscription{
@@ -1006,9 +858,9 @@ func TestParse_NewDunningEventNotification(t *testing.T) {
 			State:                  "active",
 			Quantity:               1,
 			TotalAmountInCents:     4500,
-			ActivatedAt:            recurly.NewTime(activatedTs),
-			CurrentPeriodStartedAt: recurly.NewTime(startedTs),
-			CurrentPeriodEndsAt:    recurly.NewTime(endsTs),
+			ActivatedAt:            recurly.NewTime(MustParseTime("2017-11-09T16:47:30Z")),
+			CurrentPeriodStartedAt: recurly.NewTime(MustParseTime("2018-02-09T16:47:30Z")),
+			CurrentPeriodEndsAt:    recurly.NewTime(MustParseTime("2018-03-09T16:47:30Z")),
 		},
 	}); diff != "" {
 		t.Fatal(diff)
@@ -1016,17 +868,30 @@ func TestParse_NewDunningEventNotification(t *testing.T) {
 }
 
 func TestParse_ErrUnknownNotification(t *testing.T) {
-	xmlFile := MustOpenFile("testdata/unknown_notification.xml")
-	result, err := webhooks.Parse(xmlFile)
+	f := MustOpenFile("testdata/unknown_notification.xml")
+	defer f.Close()
+
+	result, err := webhooks.Parse(f)
 	if result != nil {
 		t.Fatalf("unexpected notification: %#v", result)
 	} else if e, ok := err.(webhooks.ErrUnknownNotification); !ok {
 		t.Fatalf("unexpected type: %T, error", e)
-	} else if err.Error() != "unknown notification: unknown_notification" {
+	} else if err.Error() != `unknown notification: "unknown_notification"` {
 		t.Fatalf("unexpected error string: %s", err.Error())
 	} else if e.Name() != "unknown_notification" {
 		t.Fatalf("unexpected notification name: %s", e.Name())
 	}
+}
+
+func MustParseFile(file string) interface{} {
+	f := MustOpenFile(file)
+	result, err := webhooks.Parse(f)
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	return result
 }
 
 func MustOpenFile(name string) *os.File {
@@ -1035,4 +900,13 @@ func MustOpenFile(name string) *os.File {
 		panic(err)
 	}
 	return file
+}
+
+// MustParseTime parses a string into time.Time, panicing if there is an error.
+func MustParseTime(str string) time.Time {
+	t, err := time.Parse(recurly.DateTimeFormat, str)
+	if err != nil {
+		panic(err)
+	}
+	return t
 }

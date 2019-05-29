@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<shipping_method href="https://api.recurly.com/v2/shipping_methods/fast_fast_fast">
+   <code>fast_fast_fast</code>
+   <name>Fast Fast Fast</name>
+   <accounting_code />
+   <tax_code />
+   <created_at type="datetime">2019-05-03T23:17:16Z</created_at>
+   <updated_at type="datetime">2019-05-03T23:17:16Z</updated_at>
+</shipping_method>

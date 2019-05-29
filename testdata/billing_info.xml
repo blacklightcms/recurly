@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<billing_info href="https://your-subdomain.recurly.com/v2/accounts/1/billing_info" type="credit_card">
+   <account href="https://your-subdomain.recurly.com/v2/accounts/1" />
+   <first_name>Verena</first_name>
+   <last_name>Example</last_name>
+   <company nil="nil" />
+   <address1>123 Main St.</address1>
+   <address2 nil="nil" />
+   <city>San Francisco</city>
+   <state>CA</state>
+   <zip>94105</zip>
+   <country>US</country>
+   <phone nil="nil" />
+   <vat_number>US1234567890</vat_number>
+   <ip_address>127.0.0.1</ip_address>
+   <ip_address_country>US</ip_address_country>
+   <card_type>Visa</card_type>
+   <year type="integer">2015</year>
+   <month type="integer">11</month>
+   <first_six>411111</first_six>
+   <last_four>1111</last_four>
+</billing_info>

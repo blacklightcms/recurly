@@ -2,9 +2,9 @@ package recurly_test
 
 import (
 	"bytes"
+	"context"
 	"encoding/xml"
 	"fmt"
-	"io"
 	"net/http"
 	"testing"
 	"time"
@@ -13,10 +13,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-// TestCouponsEncoding ensures structs are encoded to XML properly.
-// Because Recurly supports partial updates, it's important that only defined
-// fields are handled properly -- including types like booleans and integers which
-// have zero values that we want to send.
+// Ensure structs are encoded to XML properly.
 func TestCoupons_Encoding(t *testing.T) {
 	redeem, _ := time.Parse(recurly.DateTimeFormat, "2014-01-01T07:00:00Z")
 	tests := []struct {
@@ -24,8 +21,15 @@ func TestCoupons_Encoding(t *testing.T) {
 		expected string
 	}{
 		{
-			v:        recurly.Coupon{XMLName: xml.Name{Local: "coupon"}},
-			expected: "<coupon><coupon_code></coupon_code><name></name><discount_type></discount_type><plan_codes></plan_codes></coupon>",
+			v: recurly.Coupon{XMLName: xml.Name{Local: "coupon"}},
+			expected: MustCompactString(`
+				<coupon>
+					<coupon_code></coupon_code>
+					<name></name>
+					<discount_type></discount_type>
+					<plan_codes></plan_codes>
+				</coupon>
+			`),
 		},
 		{
 			v: recurly.Coupon{
@@ -34,7 +38,14 @@ func TestCoupons_Encoding(t *testing.T) {
 				Name:         "Special 10% off",
 				DiscountType: "percent",
 			},
-			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><discount_type>percent</discount_type><plan_codes></plan_codes></coupon>",
+			expected: MustCompactString(`
+				<coupon>
+					<coupon_code>special</coupon_code>
+					<name>Special 10% off</name>
+					<discount_type>percent</discount_type>
+					<plan_codes></plan_codes>
+				</coupon>
+			`),
 		},
 		{
 			v: recurly.Coupon{
@@ -46,7 +57,17 @@ func TestCoupons_Encoding(t *testing.T) {
 				Description:        "Save 10%",
 				DiscountType:       "percent",
 			},
-			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><redemption_resource>account</redemption_resource><state>redeemable</state><discount_type>percent</discount_type><description>Save 10%</description><plan_codes></plan_codes></coupon>",
+			expected: MustCompactString(`
+				<coupon>
+					<coupon_code>special</coupon_code>
+					<name>Special 10% off</name>
+					<redemption_resource>account</redemption_resource>
+					<state>redeemable</state>
+					<discount_type>percent</discount_type>
+					<description>Save 10%</description>
+					<plan_codes></plan_codes>
+				</coupon>
+			`),
 		},
 		{
 			v: recurly.Coupon{
@@ -57,11 +78,22 @@ func TestCoupons_Encoding(t *testing.T) {
 				RedemptionResource: "account",
 				Description:        "Save 10%",
 				DiscountType:       "percent",
-				SingleUse:          true,
 				AppliesToAllPlans:  true,
 				DiscountPercent:    recurly.NewInt(10),
 			},
-			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><redemption_resource>account</redemption_resource><state>redeemable</state><single_use>true</single_use><applies_to_all_plans>true</applies_to_all_plans><discount_type>percent</discount_type><description>Save 10%</description><discount_percent>10</discount_percent><plan_codes></plan_codes></coupon>",
+			expected: MustCompactString(`
+				<coupon>
+					<coupon_code>special</coupon_code>
+					<name>Special 10% off</name>
+					<redemption_resource>account</redemption_resource>
+					<state>redeemable</state>
+					<applies_to_all_plans>true</applies_to_all_plans>
+					<discount_type>percent</discount_type>
+					<description>Save 10%</description>
+					<discount_percent>10</discount_percent>
+					<plan_codes></plan_codes>
+				</coupon>
+			`),
 		},
 		{
 			v: recurly.Coupon{
@@ -74,7 +106,20 @@ func TestCoupons_Encoding(t *testing.T) {
 				MaxRedemptions:           recurly.NewInt(2),
 				MaxRedemptionsPerAccount: recurly.NewInt(1),
 			},
-			expected: "<coupon><coupon_code>special</coupon_code><coupon_type>single_code</coupon_type><name>Special 10% off</name><discount_type>dollars</discount_type><discount_in_cents><USD>100</USD></discount_in_cents><max_redemptions>2</max_redemptions><max_redemptions_per_account>1</max_redemptions_per_account><plan_codes></plan_codes></coupon>",
+			expected: MustCompactString(`
+				<coupon>
+					<coupon_code>special</coupon_code>
+					<coupon_type>single_code</coupon_type>
+					<name>Special 10% off</name>
+					<discount_type>dollars</discount_type>
+					<discount_in_cents>
+					<USD>100</USD>
+					</discount_in_cents>
+					<max_redemptions>2</max_redemptions>
+					<max_redemptions_per_account>1</max_redemptions_per_account>
+					<plan_codes></plan_codes>
+				</coupon>
+			`),
 		},
 		{
 			v: recurly.Coupon{
@@ -85,7 +130,17 @@ func TestCoupons_Encoding(t *testing.T) {
 				TemporalUnit:   "day",
 				TemporalAmount: recurly.NewInt(28),
 			},
-			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><duration>temporal</duration><discount_type></discount_type><temporal_unit>day</temporal_unit><temporal_amount>28</temporal_amount><plan_codes></plan_codes></coupon>",
+			expected: MustCompactString(`
+				<coupon>
+					<coupon_code>special</coupon_code>
+					<name>Special 10% off</name>
+					<duration>temporal</duration>
+					<discount_type></discount_type>
+					<temporal_unit>day</temporal_unit>
+					<temporal_amount>28</temporal_amount>
+					<plan_codes></plan_codes>
+				</coupon>
+			`),
 		},
 		{
 			v: recurly.Coupon{
@@ -97,155 +152,324 @@ func TestCoupons_Encoding(t *testing.T) {
 				RedeemByDate:      recurly.NewTime(redeem),
 				PlanCodes:         []string{"gold", "silver"},
 			},
-			expected: "<coupon><coupon_code>special</coupon_code><name>Special 10% off</name><applies_to_all_plans>true</applies_to_all_plans><discount_type>percent</discount_type><redeem_by_date>2014-01-01T07:00:00Z</redeem_by_date><plan_codes><plan_code>gold</plan_code><plan_code>silver</plan_code></plan_codes></coupon>",
+			expected: MustCompactString(`
+				<coupon>
+					<coupon_code>special</coupon_code>
+					<name>Special 10% off</name>
+					<applies_to_all_plans>true</applies_to_all_plans>
+					<discount_type>percent</discount_type>
+					<redeem_by_date>2014-01-01T07:00:00Z</redeem_by_date>
+					<plan_codes>
+						<plan_code>gold</plan_code>
+						<plan_code>silver</plan_code>
+					</plan_codes>
+				</coupon>
+			`),
 		},
 	}
 
-	for _, tt := range tests {
-		var buf bytes.Buffer
-		if err := xml.NewEncoder(&buf).Encode(tt.v); err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		} else if buf.String() != tt.expected {
-			t.Fatalf("unexpected coupon: %v", cmp.Diff(buf.String(), tt.expected))
-		}
-	}
+	for i, tt := range tests {
+		t.Run(fmt.Sprintf("Encode/%d", i), func(t *testing.T) {
+			buf := new(bytes.Buffer)
+			if err := xml.NewEncoder(buf).Encode(tt.v); err != nil {
+				t.Fatal(err)
+			} else if buf.String() != tt.expected {
+				t.Fatal(buf.String())
+			}
+		})
 
-	for _, tt := range tests {
-		c := recurly.Coupon{}
-		if err := xml.Unmarshal([]byte(tt.expected), &c); err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		} else if diff := cmp.Diff(tt.v, c); diff != "" {
-			t.Fatalf("unexpected decode diff: %v", diff)
-		}
+		t.Run(fmt.Sprintf("Decode/%d", i), func(t *testing.T) {
+			var c recurly.Coupon
+			if err := xml.Unmarshal([]byte(tt.expected), &c); err != nil {
+				t.Fatal(err)
+			} else if diff := cmp.Diff(tt.v, c); diff != "" {
+				t.Fatal(diff)
+			}
+		})
 	}
 }
 
 func TestCoupons_List(t *testing.T) {
-	setup()
-	defer teardown()
+	client, s := recurly.NewTestServer()
+	defer s.Close()
 
-	mux.HandleFunc("/v2/coupons", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "GET" {
-			t.Fatalf("unexpected method: %s", r.Method)
+	var invocations int
+	s.HandleFunc("GET", "/v2/coupons", func(w http.ResponseWriter, r *http.Request) {
+		invocations++
+		w.WriteHeader(http.StatusOK)
+		w.Write(MustOpenFile("coupons.xml"))
+	}, t)
+
+	pager := client.Coupons.List(nil)
+	for pager.Next() {
+		var coupons []recurly.Coupon
+		if err := pager.Fetch(context.Background(), &coupons); err != nil {
+			t.Fatal(err)
+		} else if !s.Invoked {
+			t.Fatal("expected s to be invoked")
+		} else if diff := cmp.Diff(coupons, []recurly.Coupon{*NewTestCoupon()}); diff != "" {
+			t.Fatal(diff)
 		}
-		w.WriteHeader(200)
-		io.WriteString(w, `<?xml version="1.0" encoding="UTF-8"?>
-        <coupons type="array">
-          <coupon href="https://your-subdomain.recurly.com/v2/coupons/special">
-            <redemptions href="https://your-subdomain.recurly.com/v2/coupons/special/redemptions"/>
-            <id type="integer">2151093486799579392</id>
-            <coupon_code>special</coupon_code>
-            <coupon_type>single_code</coupon_type>
-            <name>Special 10% off</name>
-            <state>redeemable</state>
-            <single_use>true</single_use>
-            <discount_type>percent</discount_type>
-            <max_redemptions type="integer">200</max_redemptions>
-            <applies_to_all_plans>false</applies_to_all_plans>
-            <discount_percent type="integer">10</discount_percent>
-            <redeem_by_date type="datetime">2014-01-01T07:00:00Z</redeem_by_date>
-            <single_use type="boolean">true</single_use>
-            <applies_for_months nil="nil"></applies_for_months>
-            <max_redemptions type="integer">10</max_redemptions>
-            <applies_to_all_plans type="boolean">false</applies_to_all_plans>
-            <duration>single_use</duration>
-            <temporal_unit nil="nil"/>
-            <temporal_amount nil="nil"/>
-            <redemption_resource>account</redemption_resource>
-            <max_redemptions_per_account nil="nil"/>
-            <created_at type="datetime">2011-04-10T07:00:00Z</created_at>
-            <plan_codes type="array">
-              <plan_code>gold</plan_code>
-              <plan_code>platinum</plan_code>
-            </plan_codes>
-            <a name="redeem" href="https://your-subdomain.recurly.com/v2/coupons/special/redeem" method="post"/>
-          </coupon>
-        </coupons>`)
-	})
-
-	resp, coupons, err := client.Coupons.List(recurly.Params{"per_page": 1})
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	} else if resp.IsError() {
-		t.Fatal("expected list coupons to return OK")
-	} else if pp := resp.Request.URL.Query().Get("per_page"); pp != "1" {
-		t.Fatalf("unexpected per_page: %s", pp)
 	}
-
-	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-04-10T07:00:00Z")
-	redeem, _ := time.Parse(recurly.DateTimeFormat, "2014-01-01T07:00:00Z")
-	if diff := cmp.Diff(coupons, []recurly.Coupon{
-		{
-			XMLName:            xml.Name{Local: "coupon"},
-			ID:                 2151093486799579392,
-			Code:               "special",
-			Name:               "Special 10% off",
-			Type:               "single_code",
-			State:              "redeemable",
-			RedemptionResource: "account",
-			DiscountType:       "percent",
-			DiscountPercent:    recurly.NewInt(10),
-			RedeemByDate:       recurly.NewTime(redeem),
-			SingleUse:          true,
-			Duration:           "single_use",
-			MaxRedemptions:     recurly.NewInt(10),
-			AppliesToAllPlans:  false,
-			CreatedAt:          recurly.NewTime(ts),
-			PlanCodes:          []string{"gold", "platinum"},
-		},
-	}); diff != "" {
-		t.Fatal(diff)
+	if invocations != 1 {
+		t.Fatalf("unexpected number of invocations: %d", invocations)
 	}
 }
 
 func TestCoupons_Get(t *testing.T) {
-	setup()
-	defer teardown()
+	t.Run("OK", func(t *testing.T) {
+		client, s := recurly.NewTestServer()
+		defer s.Close()
 
-	mux.HandleFunc("/v2/coupons/special", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "GET" {
-			t.Fatalf("unexpected method: %s", r.Method)
+		s.HandleFunc("GET", "/v2/coupons/special", func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write(MustOpenFile("coupon.xml"))
+		}, t)
+
+		if coupon, err := client.Coupons.Get(context.Background(), "special"); err != nil {
+			t.Fatal(err)
+		} else if diff := cmp.Diff(coupon, NewTestCoupon()); diff != "" {
+			t.Fatal(diff)
+		} else if !s.Invoked {
+			t.Fatal("expected fn invocation")
 		}
-		w.WriteHeader(200)
-		io.WriteString(w, `<?xml version="1.0" encoding="UTF-8"?>
-            <coupon href="https://your-subdomain.recurly.com/v2/coupons/special">
-             	<redemptions href="https://your-subdomain.recurly.com/v2/coupons/special/redemptions"/>
-             	<id type="integer">2151093486799579392</id>
-             	<coupon_code>special</coupon_code>
-             	<name>20$ off</name>
-             	<state>redeemable</state>
-             	<coupon_type>bulk</coupon_type>
-             	<discount_type>dollars</discount_type>
-             	<discount_in_cents>
-             	  <USD type="integer">2000</USD>
-             	</discount_in_cents>
-             	<redemption_resource>account</redemption_resource>
-             	<unique_code_template>'savemore'99999999</unique_code_template>
-             	<redeem_by_date type="datetime">2014-01-01T07:00:00Z</redeem_by_date>
-             	<max_redemptions_per_account type="integer">1</max_redemptions_per_account>
-             	<single_use type="boolean">true</single_use>
-             	<applies_for_months nil="nil"></applies_for_months>
-             	<max_redemptions type="integer">10</max_redemptions>
-              <applies_to_all_plans type="boolean">false</applies_to_all_plans>
-             	<created_at type="datetime">2011-04-10T07:00:00Z</created_at>
-             	<plan_codes type="array">
-             	  <plan_code>gold</plan_code>
-             	  <plan_code>platinum</plan_code>
-             	</plan_codes>
-             	<a name="redeem" href="https://your-subdomain.recurly.com/v2/coupons/special/redeem" method="post"/>
-            </coupon>`)
 	})
 
-	resp, coupon, err := client.Coupons.Get("special")
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	} else if resp.IsError() {
-		t.Fatal("expected get coupon to return OK")
+	// Ensure a 404 returns nil values.
+	t.Run("ErrNotFound", func(t *testing.T) {
+		client, s := recurly.NewTestServer()
+		defer s.Close()
+
+		s.HandleFunc("GET", "/v2/coupons/special", func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusNotFound)
+		}, t)
+
+		if coupon, err := client.Coupons.Get(context.Background(), "special"); !s.Invoked {
+			t.Fatal("expected fn invocation")
+		} else if err != nil {
+			t.Fatal(err)
+		} else if coupon != nil {
+			t.Fatalf("expected nil: %#v", coupon)
+		}
+	})
+}
+
+func TestCoupons_Create(t *testing.T) {
+	client, s := recurly.NewTestServer()
+	defer s.Close()
+
+	s.HandleFunc("POST", "/v2/coupons", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusCreated)
+		w.Write(MustOpenFile("coupon.xml"))
+	}, t)
+
+	if coupon, err := client.Coupons.Create(context.Background(), recurly.Coupon{}); !s.Invoked {
+		t.Fatal("expected fn invocation")
+	} else if err != nil {
+		t.Fatal(err)
+	} else if diff := cmp.Diff(coupon, NewTestCoupon()); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
+func TestCoupons_Update(t *testing.T) {
+	client, s := recurly.NewTestServer()
+	defer s.Close()
+
+	s.HandleFunc("PUT", "/v2/coupons/special", func(w http.ResponseWriter, r *http.Request) {
+		if str := MustReadAllString(r.Body); str != MustCompactString(`
+			<coupon>
+				<name>New Coupon Name</name>
+				<description>New coupon description for the hosted pages.</description>
+				<invoice_description>New coupon description for the invoice.</invoice_description>
+				<redeem_by_date>2011-04-10T07:00:00Z</redeem_by_date>
+				<max_redemptions>500</max_redemptions>
+				<max_redemptions_per_account>1</max_redemptions_per_account>
+			</coupon>
+		`) {
+			t.Fatal(str)
+		}
+		w.WriteHeader(http.StatusCreated)
+		w.Write(MustOpenFile("coupon.xml"))
+	}, t)
+
+	if coupon, err := client.Coupons.Update(context.Background(), "special", recurly.Coupon{
+		Name:                     "New Coupon Name",
+		Description:              "New coupon description for the hosted pages.",
+		InvoiceDescription:       "New coupon description for the invoice.",
+		RedeemByDate:             recurly.NewTime(MustParseTime("2011-04-10T07:00:00Z")),
+		MaxRedemptions:           recurly.NewInt(500),
+		MaxRedemptionsPerAccount: recurly.NewInt(1),
+		// Send extra coupon fields to assert they are not sent
+		ID:                 1,
+		State:              "redeemable",
+		Type:               "bulk",
+		DiscountType:       "dollars",
+		DiscountInCents:    &recurly.UnitAmount{USD: 2000},
+		RedemptionResource: "account",
+		AppliesToAllPlans:  false,
+		UniqueCodeTemplate: "'savemore'99999999",
+		CreatedAt:          recurly.NewTime(MustParseTime("2011-04-10T07:00:00Z")),
+		PlanCodes:          []string{"gold", "platinum"},
+	}); !s.Invoked {
+		t.Fatal("expected fn invocation")
+	} else if err != nil {
+		t.Fatal(err)
+	} else if diff := cmp.Diff(coupon, NewTestCoupon()); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
+func TestCoupons_Restore(t *testing.T) {
+	t.Run("Edits", func(t *testing.T) {
+		client, s := recurly.NewTestServer()
+		defer s.Close()
+
+		s.HandleFunc("PUT", "/v2/coupons/special/restore", func(w http.ResponseWriter, r *http.Request) {
+			if str := MustReadAllString(r.Body); str != MustCompactString(`
+			<coupon>
+				<name>New Coupon Name</name>
+				<description>New coupon description for the hosted pages.</description>
+				<invoice_description>New coupon description for the invoice.</invoice_description>
+				<redeem_by_date>2011-04-10T07:00:00Z</redeem_by_date>
+				<max_redemptions>500</max_redemptions>
+				<max_redemptions_per_account>1</max_redemptions_per_account>
+			</coupon>
+		`) {
+				t.Fatal(str)
+			}
+			w.WriteHeader(http.StatusCreated)
+			w.Write(MustOpenFile("coupon.xml"))
+		}, t)
+
+		if coupon, err := client.Coupons.Restore(context.Background(), "special", recurly.Coupon{
+			Name:                     "New Coupon Name",
+			Description:              "New coupon description for the hosted pages.",
+			InvoiceDescription:       "New coupon description for the invoice.",
+			RedeemByDate:             recurly.NewTime(MustParseTime("2011-04-10T07:00:00Z")),
+			MaxRedemptions:           recurly.NewInt(500),
+			MaxRedemptionsPerAccount: recurly.NewInt(1),
+			// Send extra coupon fields to assert they are not sent
+			ID:                 1,
+			State:              "redeemable",
+			Type:               "bulk",
+			DiscountType:       "dollars",
+			DiscountInCents:    &recurly.UnitAmount{USD: 2000},
+			RedemptionResource: "account",
+			AppliesToAllPlans:  false,
+			UniqueCodeTemplate: "'savemore'99999999",
+			CreatedAt:          recurly.NewTime(MustParseTime("2011-04-10T07:00:00Z")),
+			PlanCodes:          []string{"gold", "platinum"},
+		}); !s.Invoked {
+			t.Fatal("expected fn invocation")
+		} else if err != nil {
+			t.Fatal(err)
+		} else if diff := cmp.Diff(coupon, NewTestCoupon()); diff != "" {
+			t.Fatal(diff)
+		}
+	})
+
+	t.Run("NoEdits", func(t *testing.T) {
+		client, s := recurly.NewTestServer()
+		defer s.Close()
+
+		s.HandleFunc("PUT", "/v2/coupons/special/restore", func(w http.ResponseWriter, r *http.Request) {
+			if str := MustReadAllString(r.Body); str != MustCompactString(`
+			<coupon>
+			</coupon>
+		`) {
+				t.Fatal(str)
+			}
+			w.WriteHeader(http.StatusCreated)
+			w.Write(MustOpenFile("coupon.xml"))
+		}, t)
+
+		if coupon, err := client.Coupons.Restore(context.Background(), "special", recurly.Coupon{}); !s.Invoked {
+			t.Fatal("expected fn invocation")
+		} else if err != nil {
+			t.Fatal(err)
+		} else if diff := cmp.Diff(coupon, NewTestCoupon()); diff != "" {
+			t.Fatal(diff)
+		}
+	})
+}
+
+func TestCoupons_Delete(t *testing.T) {
+	client, s := recurly.NewTestServer()
+	defer s.Close()
+
+	s.HandleFunc("DELETE", "/v2/coupons/special", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusNoContent)
+	}, t)
+
+	if err := client.Coupons.Delete(context.Background(), "special"); !s.Invoked {
+		t.Fatal("expected fn invocation")
+	} else if err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestCoupons_Generate(t *testing.T) {
+	client, s := recurly.NewTestServer()
+	defer s.Close()
+
+	s.HandleFunc("POST", "/v2/coupons/special/generate", func(w http.ResponseWriter, r *http.Request) {
+		if str := MustReadAllString(r.Body); str != MustCompactString(`
+			<coupon>
+				<number_of_unique_codes>200</number_of_unique_codes>
+	  		</coupon>
+		`) {
+			t.Fatal(str)
+		}
+
+		w.Header().Set("Location", "https://your-subdomain.recurly.com/v2/coupons/special/unique_coupon_codes?cursor=1998184141762793924:1468970111&per_page=200")
+
+		w.WriteHeader(http.StatusCreated)
+		w.Write(MustOpenFile("coupon.xml"))
+	}, t)
+
+	// Generate unique codes.
+	pager, err := client.Coupons.Generate(context.Background(), "special", 200)
+	if !s.Invoked {
+		t.Fatal("expected fn invocation")
+	} else if err != nil {
+		t.Fatal(err)
 	}
 
-	ts, _ := time.Parse(recurly.DateTimeFormat, "2011-04-10T07:00:00Z")
-	redeem, _ := time.Parse(recurly.DateTimeFormat, "2014-01-01T07:00:00Z")
-	if diff := cmp.Diff(coupon, &recurly.Coupon{
+	// Setup handler to test pager.
+	var invocations int
+	s.HandleFunc("GET", "/v2/coupons/special/unique_coupon_codes", func(w http.ResponseWriter, r *http.Request) {
+		if v := r.URL.Query().Get("cursor"); v != "1998184141762793924:1468970111" {
+			t.Fatalf("unexpected cursor: %q", v)
+		} else if v = r.URL.Query().Get("per_page"); v != "200" {
+			t.Fatalf("unexpected per_page: %q", v)
+		}
+
+		invocations++
+		w.WriteHeader(http.StatusOK)
+		w.Write(MustOpenFile("coupons.xml"))
+	}, t)
+	s.Invoked = false // reset invoked bool
+
+	// Test pager.
+	for pager.Next() {
+		var coupons []recurly.Coupon
+		if err := pager.Fetch(context.Background(), &coupons); err != nil {
+			t.Fatal(err)
+		} else if !s.Invoked {
+			t.Fatal("expected s to be invoked")
+		} else if diff := cmp.Diff(coupons, []recurly.Coupon{*NewTestCoupon()}); diff != "" {
+			t.Fatal(diff)
+		}
+	}
+	if invocations != 1 {
+		t.Fatalf("unexpected number of invocations: %d", invocations)
+	}
+}
+
+// Returns a Coupon corresponding to testdata/coupon.xml.
+func NewTestCoupon() *recurly.Coupon {
+	return &recurly.Coupon{
 		XMLName:                  xml.Name{Local: "coupon"},
 		ID:                       2151093486799579392,
 		Code:                     "special",
@@ -254,75 +478,13 @@ func TestCoupons_Get(t *testing.T) {
 		Type:                     "bulk",
 		DiscountType:             "dollars",
 		DiscountInCents:          &recurly.UnitAmount{USD: 2000},
-		RedeemByDate:             recurly.NewTime(redeem),
-		SingleUse:                true,
+		RedeemByDate:             recurly.NewTime(MustParseTime("2014-01-01T07:00:00Z")),
 		RedemptionResource:       "account",
 		MaxRedemptions:           recurly.NewInt(10),
 		MaxRedemptionsPerAccount: recurly.NewInt(1),
 		AppliesToAllPlans:        false,
 		UniqueCodeTemplate:       "'savemore'99999999",
-		CreatedAt:                recurly.NewTime(ts),
+		CreatedAt:                recurly.NewTime(MustParseTime("2011-04-10T07:00:00Z")),
 		PlanCodes:                []string{"gold", "platinum"},
-	}); diff != "" {
-		t.Fatal(diff)
-	}
-}
-
-func TestCoupons_Get_ErrNotFound(t *testing.T) {
-	setup()
-	defer teardown()
-
-	var invoked bool
-	mux.HandleFunc("/v2/coupons/special", func(w http.ResponseWriter, r *http.Request) {
-		invoked = true
-		w.WriteHeader(http.StatusNotFound)
-	})
-
-	_, coupon, err := client.Coupons.Get("special")
-	if !invoked {
-		t.Fatal("handler not invoked")
-	} else if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	} else if coupon != nil {
-		t.Fatalf("expected coupon to be nil: %#v", coupon)
-	}
-}
-
-func TestCoupons_Create(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/v2/coupons", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "POST" {
-			t.Fatalf("unexpected method: %s", r.Method)
-		}
-		w.WriteHeader(201)
-		fmt.Fprint(w, `<?xml version="1.0" encoding="UTF-8"?><coupon></coupon>`)
-	})
-
-	resp, _, err := client.Coupons.Create(recurly.Coupon{})
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	} else if resp.IsError() {
-		t.Fatal("expected create coupon to return OK")
-	}
-}
-
-func TestCoupons_Delete(t *testing.T) {
-	setup()
-	defer teardown()
-
-	mux.HandleFunc("/v2/coupons/special", func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != "DELETE" {
-			t.Fatalf("unexpected method: %s", r.Method)
-		}
-		w.WriteHeader(204)
-	})
-
-	resp, err := client.Coupons.Delete("special")
-	if err != nil {
-		t.Fatalf("unexpected error: %v", err)
-	} else if resp.IsError() {
-		t.Fatal("expected deleted coupon to return OK")
 	}
 }

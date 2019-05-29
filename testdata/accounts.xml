@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<accounts type="array">
+   <account href="https://your-subdomain.recurly.com/v2/accounts/1">
+      <adjustments href="https://your-subdomain.recurly.com/v2/accounts/1/adjustments" />
+      <billing_info href="https://your-subdomain.recurly.com/v2/accounts/1/billing_info" />
+      <invoices href="https://your-subdomain.recurly.com/v2/accounts/1/invoices" />
+      <redemption href="https://your-subdomain.recurly.com/v2/accounts/1/redemption" />
+      <subscriptions href="https://your-subdomain.recurly.com/v2/accounts/1/subscriptions" />
+      <transactions href="https://your-subdomain.recurly.com/v2/accounts/1/transactions" />
+      <account_code>1</account_code>
+      <state>active</state>
+      <username nil="nil" />
+      <email>verena@example.com</email>
+      <first_name>Verena</first_name>
+      <last_name>Example</last_name>
+      <company_name />
+      <vat_number nil="nil" />
+      <tax_exempt type="boolean">false</tax_exempt>
+      <billing_info href="https://your-subdomain.recurly.com/v2/accounts/1/billing_info" type="credit_card">
+         <account href="https://your-subdomain.recurly.com/v2/accounts/1" />
+         <first_name>Verena</first_name>
+         <last_name>Example</last_name>
+         <company nil="nil" />
+         <address1>123 Main St.</address1>
+         <address2 nil="nil" />
+         <city>San Francisco</city>
+         <state>CA</state>
+         <zip>94105</zip>
+         <country>US</country>
+         <phone nil="nil" />
+         <vat_number>US1234567890</vat_number>
+         <ip_address>127.0.0.1</ip_address>
+         <ip_address_country>US</ip_address_country>
+         <card_type>Visa</card_type>
+         <year type="integer">2015</year>
+         <month type="integer">11</month>
+         <first_six>411111</first_six>
+         <last_four>1111</last_four>
+      </billing_info>
+      <address>
+         <address1>123 Main St.</address1>
+         <address2 nil="nil" />
+         <city>San Francisco</city>
+         <state>CA</state>
+         <zip>94105</zip>
+         <country>US</country>
+         <phone nil="nil" />
+      </address>
+      <shipping_addresses>
+         <shipping_address href="https://your-subdomain.recurly.com/v2/accounts/1/shipping_addresses/2438622711411416831">
+            <account href="https://your-subdomain.recurly.com/v2/accounts/1" />
+            <subscriptions href="https://your-subdomain.recurly.com/v2/accounts/1/shipping_addresses/2438622711411416831/subscriptions" />
+            <id type="integer">2438622711411416831</id>
+            <nickname>Work</nickname>
+            <first_name>Verena</first_name>
+            <last_name>Example</last_name>
+            <company>Recurly Inc</company>
+            <email>verena@example.com</email>
+            <vat_number nil="nil" />
+            <address1>123 Main St.</address1>
+            <address2>Suite 101</address2>
+            <city>San Francisco</city>
+            <state>CA</state>
+            <zip>94105</zip>
+            <country>US</country>
+            <phone>555-222-1212</phone>
+            <created_at type="datetime">2018-03-19T15:48:00Z</created_at>
+            <updated_at type="datetime">2018-03-19T15:48:00Z</updated_at>
+         </shipping_address>
+      </shipping_addresses>
+      <accept_language nil="nil" />
+      <preferred_locale nil="nil" />
+      <hosted_login_token>a92468579e9c4231a6c0031c4716c01d</hosted_login_token>
+      <created_at type="datetime">2011-10-25T12:00:00Z</created_at>
+      <has_live_subscription type="boolean">true</has_live_subscription>
+      <has_active_subscription type="boolean">true</has_active_subscription>
+      <has_future_subscription type="boolean">false</has_future_subscription>
+      <has_canceled_subscription type="boolean">false</has_canceled_subscription>
+      <has_past_due_invoice type="boolean">false</has_past_due_invoice>
+      <custom_fields type="array">
+         <custom_field>
+            <name>device_id</name>
+            <value>KIWTL-WER-ZXMRD</value>
+         </custom_field>
+      </custom_fields>
+   </account>
+</accounts>

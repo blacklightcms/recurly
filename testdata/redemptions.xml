@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<redemptions type="array">
+   <redemption href="https://your-subdomain.recurly.com/v2/accounts/1/redemptions/374a1c75374bd81493a3f7425db0a2b8">
+      <coupon href="https://your-subdomain.recurly.com/v2/coupons/special" />
+      <account href="https://your-subdomain.recurly.com/v2/accounts/1" />
+      <subscription href="https://your-subdomain.recurly.com/v2/subscriptions/37bfef7a8e44cfc3817b7a43eba8a6e6" />
+      <uuid>374a1c75374bd81493a3f7425db0a2b8</uuid>
+      <single_use type="boolean">true</single_use>
+      <total_discounted_in_cents type="integer">0</total_discounted_in_cents>
+      <currency>USD</currency>
+      <state>active</state>
+      <coupon_code>special</coupon_code>
+      <created_at type="datetime">2016-07-11T18:56:20Z</created_at>
+      <updated_at type="datetime">2016-07-11T18:56:20Z</updated_at>
+   </redemption>
+</redemptions>

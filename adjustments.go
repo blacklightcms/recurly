@@ -1,150 +1,210 @@
 package recurly
 
-import "encoding/xml"
+import (
+	"context"
+	"encoding/xml"
+	"fmt"
+	"net/http"
+)
 
-// Adjustment state constants
+// AdjustmentsService manages the interactions for adjustments.
+type AdjustmentsService interface {
+	// List returns a pager to paginate adjustments for an account. PagerOptions are
+	// used to optionally filter the results.
+	//
+	// https://dev.recurly.com/docs/list-an-accounts-adjustments
+	ListAccount(accountCode string, opts *PagerOptions) Pager
+
+	// Get retrieves an adjustment. If the add on does not exist,
+	// a nil adjustment and nil error are returned.
+	//
+	// NOTE: Link below is from v2.9, the last documented version showing
+	// this endpoint. The endpoint appears to still be valid in v2.19, waiting
+	// to hear back from Recurly support.
+	// https://dev.recurly.com/v2.9/docs/get-an-adjustment
+	Get(ctx context.Context, uuid string) (*Adjustment, error)
+
+	// Create creates a one-time charge on an account. Charges are not invoiced
+	// or collected immediately. Non-invoiced charges will automatically be
+	// invoiced when the account's subscription renews, or you trigger a
+	// collection by posting an invoice. Charges may be removed from an account
+	// if they have not been invoiced.
+	//
+	// For a charge, set a.UnitAmountInCents to a positive number.
+	// For a credit, set a.UnitAmountInCents to a negative amount.
+	//
+	// https://dev.recurly.com/docs/create-a-charge
+	// https://dev.recurly.com/docs/create-a-credit
+	Create(ctx context.Context, accountCode string, a Adjustment) (*Adjustment, error)
+
+	// Delete deletes an adjustment from an account. Only non-invoiced adjustments
+	// can be deleted.
+	//
+	// https://dev.recurly.com/docs/delete-an-adjustment
+	Delete(ctx context.Context, uuid string) error
+}
+
+// Adjustment state constants.
 const (
 	AdjustmentStatePending = "pending"
 	AdjustmentStateInvoied = "invoiced"
 )
 
+// Revenue schedule type constants.
+const (
+	RevenueScheduleTypeNever        = "never"
+	RevenueScheduleTypeAtRangeStart = "at_range_start"
+	RevenueScheduleTypeAtInvoice    = "at_invoice"
+	RevenueScheduleTypeEvenly       = "evenly"       // if 'end_date' is set
+	RevenueScheduleTypeAtRangeEnd   = "at_range_end" // if 'end_date' is set
+)
+
 // Adjustment works with charges and credits on a given account.
+//
+// https://dev.recurly.com/docs/adjustment-object
 type Adjustment struct {
-	AccountCode            string
-	InvoiceNumber          int
-	SubscriptionUUID       string
-	UUID                   string
-	State                  string
-	Description            string
-	AccountingCode         string
-	ProductCode            string
-	Origin                 string
-	UnitAmountInCents      int
-	Quantity               int
-	OriginalAdjustmentUUID string
-	DiscountInCents        int
-	TaxInCents             int
-	TotalInCents           int
-	Currency               string
-	Taxable                NullBool
-	TaxCode                string
-	TaxType                string
-	TaxRegion              string
-	TaxRate                float64
-	TaxExempt              NullBool
-	TaxDetails             []TaxDetail
-	StartDate              NullTime
-	EndDate                NullTime
-	CreatedAt              NullTime
-	UpdatedAt              NullTime
+	XMLName                xml.Name    `xml:"adjustment"`
+	AccountCode            string      `xml:"-"` // Read only
+	InvoiceNumber          int         `xml:"-"` // Read only
+	SubscriptionUUID       string      `xml:"-"` // Read only
+	UUID                   string      `xml:"uuid,omitempty"`
+	State                  string      `xml:"state,omitempty"`
+	Description            string      `xml:"description,omitempty"`
+	AccountingCode         string      `xml:"accounting_code,omitempty"`
+	RevenueScheduleType    string      `xml:"revenue_schedule_type,omitempty"`
+	ProductCode            string      `xml:"product_code,omitempty"`
+	Origin                 string      `xml:"origin,omitempty"`
+	UnitAmountInCents      NullInt     `xml:"unit_amount_in_cents,omitempty"`
+	Quantity               int         `xml:"quantity,omitempty"`
+	OriginalAdjustmentUUID string      `xml:"original_adjustment_uuid,omitempty"`
+	DiscountInCents        int         `xml:"discount_in_cents,omitempty"`
+	TaxInCents             int         `xml:"tax_in_cents,omitempty"`
+	TotalInCents           int         `xml:"total_in_cents,omitempty"`
+	Currency               string      `xml:"currency"`
+	Taxable                NullBool    `xml:"taxable,omitempty"`
+	TaxCode                string      `xml:"tax_code,omitempty"`
+	TaxType                string      `xml:"tax_type,omitempty"`
+	TaxRegion              string      `xml:"tax_region,omitempty"`
+	TaxRate                float64     `xml:"tax_rate,omitempty"`
+	TaxExempt              NullBool    `xml:"tax_exempt,omitempty"`
+	TaxDetails             []TaxDetail `xml:"tax_details>tax_detail,omitempty"`
+	StartDate              NullTime    `xml:"start_date,omitempty"`
+	EndDate                NullTime    `xml:"end_date,omitempty"`
+	CreatedAt              NullTime    `xml:"created_at,omitempty"`
+	UpdatedAt              NullTime    `xml:"updated_at,omitempty"`
 }
 
 // MarshalXML marshals only the fields needed for creating/updating adjustments
 // with the recurly API.
 func (a Adjustment) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	v := struct {
-		XMLName           xml.Name `xml:"adjustment"`
-		Description       string   `xml:"description,omitempty"`
-		AccountingCode    string   `xml:"accounting_code,omitempty"`
-		ProductCode       string   `xml:"product_code,omitempty"`
-		UnitAmountInCents int      `xml:"unit_amount_in_cents"`
-		Quantity          int      `xml:"quantity,omitempty"`
-		Currency          string   `xml:"currency,omitempty"` // Required for some operations
-		TaxCode           string   `xml:"tax_code,omitempty"`
-		TaxExempt         NullBool `xml:"tax_exempt,omitempty"`
-		StartDate         NullTime `xml:"start_date,omitempty"`
-		EndDate           NullTime `xml:"end_date,omitempty"`
+	return e.Encode(struct {
+		XMLName             xml.Name `xml:"adjustment"`
+		Description         string   `xml:"description,omitempty"`
+		AccountingCode      string   `xml:"accounting_code,omitempty"`
+		RevenueScheduleType string   `xml:"revenue_schedule_type,omitempty"`
+		ProductCode         string   `xml:"product_code,omitempty"`
+		UnitAmountInCents   NullInt  `xml:"unit_amount_in_cents,omitempty"`
+		Quantity            int      `xml:"quantity,omitempty"`
+		Currency            string   `xml:"currency,omitempty"`
+		TaxCode             string   `xml:"tax_code,omitempty"`
+		TaxExempt           NullBool `xml:"tax_exempt,omitempty"`
+		StartDate           NullTime `xml:"start_date,omitempty"`
+		EndDate             NullTime `xml:"end_date,omitempty"`
 	}{
-		Description:       a.Description,
-		AccountingCode:    a.AccountingCode,
-		ProductCode:       a.ProductCode,
-		UnitAmountInCents: a.UnitAmountInCents,
-		Quantity:          a.Quantity,
-		Currency:          a.Currency,
-		TaxCode:           a.TaxCode,
-		TaxExempt:         a.TaxExempt,
-		StartDate:         a.StartDate,
-		EndDate:           a.EndDate,
-	}
-
-	return e.Encode(v)
+		Description:         a.Description,
+		AccountingCode:      a.AccountingCode,
+		RevenueScheduleType: a.RevenueScheduleType,
+		ProductCode:         a.ProductCode,
+		UnitAmountInCents:   a.UnitAmountInCents,
+		Quantity:            a.Quantity,
+		Currency:            a.Currency,
+		TaxCode:             a.TaxCode,
+		TaxExempt:           a.TaxExempt,
+		StartDate:           a.StartDate,
+		EndDate:             a.EndDate,
+	})
 }
 
-// UnmarshalXML unmarshal a coupon redemption object. Minaly converts href links
-// for coupons and accounts to CouponCode and AccountCodes.
+// UnmarshalXML unmarshal an adjustment.
 func (a *Adjustment) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	type adjustmentAlias Adjustment
 	var v struct {
-		XMLName                xml.Name    `xml:"adjustment"`
-		AccountCode            hrefString  `xml:"account,omitempty"`      // Read only
-		InvoiceNumber          hrefInt     `xml:"invoice,omitempty"`      // Read only
-		SubscriptionUUID       hrefString  `xml:"subscription,omitempty"` // Read only
-		UUID                   string      `xml:"uuid,omitempty"`
-		State                  string      `xml:"state,omitempty"`
-		Description            string      `xml:"description,omitempty"`
-		AccountingCode         string      `xml:"accounting_code,omitempty"`
-		ProductCode            string      `xml:"product_code,omitempty"`
-		Origin                 string      `xml:"origin,omitempty"`
-		UnitAmountInCents      int         `xml:"unit_amount_in_cents"`
-		Quantity               int         `xml:"quantity,omitempty"`
-		OriginalAdjustmentUUID string      `xml:"original_adjustment_uuid,omitempty"`
-		DiscountInCents        int         `xml:"discount_in_cents,omitempty"`
-		TaxInCents             int         `xml:"tax_in_cents,omitempty"`
-		TotalInCents           int         `xml:"total_in_cents,omitempty"`
-		Currency               string      `xml:"currency"`
-		Taxable                NullBool    `xml:"taxable,omitempty"`
-		TaxCode                string      `xml:"tax_code,omitempty"`
-		TaxType                string      `xml:"tax_type,omitempty"`
-		TaxRegion              string      `xml:"tax_region,omitempty"`
-		TaxRate                float64     `xml:"tax_rate,omitempty"`
-		TaxExempt              NullBool    `xml:"tax_exempt,omitempty"`
-		TaxDetails             []TaxDetail `xml:"tax_details>tax_detail,omitempty"`
-		StartDate              NullTime    `xml:"start_date,omitempty"`
-		EndDate                NullTime    `xml:"end_date,omitempty"`
-		CreatedAt              NullTime    `xml:"created_at,omitempty"`
-		UpdatedAt              NullTime    `xml:"updated_at,omitempty"`
+		XMLName xml.Name `xml:"adjustment"`
+		adjustmentAlias
+		AccountCode      href    `xml:"account,omitempty"`
+		InvoiceNumber    hrefInt `xml:"invoice,omitempty"`
+		SubscriptionUUID href    `xml:"subscription,omitempty"`
 	}
 	if err := d.DecodeElement(&v, &start); err != nil {
 		return err
 	}
-	*a = Adjustment{
-		AccountCode:            string(v.AccountCode),
-		InvoiceNumber:          int(v.InvoiceNumber),
-		SubscriptionUUID:       string(v.SubscriptionUUID),
-		UUID:                   v.UUID,
-		State:                  v.State,
-		Description:            v.Description,
-		AccountingCode:         v.AccountingCode,
-		ProductCode:            v.ProductCode,
-		Origin:                 v.Origin,
-		UnitAmountInCents:      v.UnitAmountInCents,
-		Quantity:               v.Quantity,
-		OriginalAdjustmentUUID: v.OriginalAdjustmentUUID,
-		DiscountInCents:        v.DiscountInCents,
-		TaxInCents:             v.TaxInCents,
-		TotalInCents:           v.TotalInCents,
-		Currency:               v.Currency,
-		Taxable:                v.Taxable,
-		TaxCode:                v.TaxCode,
-		TaxType:                v.TaxType,
-		TaxRegion:              v.TaxRegion,
-		TaxRate:                v.TaxRate,
-		TaxExempt:              v.TaxExempt,
-		TaxDetails:             v.TaxDetails,
-		StartDate:              v.StartDate,
-		EndDate:                v.EndDate,
-		CreatedAt:              v.CreatedAt,
-		UpdatedAt:              v.UpdatedAt,
-	}
 
+	*a = Adjustment(v.adjustmentAlias)
+	a.XMLName = v.XMLName
+	a.AccountCode = v.AccountCode.LastPartOfPath()
+	a.InvoiceNumber = v.InvoiceNumber.LastPartOfPath()
+	a.SubscriptionUUID = v.SubscriptionUUID.LastPartOfPath()
 	return nil
 }
 
 // TaxDetail holds tax information and is embedded in an Adjustment.
-// TaxDetails are a read only field, so theys houldn't marshall
+// TaxDetails are a read only field, so they shouldn't marshal.
 type TaxDetail struct {
 	XMLName    xml.Name `xml:"tax_detail"`
 	Name       string   `xml:"name,omitempty"`
 	Type       string   `xml:"type,omitempty"`
 	TaxRate    float64  `xml:"tax_rate,omitempty"`
 	TaxInCents int      `xml:"tax_in_cents,omitempty"`
+}
+
+var _ AdjustmentsService = &adjustmentsImpl{}
+
+// adjustmentsImpl implements AdjustmentsService.
+type adjustmentsImpl serviceImpl
+
+func (s *adjustmentsImpl) ListAccount(accountCode string, opts *PagerOptions) Pager {
+	path := fmt.Sprintf("/accounts/%s/adjustments", accountCode)
+	return s.client.newPager("GET", path, opts)
+}
+
+func (s *adjustmentsImpl) Get(ctx context.Context, uuid string) (*Adjustment, error) {
+	path := fmt.Sprintf("/adjustments/%s", sanitizeUUID(uuid))
+	req, err := s.client.newRequest("GET", path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var dst Adjustment
+	if _, err := s.client.do(ctx, req, &dst); err != nil {
+		if e, ok := err.(*ClientError); ok && e.Response.StatusCode == http.StatusNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &dst, nil
+}
+
+func (s *adjustmentsImpl) Create(ctx context.Context, accountCode string, a Adjustment) (*Adjustment, error) {
+	path := fmt.Sprintf("/accounts/%s/adjustments", accountCode)
+	req, err := s.client.newRequest("POST", path, a)
+	if err != nil {
+		return nil, err
+	}
+
+	var dst Adjustment
+	if _, err := s.client.do(ctx, req, &dst); err != nil {
+		return nil, err
+	}
+	return &dst, nil
+}
+
+func (s *adjustmentsImpl) Delete(ctx context.Context, uuid string) error {
+	path := fmt.Sprintf("/adjustments/%s", sanitizeUUID(uuid))
+	req, err := s.client.newRequest("DELETE", path, nil)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.client.do(ctx, req, nil)
+	return err
 }
