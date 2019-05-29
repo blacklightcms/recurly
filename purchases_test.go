@@ -32,7 +32,7 @@ func TestPurchases_Purchase_Encoding(t *testing.T) {
 		},
 		{
 			v:        *NewTestPurchase(),
-			expected: string(MustOpenComparerXMLFile("purchase.xml")),
+			expected: string(MustOpenCompactXMLFile("purchase.xml")),
 		},
 		{
 			v: recurly.Purchase{ShippingAddressID: 2438622711411416831},

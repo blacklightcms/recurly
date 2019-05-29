@@ -106,7 +106,7 @@ func MustStripXMLTag(b []byte) []byte {
 
 // Opens an xml file from testdata directory, but removes all spaces between
 // tags and the opening <?xml ...?> tag for simple marshaler comparisons.
-func MustOpenComparerXMLFile(file string) []byte {
+func MustOpenCompactXMLFile(file string) []byte {
 	return MustStripXMLTag(MustCompact(MustOpenFile(file)))
 }
 
