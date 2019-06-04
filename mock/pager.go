@@ -15,6 +15,9 @@ type Pager struct {
 	OnNext      func() bool
 	NextInvoked bool
 
+	OnCursor      func() string
+	CursorInvoked bool
+
 	OnFetch      func(ctx context.Context, dst interface{}) error
 	FetchInvoked bool
 
@@ -30,6 +33,11 @@ func (m *Pager) Count(ctx context.Context) (int, error) {
 func (m *Pager) Next() bool {
 	m.NextInvoked = true
 	return m.OnNext()
+}
+
+func (m *Pager) Cursor() string {
+	m.CursorInvoked = true
+	return m.OnCursor()
 }
 
 func (m *Pager) Fetch(ctx context.Context, dst interface{}) error {

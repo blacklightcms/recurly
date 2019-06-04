@@ -16,9 +16,12 @@ type Pager interface {
 	// more than once will return the value from the first call.
 	Count(ctx context.Context) (int, error)
 
-	// Next prepares returns true if there is a next result expected, or false if
+	// Next returns true if there is a next result expected, or false if
 	// there is no next result.
 	Next() bool
+
+	// Cursor returns the next cursor (if available).
+	Cursor() string
 
 	// Fetch fetches results of a single page and populates dst with the results.
 	// For use in a for loop with Next().
@@ -56,6 +59,7 @@ func (c *Client) newPager(method, path string, opts *PagerOptions) *pager {
 		method: method,
 		path:   path,
 		opts:   opts,
+		cursor: opts.Cursor,
 
 		expectResults: true,
 	}
@@ -86,9 +90,7 @@ func (p *pager) Count(ctx context.Context) (int, error) {
 	}
 }
 
-func (p *pager) Next() bool {
-	return p.expectResults
-}
+func (p *pager) Next() bool { return p.expectResults }
 
 // fetch retrieves the results and populates dst, setting the next
 // cursor.
@@ -102,7 +104,7 @@ func (p *pager) Fetch(ctx context.Context, dst interface{}) error {
 	if !p.expectResults {
 		return errors.New("no more results")
 	}
-	p.opts.cursor = p.cursor
+	p.opts.Cursor = p.cursor
 
 	req, err := p.client.newPagerRequest(p.method, p.path, p.opts, nil)
 	if err != nil {
@@ -128,10 +130,9 @@ func (p *pager) Fetch(ctx context.Context, dst interface{}) error {
 
 	resp, err := p.client.do(ctx, req, &unmarshaler)
 	if err != nil {
-		p.cursor = ""
 		p.expectResults = false
 		return err
-	} else if p.cursor = resp.NextCursor; p.cursor == "" {
+	} else if p.cursor = resp.cursor; p.cursor == "" {
 		p.expectResults = false
 	}
 
@@ -313,6 +314,8 @@ func (p *pager) FetchAll(ctx context.Context, dst interface{}) error {
 	return nil
 }
 
+func (p *pager) Cursor() string { return p.cursor }
+
 // PagerOptions are used to send pagination parameters with paginated requests.
 type PagerOptions struct {
 	// Results per page. If not provided, Recurly defaults to 50.
@@ -338,7 +341,12 @@ type PagerOptions struct {
 	// converted to a valid datetime format for Recurly.
 	query query
 
-	cursor string // managed internally by this library
+	// Cursor is set internally by the library. If you are paginating
+	// records non-consecutively and obtained the next cursor, you can set it
+	// as the starting cursor here to continue where you left off.
+	//
+	// Use Pager.Cursor() to obtain the next cursor.
+	Cursor string
 }
 
 type query map[string]interface{}
@@ -389,6 +397,6 @@ func (p PagerOptions) append(u *url.URL) {
 	p.query["order"] = p.Order
 	p.query["state"] = p.State
 	p.query["type"] = p.Type
-	p.query["cursor"] = p.cursor
+	p.query["cursor"] = p.Cursor
 	p.query.append(u)
 }

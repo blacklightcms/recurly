@@ -5,7 +5,6 @@ import (
 	"context"
 	"encoding/xml"
 	"net/http"
-	"net/url"
 	"strconv"
 	"testing"
 
@@ -251,57 +250,18 @@ func TestAddress_Encoding(t *testing.T) {
 	}
 }
 
-// Test paginating accounts. Note that all pagination code uses the same underlying
-// pager -- this test is the only paginated test that asserts the params being sent
-// properly. It also sends a cursor to ensure Next() and Fetch() work properly.
 func TestAccounts_List(t *testing.T) {
 	client, s := recurly.NewTestServer()
 	defer s.Close()
 
 	var invocations int
 	s.HandleFunc("GET", "/v2/accounts", func(w http.ResponseWriter, r *http.Request) {
-		cursor := r.URL.Query().Get("cursor")
-		switch invocations {
-		case 0:
-			if cursor != "" {
-				t.Fatalf("unexpected cursor: %s", cursor)
-			}
-			w.Header().Set("Link", `<https://test.recurly.com/v2/accounts?cursor=1972702718353176814:A1465932489>; rel="next"`)
-		case 1:
-			if cursor != "1972702718353176814:A1465932489" {
-				t.Fatalf("unexpected cursor: %s", cursor)
-			}
-		default:
-			t.Fatalf("unexpected number of invocations")
-		}
-
-		query := r.URL.Query()
-		query.Del("cursor") // conditionally checked above
-		if diff := cmp.Diff(query, url.Values{
-			"per_page":   []string{"50"},
-			"sort":       []string{"created_at"},
-			"order":      []string{"asc"},
-			"state":      []string{"active"},
-			"begin_time": []string{"2011-10-17T17:24:53Z"},
-			"end_time":   []string{"2011-10-18T17:24:53Z"},
-		}); diff != "" {
-			t.Fatal(diff)
-		}
-
+		invocations++
 		w.WriteHeader(http.StatusOK)
 		w.Write(MustOpenFile("accounts.xml"))
-		invocations++
 	}, t)
 
-	pager := client.Accounts.List(&recurly.PagerOptions{
-		PerPage:   50,
-		Sort:      "created_at",
-		Order:     "asc",
-		State:     "active",
-		BeginTime: recurly.NewTime(MustParseTime("2011-10-17T17:24:53Z")),
-		EndTime:   recurly.NewTime(MustParseTime("2011-10-18T17:24:53Z")),
-	})
-
+	pager := client.Accounts.List(nil)
 	for pager.Next() {
 		var a []recurly.Account
 		if err := pager.Fetch(context.Background(), &a); err != nil {
@@ -311,9 +271,8 @@ func TestAccounts_List(t *testing.T) {
 		} else if diff := cmp.Diff(a, []recurly.Account{*NewTestAccount()}); diff != "" {
 			t.Fatal(diff)
 		}
-		s.Invoked = false
 	}
-	if invocations != 2 {
+	if invocations != 1 {
 		t.Fatalf("unexpected number of invocations: %d", invocations)
 	}
 }
