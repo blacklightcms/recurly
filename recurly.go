@@ -190,7 +190,7 @@ func (c *Client) do(ctx context.Context, req *http.Request, v interface{}) (*res
 	} else if resp.StatusCode == http.StatusTooManyRequests {
 		return nil, &RateLimitError{
 			Response: resp,
-			Rate:     response.Rate,
+			Rate:     response.rate,
 		}
 	} else if v != nil && resp.StatusCode >= 200 && resp.StatusCode <= 299 {
 		if w, ok := v.(io.Writer); ok {
@@ -209,28 +209,27 @@ func (c *Client) do(ctx context.Context, req *http.Request, v interface{}) (*res
 }
 
 // response is a Recurly API response. This wraps the standard http.Response
-// returned from Recurly and provides convenient access to things like
-// pagination links.
+// returned from Recurly and provides access to pagination cursors and rate
+// limits.
 type response struct {
 	*http.Response
 
-	// These fields provide cursors for paginating forwards or backwards.
-	PrevCursor string
-	NextCursor string
+	// The next cursor (if available) when paginating results.
+	cursor string
 
 	// Rate limits.
-	Rate Rate
+	rate Rate
 }
 
 // NewResponse creates a new Response for the provided http.Response.
 func newResponse(r *http.Response) *response {
 	resp := &response{Response: r}
-	resp.populatePageCursors()
+	resp.populatePageCursor()
 	resp.populateRateLimit()
 	return resp
 }
 
-func (r *response) populatePageCursors() {
+func (r *response) populatePageCursor() {
 	links, ok := r.Response.Header["Link"]
 	if !ok || len(links) == 0 {
 		return
@@ -259,9 +258,7 @@ func (r *response) populatePageCursors() {
 		for _, segment := range segments[1:] {
 			switch strings.TrimSpace(segment) {
 			case `rel="next"`:
-				r.NextCursor = cursor
-			case `rel="prev"`:
-				r.PrevCursor = cursor
+				r.cursor = cursor
 			}
 		}
 	}
@@ -270,14 +267,14 @@ func (r *response) populatePageCursors() {
 // populates rate limits.
 func (r *response) populateRateLimit() {
 	if limit := r.Header.Get("X-RateLimit-Limit"); limit != "" {
-		r.Rate.Limit, _ = strconv.Atoi(limit)
+		r.rate.Limit, _ = strconv.Atoi(limit)
 	}
 	if remaining := r.Header.Get("X-RateLimit-Remaining"); remaining != "" {
-		r.Rate.Remaining, _ = strconv.Atoi(remaining)
+		r.rate.Remaining, _ = strconv.Atoi(remaining)
 	}
 	if reset := r.Header.Get("X-RateLimit-Reset"); reset != "" {
 		if v, _ := strconv.ParseInt(reset, 10, 64); v != 0 {
-			r.Rate.Reset = time.Unix(v, 0)
+			r.rate.Reset = time.Unix(v, 0)
 		}
 	}
 }

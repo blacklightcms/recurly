@@ -127,7 +127,7 @@ a nil item and nil error will be returned if the item is not found.
 Pagination
 
 All requests for resource collections support pagination. Pagination options are
-described in the recurly.PagerOptions struct and past to the list methods directly.
+described in the recurly.PagerOptions struct and passed to the list methods directly.
 
 	client := recurly.NewClient("your-subdomain", "APIKEY")
 
@@ -157,6 +157,21 @@ You can also let the library paginate for you and return all of the results at o
 	if err := pager.FetchAll(ctx, &accounts); err != nil {
 		return err
 	}
+
+In some cases, you may want to paginate non-consecutively. For example, if you have
+paginated results being sent to a frontend, and the frontend is providing your
+app the next cursor.
+
+In that case you can obtain the next cursor like this (although it may be empty):
+
+	cursor := pager.Cursor()
+
+If you have a cursor, you can provide *PagerOptions with it to start paginating
+the next result set:
+
+	pager := client.Accounts.List(&recurly.PagerOptions{
+		Cursor: cursor,
+	})
 
 */
 package recurly
