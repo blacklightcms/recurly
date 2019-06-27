@@ -489,8 +489,8 @@ func (s *subscriptionsImpl) Pause(ctx context.Context, uuid string, cycles int) 
 func (s *subscriptionsImpl) Postpone(ctx context.Context, uuid string, dt time.Time, bulk bool) (*Subscription, error) {
 	path := fmt.Sprintf("/subscriptions/%s/postpone", sanitizeUUID(uuid))
 	req, err := s.client.newQueryRequest("PUT", path, query{
-		"bulk":              bulk,
-		"next_renewal_date": dt,
+		"bulk":           bulk,
+		"next_bill_date": dt,
 	}, nil)
 	if err != nil {
 		return nil, err
