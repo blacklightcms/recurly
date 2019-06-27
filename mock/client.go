@@ -1,7 +1,7 @@
 package mock
 
 import (
-	"github.com/blacklightcms/recurly"
+	"github.com/autopilot3/recurly"
 )
 
 // Client is a test wrapper for recurly.Client holding mocks for

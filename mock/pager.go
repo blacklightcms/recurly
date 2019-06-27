@@ -3,7 +3,7 @@ package mock
 import (
 	"context"
 
-	"github.com/blacklightcms/recurly"
+	"github.com/autopilot3/recurly"
 )
 
 var _ recurly.Pager = &Pager{}
