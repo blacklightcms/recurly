@@ -82,7 +82,7 @@ Then in your test suite you might configure your own wrapper similar to mock.Cli
 		"context"
 
 		"github.com/your-project/foo"
-		"github.com/blacklightcms/recurly/mock"
+		"github.com/autopilot3/recurly/mock"
 	)
 
 	// Provider is a test wrapper for foo.Provider.

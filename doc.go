@@ -6,7 +6,7 @@ Usage
 Construct a new Recurly client, then use the various services on the client to
 access different parts of the Recurly API. For example:
 
-	import "github.com/blacklightcms/recurly"
+	import "github.com/autopilot3/recurly"
 
 	func main() {
 		client := recurly.NewClient("your-subdomain", "APIKEY")

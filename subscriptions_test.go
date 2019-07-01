@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/blacklightcms/recurly"
+	"github.com/autopilot3/recurly"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -929,7 +929,7 @@ func TestSubscriptions_Postpone(t *testing.T) {
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/postpone", func(w http.ResponseWriter, r *http.Request) {
-		if v := r.URL.Query().Get("next_renewal_date"); v != "2015-08-27T07:00:00Z" {
+		if v := r.URL.Query().Get("next_bill_date"); v != "2015-08-27T07:00:00Z" {
 			t.Fatalf("unexpected input for next_renewal_date: %q", v)
 		} else if v := r.URL.Query().Get("bulk"); v != "false" {
 			t.Fatalf("unexpected input for bulk: %q", v)
