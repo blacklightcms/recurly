@@ -11,6 +11,7 @@ import (
 const (
 	NewChargeInvoice        = "new_charge_invoice_notification"
 	ProcessingChargeInvoice = "processing_charge_invoice_notification"
+	PastDueInvoice          = "past_due_invoice_notification"
 	PastDueChargeInvoice    = "past_due_charge_invoice_notification"
 	PaidChargeInvoice       = "paid_charge_invoice_notification"
 	FailedChargeInvoice     = "failed_charge_invoice_notification"
