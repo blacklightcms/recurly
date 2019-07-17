@@ -33,7 +33,7 @@ func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 		{
 			v: recurly.NewSubscription{
 				PlanCode:             "gold",
-				AutoRenew:            true,
+				AutoRenew:            recurly.NewBool(true),
 				RenewalBillingCycles: recurly.NewInt(2),
 				Account: recurly.Account{
 					Code: "123",
