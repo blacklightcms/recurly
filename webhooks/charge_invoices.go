@@ -16,6 +16,7 @@ const (
 	PaidChargeInvoice       = "paid_charge_invoice_notification"
 	FailedChargeInvoice     = "failed_charge_invoice_notification"
 	ReopenedChargeInvoice   = "reopened_charge_invoice_notification"
+	ClosedInvoiceNotification = "closed_invoice_notification"
 )
 
 // ChargeInvoiceNotification is returned for all charge invoice notifications.
