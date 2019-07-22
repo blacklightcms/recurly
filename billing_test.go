@@ -115,7 +115,7 @@ func TestBilling_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Billing{Number: 4111111111111111, Month: 5, Year: 2020, VerificationValue: 111},
+			v: recurly.Billing{Number: 4111111111111111, Month: 5, Year: 2020, VerificationValue: "111"},
 			expected: MustCompactString(`
 				<billing_info>
 					<number>4111111111111111</number>

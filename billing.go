@@ -85,7 +85,7 @@ type Billing struct {
 	Number            int    `xml:"number,omitempty"`
 	Month             int    `xml:"month,omitempty"`
 	Year              int    `xml:"year,omitempty"`
-	VerificationValue int    `xml:"verification_value,omitempty"` // Create/update only
+	VerificationValue string `xml:"verification_value,omitempty"` // Create/update only
 
 	// Paypal
 	PaypalAgreementID string `xml:"paypal_billing_agreement_id,omitempty"`
