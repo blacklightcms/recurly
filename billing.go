@@ -82,9 +82,9 @@ type Billing struct {
 	FirstSix          string `xml:"first_six,omitempty"`
 	LastFour          string `xml:"last_four,omitempty"`
 	CardType          string `xml:"card_type,omitempty"`
-	Number            int    `xml:"number,omitempty"`
-	Month             int    `xml:"month,omitempty"`
-	Year              int    `xml:"year,omitempty"`
+	Number            string `xml:"number,omitempty"`
+	Month             string `xml:"month,omitempty"`
+	Year              string `xml:"year,omitempty"`
 	VerificationValue string `xml:"verification_value,omitempty"` // Create/update only
 
 	// Paypal

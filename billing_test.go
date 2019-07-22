@@ -317,9 +317,9 @@ func TestBilling_Create(t *testing.T) {
 			State:     "CA",
 			Zip:       "94105",
 			Country:   "US",
-			Number:    4111111111111111,
-			Month:     10,
-			Year:      2020,
+			Number:    "4111111111111111",
+			Month:     "10",
+			Year:      "2020",
 		}); !s.Invoked {
 			t.Fatal("expected fn invocation")
 		} else if err != nil {
@@ -419,9 +419,9 @@ func TestBilling_Update(t *testing.T) {
 			State:     "CA",
 			Zip:       "94105",
 			Country:   "US",
-			Number:    4111111111111111,
-			Month:     10,
-			Year:      2020,
+			Number:    "4111111111111111",
+			Month:     "10",
+			Year:      "2020",
 		}); !s.Invoked {
 			t.Fatal("expected fn invocation")
 		} else if err != nil {
