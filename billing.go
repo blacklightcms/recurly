@@ -83,8 +83,8 @@ type Billing struct {
 	LastFour          string `xml:"last_four,omitempty"`
 	CardType          string `xml:"card_type,omitempty"`
 	Number            string `xml:"number,omitempty"`
-	Month             string `xml:"month,omitempty"`
-	Year              string `xml:"year,omitempty"`
+	Month             int    `xml:"month,omitempty"`
+	Year              int    `xml:"year,omitempty"`
 	VerificationValue string `xml:"verification_value,omitempty"` // Create/update only
 
 	// Paypal
@@ -107,7 +107,7 @@ type Billing struct {
 
 // Type returns the billing info type. Returns either  "", "bank", or an empty string.
 func (b Billing) Type() string {
-	if b.FirstSix != "" && b.LastFour != "" && b.Month != "" && b.Year != "" {
+	if b.FirstSix != "" && b.LastFour != "" && b.Month > 0 && b.Year > 0 {
 		return "card"
 	} else if b.NameOnAccount != "" && b.RoutingNumber != "" && b.AccountNumber != "" {
 		return "bank"
