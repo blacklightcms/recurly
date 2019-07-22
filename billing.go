@@ -107,7 +107,7 @@ type Billing struct {
 
 // Type returns the billing info type. Returns either  "", "bank", or an empty string.
 func (b Billing) Type() string {
-	if b.FirstSix != "" && b.LastFour != "" && b.Month > 0 && b.Year > 0 {
+	if b.FirstSix != "" && b.LastFour != "" && b.Month != "" && b.Year != "" {
 		return "card"
 	} else if b.NameOnAccount != "" && b.RoutingNumber != "" && b.AccountNumber != "" {
 		return "bank"
