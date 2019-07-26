@@ -100,9 +100,10 @@ type Billing struct {
 	AccountNumber string `xml:"account_number,omitempty"`
 	AccountType   string `xml:"account_type,omitempty"`
 
-	ExternalHPPType string `xml:"external_hpp_type,omitempty"` // only usable with purchases API
-	Currency        string `xml:"currency,omitempty"`          // Create/update only
-	Token           string `xml:"token_id,omitempty"`          // Create/update only
+	ExternalHPPType                 string `xml:"external_hpp_type,omitempty"`                     // only usable with purchases API
+	Currency                        string `xml:"currency,omitempty"`                              // Create/update only
+	Token                           string `xml:"token_id,omitempty"`                              // Create/update only
+	ThreeDSecureActionResultTokenID string `xml:"three_d_secure_action_result_token_id,omitempty"` // Create/update only
 }
 
 // Type returns the billing info type. Returns either  "", "bank", or an empty string.
