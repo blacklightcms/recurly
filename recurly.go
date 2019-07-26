@@ -325,7 +325,7 @@ func (r *response) parseClientError(v interface{}) error {
 
 		// Any transaction errors return TransactionFailedError.
 		if e.Transaction != nil || e.TransactionError != nil {
-			transFailedErr := &TransactionFailedError{
+			transFailedErr := TransactionFailedError{
 				Response:    r.Response,
 				Transaction: e.Transaction,
 			}
@@ -433,7 +433,7 @@ type TransactionFailedError struct {
 	TransactionError TransactionError
 }
 
-func (e *TransactionFailedError) Error() string {
+func (e TransactionFailedError) Error() string {
 	return fmt.Sprintf("transaction failed: %s %s: %d [%s/%s/%s]",
 		e.Response.Request.Method,
 		e.Response.Request.URL.Path,
