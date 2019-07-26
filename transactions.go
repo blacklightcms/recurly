@@ -77,12 +77,13 @@ type Transaction struct {
 //
 // https://dev.recurly.com/page/transaction-errors
 type TransactionError struct {
-	XMLName          xml.Name `xml:"transaction_error"`
-	ErrorCode        string   `xml:"error_code,omitempty"`
-	ErrorCategory    string   `xml:"error_category,omitempty"`
-	MerchantMessage  string   `xml:"merchant_message,omitempty"`
-	CustomerMessage  string   `xml:"customer_message,omitempty"`
-	GatewayErrorCode string   `xml:"gateway_error_code,omitempty"`
+	XMLName                   xml.Name `xml:"transaction_error"`
+	ErrorCode                 string   `xml:"error_code,omitempty"`
+	ErrorCategory             string   `xml:"error_category,omitempty"`
+	MerchantMessage           string   `xml:"merchant_message,omitempty"`
+	CustomerMessage           string   `xml:"customer_message,omitempty"`
+	GatewayErrorCode          string   `xml:"gateway_error_code,omitempty"`
+	ThreeDSecureActionTokenID string   `xml:"three_d_secure_action_token_id,omitempty"`
 }
 
 // UnmarshalXML unmarshals transactions and handles intermediary state during unmarshaling
