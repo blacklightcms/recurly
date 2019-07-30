@@ -103,6 +103,8 @@ type Billing struct {
 	ExternalHPPType string `xml:"external_hpp_type,omitempty"` // only usable with purchases API
 	Currency        string `xml:"currency,omitempty"`          // Create/update only
 	Token           string `xml:"token_id,omitempty"`          // Create/update only
+
+	ThreeDSecureActionResultTokenId string `xml:"three_d_secure_action_result_token_id,omitempty"` // Create/update only
 }
 
 // Type returns the billing info type. Returns either  "", "bank", or an empty string.
