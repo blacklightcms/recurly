@@ -284,6 +284,32 @@ func TestBilling_Create(t *testing.T) {
 		}
 	})
 
+	t.Run("Token with 3D secure action result token", func(t *testing.T) {
+		client, s := recurly.NewTestServer()
+		defer s.Close()
+
+		s.HandleFunc("POST", "/v2/accounts/1/billing_info", func(w http.ResponseWriter, r *http.Request) {
+			if str := MustReadAllString(r.Body); str != MustCompactString(`
+			<billing_info>
+				<token_id>TOKEN</token_id>
+				<three_d_secure_action_result_token_id>THREE_D_SECURE_ACTION_RESULT_TOKEN</three_d_secure_action_result_token_id>
+			</billing_info>
+		`) {
+				t.Fatal(str)
+			}
+			w.WriteHeader(http.StatusCreated)
+			w.Write(MustOpenFile("billing_info.xml"))
+		}, t)
+
+		if info, err := client.Billing.Create(context.Background(), "1", recurly.Billing{Token: "TOKEN", ThreeDSecureActionResultTokenID: "THREE_D_SECURE_ACTION_RESULT_TOKEN"}); !s.Invoked {
+			t.Fatal("expected fn invocation")
+		} else if err != nil {
+			t.Fatal(err)
+		} else if diff := cmp.Diff(info, NewTestBillingInfo()); diff != "" {
+			t.Fatal(diff)
+		}
+	})
+
 	t.Run("BillingInfo", func(t *testing.T) {
 		client, s := recurly.NewTestServer()
 		defer s.Close()
@@ -356,12 +382,38 @@ func TestBilling_Update(t *testing.T) {
 		}
 	})
 
+	t.Run("Token with 3D secure action result token", func(t *testing.T) {
+		client, s := recurly.NewTestServer()
+		defer s.Close()
+
+		s.HandleFunc("PUT", "/v2/accounts/1/billing_info", func(w http.ResponseWriter, r *http.Request) {
+			if str := MustReadAllString(r.Body); str != MustCompactString(`
+				<billing_info>
+					<token_id>TOKEN</token_id>
+					<three_d_secure_action_result_token_id>THREE_D_SECURE_ACTION_RESULT_TOKEN</three_d_secure_action_result_token_id>
+				</billing_info>
+			`) {
+				t.Fatal(str)
+			}
+			w.WriteHeader(http.StatusOK)
+			w.Write(MustOpenFile("billing_info.xml"))
+		}, t)
+
+		if info, err := client.Billing.Update(context.Background(), "1", recurly.Billing{Token: "TOKEN", ThreeDSecureActionResultTokenID: "THREE_D_SECURE_ACTION_RESULT_TOKEN"}); !s.Invoked {
+			t.Fatal("expected fn invocation")
+		} else if err != nil {
+			t.Fatal(err)
+		} else if diff := cmp.Diff(info, NewTestBillingInfo()); diff != "" {
+			t.Fatal(diff)
+		}
+	})
+
 	t.Run("InvalidToken", func(t *testing.T) {
 		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("PUT", "/v2/accounts/1/billing_info", func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusNotFound)
+			w.WriteHeader(http.StatusUnprocessableEntity)
 			w.Write([]byte(`
 				<?xml version="1.0" encoding="UTF-8"?>
 				<error>
