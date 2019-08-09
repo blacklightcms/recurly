@@ -347,7 +347,7 @@ func TestClient_TransactionFailedError(t *testing.T) {
 		MerchantMessage:           "The payment gateway declined the transaction because the security code (CVV) did not match.",
 		CustomerMessage:           "The security code you entered does not match. Please update the CVV and try again.",
 		GatewayErrorCode:          "301",
-		ThreeDSecureActionTokenID: "three_d_secure_action_token_id",
+		ThreeDSecureActionTokenID: "ABCDEFGHIJKL012345",
 	}); diff != "" {
 		t.Fatal(diff)
 	} else if diff := cmp.Diff(e.Transaction, NewTestTransactionFailed()); diff != "" {
