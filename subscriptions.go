@@ -254,6 +254,7 @@ type UpdateSubscription struct {
 	RenewalBillingCycles   NullInt              `xml:"renewal_billing_cycles,omitempty"`
 	AutoRenew              NullBool             `xml:"auto_renew,omitempty"`
 	CustomFields           *CustomFields        `xml:"custom_fields,omitempty"`
+	BillingInfo            *Billing             `xml:"billing_info,omitempty"`
 }
 
 // SubscriptionNotes is used to update a subscription's notes.
