@@ -336,6 +336,9 @@ type PagerOptions struct {
 	State string // supported by some endpoints. Check Recurly's documenation.
 	Type  string // supported by some endpoints. Check Recurly's documentation.
 
+	// Search query
+	Q string
+
 	// query is for any one-off URL params used by a specific endpoint.
 	// Values sent as time.Time or recurly.NullTime will be automatically
 	// converted to a valid datetime format for Recurly.
@@ -398,5 +401,6 @@ func (p PagerOptions) append(u *url.URL) {
 	p.query["state"] = p.State
 	p.query["type"] = p.Type
 	p.query["cursor"] = p.Cursor
+	p.query["q"] = p.Q
 	p.query.append(u)
 }

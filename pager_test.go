@@ -42,6 +42,7 @@ func TestPager(t *testing.T) {
 			"state":      []string{"active"},
 			"begin_time": []string{"2011-10-17T17:24:53Z"},
 			"end_time":   []string{"2011-10-18T17:24:53Z"},
+			"q":          []string{"test@foo.com"},
 		}); diff != "" {
 			t.Fatal(diff)
 		}
@@ -58,6 +59,7 @@ func TestPager(t *testing.T) {
 		State:     "active",
 		BeginTime: recurly.NewTime(MustParseTime("2011-10-17T17:24:53Z")),
 		EndTime:   recurly.NewTime(MustParseTime("2011-10-18T17:24:53Z")),
+		Q:         "test@foo.com",
 	})
 
 	for pager.Next() {
