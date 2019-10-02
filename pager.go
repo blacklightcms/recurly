@@ -116,6 +116,7 @@ func (p *pager) Fetch(ctx context.Context, dst interface{}) error {
 		Account         []Account         `xml:"account"`
 		Adjustment      []Adjustment      `xml:"adjustment"`
 		AddOn           []AddOn           `xml:"add_on"`
+		AddOnUsage		[]AddOnUsage	  `xml:"usage"`
 		Coupon          []Coupon          `xml:"coupon"`
 		CreditPayment   []CreditPayment   `xml:"credit_payment"`
 		Invoice         []Invoice         `xml:"invoice"`
@@ -144,6 +145,8 @@ func (p *pager) Fetch(ctx context.Context, dst interface{}) error {
 		*v = unmarshaler.Adjustment
 	case *[]AddOn:
 		*v = unmarshaler.AddOn
+	case *[]AddOnUsage:
+		*v = unmarshaler.AddOnUsage
 	case *[]Coupon:
 		*v = unmarshaler.Coupon
 	case *[]CreditPayment:
@@ -201,6 +204,16 @@ func (p *pager) FetchAll(ctx context.Context, dst interface{}) error {
 		var all []AddOn
 		for p.Next() {
 			var dst []AddOn
+			if err := p.Fetch(ctx, &dst); err != nil {
+				return err
+			}
+			all = append(all, dst...)
+		}
+		*v = all
+	case *[]AddOnUsage:
+		var all []AddOnUsage
+		for p.Next() {
+			var dst []AddOnUsage
 			if err := p.Fetch(ctx, &dst); err != nil {
 				return err
 			}
@@ -339,7 +352,7 @@ type PagerOptions struct {
 	// query is for any one-off URL params used by a specific endpoint.
 	// Values sent as time.Time or recurly.NullTime will be automatically
 	// converted to a valid datetime format for Recurly.
-	query query
+	Query query
 
 	// Cursor is set internally by the library. If you are paginating
 	// records non-consecutively and obtained the next cursor, you can set it
@@ -384,19 +397,19 @@ func (q query) append(u *url.URL) {
 
 // append appends params to a URL.
 func (p PagerOptions) append(u *url.URL) {
-	if p.query == nil {
-		p.query = map[string]interface{}{}
+	if p.Query == nil {
+		p.Query = map[string]interface{}{}
 	}
 	if p.PerPage > 0 {
-		p.query["per_page"] = p.PerPage
+		p.Query["per_page"] = p.PerPage
 	}
 
-	p.query["begin_time"] = p.BeginTime.String()
-	p.query["end_time"] = p.EndTime.String()
-	p.query["sort"] = p.Sort
-	p.query["order"] = p.Order
-	p.query["state"] = p.State
-	p.query["type"] = p.Type
-	p.query["cursor"] = p.Cursor
-	p.query.append(u)
+	p.Query["begin_time"] = p.BeginTime.String()
+	p.Query["end_time"] = p.EndTime.String()
+	p.Query["sort"] = p.Sort
+	p.Query["order"] = p.Order
+	p.Query["state"] = p.State
+	p.Query["type"] = p.Type
+	p.Query["cursor"] = p.Cursor
+	p.Query.append(u)
 }

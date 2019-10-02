@@ -11,6 +11,7 @@ type Client struct {
 
 	Accounts          AccountsService
 	AddOns            AddOnsService
+	AddOnUsages       AddOnUsageService
 	Adjustments       AdjustmentsService
 	Billing           BillingService
 	Coupons           CouponsService
@@ -33,6 +34,7 @@ func NewClient(subdomain, apiKey string) *Client {
 	// Attach mock implementations.
 	c.Client.Accounts = &c.Accounts
 	c.Client.AddOns = &c.AddOns
+	c.Client.AddOnUsages = &c.AddOnUsages
 	c.Client.Adjustments = &c.Adjustments
 	c.Client.Billing = &c.Billing
 	c.Client.Coupons = &c.Coupons
