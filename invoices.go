@@ -344,6 +344,7 @@ type InvoiceRefund struct {
 type CollectInvoice struct {
 	XMLName         xml.Name `xml:"invoice"`
 	TransactionType string   `xml:"transaction_type,omitempty"` // Optional transaction type. Currently accepts "moto"
+	BillingInfo     *Billing `xml:"billing_info,omitempty"`
 }
 
 // InvoiceLineItemsRefund is used to refund one or more line items on an invoice.
