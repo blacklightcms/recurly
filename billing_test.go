@@ -139,7 +139,7 @@ func TestBilling_Encoding(t *testing.T) {
 			v: recurly.Billing{TransactionType: "moto"},
 			expected: MustCompactString(`
 				<billing_info>
-					<transaction_type>motot</transaction_type>
+					<transaction_type>moto</transaction_type>
 				</billing_info>
 			`),
 		},
