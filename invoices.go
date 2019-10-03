@@ -149,7 +149,7 @@ const (
 	VoidRefundMethodCreditFirst      = "credit_first"
 )
 
-// Invoice is an individual invoice for an account. Transactions aareer guaranteed
+// Invoice is an individual invoice for an account. Transactions are guaranteed
 // to be sorted from oldest to newest by date.
 // The only fields annotated with XML tags are those for posting an invoice.
 // Unmarshaling an invoice is handled by the custom UnmarshalXML function.
