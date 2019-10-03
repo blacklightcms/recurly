@@ -51,7 +51,7 @@ type InvoicesService interface {
 	// is rate limited. See Recurly's documentation for details.
 	//
 	// https://dev.recurly.com/docs/collect-an-invoice
-	Collect(ctx context.Context, invoiceNumber int) (*Invoice, error)
+	Collect(ctx context.Context, invoiceNumber int, collectInvoice CollectInvoice) (*Invoice, error)
 
 	// MarkPaid marks an invoice as paid successfully.
 	//
@@ -340,6 +340,12 @@ type InvoiceRefund struct {
 	RefundedAt          NullTime `xml:"refunded_at,omitempty"`
 }
 
+// CollectInvoice is used as the request body for collecting an invoice.
+type CollectInvoice struct {
+	XMLName         xml.Name `xml:"invoice"`
+	TransactionType string   `xml:"transaction_type,omitempty"` // Optional transaction type. Currently accepts "moto"
+}
+
 // InvoiceLineItemsRefund is used to refund one or more line items on an invoice.
 type InvoiceLineItemsRefund struct {
 	XMLName   xml.Name       `xml:"invoice"`
@@ -440,9 +446,9 @@ func (s *invoicesImpl) Create(ctx context.Context, accountCode string, invoice I
 	return dst.ChargeInvoice, nil
 }
 
-func (s *invoicesImpl) Collect(ctx context.Context, invoiceNumber int) (*Invoice, error) {
+func (s *invoicesImpl) Collect(ctx context.Context, invoiceNumber int, collectInvoice CollectInvoice) (*Invoice, error) {
 	path := fmt.Sprintf("/invoices/%d/collect", invoiceNumber)
-	req, err := s.client.newRequest("PUT", path, nil)
+	req, err := s.client.newRequest("PUT", path, collectInvoice)
 	if err != nil {
 		return nil, err
 	}
