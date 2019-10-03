@@ -188,6 +188,7 @@ type NewSubscription struct {
 	ShippingMethodCode      string               `xml:"shipping_method_code,omitempty"`
 	ShippingAmountInCents   NullInt              `xml:"shipping_amount_in_cents,omitempty"`
 	CustomFields            *CustomFields        `xml:"custom_fields,omitempty"`
+	TransactionType         string               `xml:"transaction_type,omitempty"` // Optional transaction type. Currently accepts "moto"
 }
 
 // UnmarshalXML unmarshals transactions and handles intermediary state during unmarshaling
@@ -255,6 +256,7 @@ type UpdateSubscription struct {
 	AutoRenew              NullBool             `xml:"auto_renew,omitempty"`
 	CustomFields           *CustomFields        `xml:"custom_fields,omitempty"`
 	BillingInfo            *Billing             `xml:"billing_info,omitempty"`
+	TransactionType        string               `xml:"transaction_type,omitempty"` // Optional transaction type. Currently accepts "moto"
 }
 
 // SubscriptionNotes is used to update a subscription's notes.

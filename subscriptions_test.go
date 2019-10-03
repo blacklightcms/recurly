@@ -463,6 +463,26 @@ func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 				</subscription>
 			`),
 		},
+		{
+			v: recurly.NewSubscription{
+				PlanCode: "gold",
+				Currency: "USD",
+				Account: recurly.Account{
+					Code: "123",
+				},
+				TransactionType: "moto",
+			},
+			expected: MustCompactString(`
+				<subscription>
+					<plan_code>gold</plan_code>
+					<account>
+						<account_code>123</account_code>
+					</account>
+					<currency>USD</currency>
+					<transaction_type>moto</transaction_type>
+				</subscription>
+			`),
+		},
 	}
 
 	for i, tt := range tests {
@@ -599,6 +619,16 @@ func TestSubscriptions_UpdateSubscription_Encoding(t *testing.T) {
 							<quantity>2</quantity>
 						</subscription_add_on>
 					</subscription_add_ons>
+				</subscription>
+			`),
+		},
+		{
+			v: recurly.UpdateSubscription{
+				TransactionType: "moto",
+			},
+			expected: MustCompactString(`
+				<subscription>
+					<transaction_type>moto</transaction_type>
 				</subscription>
 			`),
 		},
