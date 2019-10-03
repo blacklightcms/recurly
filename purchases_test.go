@@ -61,6 +61,7 @@ func TestPurchases_Purchase_Encoding(t *testing.T) {
 					},
 				},
 				ShippingAddressID: 1,
+				TransactionType:   "moto",
 			},
 			expected: MustCompactString(`
 				<purchase>
@@ -81,6 +82,7 @@ func TestPurchases_Purchase_Encoding(t *testing.T) {
 							<shipping_amount_in_cents>10</shipping_amount_in_cents>
 						</shipping_fee>
 					</shipping_fees>
+					<transaction_type>moto</transaction_type>
 				</purchase>
 			`),
 		},
