@@ -29,7 +29,7 @@ type InvoicesService struct {
 	OnCreate      func(ctx context.Context, accountCode string, invoice recurly.Invoice) (*recurly.Invoice, error)
 	CreateInvoked bool
 
-	OnCollect      func(ctx context.Context, invoiceNumber int) (*recurly.Invoice, error)
+	OnCollect      func(ctx context.Context, invoiceNumber int, collectInvoice recurly.CollectInvoice) (*recurly.Invoice, error)
 	CollectInvoked bool
 
 	OnMarkPaid      func(ctx context.Context, invoiceNumber int) (*recurly.Invoice, error)
@@ -81,9 +81,9 @@ func (m *InvoicesService) Create(ctx context.Context, accountCode string, invoic
 	return m.OnCreate(ctx, accountCode, invoice)
 }
 
-func (m *InvoicesService) Collect(ctx context.Context, invoiceNumber int) (*recurly.Invoice, error) {
+func (m *InvoicesService) Collect(ctx context.Context, invoiceNumber int, collectInvoice recurly.CollectInvoice) (*recurly.Invoice, error) {
 	m.CollectInvoked = true
-	return m.OnCollect(ctx, invoiceNumber)
+	return m.OnCollect(ctx, invoiceNumber, collectInvoice)
 }
 
 func (m *InvoicesService) MarkPaid(ctx context.Context, invoiceNumber int) (*recurly.Invoice, error) {

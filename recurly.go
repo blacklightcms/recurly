@@ -19,7 +19,7 @@ import (
 // apiVersion is the API version in use by this client.
 // NOTE: v2.19:
 //		- Parent/child accounts not yet implemented.
-const apiVersion = "2.21"
+const apiVersion = "2.22"
 
 // uaVersion is the userAgent version sent to Recurly so they can track usage
 // of this library.

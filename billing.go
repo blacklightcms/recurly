@@ -104,6 +104,7 @@ type Billing struct {
 	Currency                        string `xml:"currency,omitempty"`                              // Create/update only
 	Token                           string `xml:"token_id,omitempty"`                              // Create/update only
 	ThreeDSecureActionResultTokenID string `xml:"three_d_secure_action_result_token_id,omitempty"` // Create/update only
+	TransactionType                 string `xml:"transaction_type,omitempty"`                      // Create only
 }
 
 // Type returns the billing info type. Returns either  "", "bank", or an empty string.
