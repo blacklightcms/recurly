@@ -11,6 +11,6 @@
     <billed_at nil="nil"/>
     <usage_type>price</usage_type>
     <unit_amount_in_cents type="integer">45</unit_amount_in_cents>
-    <usage_percentage nil="nil"/>
+    <usage_percentage>12.34</usage_percentage>
   </usage>
 </usages>

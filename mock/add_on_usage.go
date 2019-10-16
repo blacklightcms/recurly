@@ -8,43 +8,43 @@ import (
 var _ recurly.AddOnUsageService = &AddOnUsageService{}
 
 type AddOnUsageService struct {
-	OnList      func(subUUID, addOnCode string, opts *recurly.PagerOptions) recurly.Pager
+	OnList      func(uuid, addOnCode string, opts *recurly.PagerOptions) recurly.Pager
 	ListInvoked bool
 
-	OnGet      func(ctx context.Context, subUUID, addOnCode, usageId string) (*recurly.AddOnUsage, error)
+	OnGet      func(ctx context.Context, uuid, addOnCode, usageId string) (*recurly.AddOnUsage, error)
 	GetInvoked bool
 
-	OnCreate      func(ctx context.Context, subUUID, addOnCode string, usage recurly.AddOnUsage) (*recurly.AddOnUsage, error)
+	OnCreate      func(ctx context.Context, uuid, addOnCode string, usage recurly.AddOnUsage) (*recurly.AddOnUsage, error)
 	CreateInvoked bool
 
-	OnUpdate      func(ctx context.Context, subUUID, addOnCode string, usage recurly.AddOnUsage) (*recurly.AddOnUsage, error)
+	OnUpdate      func(ctx context.Context, uuid, addOnCode string, usage recurly.AddOnUsage) (*recurly.AddOnUsage, error)
 	UpdateInvoked bool
 
-	OnDelete      func(ctx context.Context, subUUID, addOnCode, usageId string) error
+	OnDelete      func(ctx context.Context, uuid, addOnCode, usageId string) error
 	DeleteInvoked bool
 }
 
-func (m *AddOnUsageService) List(subUUID, addOnCode string, opts *recurly.PagerOptions) recurly.Pager {
+func (m *AddOnUsageService) List(uuid, addOnCode string, opts *recurly.PagerOptions) recurly.Pager {
 	m.ListInvoked = true
-	return m.OnList(subUUID, addOnCode, opts)
+	return m.OnList(uuid, addOnCode, opts)
 }
 
-func (m *AddOnUsageService) Get(ctx context.Context, subUUID, addOnCode, usageId string) (*recurly.AddOnUsage, error) {
+func (m *AddOnUsageService) Get(ctx context.Context, uuid, addOnCode, usageId string) (*recurly.AddOnUsage, error) {
 	m.GetInvoked = true
-	return m.OnGet(ctx, subUUID, addOnCode, usageId)
+	return m.OnGet(ctx, uuid, addOnCode, usageId)
 }
 
-func (m *AddOnUsageService) Create(ctx context.Context, subUUID, addOnCode string, usage recurly.AddOnUsage) (*recurly.AddOnUsage, error) {
+func (m *AddOnUsageService) Create(ctx context.Context, uuid, addOnCode string, usage recurly.AddOnUsage) (*recurly.AddOnUsage, error) {
 	m.CreateInvoked = true
-	return m.OnCreate(ctx, subUUID, addOnCode, usage)
+	return m.OnCreate(ctx, uuid, addOnCode, usage)
 }
 
-func (m *AddOnUsageService) Update(ctx context.Context, subUUID, addOnCode, usageId string, usage recurly.AddOnUsage) (*recurly.AddOnUsage, error) {
+func (m *AddOnUsageService) Update(ctx context.Context, uuid, addOnCode, usageId string, usage recurly.AddOnUsage) (*recurly.AddOnUsage, error) {
 	m.UpdateInvoked = true
-	return m.OnUpdate(ctx, subUUID, addOnCode, usage)
+	return m.OnUpdate(ctx, uuid, addOnCode, usage)
 }
 
-func (m *AddOnUsageService) Delete(ctx context.Context, subUUID, addOnCode, usageId string) error {
+func (m *AddOnUsageService) Delete(ctx context.Context, uuid, addOnCode, usageId string) error {
 	m.DeleteInvoked = true
-	return m.OnDelete(ctx, subUUID, addOnCode, usageId)
+	return m.OnDelete(ctx, uuid, addOnCode, usageId)
 }

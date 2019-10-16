@@ -116,7 +116,7 @@ func (p *pager) Fetch(ctx context.Context, dst interface{}) error {
 		Account         []Account         `xml:"account"`
 		Adjustment      []Adjustment      `xml:"adjustment"`
 		AddOn           []AddOn           `xml:"add_on"`
-		AddOnUsage		[]AddOnUsage	  `xml:"usage"`
+		AddOnUsage      []AddOnUsage      `xml:"usage"`
 		Coupon          []Coupon          `xml:"coupon"`
 		CreditPayment   []CreditPayment   `xml:"credit_payment"`
 		Invoice         []Invoice         `xml:"invoice"`

@@ -280,7 +280,7 @@ func TestXML_NullFloat(t *testing.T) {
 	}
 
 	type testStruct struct {
-		XMLName xml.Name        `xml:"test"`
+		XMLName xml.Name          `xml:"test"`
 		Value   recurly.NullFloat `xml:"f"`
 	}
 
@@ -342,8 +342,6 @@ func TestXML_NullFloatPtr(t *testing.T) {
 		t.Fatalf("unexpected value: %f", value)
 	}
 }
-
-
 
 func TestXML_NullTime(t *testing.T) {
 	t.Run("ZeroValue", func(t *testing.T) {

@@ -13,61 +13,59 @@ type AddOnUsageService interface {
 	// optionally filter the results.
 	//
 	// https://dev.recurly.com/docs/list-add-ons-usage
-	List(subUUID, addOnCode string, opts *PagerOptions) Pager
+	List(uuid, addOnCode string, opts *PagerOptions) Pager
 
 	// Create creates a new usage for add-on in subscription.
 	//
 	// https://dev.recurly.com/docs/log-usage
-	Create(ctx context.Context, subUUID, addOnCode string, usage AddOnUsage) (*AddOnUsage, error)
+	Create(ctx context.Context, uuid, addOnCode string, usage AddOnUsage) (*AddOnUsage, error)
 
 	// Get retrieves an usage. If the usage does not exist,
 	// a nil usage and nil error are returned.
 	//
 	// https://dev.recurly.com/docs/lookup-usage-record
-	Get(ctx context.Context, subUUID, addOnCode, usageId string) (*AddOnUsage, error)
+	Get(ctx context.Context, uuid, addOnCode, usageID string) (*AddOnUsage, error)
 
 	// Update updates the usage information. Once usage is billed, only MerchantTag can be updated.
 	//
 	// https://dev.recurly.com/docs/update-usage
-	Update(ctx context.Context, subUUID, addOnCode, usageId string, usage AddOnUsage) (*AddOnUsage, error)
+	Update(ctx context.Context, uuid, addOnCode, usageID string, usage AddOnUsage) (*AddOnUsage, error)
 
 	// Delete removes an usage from subscription add-on. If usage is billed, it can't be removed
 	//
 	// https://dev.recurly.com/docs/delete-a-usage-record
-	Delete(ctx context.Context, subUUID, addOnCode, usageId string) error
+	Delete(ctx context.Context, uuid, addOnCode, usageID string) error
 }
 
 // Usage is a billable event or group of events recorded on a purchased usage-based add-on and billed in arrears each billing cycle.
 //
 // https://dev.recurly.com/docs/usage-record-object
 type AddOnUsage struct {
-	XMLName            xml.Name `xml:"usage"`
-	Id                 int      `xml:"id,omitempty"`
-	Amount             int      `xml:"amount,omitempty"`
-	MerchantTag        string   `xml:"merchant_tag,omitempty"`
-	RecordingTimestamp NullTime `xml:"recording_timestamp,omitempty"`
-	UsageTimestamp     NullTime `xml:"usage_timestamp,omitempty"`
-	CreatedAt          NullTime `xml:"created_at,omitempty"`
-	UpdatedAt          NullTime `xml:"updated_at,omitempty"`
-	BilledAt           NullTime `xml:"billed_at,omitempty"`
-	UsageType          string   `xml:"usage_type,omitempty"`
-	UnitAmountInCents  int      `xml:"unit_amount_in_cents,omitempty"`
-	UsagePercentage    NullFloat  `xml:"usage_percentage,omitempty"`
+	XMLName            xml.Name  `xml:"usage"`
+	ID                 int       `xml:"id,omitempty"`
+	Amount             int       `xml:"amount,omitempty"`
+	MerchantTag        string    `xml:"merchant_tag,omitempty"`
+	RecordingTimestamp NullTime  `xml:"recording_timestamp,omitempty"`
+	UsageTimestamp     NullTime  `xml:"usage_timestamp,omitempty"`
+	CreatedAt          NullTime  `xml:"created_at,omitempty"`
+	UpdatedAt          NullTime  `xml:"updated_at,omitempty"`
+	BilledAt           NullTime  `xml:"billed_at,omitempty"`
+	UsageType          string    `xml:"usage_type,omitempty"`
+	UnitAmountInCents  int       `xml:"unit_amount_in_cents,omitempty"`
+	UsagePercentage    NullFloat `xml:"usage_percentage,omitempty"`
 }
 
 var _ AddOnUsageService = &addOnUsageServiceImpl{}
 
 type addOnUsageServiceImpl serviceImpl
 
-func (s *addOnUsageServiceImpl) List(subUUID, addOnCode string, opts *PagerOptions) Pager {
-
-	path := fmt.Sprintf("/subscriptions/%s/add_ons/%s/usage", subUUID, addOnCode)
-	fmt.Printf("\n huh, path=[%s]\n", path)
+func (s *addOnUsageServiceImpl) List(uuid, addOnCode string, opts *PagerOptions) Pager {
+	path := fmt.Sprintf("/subscriptions/%s/add_ons/%s/usage", uuid, addOnCode)
 	return s.client.newPager("GET", path, opts)
 }
 
-func (s *addOnUsageServiceImpl) Get(ctx context.Context, subUUID, addOnCode, usageId string) (*AddOnUsage, error) {
-	path := fmt.Sprintf("/subscriptions/%s/add_ons/%s/usage/%s", subUUID, addOnCode, usageId)
+func (s *addOnUsageServiceImpl) Get(ctx context.Context, uuid, addOnCode, usageID string) (*AddOnUsage, error) {
+	path := fmt.Sprintf("/subscriptions/%s/add_ons/%s/usage/%s", uuid, addOnCode, usageID)
 	req, err := s.client.newRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
@@ -83,9 +81,8 @@ func (s *addOnUsageServiceImpl) Get(ctx context.Context, subUUID, addOnCode, usa
 	return &dst, nil
 }
 
-func (s *addOnUsageServiceImpl) Create(ctx context.Context, subUUID, addOnCode string, usage AddOnUsage) (*AddOnUsage, error) {
-
-	path := fmt.Sprintf("/subscriptions/%s/add_ons/%s/usage", subUUID, addOnCode)
+func (s *addOnUsageServiceImpl) Create(ctx context.Context, uuid, addOnCode string, usage AddOnUsage) (*AddOnUsage, error) {
+	path := fmt.Sprintf("/subscriptions/%s/add_ons/%s/usage", uuid, addOnCode)
 	req, err := s.client.newRequest("POST", path, usage)
 	if err != nil {
 		return nil, err
@@ -98,9 +95,8 @@ func (s *addOnUsageServiceImpl) Create(ctx context.Context, subUUID, addOnCode s
 	return &dst, nil
 }
 
-func (s *addOnUsageServiceImpl) Update(ctx context.Context, subUUID, addOnCode, usageId string, usage AddOnUsage) (*AddOnUsage, error) {
-
-	path := fmt.Sprintf("/subscriptions/%s/add_ons/%s/usage/%s", subUUID, addOnCode, usageId)
+func (s *addOnUsageServiceImpl) Update(ctx context.Context, uuid, addOnCode, usageID string, usage AddOnUsage) (*AddOnUsage, error) {
+	path := fmt.Sprintf("/subscriptions/%s/add_ons/%s/usage/%s", uuid, addOnCode, usageID)
 	req, err := s.client.newRequest("PUT", path, usage)
 	if err != nil {
 		return nil, err
@@ -113,9 +109,8 @@ func (s *addOnUsageServiceImpl) Update(ctx context.Context, subUUID, addOnCode, 
 	return &dst, nil
 }
 
-func (s *addOnUsageServiceImpl) Delete(ctx context.Context, subUUID, addOnCode, usageId string) error {
-
-	path := fmt.Sprintf("/subscriptions/%s/add_ons/%s/usage/%s", subUUID, addOnCode, usageId)
+func (s *addOnUsageServiceImpl) Delete(ctx context.Context, uuid, addOnCode, usageID string) error {
+	path := fmt.Sprintf("/subscriptions/%s/add_ons/%s/usage/%s", uuid, addOnCode, usageID)
 	req, err := s.client.newRequest("DELETE", path, nil)
 	if err != nil {
 		return err

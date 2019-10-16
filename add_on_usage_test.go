@@ -15,7 +15,6 @@ import (
 
 // Ensure structs are encoded to XML properly.
 func TestAddOnUsage_Encoding(t *testing.T) {
-
 	now := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
 	tests := []struct {
 		v        recurly.AddOnUsage
@@ -28,7 +27,7 @@ func TestAddOnUsage_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.AddOnUsage{Id: 123456},
+			v: recurly.AddOnUsage{ID: 123456},
 			expected: MustCompactString(`
 				<usage>
 					<id>123456</id>
@@ -246,10 +245,8 @@ func TestAddOnUsage_Delete(t *testing.T) {
 	}
 }
 
-
 // Returns add on corresponding to testdata/add_on.xml
 func NewTestAddOnUsage() *recurly.AddOnUsage {
-
 	now := time.Date(2000, 1, 1, 0, 0, 0, 0, time.UTC)
 	return &recurly.AddOnUsage{
 		XMLName:            xml.Name{Local: "usage"},
@@ -262,6 +259,6 @@ func NewTestAddOnUsage() *recurly.AddOnUsage {
 		BilledAt:           recurly.NullTime{},
 		UsageType:          "price",
 		UnitAmountInCents:  45,
-		UsagePercentage:    recurly.NullFloat{},
+		UsagePercentage:    recurly.NewFloat(12.34),
 	}
 }
