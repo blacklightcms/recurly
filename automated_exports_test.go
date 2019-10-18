@@ -52,7 +52,7 @@ func TestAutomatedExports_Get(t *testing.T) {
 
 		s.HandleFunc("GET", "/v2/export_dates/2019-10-10/export_files/sub.csv.gz", func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
-			w.Write(MustOpenFile("automated_exports.xml"))
+			w.Write(MustOpenFile("automated_export.xml"))
 		}, t)
 
 		if a, err := client.AutomatedExports.Get(context.Background(), "2019-10-10", "sub.csv.gz"); err != nil {
