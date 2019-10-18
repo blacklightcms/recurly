@@ -46,16 +46,18 @@ func TestAutomatedExports_Encoding(t *testing.T) {
 }
 
 func TestAutomatedExports_Get(t *testing.T) {
+	now := time.Date(2015, 2, 4, 23, 13, 7, 0, time.UTC)
+
 	t.Run("OK", func(t *testing.T) {
 		client, s := recurly.NewTestServer()
 		defer s.Close()
 
-		s.HandleFunc("GET", "/v2/export_dates/2019-10-10/export_files/sub.csv.gz", func(w http.ResponseWriter, r *http.Request) {
+		s.HandleFunc("GET", "/v2/export_dates/2015-02-04/export_files/sub.csv.gz", func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusOK)
 			w.Write(MustOpenFile("automated_export.xml"))
 		}, t)
 
-		if a, err := client.AutomatedExports.Get(context.Background(), "2019-10-10", "sub.csv.gz"); err != nil {
+		if a, err := client.AutomatedExports.Get(context.Background(), now, "sub.csv.gz"); err != nil {
 			t.Fatal(err)
 		} else if diff := cmp.Diff(a, NewTestAutomatedExport()); diff != "" {
 			t.Fatal(diff)
@@ -69,11 +71,11 @@ func TestAutomatedExports_Get(t *testing.T) {
 		client, s := recurly.NewTestServer()
 		defer s.Close()
 
-		s.HandleFunc("GET", "/v2/export_dates/2019-10-10/export_files/sub.csv.gz", func(w http.ResponseWriter, r *http.Request) {
+		s.HandleFunc("GET", "/v2/export_dates/2015-02-04/export_files/sub.csv.gz", func(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(http.StatusNotFound)
 		}, t)
 
-		if a, err := client.AutomatedExports.Get(context.Background(), "2019-10-10", "sub.csv.gz"); !s.Invoked {
+		if a, err := client.AutomatedExports.Get(context.Background(), now, "sub.csv.gz"); !s.Invoked {
 			t.Fatal("expected fn invocation")
 		} else if err != nil {
 			t.Fatal(err)

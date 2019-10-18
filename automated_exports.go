@@ -5,6 +5,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"net/http"
+	"time"
 )
 
 // AutomatedExportsService manages the interactions for automated exports.
@@ -12,7 +13,7 @@ type AutomatedExportsService interface {
 	// Get retrieves export file.
 	//
 	// https://dev.recurly.com/docs/download-export-file
-	Get(ctx context.Context, date string, fileName string) (*AutomatedExport, error)
+	Get(ctx context.Context, date time.Time, fileName string) (*AutomatedExport, error)
 }
 
 // AutomatedExport holds export file info.
@@ -27,8 +28,9 @@ var _ AutomatedExportsService = &automatedExportsImpl{}
 // automatedExportsImpl implements AutomatedExportsService.
 type automatedExportsImpl serviceImpl
 
-func (s *automatedExportsImpl) Get(ctx context.Context, date string, fileName string) (*AutomatedExport, error) {
-	path := fmt.Sprintf("/export_dates/%s/export_files/%s", date, fileName)
+func (s *automatedExportsImpl) Get(ctx context.Context, date time.Time, fileName string) (*AutomatedExport, error) {
+	d := fmt.Sprintf("%02d-%02d-%02d", date.Year(), date.Month(), date.Day())
+	path := fmt.Sprintf("/export_dates/%s/export_files/%s", d, fileName)
 	req, err := s.client.newRequest("GET", path, nil)
 	if err != nil {
 		return nil, err
