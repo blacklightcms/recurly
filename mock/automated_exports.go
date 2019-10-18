@@ -7,7 +7,7 @@ import (
 
 var _ recurly.AutomatedExportsService = &AutomatedExportsService{}
 
-// AdjustmentsService manages the interactions for adjustments.
+// AutomatedExportsService manages the interactions for automated exports.
 type AutomatedExportsService struct {
 	OnGet      func(ctx context.Context, date string, fileName string) (*recurly.AutomatedExport, error)
 	GetInvoked bool
