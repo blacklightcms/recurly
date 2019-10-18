@@ -118,6 +118,8 @@ func (p *pager) Fetch(ctx context.Context, dst interface{}) error {
 		AddOn           []AddOn           `xml:"add_on"`
 		Coupon          []Coupon          `xml:"coupon"`
 		CreditPayment   []CreditPayment   `xml:"credit_payment"`
+		ExportDate      []ExportDate      `xml:"export_date"`
+		ExportFile      []ExportFile      `xml:"export_file"`
 		Invoice         []Invoice         `xml:"invoice"`
 		Note            []Note            `xml:"note"`
 		Plan            []Plan            `xml:"plan"`
@@ -148,6 +150,10 @@ func (p *pager) Fetch(ctx context.Context, dst interface{}) error {
 		*v = unmarshaler.Coupon
 	case *[]CreditPayment:
 		*v = unmarshaler.CreditPayment
+	case *[]ExportDate:
+		*v = unmarshaler.ExportDate
+	case *[]ExportFile:
+		*v = unmarshaler.ExportFile
 	case *[]Invoice:
 		*v = unmarshaler.Invoice
 	case *[]Note:
