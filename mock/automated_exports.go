@@ -2,7 +2,7 @@ package mock
 
 import (
 	"context"
-	"github.com/aaronchooo/recurly"
+	"github.com/blacklightcms/recurly"
 )
 
 var _ recurly.AutomatedExportsService = &AutomatedExportsService{}
