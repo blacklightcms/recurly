@@ -121,6 +121,14 @@ func TestAccounts_Encoding(t *testing.T) {
 			`),
 		},
 		{
+			v: recurly.Account{TransactionType: "moto"},
+			expected: MustCompactString(`
+				<account>
+					<transaction_type>moto</transaction_type>
+				</account>
+			`),
+		},
+		{
 			v: recurly.Account{FirstName: "Larry", Address: &recurly.Address{Address: "123 Main St.", City: "San Francisco", State: "CA", Zip: "94105", Country: "US"}},
 			expected: MustCompactString(`
 				<account>

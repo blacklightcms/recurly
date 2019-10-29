@@ -94,6 +94,7 @@ type Account struct {
 	HasPastDueInvoice       NullBool           `xml:"has_past_due_invoice,omitempty"`
 	PreferredLocale         string             `xml:"preferred_locale,omitempty"`
 	CustomFields            *CustomFields      `xml:"custom_fields,omitempty"`
+	TransactionType         string             `xml:"transaction_type,omitempty"` // Create only
 }
 
 // AccountBalance is used for getting the account balance.

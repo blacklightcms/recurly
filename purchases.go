@@ -67,6 +67,7 @@ type Purchase struct {
 	ShippingAddressID     int64                  `xml:"shipping_address_id,omitempty"`
 	GatewayCode           string                 `xml:"gateway_code,omitempty"`
 	ShippingFees          *[]ShippingFee         `xml:"shipping_fees>shipping_fee,omitempty"`
+	TransactionType       string                 `xml:"transaction_type,omitempty"` // Create only
 }
 
 // PurchaseSubscription represents a subscription to purchase some new subscription.

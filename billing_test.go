@@ -135,6 +135,14 @@ func TestBilling_Encoding(t *testing.T) {
 				</billing_info>
 			`),
 		},
+		{
+			v: recurly.Billing{TransactionType: "moto"},
+			expected: MustCompactString(`
+				<billing_info>
+					<transaction_type>moto</transaction_type>
+				</billing_info>
+			`),
+		},
 	}
 
 	for i, tt := range tests {

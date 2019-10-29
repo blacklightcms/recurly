@@ -1,15 +1,46 @@
 package recurly_test
 
 import (
+	"bytes"
 	"context"
 	"encoding/xml"
 	"net"
 	"net/http"
+	"strconv"
 	"testing"
 
 	"github.com/blacklightcms/recurly"
 	"github.com/google/go-cmp/cmp"
 )
+
+func TestInvoices_Encoding(t *testing.T) {
+	tests := []struct {
+		v        recurly.CollectInvoice
+		expected string
+	}{
+		{
+			v: recurly.CollectInvoice{
+				TransactionType: "moto",
+			},
+			expected: MustCompactString(`
+				<invoice>
+					<transaction_type>moto</transaction_type>
+				</invoice>
+		`),
+		},
+	}
+
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			buf := new(bytes.Buffer)
+			if err := xml.NewEncoder(buf).Encode(tt.v); err != nil {
+				t.Fatal(err)
+			} else if buf.String() != tt.expected {
+				t.Fatal(buf.String())
+			}
+		})
+	}
+}
 
 func TestInvoices_List(t *testing.T) {
 	client, s := recurly.NewTestServer()
@@ -211,7 +242,7 @@ func TestInvoices_Collect(t *testing.T) {
 		w.Write(MustOpenFile("invoice.xml"))
 	}, t)
 
-	if invoice, err := client.Invoices.Collect(context.Background(), 1010); !s.Invoked {
+	if invoice, err := client.Invoices.Collect(context.Background(), 1010, recurly.CollectInvoice{}); !s.Invoked {
 		t.Fatal("expected fn invocation")
 	} else if err != nil {
 		t.Fatal(err)

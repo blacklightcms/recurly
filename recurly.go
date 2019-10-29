@@ -19,7 +19,7 @@ import (
 // apiVersion is the API version in use by this client.
 // NOTE: v2.19:
 //		- Parent/child accounts not yet implemented.
-const apiVersion = "2.21"
+const apiVersion = "2.22"
 
 // uaVersion is the userAgent version sent to Recurly so they can track usage
 // of this library.
@@ -55,6 +55,7 @@ type Client struct {
 	Adjustments       AdjustmentsService
 	AddOns            AddOnsService
 	AddOnUsages       AddOnUsageService
+	AutomatedExports  AutomatedExportsService
 	Billing           BillingService
 	Coupons           CouponsService
 	CreditPayments    CreditPaymentsService
@@ -97,6 +98,7 @@ func NewClient(subdomain, apiKey string) *Client {
 	client.Adjustments = &adjustmentsImpl{client: client}
 	client.AddOns = &addOnsImpl{client: client}
 	client.AddOnUsages = &addOnUsageServiceImpl{client: client}
+	client.AutomatedExports = &automatedExportsImpl{client: client}
 	client.Billing = &billingImpl{client: client}
 	client.Coupons = &couponsImpl{client: client}
 	client.CreditPayments = &creditInvoicesImpl{client: client}
