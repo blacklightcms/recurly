@@ -51,7 +51,7 @@ var _ AutomatedExportsService = &automatedExportsImpl{}
 type automatedExportsImpl serviceImpl
 
 func (s *automatedExportsImpl) Get(ctx context.Context, date time.Time, fileName string) (*AutomatedExport, error) {
-	d := fmt.Sprintf("%02d-%02d-%02d", date.Year(), date.Month(), date.Day())
+	d := date.Format("2006-01-02")
 	path := fmt.Sprintf("/export_dates/%s/export_files/%s", d, fileName)
 	req, err := s.client.newRequest("GET", path, nil)
 	if err != nil {
@@ -69,12 +69,11 @@ func (s *automatedExportsImpl) Get(ctx context.Context, date time.Time, fileName
 }
 
 func (s *automatedExportsImpl) ListDates(opts *PagerOptions) Pager {
-	path := "/export_dates"
-	return s.client.newPager("GET", path, opts)
+	return s.client.newPager("GET", "/export_dates", opts)
 }
 
 func (s *automatedExportsImpl) ListFiles(date time.Time, opts *PagerOptions) Pager {
-	d := fmt.Sprintf("%02d-%02d-%02d", date.Year(), date.Month(), date.Day())
+	d := date.Format("2006-01-02")
 	path := fmt.Sprintf("/export_dates/%s/export_files", d)
 	return s.client.newPager("GET", path, opts)
 }
