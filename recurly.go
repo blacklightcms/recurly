@@ -54,6 +54,7 @@ type Client struct {
 	Accounts          AccountsService
 	Adjustments       AdjustmentsService
 	AddOns            AddOnsService
+	AutomatedExports  AutomatedExportsService
 	Billing           BillingService
 	Coupons           CouponsService
 	CreditPayments    CreditPaymentsService
@@ -95,6 +96,7 @@ func NewClient(subdomain, apiKey string) *Client {
 	client.Accounts = &accountsImpl{client: client}
 	client.Adjustments = &adjustmentsImpl{client: client}
 	client.AddOns = &addOnsImpl{client: client}
+	client.AutomatedExports = &automatedExportsImpl{client: client}
 	client.Billing = &billingImpl{client: client}
 	client.Coupons = &couponsImpl{client: client}
 	client.CreditPayments = &creditInvoicesImpl{client: client}
