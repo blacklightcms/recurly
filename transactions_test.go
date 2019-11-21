@@ -224,3 +224,39 @@ func NewTestTransactionFailed() *recurly.Transaction {
 		},
 	}
 }
+
+// Returns a Transaction corresponding to testdata/transaction_refunded.xml
+// as well as the transaction portion of testdata/errors_transaction_refunded.xml.
+func NewTestTransactionRefunded() *recurly.Transaction {
+	return &recurly.Transaction{
+		InvoiceNumber: 1108,
+		UUID:          "5346552e216a445f82b524bb9d1d27aa", // UUID has been sanitized
+		Action:        "refund",
+		AmountInCents: 1000,
+		TaxInCents:    0,
+		Currency:      "USD",
+		Status:        "success",
+		Description:   "Order #717",
+		PaymentMethod: "credit_card",
+		Reference:     "5416477",
+		Source:        "transaction",
+		Recurring:     recurly.NewBool(false),
+		Test:          true,
+		Voidable:      recurly.NewBool(false),
+		Refundable:    recurly.NewBool(false),
+		IPAddress:     net.ParseIP("127.0.0.1"),
+		Account: recurly.Account{
+			XMLName: xml.Name{Local: "account"},
+			Code:    "1",
+			Email:   "verena@example.com",
+			BillingInfo: &recurly.Billing{
+				XMLName:  xml.Name{Local: "billing_info"},
+				CardType: "Visa",
+				Year:     2015,
+				Month:    11,
+				FirstSix: "400000",
+				LastFour: "0101",
+			},
+		},
+	}
+}
