@@ -85,6 +85,25 @@ func TestTransactions_Get(t *testing.T) {
 		}
 	})
 
+	// Retrieving a refunded transaction should succeed
+	t.Run("Refund OK", func(t *testing.T) {
+		client, s := recurly.NewTestServer()
+		defer s.Close()
+
+		s.HandleFunc("GET", "/v2/transactions/5346552e216a445f82b524bb9d1d27aa", func(w http.ResponseWriter, r *http.Request) {
+			w.WriteHeader(http.StatusOK)
+			w.Write(MustOpenFile("transaction_refunded.xml"))
+		}, t)
+
+		if transaction, err := client.Transactions.Get(context.Background(), "5346552e-216a-445f-82b5-24bb9d1d27aa"); err != nil {
+			t.Fatal(err)
+		} else if diff := cmp.Diff(transaction, NewTestTransactionRefunded()); diff != "" {
+			t.Fatal(diff)
+		} else if !s.Invoked {
+			t.Fatal("expected fn invocation")
+		}
+	})
+
 	// Retrieving a failed transaction should hold the transaction errors.
 	t.Run("TransactionFailed", func(t *testing.T) {
 		client, s := recurly.NewTestServer()
@@ -226,36 +245,46 @@ func NewTestTransactionFailed() *recurly.Transaction {
 }
 
 // Returns a Transaction corresponding to testdata/transaction_refunded.xml
-// as well as the transaction portion of testdata/errors_transaction_refunded.xml.
 func NewTestTransactionRefunded() *recurly.Transaction {
 	return &recurly.Transaction{
-		InvoiceNumber: 1108,
-		UUID:          "5346552e216a445f82b524bb9d1d27aa", // UUID has been sanitized
-		Action:        "refund",
-		AmountInCents: 1000,
-		TaxInCents:    0,
-		Currency:      "USD",
-		Status:        "success",
-		Description:   "Order #717",
-		PaymentMethod: "credit_card",
-		Reference:     "5416477",
-		Source:        "transaction",
-		Recurring:     recurly.NewBool(false),
-		Test:          true,
-		Voidable:      recurly.NewBool(false),
-		Refundable:    recurly.NewBool(false),
-		IPAddress:     net.ParseIP("127.0.0.1"),
+		InvoiceNumber:           1108,
+		UUID:                    "5346552e216a445f82b524bb9d1d27aa", // UUID has been sanitized
+		OriginalTransactionUUID: "b9d02bfaa8bf401abf2b18db76863ac4",
+		Action:                  "refund",
+		AmountInCents:           1000,
+		TaxInCents:              0,
+		Currency:                "USD",
+		Status:                  "success",
+		Description:             "Order #717",
+		PaymentMethod:           "credit_card",
+		Reference:               "5416477",
+		Source:                  "transaction",
+		Recurring:               recurly.NewBool(false),
+		Test:                    true,
+		Voidable:                recurly.NewBool(false),
+		Refundable:              recurly.NewBool(false),
+		IPAddress:               net.ParseIP("127.0.0.1"),
+		CreatedAt:               recurly.NewTime(time.Date(2015, time.June, 10, 15, 25, 6, 0, time.UTC)),
 		Account: recurly.Account{
-			XMLName: xml.Name{Local: "account"},
-			Code:    "1",
-			Email:   "verena@example.com",
+			XMLName:   xml.Name{Local: "account"},
+			Code:      "1",
+			FirstName: "Verena",
+			LastName:  "Example",
+			Email:     "verena@test.com",
 			BillingInfo: &recurly.Billing{
-				XMLName:  xml.Name{Local: "billing_info"},
-				CardType: "Visa",
-				Year:     2015,
-				Month:    11,
-				FirstSix: "400000",
-				LastFour: "0101",
+				XMLName:   xml.Name{Local: "billing_info"},
+				FirstName: "Verena",
+				LastName:  "Example",
+				Address:   "123 Main St.",
+				City:      "San Francisco",
+				State:     "CA",
+				Zip:       "94105",
+				Country:   "US",
+				CardType:  "Visa",
+				Year:      2017,
+				Month:     11,
+				FirstSix:  "411111",
+				LastFour:  "1111",
 			},
 		},
 	}
