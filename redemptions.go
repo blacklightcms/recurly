@@ -43,7 +43,7 @@ type RedemptionsService interface {
 	// of the coupon. See Recurly's documentation for details.
 	//
 	// https://dev.recurly.com/docs/remove-a-coupon-from-an-account
-	Delete(ctx context.Context, accountCode string) error
+	Delete(ctx context.Context, accountCode, couponCode string) error
 }
 
 // Redemptions constants.
@@ -148,8 +148,8 @@ func (s *redemptionsImpl) Redeem(ctx context.Context, code string, r CouponRedem
 	return &dst, nil
 }
 
-func (s *redemptionsImpl) Delete(ctx context.Context, accountCode string) error {
-	path := fmt.Sprintf("/accounts/%s/redemption", accountCode)
+func (s *redemptionsImpl) Delete(ctx context.Context, accountCode, couponCode string) error {
+	path := fmt.Sprintf("/accounts/%s/redemption/%s", accountCode, couponCode)
 	req, err := s.client.newRequest("DELETE", path, nil)
 	if err != nil {
 		return err

@@ -156,11 +156,11 @@ func TestRedemptions_Delete(t *testing.T) {
 	client, s := recurly.NewTestServer()
 	defer s.Close()
 
-	s.HandleFunc("DELETE", "/v2/accounts/1/redemption", func(w http.ResponseWriter, r *http.Request) {
+	s.HandleFunc("DELETE", "/v2/accounts/1/redemption/30_off", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 	}, t)
 
-	if err := client.Redemptions.Delete(context.Background(), "1"); !s.Invoked {
+	if err := client.Redemptions.Delete(context.Background(), "1", "30_off"); !s.Invoked {
 		t.Fatal("expected fn invocation")
 	} else if err != nil {
 		t.Fatal(err)
