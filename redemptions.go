@@ -149,7 +149,7 @@ func (s *redemptionsImpl) Redeem(ctx context.Context, code string, r CouponRedem
 }
 
 func (s *redemptionsImpl) Delete(ctx context.Context, accountCode, couponCode string) error {
-	path := fmt.Sprintf("/accounts/%s/redemption/%s", accountCode, couponCode)
+	path := fmt.Sprintf("/accounts/%s/redemptions/%s", accountCode, couponCode)
 	req, err := s.client.newRequest("DELETE", path, nil)
 	if err != nil {
 		return err

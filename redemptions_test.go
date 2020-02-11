@@ -156,7 +156,7 @@ func TestRedemptions_Delete(t *testing.T) {
 	client, s := recurly.NewTestServer()
 	defer s.Close()
 
-	s.HandleFunc("DELETE", "/v2/accounts/1/redemption/30_off", func(w http.ResponseWriter, r *http.Request) {
+	s.HandleFunc("DELETE", "/v2/accounts/1/redemptions/30_off", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 	}, t)
 
