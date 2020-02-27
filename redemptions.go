@@ -43,7 +43,7 @@ type RedemptionsService interface {
 	// of the coupon. See Recurly's documentation for details.
 	//
 	// https://dev.recurly.com/docs/remove-a-coupon-from-an-account
-	Delete(ctx context.Context, accountCode, couponCode string) error
+	Delete(ctx context.Context, accountCode, redemptionUUID string) error
 }
 
 // Redemptions constants.
