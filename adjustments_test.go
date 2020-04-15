@@ -35,6 +35,17 @@ func TestAdjustments_Encoding(t *testing.T) {
 			`),
 		},
 		{
+			v: recurly.Adjustment{Origin: "external_gift_card", UnitAmountInCents: recurly.NewInt(-2000), Currency: "USD"},
+			expected: MustCompactString(`
+				<adjustment>
+					<origin>external_gift_card</origin>
+					<unit_amount_in_cents>-2000</unit_amount_in_cents>
+					<currency>USD</currency>
+				</adjustment>
+			`),
+		},
+
+		{
 			v: recurly.Adjustment{Description: "Charge for extra bandwidth", ProductCode: "bandwidth", UnitAmountInCents: recurly.NewInt(2000), Currency: "USD"},
 			expected: MustCompactString(`
 				<adjustment>
