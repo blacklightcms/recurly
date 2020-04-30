@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"context"
 	"encoding/xml"
+	"io/ioutil"
 	"net/http"
 	"strconv"
+	"strings"
 	"testing"
 	"time"
 
@@ -797,6 +799,10 @@ func TestSubscriptions_UpdateNotes(t *testing.T) {
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/notes", func(w http.ResponseWriter, r *http.Request) {
+		body, _ := ioutil.ReadAll(r.Body)
+		if !strings.Contains(string(body), "gateway_code") {
+			t.Fatal("gateway code not encoded")
+		}
 		w.WriteHeader(http.StatusOK)
 		w.Write(MustOpenFile("subscription.xml"))
 	}, t)
