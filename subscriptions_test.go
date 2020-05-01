@@ -646,6 +646,55 @@ func TestSubscriptions_UpdateSubscription_Encoding(t *testing.T) {
 	}
 }
 
+func TestSubscriptions_SubscriptionNotes_Encoding(t *testing.T) {
+	tests := []struct {
+		v        recurly.SubscriptionNotes
+		expected string
+	}{
+		{
+			expected: MustCompactString(`
+				<subscription>
+          <gateway_code></gateway_code>
+				</subscription>
+			`),
+		},
+		{
+			v: recurly.SubscriptionNotes{
+				GatewayCode:   "test",
+				CustomerNotes: "prepaid",
+			},
+			expected: MustCompactString(`
+				<subscription>
+          <customer_notes>prepaid</customer_notes>
+          <gateway_code>test</gateway_code>
+				</subscription>
+			`),
+		},
+		{
+			v: recurly.SubscriptionNotes{
+				TermsAndConditions: "none",
+			},
+			expected: MustCompactString(`
+				<subscription>
+          <terms_and_conditions>none</terms_and_conditions>
+          <gateway_code></gateway_code>
+				</subscription>
+			`),
+		},
+	}
+
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			buf := new(bytes.Buffer)
+			if err := xml.NewEncoder(buf).Encode(tt.v); err != nil {
+				t.Fatal(err)
+			} else if buf.String() != tt.expected {
+				t.Fatal(buf.String())
+			}
+		})
+	}
+}
+
 func TestSubscriptions_List(t *testing.T) {
 	client, s := recurly.NewTestServer()
 	defer s.Close()

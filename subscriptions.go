@@ -265,7 +265,7 @@ type SubscriptionNotes struct {
 	TermsAndConditions    string        `xml:"terms_and_conditions,omitempty"`
 	CustomerNotes         string        `xml:"customer_notes,omitempty"`
 	VATReverseChargeNotes string        `xml:"vat_reverse_charge_notes,omitempty"`
-	GatewayCode           string        `xml:"gateway_code,omitempty"`
+	GatewayCode           string        `xml:"gateway_code"`
 	CustomFields          *CustomFields `xml:"custom_fields,omitempty"`
 }
 
