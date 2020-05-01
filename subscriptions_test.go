@@ -4,10 +4,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/xml"
-	"io/ioutil"
 	"net/http"
 	"strconv"
-	"strings"
 	"testing"
 	"time"
 
@@ -648,6 +646,55 @@ func TestSubscriptions_UpdateSubscription_Encoding(t *testing.T) {
 	}
 }
 
+func TestSubscriptions_SubscriptionNotes_Encoding(t *testing.T) {
+	tests := []struct {
+		v        recurly.SubscriptionNotes
+		expected string
+	}{
+		{
+			expected: MustCompactString(`
+				<subscription>
+          <gateway_code></gateway_code>
+				</subscription>
+			`),
+		},
+		{
+			v: recurly.SubscriptionNotes{
+				GatewayCode:   "test",
+				CustomerNotes: "prepaid",
+			},
+			expected: MustCompactString(`
+				<subscription>
+          <customer_notes>prepaid</customer_notes>
+          <gateway_code>test</gateway_code>
+				</subscription>
+			`),
+		},
+		{
+			v: recurly.SubscriptionNotes{
+				TermsAndConditions: "none",
+			},
+			expected: MustCompactString(`
+				<subscription>
+          <terms_and_conditions>none</terms_and_conditions>
+          <gateway_code></gateway_code>
+				</subscription>
+			`),
+		},
+	}
+
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			buf := new(bytes.Buffer)
+			if err := xml.NewEncoder(buf).Encode(tt.v); err != nil {
+				t.Fatal(err)
+			} else if buf.String() != tt.expected {
+				t.Fatal(buf.String())
+			}
+		})
+	}
+}
+
 func TestSubscriptions_List(t *testing.T) {
 	client, s := recurly.NewTestServer()
 	defer s.Close()
@@ -799,10 +846,6 @@ func TestSubscriptions_UpdateNotes(t *testing.T) {
 	defer s.Close()
 
 	s.HandleFunc("PUT", "/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/notes", func(w http.ResponseWriter, r *http.Request) {
-		body, _ := ioutil.ReadAll(r.Body)
-		if !strings.Contains(string(body), "gateway_code") {
-			t.Fatal("gateway code not encoded")
-		}
 		w.WriteHeader(http.StatusOK)
 		w.Write(MustOpenFile("subscription.xml"))
 	}, t)
