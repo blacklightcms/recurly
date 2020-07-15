@@ -123,6 +123,15 @@ func TestAddOns_Encoding(t *testing.T) {
 			`),
 		},
 		{
+			v: recurly.AddOn{AvalaraServiceType: 300, AvalaraTransactionType: 6},
+			expected: MustCompactString(`
+				<add_on>
+					<avalara_transaction_type>6</avalara_transaction_type>
+					<avalara_service_type>300</avalara_service_type>
+				</add_on>
+			`),
+		},
+		{
 			v: recurly.AddOn{TierType: "flat"},
 			expected: MustCompactString(`
 				<add_on>

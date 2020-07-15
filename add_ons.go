@@ -56,7 +56,12 @@ type AddOn struct {
 	ItemCode                    string     `xml:"item_code,omitempty"`
 	TierType                    string     `xml:"tier_type,omitempty"`
 	Tiers                       *[]Tier    `xml:"tiers>tier,omitempty"`
-	CreatedAt                   NullTime   `xml:"created_at,omitempty"`
+
+	// The following are only valid with an `Avalara for Communications` integration
+	AvalaraTransactionType int `xml:"avalara_transaction_type,omitempty"`
+	AvalaraServiceType     int `xml:"avalara_service_type,omitempty"`
+
+	CreatedAt NullTime `xml:"created_at,omitempty"`
 }
 
 // UnitAmount can read or write amounts in various currencies.
