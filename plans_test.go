@@ -234,6 +234,25 @@ func TestPlans_Encoding(t *testing.T) {
 				</plan>
 			`),
 		},
+		{
+			v: recurly.Plan{Name: "Gold", AllowAnyItemOnSubscription: recurly.NewBool(true)},
+			expected: MustCompactString(`
+				<plan>
+					<name>Gold</name>
+					<allow_any_item_on_subscription>true</allow_any_item_on_subscription>
+				</plan>
+			`),
+		},
+		{
+			v: recurly.Plan{Name: "Gold", AvalaraServiceType: 600, AvalaraTransactionType: 3},
+			expected: MustCompactString(`
+				<plan>
+					<name>Gold</name>
+					<avalara_transaction_type>3</avalara_transaction_type>
+					<avalara_service_type>600</avalara_service_type>
+				</plan>
+			`),
+		},
 	}
 
 	for i, tt := range tests {

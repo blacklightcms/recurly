@@ -19,7 +19,7 @@ import (
 // apiVersion is the API version in use by this client.
 // NOTE: v2.19:
 //		- Parent/child accounts not yet implemented.
-const apiVersion = "2.22"
+const apiVersion = "2.27"
 
 // uaVersion is the userAgent version sent to Recurly so they can track usage
 // of this library.
@@ -66,6 +66,7 @@ type Client struct {
 	ShippingMethods   ShippingMethodsService
 	Subscriptions     SubscriptionsService
 	Transactions      TransactionsService
+	Items             ItemsService
 }
 
 type serviceImpl struct {
@@ -108,6 +109,7 @@ func NewClient(subdomain, apiKey string) *Client {
 	client.ShippingMethods = &shippingMethodsImpl{client: client}
 	client.Subscriptions = &subscriptionsImpl{client: client}
 	client.Transactions = &transactionsImpl{client: client}
+	client.Items = &itemsImpl{client: client}
 	return client
 }
 

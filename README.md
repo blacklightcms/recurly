@@ -5,7 +5,7 @@
  Recurly is a Go (golang) API Client for the [Recurly](https://recurly.com/) API. It is actively maintained, unit tested, and uses no external dependencies. The vast majority of the API is implemented.
 
  Supports:
-  - Recurly API `v2.22`
+  - Recurly API `v2.27`
   - Accounts
   - Add Ons
   - Adjustments

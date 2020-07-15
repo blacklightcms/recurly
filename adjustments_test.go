@@ -127,6 +127,17 @@ func TestAdjustments_Encoding(t *testing.T) {
 				</adjustment>
 			`),
 		},
+		{
+			v: recurly.Adjustment{UnitAmountInCents: recurly.NewInt(2000), Currency: "USD", AvalaraServiceType: 600, AvalaraTransactionType: 3},
+			expected: MustCompactString(`
+				<adjustment>
+					<unit_amount_in_cents>2000</unit_amount_in_cents>
+					<currency>USD</currency>
+					<avalara_transaction_type>3</avalara_transaction_type>
+					<avalara_service_type>600</avalara_service_type>
+				</adjustment>
+			`),
+		},
 	}
 
 	for i, tt := range tests {
@@ -290,7 +301,6 @@ func NewTestAdjustment() *recurly.Adjustment {
 		TaxInCents:             175,
 		TotalInCents:           2175,
 		Currency:               "USD",
-		Taxable:                recurly.NewBool(false),
 		TaxType:                "usst",
 		TaxRegion:              "CA",
 		TaxRate:                0.0875,
@@ -302,6 +312,9 @@ func NewTestAdjustment() *recurly.Adjustment {
 				Type:       "state",
 				TaxRate:    0.065,
 				TaxInCents: 130,
+				Surcharge:  recurly.NewBool(true),
+				Billable:   recurly.NewBool(true),
+				Level:      "state",
 			},
 			{
 				XMLName:    xml.Name{Local: "tax_detail"},

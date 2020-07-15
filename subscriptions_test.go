@@ -608,6 +608,7 @@ func TestSubscriptions_UpdateSubscription_Encoding(t *testing.T) {
 					Code:              "extra_users",
 					UnitAmountInCents: recurly.NewInt(1000),
 					Quantity:          2,
+					AddOnSource:       "plan_add_on",
 				}},
 			},
 			expected: MustCompactString(`
@@ -617,6 +618,7 @@ func TestSubscriptions_UpdateSubscription_Encoding(t *testing.T) {
 							<add_on_code>extra_users</add_on_code>
 							<unit_amount_in_cents>1000</unit_amount_in_cents>
 							<quantity>2</quantity>
+							<add_on_source>plan_add_on</add_on_source>
 						</subscription_add_on>
 					</subscription_add_ons>
 				</subscription>
@@ -1036,6 +1038,24 @@ func TestSubscriptions_Resume(t *testing.T) {
 	}, t)
 
 	if subscription, err := client.Subscriptions.Resume(context.Background(), "44f83d7c-ba35-4d5b-8481-2419f923ea96"); !s.Invoked {
+		t.Fatal("expected fn invocation")
+	} else if err != nil {
+		t.Fatal(err)
+	} else if diff := cmp.Diff(subscription, NewTestSubscription()); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
+func TestSubscriptions_ConvertTrial(t *testing.T) {
+	client, s := recurly.NewTestServer()
+	defer s.Close()
+
+	s.HandleFunc("PUT", "/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/convert_trial", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write(MustOpenFile("subscription.xml"))
+	}, t)
+
+	if subscription, err := client.Subscriptions.ConvertTrial(context.Background(), "44f83d7c-ba35-4d5b-8481-2419f923ea96"); !s.Invoked {
 		t.Fatal("expected fn invocation")
 	} else if err != nil {
 		t.Fatal(err)
