@@ -312,7 +312,6 @@ func NewTestAdjustment() *recurly.Adjustment {
 				Type:       "state",
 				TaxRate:    0.065,
 				TaxInCents: 130,
-				Surcharge:  recurly.NewBool(true),
 				Billable:   recurly.NewBool(true),
 				Level:      "state",
 			},

@@ -166,7 +166,6 @@ type TaxDetail struct {
 	TaxRate    float64  `xml:"tax_rate,omitempty"`
 	TaxInCents int      `xml:"tax_in_cents,omitempty"`
 	Level      string   `xml:"level,omitempty"`
-	Surcharge  NullBool `xml:"surcharge,omitempty"`
 	Billable   NullBool `xml:"billable,omitempty"`
 }
 

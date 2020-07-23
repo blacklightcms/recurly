@@ -159,7 +159,6 @@
             <tax_rate type="float">0.065</tax_rate>
             <tax_in_cents type="integer">130</tax_in_cents>
             <level>state</level>
-            <surcharge type="boolean">true</surcharge>
             <billable type="boolean">true</billable>
          </tax_detail>
       </tax_details>
