@@ -51,7 +51,17 @@ type AddOn struct {
 	TaxCode                     string     `xml:"tax_code,omitempty"`
 	UnitAmountInCents           UnitAmount `xml:"unit_amount_in_cents,omitempty"`
 	AccountingCode              string     `xml:"accounting_code,omitempty"`
-	CreatedAt                   NullTime   `xml:"created_at,omitempty"`
+	ExternalSKU                 string     `xml:"external_sku,omitempty"`
+	ItemState                   string     `xml:"item_state,omitempty"`
+	ItemCode                    string     `xml:"item_code,omitempty"`
+	TierType                    string     `xml:"tier_type,omitempty"`
+	Tiers                       *[]Tier    `xml:"tiers>tier,omitempty"`
+
+	// The following are only valid with an `Avalara for Communications` integration
+	AvalaraTransactionType int `xml:"avalara_transaction_type,omitempty"`
+	AvalaraServiceType     int `xml:"avalara_service_type,omitempty"`
+
+	CreatedAt NullTime `xml:"created_at,omitempty"`
 }
 
 // UnitAmount can read or write amounts in various currencies.
@@ -71,6 +81,13 @@ func (u UnitAmount) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 		e.EncodeElement(uaAlias(u), start)
 	}
 	return nil
+}
+
+// Tier is used for Quantity Based Pricing models https://docs.recurly.com/docs/billing-models#section-quantity-based
+type Tier struct {
+	XMLName           xml.Name   `xml:"tier"`
+	UnitAmountInCents UnitAmount `xml:"unit_amount_in_cents,omitempty"`
+	EndingQuantity    int        `xml:"ending_quantity,omitempty"`
 }
 
 var _ AddOnsService = &addOnsImpl{}

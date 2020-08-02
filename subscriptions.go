@@ -99,6 +99,11 @@ type SubscriptionsService interface {
 	//
 	// https://dev.recurly.com/docs/resume-subscription
 	Resume(ctx context.Context, uuid string) (*Subscription, error)
+
+	// Immediately converts a trial subscription to paid
+	//
+	// https://dev.recurly.com/docs/convert-trial
+	ConvertTrial(ctx context.Context, uuid string) (*Subscription, error)
 }
 
 // Subscription state constants.
@@ -225,6 +230,7 @@ type SubscriptionAddOn struct {
 	Code              string   `xml:"add_on_code"`
 	UnitAmountInCents NullInt  `xml:"unit_amount_in_cents,omitempty"`
 	Quantity          int      `xml:"quantity,omitempty"`
+	AddOnSource       string   `xml:"add_on_source,omitempty"`
 }
 
 // PendingSubscription are updates to the subscription or subscription add ons that
@@ -508,6 +514,20 @@ func (s *subscriptionsImpl) Postpone(ctx context.Context, uuid string, dt time.T
 
 func (s *subscriptionsImpl) Resume(ctx context.Context, uuid string) (*Subscription, error) {
 	path := fmt.Sprintf("/subscriptions/%s/resume", sanitizeUUID(uuid))
+	req, err := s.client.newRequest("PUT", path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var dst Subscription
+	if _, err := s.client.do(ctx, req, &dst); err != nil {
+		return nil, err
+	}
+	return &dst, err
+}
+
+func (s *subscriptionsImpl) ConvertTrial(ctx context.Context, uuid string) (*Subscription, error) {
+	path := fmt.Sprintf("/subscriptions/%s/convert_trial", sanitizeUUID(uuid))
 	req, err := s.client.newRequest("PUT", path, nil)
 	if err != nil {
 		return nil, err

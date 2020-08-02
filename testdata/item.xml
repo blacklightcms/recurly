@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<item href="https://your-subdomain.recurly.com/v2/items/pink_sweaters">
+    <item_code>pink_sweaters</item_code>
+    <name>Pink Sweaters</name>
+    <description>Favorite Pink Sweaters</description>
+    <external_sku>PS1234</external_sku>
+    <accounting_code>ps0000193</accounting_code>
+    <revenue_schedule_type>evenly</revenue_schedule_type>
+    <tax_exempt type="boolean">false</tax_exempt>
+    <state>active</state>
+    <custom_fields type="array">
+        <custom_field>
+        <name>size</name>
+        <value>large</value>
+        </custom_field>
+    </custom_fields>
+    <created_at type="datetime">2019-11-21T15:55:19Z</created_at>
+    <updated_at type="datetime">2019-11-21T15:55:19Z</updated_at>
+    <deleted_at nil="nil"></deleted_at>
+</item>

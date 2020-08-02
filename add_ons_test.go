@@ -98,6 +98,62 @@ func TestAddOns_Encoding(t *testing.T) {
 				</add_on>
 			`),
 		},
+		{
+			v: recurly.AddOn{ItemCode: "pink_sweaters"},
+			expected: MustCompactString(`
+				<add_on>
+					<item_code>pink_sweaters</item_code>
+				</add_on>
+			`),
+		},
+		{
+			v: recurly.AddOn{ExternalSKU: "BC-123-ABC"},
+			expected: MustCompactString(`
+				<add_on>
+					<external_sku>BC-123-ABC</external_sku>
+				</add_on>
+			`),
+		},
+		{
+			v: recurly.AddOn{ItemState: "active"},
+			expected: MustCompactString(`
+				<add_on>
+					<item_state>active</item_state>
+				</add_on>
+			`),
+		},
+		{
+			v: recurly.AddOn{AvalaraServiceType: 300, AvalaraTransactionType: 6},
+			expected: MustCompactString(`
+				<add_on>
+					<avalara_transaction_type>6</avalara_transaction_type>
+					<avalara_service_type>300</avalara_service_type>
+				</add_on>
+			`),
+		},
+		{
+			v: recurly.AddOn{TierType: "flat"},
+			expected: MustCompactString(`
+				<add_on>
+					<tier_type>flat</tier_type>
+				</add_on>
+			`),
+		},
+		{
+			v: recurly.AddOn{Tiers: &[]recurly.Tier{*NewTestTier()}},
+			expected: MustCompactString(`
+				<add_on>
+					<tiers>
+						<tier>
+							<unit_amount_in_cents>
+								<USD>100</USD>
+							</unit_amount_in_cents>
+							<ending_quantity>500</ending_quantity>
+						</tier>
+					</tiers>
+				</add_on>
+			`),
+		},
 	}
 
 	for i, tt := range tests {
@@ -331,7 +387,19 @@ func NewTestAddOn() *recurly.AddOn {
 		UnitAmountInCents: recurly.UnitAmount{
 			USD: 200,
 		},
+		TierType:       "volume",
+		Tiers:          &[]recurly.Tier{*NewTestTier()},
 		AccountingCode: "abc123",
 		CreatedAt:      recurly.NewTime(MustParseTime("2011-06-28T12:34:56Z")),
+	}
+}
+
+func NewTestTier() *recurly.Tier {
+	return &recurly.Tier{
+		XMLName:        xml.Name{Local: "tier"},
+		EndingQuantity: 500,
+		UnitAmountInCents: recurly.UnitAmount{
+			USD: 100,
+		},
 	}
 }

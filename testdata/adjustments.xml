@@ -18,7 +18,6 @@
       <tax_in_cents type="integer">175</tax_in_cents>
       <total_in_cents type="integer">2175</total_in_cents>
       <currency>USD</currency>
-      <taxable type="boolean">false</taxable>
       <tax_type>usst</tax_type>
       <tax_region>CA</tax_region>
       <tax_rate type="float">0.0875</tax_rate>
@@ -29,6 +28,8 @@
             <type>state</type>
             <tax_rate type="float">0.065</tax_rate>
             <tax_in_cents type="integer">130</tax_in_cents>
+            <level>state</level>
+            <billable type="boolean">true</billable>
          </tax_detail>
          <tax_detail>
             <name>san mateo county</name>

@@ -473,6 +473,17 @@ func NewTestInvoice() *recurly.Invoice {
 		TaxRate:          float64(0),
 		NetTerms:         recurly.NewInt(0),
 		CollectionMethod: "automatic",
+		TaxDetails: &[]recurly.TaxDetail{
+			{
+				XMLName:    xml.Name{Local: "tax_detail"},
+				Name:       "california",
+				Type:       "state",
+				TaxRate:    0.065,
+				TaxInCents: 130,
+				Billable:   recurly.NewBool(true),
+				Level:      "state",
+			},
+		},
 		LineItems: []recurly.Adjustment{
 			{
 				XMLName:             xml.Name{Local: "adjustment"},
@@ -490,7 +501,6 @@ func NewTestInvoice() *recurly.Invoice {
 				TaxInCents:          0,
 				TotalInCents:        150000,
 				Currency:            "USD",
-				Taxable:             recurly.NewBool(false),
 				StartDate:           recurly.NewTime(MustParseTime("2018-06-05T15:44:56Z")),
 				EndDate:             recurly.NewTime(MustParseTime("2018-07-05T15:44:56Z")),
 				CreatedAt:           recurly.NewTime(MustParseTime("2018-06-05T15:44:57Z")),
@@ -512,7 +522,6 @@ func NewTestInvoice() *recurly.Invoice {
 				TaxInCents:          0,
 				TotalInCents:        3000,
 				Currency:            "USD",
-				Taxable:             recurly.NewBool(false),
 				StartDate:           recurly.NewTime(MustParseTime("2018-06-05T15:44:56Z")),
 				EndDate:             recurly.NewTime(MustParseTime("2018-07-05T15:44:56Z")),
 				CreatedAt:           recurly.NewTime(MustParseTime("2018-06-05T15:44:57Z")),

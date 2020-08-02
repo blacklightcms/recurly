@@ -188,6 +188,9 @@ type Invoice struct {
 	LineItems               []Adjustment    `xml:"-"`
 	Transactions            []Transaction   `xml:"-"`
 	CreditPayments          []CreditPayment `xml:"-"`
+
+	// TaxDetails is only available if the site has the  `Avalara for Communications` integration
+	TaxDetails *[]TaxDetail `xml:"tax_details>tax_detail,omitempty"`
 }
 
 // UnmarshalXML unmarshals invoices and handles intermediary state during unmarshaling
@@ -277,6 +280,7 @@ type invoiceFields struct {
 	LineItems               []Adjustment    `xml:"line_items>adjustment,omitempty"`
 	Transactions            []Transaction   `xml:"transactions>transaction,omitempty"`
 	CreditPayments          []CreditPayment `xml:"credit_payments>credit_payment,omitempty"`
+	TaxDetails              *[]TaxDetail    `xml:"tax_details>tax_detail,omitempty"`
 }
 
 // convert to Invoice and sort transactions.
@@ -313,6 +317,7 @@ func (i invoiceFields) ToInvoice() Invoice {
 		LineItems:               i.LineItems,
 		Transactions:            i.Transactions,
 		CreditPayments:          i.CreditPayments,
+		TaxDetails:              i.TaxDetails,
 	}
 	Transactions(inv.Transactions).Sort()
 	return inv

@@ -151,5 +151,15 @@
          </details>
       </transaction>
    </transactions>
+   <tax_details type="array">
+      <tax_detail>
+         <name>california</name>
+         <type>state</type>
+         <tax_rate type="float">0.065</tax_rate>
+         <tax_in_cents type="integer">130</tax_in_cents>
+         <level>state</level>
+         <billable type="boolean">true</billable>
+      </tax_detail>
+   </tax_details>
    <a name="refund" href="https://your-subdomain.recurly.com/v2/invoices/5558/refund" method="post" />
 </invoice>
