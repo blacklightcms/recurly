@@ -52,6 +52,9 @@ type SubscriptionsService struct {
 
 	OnResume      func(ctx context.Context, uuid string) (*recurly.Subscription, error)
 	ResumeInvoked bool
+
+	OnConvertTrial func(ctx context.Context, uuid string) (*recurly.Subscription, error)
+	ConvertTrialInvoked bool
 }
 
 func (m *SubscriptionsService) List(opts *recurly.PagerOptions) recurly.Pager {
@@ -122,4 +125,9 @@ func (m *SubscriptionsService) Pause(ctx context.Context, uuid string, cycles in
 func (m *SubscriptionsService) Resume(ctx context.Context, uuid string) (*recurly.Subscription, error) {
 	m.ResumeInvoked = true
 	return m.OnResume(ctx, uuid)
+}
+
+func (m *SubscriptionsService) ConvertTrial(ctx context.Context, uuid string) (*recurly.Subscription, error) {
+	m.ConvertTrialInvoked = true
+	return m.OnConvertTrial(ctx, uuid)
 }
