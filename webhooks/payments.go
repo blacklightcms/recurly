@@ -9,12 +9,13 @@ import (
 // Payment notifications.
 // https://dev.recurly.com/page/webhooks#payment-notifications
 const (
-	SuccessfulPayment = "successful_payment_notification"
-	FailedPayment     = "failed_payment_notification"
-	VoidPayment       = "void_payment_notification"
-	SuccessfulRefund  = "successful_refund_notification"
-	ScheduledPayment  = "scheduled_payment_notification"
-	ProcessingPayment = "processing_payment_notification"
+	SuccessfulPayment        = "successful_payment_notification"
+	FailedPayment            = "failed_payment_notification"
+	VoidPayment              = "void_payment_notification"
+	SuccessfulRefund         = "successful_refund_notification"
+	ScheduledPayment         = "scheduled_payment_notification"
+	ProcessingPayment        = "processing_payment_notification"
+	TransactionStatusUpdated = "transaction_status_updated_notification"
 )
 
 // PaymentNotification is returned for all credit payment notifications.
