@@ -61,7 +61,7 @@ func nameToNotification(name string) (interface{}, error) {
 		return &CreditInvoiceNotification{Type: name}, nil
 	case NewCreditPayment, VoidedCreditPayment:
 		return &CreditPaymentNotification{Type: name}, nil
-	case SuccessfulPayment, FailedPayment, VoidPayment, SuccessfulRefund, ScheduledPayment, ProcessingPayment:
+	case SuccessfulPayment, FailedPayment, VoidPayment, SuccessfulRefund, ScheduledPayment, ProcessingPayment, TransactionStatusUpdated:
 		return &PaymentNotification{Type: name}, nil
 	case NewDunningEvent:
 		return &NewDunningEventNotification{Type: name}, nil

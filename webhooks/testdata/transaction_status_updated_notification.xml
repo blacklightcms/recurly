@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transaction_status_updated_notification>
+   <account>
+      <account_code>1</account_code>
+      <username nil="true">verena</username>
+      <email>verena@example.com</email>
+      <first_name>Verena</first_name>
+      <last_name>Example</last_name>
+      <company_name nil="true">Company, Inc.</company_name>
+   </account>
+   <transaction>
+      <id>a5143c1d3a6f4a8287d0e2cc1d4c0427</id>
+      <invoice_id>ffc64d71d4b5404e93f13aac9c63b007</invoice_id>
+      <invoice_number type="integer">2059</invoice_number>
+      <subscription_id>1974a098jhlkjasdfljkha898326881c</subscription_id>
+      <action>purchase</action>
+      <date type="datetime">2010-10-05T23:00:50Z</date>
+      <amount_in_cents type="integer">1000</amount_in_cents>
+      <status>void</status>
+      <message>Test Gateway: Successful test transaction</message>
+      <reference>reference</reference>
+      <source>subscription</source>
+      <cvv_result code="" />
+      <avs_result code="" />
+      <avs_result_street />
+      <avs_result_postal />
+      <test type="boolean">true</test>
+      <voidable type="boolean">true</voidable>
+      <refundable type="boolean">true</refundable>
+   </transaction>
+</transaction_status_updated_notification>
