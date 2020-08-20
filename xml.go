@@ -164,6 +164,82 @@ func (n NullInt) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return nil
 }
 
+// NullFloat is used for properly handling float types that could be null. (float64 is returned)
+type NullFloat struct {
+	value float64
+	valid bool
+}
+
+// NullFloat returns NullFloat with a valid value of f.
+func NewFloat(f float64) NullFloat {
+	return NullFloat{value: f, valid: true}
+}
+
+// NewFloatPtr returns a new NullFloat from a pointer to float64.
+func NewFloatPtr(f *float64) NullFloat {
+	if f == nil {
+		return NullFloat{}
+	}
+	return NewFloat(*f)
+}
+
+// Float64 returns the float64 value, regardless of validity. Use Value() if
+// you need to know whether the value is valid.
+func (n NullFloat) Float64() float64 {
+	return n.value
+}
+
+// Float64Ptr returns a pointer to the float64 value, or nil if the value is not valid.
+func (n NullFloat) Float64Ptr() *float64 {
+	if n.valid {
+		return &n.value
+	}
+	return nil
+}
+
+// Value returns the value of NullFloat. The value should only be considered
+// valid if ok returns true.
+func (n NullFloat) Value() (value float64, ok bool) {
+	return n.value, n.valid
+}
+
+// Equal compares the equality of two NullFloat.
+func (n NullFloat) Equal(v NullFloat) bool {
+	return n.value == v.value && n.valid == v.valid
+}
+
+// MarshalJSON marshals an float64 based on whether valid is true.
+func (n NullFloat) MarshalJSON() ([]byte, error) {
+	if n.valid {
+		return json.Marshal(n.value)
+	}
+	return []byte("null"), nil
+}
+
+// UnmarshalXML unmarshals an float64 properly, as well as marshaling an empty string to nil.
+func (n *NullFloat) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var v struct {
+		Float float64 `xml:",chardata"`
+		Nil   string  `xml:"nil,attr"`
+	}
+	if err := d.DecodeElement(&v, &start); err != nil {
+		return err
+	} else if strings.EqualFold(v.Nil, "nil") || strings.EqualFold(v.Nil, "true") {
+		return nil
+	}
+	*n = NewFloat(v.Float)
+	return nil
+}
+
+// MarshalXML marshals NullFloat greater than zero to XML. Otherwise nothing is
+// marshaled.
+func (n NullFloat) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
+	if n.valid {
+		return e.EncodeElement(n.value, start)
+	}
+	return nil
+}
+
 // DateTimeFormat is the format Recurly uses to represent datetimes.
 const DateTimeFormat = "2006-01-02T15:04:05Z07:00"
 

@@ -233,6 +233,116 @@ func TestXML_NullIntPtr(t *testing.T) {
 	}
 }
 
+func TestXML_NullFloat(t *testing.T) {
+	t.Run("ZeroValue", func(t *testing.T) {
+		var f recurly.NullFloat
+		if value, ok := f.Value(); ok {
+			t.Fatal("expected ok to be false")
+		} else if value != 0 {
+			t.Fatalf("unexpected value: %f", value)
+		}
+
+		if f.Float64() != 0 {
+			t.Fatalf("unexpected value: %f", f.Float64())
+		} else if ptr := f.Float64Ptr(); ptr != nil {
+			t.Fatalf("expected nil: %#v", ptr)
+		}
+	})
+
+	f := recurly.NewFloat(12.34)
+	if value, ok := f.Value(); !ok {
+		t.Fatal("expected ok to be true")
+	} else if value != 12.34 {
+		t.Fatalf("unexpected value: %f", value)
+	}
+
+	if f.Float64() != 12.34 {
+		t.Fatalf("unexpected value: %f", f.Float64())
+	} else if ptr := f.Float64Ptr(); ptr == nil {
+		t.Fatal("expected non-nil value")
+	} else if *ptr != 12.34 {
+		t.Fatalf("unexpected value: %#v", ptr)
+	}
+
+	f = recurly.NewFloat(0.00)
+	if value, ok := f.Value(); !ok {
+		t.Fatal("expected ok to be true")
+	} else if value != 0 {
+		t.Fatalf("unexpected value: %f", value)
+	}
+
+	if f.Float64() != 0 {
+		t.Fatalf("unexpected value: %f", f.Float64())
+	} else if ptr := f.Float64Ptr(); ptr == nil {
+		t.Fatal("expected non-nil value")
+	} else if *ptr != 0 {
+		t.Fatalf("unexpected value: %#v", ptr)
+	}
+
+	type testStruct struct {
+		XMLName xml.Name          `xml:"test"`
+		Value   recurly.NullFloat `xml:"f"`
+	}
+
+	t.Run("Encode", func(t *testing.T) {
+		for i, tt := range []struct {
+			value  recurly.NullFloat
+			expect string
+		}{
+			{value: recurly.NewFloat(12.34), expect: `<test><f>12.34</f></test>`},
+			{value: recurly.NewFloat(0.0000), expect: `<test><f>0</f></test>`},
+			{value: recurly.NewFloat(-12.34), expect: `<test><f>-12.34</f></test>`},
+			{value: recurly.NewFloat(-0.01), expect: `<test><f>-0.01</f></test>`},
+			{value: recurly.NewFloat(0.009), expect: `<test><f>0.009</f></test>`},
+			{expect: `<test></test>`}, // zero value
+		} {
+			if aXml, err := xml.Marshal(testStruct{Value: tt.value}); err != nil {
+				t.Fatalf("%d %#v", i, err)
+			} else if string(aXml) != tt.expect {
+				t.Fatalf("%d %s", i, string(aXml))
+			}
+		}
+	})
+
+	t.Run("Decode", func(t *testing.T) {
+		for i, tt := range []struct {
+			expect recurly.NullFloat
+			input  string
+		}{
+			{expect: recurly.NewFloat(12.34), input: `<test><f>12.34</f></test>`},
+			{expect: recurly.NewFloat(0), input: `<test><f>0</f></test>`},
+			{expect: recurly.NewFloat(-12.34), input: `<test><f>-12.34</f></test>`},
+			{expect: recurly.NewFloat(-0.01), input: `<test><f>-0.01</f></test>`},
+			{expect: recurly.NewFloat(0.009), input: `<test><f>0.009</f></test>`},
+			{input: `<test></test>`}, // zero value
+		} {
+			var dst testStruct
+			if err := xml.Unmarshal([]byte(tt.input), &dst); err != nil {
+				t.Fatalf("%d %#v", i, err)
+			} else if diff := cmp.Diff(testStruct{XMLName: xml.Name{Local: "test"}, Value: tt.expect}, dst); diff != "" {
+				t.Fatalf("%d %s", i, diff)
+			}
+		}
+	})
+}
+
+func TestXML_NullFloatPtr(t *testing.T) {
+	f := recurly.NewFloatPtr(nil)
+	if value, ok := f.Value(); ok {
+		t.Fatal("expected ok to be false")
+	} else if value != 0 {
+		t.Fatalf("unexpected value: %f", value)
+	}
+
+	floatVal := 0.07
+	f = recurly.NewFloatPtr(&floatVal)
+	if value, ok := f.Value(); !ok {
+		t.Fatal("expected ok to be true")
+	} else if value != 0.07 {
+		t.Fatalf("unexpected value: %f", value)
+	}
+}
+
 func TestXML_NullTime(t *testing.T) {
 	t.Run("ZeroValue", func(t *testing.T) {
 		var rt recurly.NullTime
