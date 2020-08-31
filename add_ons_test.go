@@ -244,6 +244,15 @@ func TestUnitAmount(t *testing.T) {
 				</s>
 			`),
 		},
+		{v: s{Amount: recurly.UnitAmount{INR: 500}},
+			expected: MustCompactString(`
+				<s>
+					<amount>
+						<INR>500</INR>
+					</amount>
+				</s>
+			`),
+		},
 	}
 
 	buf := new(bytes.Buffer)
