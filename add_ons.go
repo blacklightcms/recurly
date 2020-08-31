@@ -71,12 +71,13 @@ type UnitAmount struct {
 	GBP int `xml:"GBP,omitempty"`
 	CAD int `xml:"CAD,omitempty"`
 	AUD int `xml:"AUD,omitempty"`
+	INR int `xml:"INR,omitempty"`
 }
 
 // MarshalXML ensures UnitAmount is not marshaled unless one or more currencies
 // has a value greater than zero.
 func (u UnitAmount) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	if u.USD > 0 || u.EUR > 0 || u.CAD > 0 || u.GBP > 0 || u.AUD > 0 {
+	if u.USD > 0 || u.EUR > 0 || u.CAD > 0 || u.GBP > 0 || u.AUD > 0 || u.INR > 0 {
 		type uaAlias UnitAmount
 		e.EncodeElement(uaAlias(u), start)
 	}
