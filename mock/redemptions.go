@@ -22,7 +22,7 @@ type RedemptionsService struct {
 	OnRedeem      func(ctx context.Context, code string, r recurly.CouponRedemption) (*recurly.Redemption, error)
 	RedeemInvoked bool
 
-	OnDelete      func(ctx context.Context, accountCode string) error
+	OnDelete      func(ctx context.Context, accountCode, redemptionUUID string) error
 	DeleteInvoked bool
 }
 
@@ -46,7 +46,7 @@ func (m *RedemptionsService) Redeem(ctx context.Context, code string, r recurly.
 	return m.OnRedeem(ctx, code, r)
 }
 
-func (m *RedemptionsService) Delete(ctx context.Context, accountCode string) error {
+func (m *RedemptionsService) Delete(ctx context.Context, accountCode, redemptionUUID string) error {
 	m.DeleteInvoked = true
-	return m.OnDelete(ctx, accountCode)
+	return m.OnDelete(ctx, accountCode, redemptionUUID)
 }

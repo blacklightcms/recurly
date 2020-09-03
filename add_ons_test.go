@@ -81,7 +81,7 @@ func TestAddOns_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.AddOn{UnitAmountInCents: recurly.UnitAmount{USD: 200}},
+			v: recurly.AddOn{UnitAmountInCents: recurly.UnitAmount{USD: recurly.NewAmount(200)}},
 			expected: MustCompactString(`
 				<add_on>
 					<unit_amount_in_cents>
@@ -95,6 +95,62 @@ func TestAddOns_Encoding(t *testing.T) {
 			expected: MustCompactString(`
 				<add_on>
 					<accounting_code>abc123</accounting_code>
+				</add_on>
+			`),
+		},
+		{
+			v: recurly.AddOn{ItemCode: "pink_sweaters"},
+			expected: MustCompactString(`
+				<add_on>
+					<item_code>pink_sweaters</item_code>
+				</add_on>
+			`),
+		},
+		{
+			v: recurly.AddOn{ExternalSKU: "BC-123-ABC"},
+			expected: MustCompactString(`
+				<add_on>
+					<external_sku>BC-123-ABC</external_sku>
+				</add_on>
+			`),
+		},
+		{
+			v: recurly.AddOn{ItemState: "active"},
+			expected: MustCompactString(`
+				<add_on>
+					<item_state>active</item_state>
+				</add_on>
+			`),
+		},
+		{
+			v: recurly.AddOn{AvalaraServiceType: 300, AvalaraTransactionType: 6},
+			expected: MustCompactString(`
+				<add_on>
+					<avalara_transaction_type>6</avalara_transaction_type>
+					<avalara_service_type>300</avalara_service_type>
+				</add_on>
+			`),
+		},
+		{
+			v: recurly.AddOn{TierType: "flat"},
+			expected: MustCompactString(`
+				<add_on>
+					<tier_type>flat</tier_type>
+				</add_on>
+			`),
+		},
+		{
+			v: recurly.AddOn{Tiers: &[]recurly.Tier{*NewTestTier()}},
+			expected: MustCompactString(`
+				<add_on>
+					<tiers>
+						<tier>
+							<unit_amount_in_cents>
+								<USD>100</USD>
+							</unit_amount_in_cents>
+							<ending_quantity>500</ending_quantity>
+						</tier>
+					</tiers>
 				</add_on>
 			`),
 		},
@@ -124,7 +180,7 @@ func TestUnitAmount(t *testing.T) {
 		{
 			expected: "<s></s>",
 		},
-		{v: s{Amount: recurly.UnitAmount{USD: 1000}},
+		{v: s{Amount: recurly.UnitAmount{USD: recurly.NewAmount(1000)}},
 			expected: MustCompactString(`
 				<s>
 					<amount>
@@ -133,7 +189,7 @@ func TestUnitAmount(t *testing.T) {
 				</s>
 			`),
 		},
-		{v: s{Amount: recurly.UnitAmount{USD: 800, EUR: 650}},
+		{v: s{Amount: recurly.UnitAmount{USD: recurly.NewAmount(800), EUR: recurly.NewAmount(650)}},
 			expected: MustCompactString(`
 				<s>
 					<amount>
@@ -143,7 +199,7 @@ func TestUnitAmount(t *testing.T) {
 				</s>
 			`),
 		},
-		{v: s{Amount: recurly.UnitAmount{EUR: 650}},
+		{v: s{Amount: recurly.UnitAmount{EUR: recurly.NewAmount(650)}},
 			expected: MustCompactString(`
 				<s>
 					<amount>
@@ -152,7 +208,7 @@ func TestUnitAmount(t *testing.T) {
 				</s>
 			`),
 		},
-		{v: s{Amount: recurly.UnitAmount{GBP: 3000}},
+		{v: s{Amount: recurly.UnitAmount{GBP: recurly.NewAmount(3000)}},
 			expected: MustCompactString(`
 				<s>
 					<amount>
@@ -161,7 +217,7 @@ func TestUnitAmount(t *testing.T) {
 				</s>
 			`),
 		},
-		{v: s{Amount: recurly.UnitAmount{CAD: 300}},
+		{v: s{Amount: recurly.UnitAmount{CAD: recurly.NewAmount(300)}},
 			expected: MustCompactString(`
 				<s>
 					<amount>
@@ -170,7 +226,7 @@ func TestUnitAmount(t *testing.T) {
 				</s>
 			`),
 		},
-		{v: s{Amount: recurly.UnitAmount{AUD: 400}},
+		{v: s{Amount: recurly.UnitAmount{AUD: recurly.NewAmount(400)}},
 			expected: MustCompactString(`
 				<s>
 					<amount>
@@ -179,7 +235,7 @@ func TestUnitAmount(t *testing.T) {
 				</s>
 			`),
 		},
-		{v: s{Amount: recurly.UnitAmount{USD: 1}},
+		{v: s{Amount: recurly.UnitAmount{USD: recurly.NewAmount(1)}},
 			expected: MustCompactString(`
 				<s>
 					<amount>
@@ -329,9 +385,21 @@ func NewTestAddOn() *recurly.AddOn {
 		DisplayQuantityOnHostedPage: recurly.NewBool(false),
 		TaxCode:                     "digital",
 		UnitAmountInCents: recurly.UnitAmount{
-			USD: 200,
+			USD: recurly.NewAmount(200),
 		},
+		TierType:       "volume",
+		Tiers:          &[]recurly.Tier{*NewTestTier()},
 		AccountingCode: "abc123",
 		CreatedAt:      recurly.NewTime(MustParseTime("2011-06-28T12:34:56Z")),
+	}
+}
+
+func NewTestTier() *recurly.Tier {
+	return &recurly.Tier{
+		XMLName:        xml.Name{Local: "tier"},
+		EndingQuantity: 500,
+		UnitAmountInCents: recurly.UnitAmount{
+			USD: recurly.NewAmount(100),
+		},
 	}
 }

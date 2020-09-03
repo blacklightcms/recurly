@@ -1,15 +1,46 @@
 package recurly_test
 
 import (
+	"bytes"
 	"context"
 	"encoding/xml"
 	"net"
 	"net/http"
+	"strconv"
 	"testing"
 
 	"github.com/autopilot3/recurly"
 	"github.com/google/go-cmp/cmp"
 )
+
+func TestInvoices_Encoding(t *testing.T) {
+	tests := []struct {
+		v        recurly.CollectInvoice
+		expected string
+	}{
+		{
+			v: recurly.CollectInvoice{
+				TransactionType: "moto",
+			},
+			expected: MustCompactString(`
+				<invoice>
+					<transaction_type>moto</transaction_type>
+				</invoice>
+		`),
+		},
+	}
+
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			buf := new(bytes.Buffer)
+			if err := xml.NewEncoder(buf).Encode(tt.v); err != nil {
+				t.Fatal(err)
+			} else if buf.String() != tt.expected {
+				t.Fatal(buf.String())
+			}
+		})
+	}
+}
 
 func TestInvoices_List(t *testing.T) {
 	client, s := recurly.NewTestServer()
@@ -211,7 +242,7 @@ func TestInvoices_Collect(t *testing.T) {
 		w.Write(MustOpenFile("invoice.xml"))
 	}, t)
 
-	if invoice, err := client.Invoices.Collect(context.Background(), 1010); !s.Invoked {
+	if invoice, err := client.Invoices.Collect(context.Background(), 1010, recurly.CollectInvoice{}); !s.Invoked {
 		t.Fatal("expected fn invocation")
 	} else if err != nil {
 		t.Fatal(err)
@@ -442,6 +473,17 @@ func NewTestInvoice() *recurly.Invoice {
 		TaxRate:          float64(0),
 		NetTerms:         recurly.NewInt(0),
 		CollectionMethod: "automatic",
+		TaxDetails: &[]recurly.TaxDetail{
+			{
+				XMLName:    xml.Name{Local: "tax_detail"},
+				Name:       "california",
+				Type:       "state",
+				TaxRate:    0.065,
+				TaxInCents: 130,
+				Billable:   recurly.NewBool(true),
+				Level:      "state",
+			},
+		},
 		LineItems: []recurly.Adjustment{
 			{
 				XMLName:             xml.Name{Local: "adjustment"},
@@ -459,7 +501,6 @@ func NewTestInvoice() *recurly.Invoice {
 				TaxInCents:          0,
 				TotalInCents:        150000,
 				Currency:            "USD",
-				Taxable:             recurly.NewBool(false),
 				StartDate:           recurly.NewTime(MustParseTime("2018-06-05T15:44:56Z")),
 				EndDate:             recurly.NewTime(MustParseTime("2018-07-05T15:44:56Z")),
 				CreatedAt:           recurly.NewTime(MustParseTime("2018-06-05T15:44:57Z")),
@@ -481,7 +522,6 @@ func NewTestInvoice() *recurly.Invoice {
 				TaxInCents:          0,
 				TotalInCents:        3000,
 				Currency:            "USD",
-				Taxable:             recurly.NewBool(false),
 				StartDate:           recurly.NewTime(MustParseTime("2018-06-05T15:44:56Z")),
 				EndDate:             recurly.NewTime(MustParseTime("2018-07-05T15:44:56Z")),
 				CreatedAt:           recurly.NewTime(MustParseTime("2018-06-05T15:44:57Z")),
@@ -520,19 +560,20 @@ func NewTestInvoice() *recurly.Invoice {
 					LastName:  "Example",
 					Email:     "verena@test.com",
 					BillingInfo: &recurly.Billing{
-						XMLName:   xml.Name{Local: "billing_info"},
-						FirstName: "Verena",
-						LastName:  "Example",
-						Address:   "123 Main St.",
-						City:      "San Francisco",
-						State:     "CA",
-						Zip:       "94105",
-						Country:   "US",
-						CardType:  "Visa",
-						Year:      2017,
-						Month:     11,
-						FirstSix:  "411111",
-						LastFour:  "1111",
+						XMLName:     xml.Name{Local: "billing_info"},
+						FirstName:   "Verena",
+						LastName:    "Example",
+						Address:     "123 Main St.",
+						City:        "San Francisco",
+						State:       "CA",
+						Zip:         "94105",
+						Country:     "US",
+						CardType:    "Visa",
+						Year:        2017,
+						Month:       11,
+						FirstSix:    "411111",
+						LastFour:    "1111",
+						PaymentType: "credit_card",
 					},
 				},
 			},

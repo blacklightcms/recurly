@@ -81,47 +81,57 @@ type Adjustment struct {
 	TaxInCents             int         `xml:"tax_in_cents,omitempty"`
 	TotalInCents           int         `xml:"total_in_cents,omitempty"`
 	Currency               string      `xml:"currency"`
-	Taxable                NullBool    `xml:"taxable,omitempty"`
 	TaxCode                string      `xml:"tax_code,omitempty"`
 	TaxType                string      `xml:"tax_type,omitempty"`
 	TaxRegion              string      `xml:"tax_region,omitempty"`
 	TaxRate                float64     `xml:"tax_rate,omitempty"`
 	TaxExempt              NullBool    `xml:"tax_exempt,omitempty"`
 	TaxDetails             []TaxDetail `xml:"tax_details>tax_detail,omitempty"`
-	StartDate              NullTime    `xml:"start_date,omitempty"`
-	EndDate                NullTime    `xml:"end_date,omitempty"`
-	CreatedAt              NullTime    `xml:"created_at,omitempty"`
-	UpdatedAt              NullTime    `xml:"updated_at,omitempty"`
+
+	// The following are only valid with an `Avalara for Communications` integration
+	AvalaraTransactionType int `xml:"avalara_transaction_type,omitempty"`
+	AvalaraServiceType     int `xml:"avalara_service_type,omitempty"`
+
+	StartDate NullTime `xml:"start_date,omitempty"`
+	EndDate   NullTime `xml:"end_date,omitempty"`
+	CreatedAt NullTime `xml:"created_at,omitempty"`
+	UpdatedAt NullTime `xml:"updated_at,omitempty"`
 }
 
 // MarshalXML marshals only the fields needed for creating/updating adjustments
 // with the recurly API.
 func (a Adjustment) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
 	return e.Encode(struct {
-		XMLName             xml.Name `xml:"adjustment"`
-		Description         string   `xml:"description,omitempty"`
-		AccountingCode      string   `xml:"accounting_code,omitempty"`
-		RevenueScheduleType string   `xml:"revenue_schedule_type,omitempty"`
-		ProductCode         string   `xml:"product_code,omitempty"`
-		UnitAmountInCents   NullInt  `xml:"unit_amount_in_cents,omitempty"`
-		Quantity            int      `xml:"quantity,omitempty"`
-		Currency            string   `xml:"currency,omitempty"`
-		TaxCode             string   `xml:"tax_code,omitempty"`
-		TaxExempt           NullBool `xml:"tax_exempt,omitempty"`
-		StartDate           NullTime `xml:"start_date,omitempty"`
-		EndDate             NullTime `xml:"end_date,omitempty"`
+		XMLName                xml.Name `xml:"adjustment"`
+		Description            string   `xml:"description,omitempty"`
+		AccountingCode         string   `xml:"accounting_code,omitempty"`
+		RevenueScheduleType    string   `xml:"revenue_schedule_type,omitempty"`
+		ProductCode            string   `xml:"product_code,omitempty"`
+		Origin                 string   `xml:"origin,omitempty"`
+		UnitAmountInCents      NullInt  `xml:"unit_amount_in_cents,omitempty"`
+		Quantity               int      `xml:"quantity,omitempty"`
+		Currency               string   `xml:"currency,omitempty"`
+		TaxCode                string   `xml:"tax_code,omitempty"`
+		TaxExempt              NullBool `xml:"tax_exempt,omitempty"`
+		AvalaraTransactionType int      `xml:"avalara_transaction_type,omitempty"`
+		AvalaraServiceType     int      `xml:"avalara_service_type,omitempty"`
+		StartDate              NullTime `xml:"start_date,omitempty"`
+		EndDate                NullTime `xml:"end_date,omitempty"`
 	}{
-		Description:         a.Description,
-		AccountingCode:      a.AccountingCode,
-		RevenueScheduleType: a.RevenueScheduleType,
-		ProductCode:         a.ProductCode,
-		UnitAmountInCents:   a.UnitAmountInCents,
-		Quantity:            a.Quantity,
-		Currency:            a.Currency,
-		TaxCode:             a.TaxCode,
-		TaxExempt:           a.TaxExempt,
-		StartDate:           a.StartDate,
-		EndDate:             a.EndDate,
+		Description:            a.Description,
+		AccountingCode:         a.AccountingCode,
+		RevenueScheduleType:    a.RevenueScheduleType,
+		ProductCode:            a.ProductCode,
+		Origin:                 a.Origin,
+		UnitAmountInCents:      a.UnitAmountInCents,
+		Quantity:               a.Quantity,
+		Currency:               a.Currency,
+		TaxCode:                a.TaxCode,
+		TaxExempt:              a.TaxExempt,
+		AvalaraServiceType:     a.AvalaraServiceType,
+		AvalaraTransactionType: a.AvalaraTransactionType,
+		StartDate:              a.StartDate,
+		EndDate:                a.EndDate,
 	})
 }
 
@@ -155,6 +165,8 @@ type TaxDetail struct {
 	Type       string   `xml:"type,omitempty"`
 	TaxRate    float64  `xml:"tax_rate,omitempty"`
 	TaxInCents int      `xml:"tax_in_cents,omitempty"`
+	Level      string   `xml:"level,omitempty"`
+	Billable   NullBool `xml:"billable,omitempty"`
 }
 
 var _ AdjustmentsService = &adjustmentsImpl{}

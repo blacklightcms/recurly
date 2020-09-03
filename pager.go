@@ -118,6 +118,8 @@ func (p *pager) Fetch(ctx context.Context, dst interface{}) error {
 		AddOn           []AddOn           `xml:"add_on"`
 		Coupon          []Coupon          `xml:"coupon"`
 		CreditPayment   []CreditPayment   `xml:"credit_payment"`
+		ExportDate      []ExportDate      `xml:"export_date"`
+		ExportFile      []ExportFile      `xml:"export_file"`
 		Invoice         []Invoice         `xml:"invoice"`
 		Note            []Note            `xml:"note"`
 		Plan            []Plan            `xml:"plan"`
@@ -126,6 +128,7 @@ func (p *pager) Fetch(ctx context.Context, dst interface{}) error {
 		ShippingMethod  []ShippingMethod  `xml:"shipping_method"`
 		Subscription    []Subscription    `xml:"subscription"`
 		Transaction     []Transaction     `xml:"transaction"`
+		Item            []Item            `xml:"item"`
 	}
 
 	resp, err := p.client.do(ctx, req, &unmarshaler)
@@ -148,6 +151,10 @@ func (p *pager) Fetch(ctx context.Context, dst interface{}) error {
 		*v = unmarshaler.Coupon
 	case *[]CreditPayment:
 		*v = unmarshaler.CreditPayment
+	case *[]ExportDate:
+		*v = unmarshaler.ExportDate
+	case *[]ExportFile:
+		*v = unmarshaler.ExportFile
 	case *[]Invoice:
 		*v = unmarshaler.Invoice
 	case *[]Note:
@@ -164,6 +171,8 @@ func (p *pager) Fetch(ctx context.Context, dst interface{}) error {
 		*v = unmarshaler.Subscription
 	case *[]Transaction:
 		*v = unmarshaler.Transaction
+	case *[]Item:
+		*v = unmarshaler.Item
 	default:
 		return fmt.Errorf("unknown type used for pagination: %T", dst)
 	}

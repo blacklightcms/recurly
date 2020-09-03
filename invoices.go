@@ -51,7 +51,7 @@ type InvoicesService interface {
 	// is rate limited. See Recurly's documentation for details.
 	//
 	// https://dev.recurly.com/docs/collect-an-invoice
-	Collect(ctx context.Context, invoiceNumber int) (*Invoice, error)
+	Collect(ctx context.Context, invoiceNumber int, collectInvoice CollectInvoice) (*Invoice, error)
 
 	// MarkPaid marks an invoice as paid successfully.
 	//
@@ -149,7 +149,7 @@ const (
 	VoidRefundMethodCreditFirst      = "credit_first"
 )
 
-// Invoice is an individual invoice for an account. Transactions aareer guaranteed
+// Invoice is an individual invoice for an account. Transactions are guaranteed
 // to be sorted from oldest to newest by date.
 // The only fields annotated with XML tags are those for posting an invoice.
 // Unmarshaling an invoice is handled by the custom UnmarshalXML function.
@@ -188,6 +188,9 @@ type Invoice struct {
 	LineItems               []Adjustment    `xml:"-"`
 	Transactions            []Transaction   `xml:"-"`
 	CreditPayments          []CreditPayment `xml:"-"`
+
+	// TaxDetails is only available if the site has the  `Avalara for Communications` integration
+	TaxDetails *[]TaxDetail `xml:"tax_details>tax_detail,omitempty"`
 }
 
 // UnmarshalXML unmarshals invoices and handles intermediary state during unmarshaling
@@ -277,6 +280,7 @@ type invoiceFields struct {
 	LineItems               []Adjustment    `xml:"line_items>adjustment,omitempty"`
 	Transactions            []Transaction   `xml:"transactions>transaction,omitempty"`
 	CreditPayments          []CreditPayment `xml:"credit_payments>credit_payment,omitempty"`
+	TaxDetails              *[]TaxDetail    `xml:"tax_details>tax_detail,omitempty"`
 }
 
 // convert to Invoice and sort transactions.
@@ -313,6 +317,7 @@ func (i invoiceFields) ToInvoice() Invoice {
 		LineItems:               i.LineItems,
 		Transactions:            i.Transactions,
 		CreditPayments:          i.CreditPayments,
+		TaxDetails:              i.TaxDetails,
 	}
 	Transactions(inv.Transactions).Sort()
 	return inv
@@ -338,6 +343,13 @@ type InvoiceRefund struct {
 	PaymentMethod       string   `xml:"payment_method,omitempty"`
 	Description         string   `xml:"description,omitempty"`
 	RefundedAt          NullTime `xml:"refunded_at,omitempty"`
+}
+
+// CollectInvoice is used as the request body for collecting an invoice.
+type CollectInvoice struct {
+	XMLName         xml.Name `xml:"invoice"`
+	TransactionType string   `xml:"transaction_type,omitempty"` // Optional transaction type. Currently accepts "moto"
+	BillingInfo     *Billing `xml:"billing_info,omitempty"`
 }
 
 // InvoiceLineItemsRefund is used to refund one or more line items on an invoice.
@@ -440,9 +452,9 @@ func (s *invoicesImpl) Create(ctx context.Context, accountCode string, invoice I
 	return dst.ChargeInvoice, nil
 }
 
-func (s *invoicesImpl) Collect(ctx context.Context, invoiceNumber int) (*Invoice, error) {
+func (s *invoicesImpl) Collect(ctx context.Context, invoiceNumber int, collectInvoice CollectInvoice) (*Invoice, error) {
 	path := fmt.Sprintf("/invoices/%d/collect", invoiceNumber)
-	req, err := s.client.newRequest("PUT", path, nil)
+	req, err := s.client.newRequest("PUT", path, collectInvoice)
 	if err != nil {
 		return nil, err
 	}

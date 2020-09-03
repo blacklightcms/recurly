@@ -61,6 +61,7 @@ func TestPurchases_Purchase_Encoding(t *testing.T) {
 					},
 				},
 				ShippingAddressID: 1,
+				TransactionType:   "moto",
 			},
 			expected: MustCompactString(`
 				<purchase>
@@ -81,6 +82,7 @@ func TestPurchases_Purchase_Encoding(t *testing.T) {
 							<shipping_amount_in_cents>10</shipping_amount_in_cents>
 						</shipping_fee>
 					</shipping_fees>
+					<transaction_type>moto</transaction_type>
 				</purchase>
 			`),
 		},
@@ -237,7 +239,7 @@ func NewTestPurchase() *recurly.Purchase {
 				FirstName: "Benjamin",
 				LastName:  "Du Monde",
 				Month:     12,
-				Number:    4111111111111111,
+				Number:    "4111111111111111",
 				State:     "CA",
 				Year:      2019,
 				Zip:       "94110",

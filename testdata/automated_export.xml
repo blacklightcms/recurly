@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<export_file href="https://your-subbdomain.recurly.com/v2/export_dates/2019-10-10/export_files/sub.csv.gz">
+    <download_url>https://recurly.s3.amazonaws.com/file</download_url>
+    <expires_at type="datetime">2015-02-04T23:13:07Z</expires_at>
+</export_file>

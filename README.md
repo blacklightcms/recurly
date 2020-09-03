@@ -1,11 +1,11 @@
 # Recurly Client for Go
 
- [![Build Status](https://travis-ci.org/blacklightcms/recurly.svg?branch=master)](https://travis-ci.org/blacklightcms/recurly)  [![GoDoc](https://godoc.org/github.com/blacklightcms/recurly?status.svg)](https://godoc.org/github.com/blacklightcms/recurly/)
+ [![Build Status](https://travis-ci.org/blacklightcms/recurly.svg?branch=master)](https://travis-ci.org/blacklightcms/recurly)  [![GoDoc](https://godoc.org/github.com/autopilot3/recurly?status.svg)](https://godoc.org/github.com/autopilot3/recurly/)
 
  Recurly is a Go (golang) API Client for the [Recurly](https://recurly.com/) API. It is actively maintained, unit tested, and uses no external dependencies. The vast majority of the API is implemented.
 
  Supports:
-  - Recurly API `v2.20`
+  - Recurly API `v2.27`
   - Accounts
   - Add Ons
   - Adjustments
@@ -25,20 +25,20 @@
 Install:
 
 ```shell
-go get github.com/blacklightcms/recurly
+go get github.com/autopilot3/recurly
 ```
 
 Import:
 ```go
-import "github.com/blacklightcms/recurly"
+import "github.com/autopilot3/recurly"
 ```
 
 Resources:
- - [API Docs](https://godoc.org/github.com/blacklightcms/recurly/)
- - [Examples](https://godoc.org/github.com/blacklightcms/recurly/#pkg-examples)
+ - [API Docs](https://godoc.org/github.com/autopilot3/recurly/)
+ - [Examples](https://godoc.org/github.com/autopilot3/recurly/#pkg-examples)
 
 ## Note on v1 and breaking changes
-If migrating from a previous version of the library, there was a large refactor with breaking changes released to address some design issues with the library. See the [migration guide](https://github.com/blacklightcms/recurly/wiki/v1-Migration-Guide) for steps on how to migrate to the latest version.
+If migrating from a previous version of the library, there was a large refactor with breaking changes released to address some design issues with the library. See the [migration guide](https://github.com/autopilot3/recurly/wiki/v1-Migration-Guide) for steps on how to migrate to the latest version.
 
 This is recommended for all users.
 
@@ -54,7 +54,7 @@ a, err := client.Accounts.Get(context.Background(), "1")
 ```
 
 ## Examples and How To
-Please go through [examples](https://godoc.org/github.com/blacklightcms/recurly/#pkg-examples) for detailed examples of using this package.
+Please go through [examples](https://godoc.org/github.com/autopilot3/recurly/#pkg-examples) for detailed examples of using this package.
 
 The examples explain important cases like:
 
@@ -152,7 +152,7 @@ The usage is to parse the webhook from a reader, then use a switch statement
 to determine the type of webhook received.
 
 ```go
-// import "github.com/blacklightcms/recurly/webhooks"
+// import "github.com/autopilot3/recurly/webhooks"
 
 hook, err := webhooks.Parse(r)
 if e, ok := err.(*webhooks.ErrUnknownNotification); ok {
@@ -186,7 +186,7 @@ when testing your own code that uses this library.
 Instead we recommend using the `mock` package. The `mock` package provides mocks 
 for all of the different services in this library.
 
-For examples of how to test your code using mocks, visit the [GoDoc examples](https://godoc.org/github.com/blacklightcms/recurly/mock/).
+For examples of how to test your code using mocks, visit the [GoDoc examples](https://godoc.org/github.com/autopilot3/recurly/mock/).
 
 > **NOTE**: If you need to go beyond mocks and test requests/responses, `testing.go` exports `TestServer`. This is how the library tests itself. See the GoDoc or the `*_test.go` files for usage examples.
 

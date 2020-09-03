@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transaction href="https://your-subdomain.recurly.com/v2/transactions/5346552e216a445f82b524bb9d1d27aa" type="credit_card">
+   <account href="https://your-subdomain.recurly.com/v2/accounts/1" />
+   <invoice href="https://your-subdomain.recurly.com/v2/invoices/1108" />
+   <original_transaction href="https://your-subdomain.recurly.com/v2/transactions/b9d02bfaa8bf401abf2b18db76863ac4"/>
+   <uuid>5346552e216a445f82b524bb9d1d27aa</uuid>
+   <action>refund</action>
+   <amount_in_cents type="integer">1000</amount_in_cents>
+   <tax_in_cents type="integer">0</tax_in_cents>
+   <currency>USD</currency>
+   <status>success</status>
+   <description>Order #717</description>
+   <payment_method>credit_card</payment_method>
+   <reference>5416477</reference>
+   <source>transaction</source>
+   <recurring type="boolean">false</recurring>
+   <test type="boolean">true</test>
+   <voidable type="boolean">false</voidable>
+   <refundable type="boolean">false</refundable>
+   <ip_address>127.0.0.1</ip_address>
+   <created_at type="datetime">2015-06-10T15:25:06Z</created_at>
+   <collected_at type="datetime">2015-06-10T15:25:06Z</collected_at>
+   <updated_at type="datetime">2015-06-10T15:25:06Z</updated_at>
+   <details>
+      <account>
+         <account_code>1</account_code>
+         <first_name>Verena</first_name>
+         <last_name>Example</last_name>
+         <company nil="nil" />
+         <email>verena@test.com</email>
+         <billing_info type="credit_card">
+            <first_name>Verena</first_name>
+            <last_name>Example</last_name>
+            <address1>123 Main St.</address1>
+            <address2 nil="nil" />
+            <city>San Francisco</city>
+            <state>CA</state>
+            <zip>94105</zip>
+            <country>US</country>
+            <phone nil="nil" />
+            <vat_number nil="nil" />
+            <card_type>Visa</card_type>
+            <year type="integer">2017</year>
+            <month type="integer">11</month>
+            <first_six>411111</first_six>
+            <last_four>1111</last_four>
+         </billing_info>
+      </account>
+   </details>
+</transaction>

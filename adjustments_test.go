@@ -35,6 +35,17 @@ func TestAdjustments_Encoding(t *testing.T) {
 			`),
 		},
 		{
+			v: recurly.Adjustment{Origin: "external_gift_card", UnitAmountInCents: recurly.NewInt(-2000), Currency: "USD"},
+			expected: MustCompactString(`
+				<adjustment>
+					<origin>external_gift_card</origin>
+					<unit_amount_in_cents>-2000</unit_amount_in_cents>
+					<currency>USD</currency>
+				</adjustment>
+			`),
+		},
+
+		{
 			v: recurly.Adjustment{Description: "Charge for extra bandwidth", ProductCode: "bandwidth", UnitAmountInCents: recurly.NewInt(2000), Currency: "USD"},
 			expected: MustCompactString(`
 				<adjustment>
@@ -113,6 +124,17 @@ func TestAdjustments_Encoding(t *testing.T) {
 					<revenue_schedule_type>at_invoice</revenue_schedule_type>
 					<unit_amount_in_cents>2000</unit_amount_in_cents>
 					<currency>USD</currency>
+				</adjustment>
+			`),
+		},
+		{
+			v: recurly.Adjustment{UnitAmountInCents: recurly.NewInt(2000), Currency: "USD", AvalaraServiceType: 600, AvalaraTransactionType: 3},
+			expected: MustCompactString(`
+				<adjustment>
+					<unit_amount_in_cents>2000</unit_amount_in_cents>
+					<currency>USD</currency>
+					<avalara_transaction_type>3</avalara_transaction_type>
+					<avalara_service_type>600</avalara_service_type>
 				</adjustment>
 			`),
 		},
@@ -279,7 +301,6 @@ func NewTestAdjustment() *recurly.Adjustment {
 		TaxInCents:             175,
 		TotalInCents:           2175,
 		Currency:               "USD",
-		Taxable:                recurly.NewBool(false),
 		TaxType:                "usst",
 		TaxRegion:              "CA",
 		TaxRate:                0.0875,
@@ -291,6 +312,8 @@ func NewTestAdjustment() *recurly.Adjustment {
 				Type:       "state",
 				TaxRate:    0.065,
 				TaxInCents: 130,
+				Billable:   recurly.NewBool(true),
+				Level:      "state",
 			},
 			{
 				XMLName:    xml.Name{Local: "tax_detail"},

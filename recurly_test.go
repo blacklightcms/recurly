@@ -334,19 +334,20 @@ func TestClient_TransactionFailedError(t *testing.T) {
 		t.Fatal("expected invocation")
 	} else if err == nil {
 		t.Fatal(err)
-	} else if e, ok := err.(*recurly.TransactionFailedError); !ok {
+	} else if e, ok := err.(recurly.TransactionFailedError); !ok {
 		t.Fatalf("unexpected error: %T %#v", err, err)
 	} else if e.Response == nil {
 		t.Fatal("expected *http.Response")
 	} else if e.Response.StatusCode != http.StatusUnprocessableEntity {
 		t.Fatalf("unexpected status code: %d", e.Response.StatusCode)
 	} else if diff := cmp.Diff(e.TransactionError, recurly.TransactionError{
-		XMLName:          xml.Name{Local: "transaction_error"},
-		ErrorCode:        "fraud_security_code",
-		ErrorCategory:    "fraud",
-		MerchantMessage:  "The payment gateway declined the transaction because the security code (CVV) did not match.",
-		CustomerMessage:  "The security code you entered does not match. Please update the CVV and try again.",
-		GatewayErrorCode: "301",
+		XMLName:                   xml.Name{Local: "transaction_error"},
+		ErrorCode:                 "fraud_security_code",
+		ErrorCategory:             "fraud",
+		MerchantMessage:           "The payment gateway declined the transaction because the security code (CVV) did not match.",
+		CustomerMessage:           "The security code you entered does not match. Please update the CVV and try again.",
+		GatewayErrorCode:          "301",
+		ThreeDSecureActionTokenID: "ABCDEFGHIJKL012345",
 	}); diff != "" {
 		t.Fatal(diff)
 	} else if diff := cmp.Diff(e.Transaction, NewTestTransactionFailed()); diff != "" {
