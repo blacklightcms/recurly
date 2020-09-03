@@ -814,6 +814,41 @@ func TestParse_ScheduledPaymentNotification(t *testing.T) {
 	}
 }
 
+func TestParse_TransactionStatusUpdatedNotification(t *testing.T) {
+	result := MustParseFile("testdata/transaction_status_updated_notification.xml")
+	if n, ok := result.(*webhooks.PaymentNotification); !ok {
+		t.Fatalf("unexpected type: %T, result", n)
+	} else if diff := cmp.Diff(n, &webhooks.PaymentNotification{
+		Type: webhooks.TransactionStatusUpdated,
+		Account: webhooks.Account{
+			XMLName:     xml.Name{Local: "account"},
+			Code:        "1",
+			Username:    "verena",
+			Email:       "verena@example.com",
+			FirstName:   "Verena",
+			LastName:    "Example",
+			CompanyName: "Company, Inc.",
+		},
+		Transaction: webhooks.Transaction{
+			XMLName:          xml.Name{Local: "transaction"},
+			UUID:             "a5143c1d3a6f4a8287d0e2cc1d4c0427",
+			InvoiceNumber:    2059,
+			SubscriptionUUID: "1974a098jhlkjasdfljkha898326881c",
+			Action:           "purchase",
+			AmountInCents:    1000,
+			Status:           "void",
+			Message:          "Test Gateway: Successful test transaction",
+			Reference:        "reference",
+			Source:           "subscription",
+			Test:             recurly.NewBool(true),
+			Voidable:         recurly.NewBool(true),
+			Refundable:       recurly.NewBool(true),
+		},
+	}); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
 func TestParse_NewDunningEventNotification(t *testing.T) {
 	result := MustParseFile("testdata/new_dunning_event_notification.xml")
 	if n, ok := result.(*webhooks.NewDunningEventNotification); !ok {

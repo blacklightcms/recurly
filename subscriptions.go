@@ -99,6 +99,11 @@ type SubscriptionsService interface {
 	//
 	// https://dev.recurly.com/docs/resume-subscription
 	Resume(ctx context.Context, uuid string) (*Subscription, error)
+
+	// Immediately converts a trial subscription to paid
+	//
+	// https://dev.recurly.com/docs/convert-trial
+	ConvertTrial(ctx context.Context, uuid string) (*Subscription, error)
 }
 
 // Subscription state constants.
@@ -188,6 +193,7 @@ type NewSubscription struct {
 	ShippingMethodCode      string               `xml:"shipping_method_code,omitempty"`
 	ShippingAmountInCents   NullInt              `xml:"shipping_amount_in_cents,omitempty"`
 	CustomFields            *CustomFields        `xml:"custom_fields,omitempty"`
+	TransactionType         string               `xml:"transaction_type,omitempty"` // Optional transaction type. Currently accepts "moto"
 }
 
 // UnmarshalXML unmarshals transactions and handles intermediary state during unmarshaling
@@ -224,6 +230,7 @@ type SubscriptionAddOn struct {
 	Code              string   `xml:"add_on_code"`
 	UnitAmountInCents NullInt  `xml:"unit_amount_in_cents,omitempty"`
 	Quantity          int      `xml:"quantity,omitempty"`
+	AddOnSource       string   `xml:"add_on_source,omitempty"`
 }
 
 // PendingSubscription are updates to the subscription or subscription add ons that
@@ -254,6 +261,8 @@ type UpdateSubscription struct {
 	RenewalBillingCycles   NullInt              `xml:"renewal_billing_cycles,omitempty"`
 	AutoRenew              NullBool             `xml:"auto_renew,omitempty"`
 	CustomFields           *CustomFields        `xml:"custom_fields,omitempty"`
+	BillingInfo            *Billing             `xml:"billing_info,omitempty"`
+	TransactionType        string               `xml:"transaction_type,omitempty"` // Optional transaction type. Currently accepts "moto"
 }
 
 // SubscriptionNotes is used to update a subscription's notes.
@@ -262,7 +271,7 @@ type SubscriptionNotes struct {
 	TermsAndConditions    string        `xml:"terms_and_conditions,omitempty"`
 	CustomerNotes         string        `xml:"customer_notes,omitempty"`
 	VATReverseChargeNotes string        `xml:"vat_reverse_charge_notes,omitempty"`
-	GatewayCode           string        `xml:"gateway_code,omitempty"`
+	GatewayCode           string        `xml:"gateway_code"`
 	CustomFields          *CustomFields `xml:"custom_fields,omitempty"`
 }
 
@@ -505,6 +514,20 @@ func (s *subscriptionsImpl) Postpone(ctx context.Context, uuid string, dt time.T
 
 func (s *subscriptionsImpl) Resume(ctx context.Context, uuid string) (*Subscription, error) {
 	path := fmt.Sprintf("/subscriptions/%s/resume", sanitizeUUID(uuid))
+	req, err := s.client.newRequest("PUT", path, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	var dst Subscription
+	if _, err := s.client.do(ctx, req, &dst); err != nil {
+		return nil, err
+	}
+	return &dst, err
+}
+
+func (s *subscriptionsImpl) ConvertTrial(ctx context.Context, uuid string) (*Subscription, error) {
+	path := fmt.Sprintf("/subscriptions/%s/convert_trial", sanitizeUUID(uuid))
 	req, err := s.client.newRequest("PUT", path, nil)
 	if err != nil {
 		return nil, err

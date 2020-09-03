@@ -115,7 +115,7 @@ func TestBilling_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Billing{Number: 4111111111111111, Month: 5, Year: 2020, VerificationValue: "111"},
+			v: recurly.Billing{Number: "4111111111111111", Month: 5, Year: 2020, VerificationValue: "111"},
 			expected: MustCompactString(`
 				<billing_info>
 					<number>4111111111111111</number>
@@ -132,6 +132,14 @@ func TestBilling_Encoding(t *testing.T) {
 					<routing_number>065400137</routing_number>
 					<account_number>0123456789</account_number>
 					<account_type>checking</account_type>
+				</billing_info>
+			`),
+		},
+		{
+			v: recurly.Billing{TransactionType: "moto"},
+			expected: MustCompactString(`
+				<billing_info>
+					<transaction_type>moto</transaction_type>
 				</billing_info>
 			`),
 		},
@@ -229,9 +237,10 @@ func TestBilling_Get(t *testing.T) {
 		if info, err := client.Billing.Get(context.Background(), "1"); err != nil {
 			t.Fatal(err)
 		} else if diff := cmp.Diff(info, &recurly.Billing{
-			XMLName:   xml.Name{Local: "billing_info"},
-			FirstName: "Verena",
-			LastName:  "Example",
+			XMLName:     xml.Name{Local: "billing_info"},
+			FirstName:   "Verena",
+			LastName:    "Example",
+			PaymentType: "ach",
 		}); diff != "" {
 			t.Fatal(diff)
 		} else if !s.Invoked {
@@ -276,6 +285,32 @@ func TestBilling_Create(t *testing.T) {
 		}, t)
 
 		if info, err := client.Billing.Create(context.Background(), "1", recurly.Billing{Token: "TOKEN"}); !s.Invoked {
+			t.Fatal("expected fn invocation")
+		} else if err != nil {
+			t.Fatal(err)
+		} else if diff := cmp.Diff(info, NewTestBillingInfo()); diff != "" {
+			t.Fatal(diff)
+		}
+	})
+
+	t.Run("Token with 3D secure action result token", func(t *testing.T) {
+		client, s := recurly.NewTestServer()
+		defer s.Close()
+
+		s.HandleFunc("POST", "/v2/accounts/1/billing_info", func(w http.ResponseWriter, r *http.Request) {
+			if str := MustReadAllString(r.Body); str != MustCompactString(`
+			<billing_info>
+				<token_id>TOKEN</token_id>
+				<three_d_secure_action_result_token_id>THREE_D_SECURE_ACTION_RESULT_TOKEN</three_d_secure_action_result_token_id>
+			</billing_info>
+		`) {
+				t.Fatal(str)
+			}
+			w.WriteHeader(http.StatusCreated)
+			w.Write(MustOpenFile("billing_info.xml"))
+		}, t)
+
+		if info, err := client.Billing.Create(context.Background(), "1", recurly.Billing{Token: "TOKEN", ThreeDSecureActionResultTokenID: "THREE_D_SECURE_ACTION_RESULT_TOKEN"}); !s.Invoked {
 			t.Fatal("expected fn invocation")
 		} else if err != nil {
 			t.Fatal(err)
@@ -356,12 +391,38 @@ func TestBilling_Update(t *testing.T) {
 		}
 	})
 
+	t.Run("Token with 3D secure action result token", func(t *testing.T) {
+		client, s := recurly.NewTestServer()
+		defer s.Close()
+
+		s.HandleFunc("PUT", "/v2/accounts/1/billing_info", func(w http.ResponseWriter, r *http.Request) {
+			if str := MustReadAllString(r.Body); str != MustCompactString(`
+				<billing_info>
+					<token_id>TOKEN</token_id>
+					<three_d_secure_action_result_token_id>THREE_D_SECURE_ACTION_RESULT_TOKEN</three_d_secure_action_result_token_id>
+				</billing_info>
+			`) {
+				t.Fatal(str)
+			}
+			w.WriteHeader(http.StatusOK)
+			w.Write(MustOpenFile("billing_info.xml"))
+		}, t)
+
+		if info, err := client.Billing.Update(context.Background(), "1", recurly.Billing{Token: "TOKEN", ThreeDSecureActionResultTokenID: "THREE_D_SECURE_ACTION_RESULT_TOKEN"}); !s.Invoked {
+			t.Fatal("expected fn invocation")
+		} else if err != nil {
+			t.Fatal(err)
+		} else if diff := cmp.Diff(info, NewTestBillingInfo()); diff != "" {
+			t.Fatal(diff)
+		}
+	})
+
 	t.Run("InvalidToken", func(t *testing.T) {
 		client, s := recurly.NewTestServer()
 		defer s.Close()
 
 		s.HandleFunc("PUT", "/v2/accounts/1/billing_info", func(w http.ResponseWriter, r *http.Request) {
-			w.WriteHeader(http.StatusNotFound)
+			w.WriteHeader(http.StatusUnprocessableEntity)
 			w.Write([]byte(`
 				<?xml version="1.0" encoding="UTF-8"?>
 				<error>
@@ -466,5 +527,6 @@ func NewTestBillingInfo() *recurly.Billing {
 		Month:            11,
 		FirstSix:         "411111",
 		LastFour:         "1111",
+		PaymentType:      "credit_card",
 	}
 }

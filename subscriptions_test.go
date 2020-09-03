@@ -463,6 +463,26 @@ func TestSubscriptions_NewSubscription_Encoding(t *testing.T) {
 				</subscription>
 			`),
 		},
+		{
+			v: recurly.NewSubscription{
+				PlanCode: "gold",
+				Currency: "USD",
+				Account: recurly.Account{
+					Code: "123",
+				},
+				TransactionType: "moto",
+			},
+			expected: MustCompactString(`
+				<subscription>
+					<plan_code>gold</plan_code>
+					<account>
+						<account_code>123</account_code>
+					</account>
+					<currency>USD</currency>
+					<transaction_type>moto</transaction_type>
+				</subscription>
+			`),
+		},
 	}
 
 	for i, tt := range tests {
@@ -588,6 +608,7 @@ func TestSubscriptions_UpdateSubscription_Encoding(t *testing.T) {
 					Code:              "extra_users",
 					UnitAmountInCents: recurly.NewInt(1000),
 					Quantity:          2,
+					AddOnSource:       "plan_add_on",
 				}},
 			},
 			expected: MustCompactString(`
@@ -597,8 +618,68 @@ func TestSubscriptions_UpdateSubscription_Encoding(t *testing.T) {
 							<add_on_code>extra_users</add_on_code>
 							<unit_amount_in_cents>1000</unit_amount_in_cents>
 							<quantity>2</quantity>
+							<add_on_source>plan_add_on</add_on_source>
 						</subscription_add_on>
 					</subscription_add_ons>
+				</subscription>
+			`),
+		},
+		{
+			v: recurly.UpdateSubscription{
+				TransactionType: "moto",
+			},
+			expected: MustCompactString(`
+				<subscription>
+					<transaction_type>moto</transaction_type>
+				</subscription>
+			`),
+		},
+	}
+
+	for i, tt := range tests {
+		t.Run(strconv.Itoa(i), func(t *testing.T) {
+			buf := new(bytes.Buffer)
+			if err := xml.NewEncoder(buf).Encode(tt.v); err != nil {
+				t.Fatal(err)
+			} else if buf.String() != tt.expected {
+				t.Fatal(buf.String())
+			}
+		})
+	}
+}
+
+func TestSubscriptions_SubscriptionNotes_Encoding(t *testing.T) {
+	tests := []struct {
+		v        recurly.SubscriptionNotes
+		expected string
+	}{
+		{
+			expected: MustCompactString(`
+				<subscription>
+          <gateway_code></gateway_code>
+				</subscription>
+			`),
+		},
+		{
+			v: recurly.SubscriptionNotes{
+				GatewayCode:   "test",
+				CustomerNotes: "prepaid",
+			},
+			expected: MustCompactString(`
+				<subscription>
+          <customer_notes>prepaid</customer_notes>
+          <gateway_code>test</gateway_code>
+				</subscription>
+			`),
+		},
+		{
+			v: recurly.SubscriptionNotes{
+				TermsAndConditions: "none",
+			},
+			expected: MustCompactString(`
+				<subscription>
+          <terms_and_conditions>none</terms_and_conditions>
+          <gateway_code></gateway_code>
 				</subscription>
 			`),
 		},
@@ -957,6 +1038,24 @@ func TestSubscriptions_Resume(t *testing.T) {
 	}, t)
 
 	if subscription, err := client.Subscriptions.Resume(context.Background(), "44f83d7c-ba35-4d5b-8481-2419f923ea96"); !s.Invoked {
+		t.Fatal("expected fn invocation")
+	} else if err != nil {
+		t.Fatal(err)
+	} else if diff := cmp.Diff(subscription, NewTestSubscription()); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
+func TestSubscriptions_ConvertTrial(t *testing.T) {
+	client, s := recurly.NewTestServer()
+	defer s.Close()
+
+	s.HandleFunc("PUT", "/v2/subscriptions/44f83d7cba354d5b84812419f923ea96/convert_trial", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		w.Write(MustOpenFile("subscription.xml"))
+	}, t)
+
+	if subscription, err := client.Subscriptions.ConvertTrial(context.Background(), "44f83d7c-ba35-4d5b-8481-2419f923ea96"); !s.Invoked {
 		t.Fatal("expected fn invocation")
 	} else if err != nil {
 		t.Fatal(err)
