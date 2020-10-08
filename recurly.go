@@ -234,12 +234,13 @@ func newResponse(r *http.Response) *response {
 }
 
 func (r *response) populatePageCursor() {
-	links, ok := r.Response.Header["Link"]
-	if !ok || len(links) == 0 {
+	links := r.Response.Header.Get("Link")
+
+	if len(links) == 0 {
 		return
 	}
 
-	for _, link := range strings.Split(links[0], ",") {
+	for _, link := range strings.Split(links, ",") {
 		segments := strings.Split(strings.TrimSpace(link), ";")
 
 		if len(segments) < 2 { // link must at least have href and rel
