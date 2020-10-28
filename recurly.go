@@ -234,35 +234,33 @@ func newResponse(r *http.Response) *response {
 }
 
 func (r *response) populatePageCursor() {
-	links, ok := r.Response.Header["Link"]
-	if !ok || len(links) == 0 {
-		return
-	}
+	links := r.Response.Header.Get("Link")
+	if links != "" {
+		for _, link := range strings.Split(links, ",") {
+			segments := strings.Split(strings.TrimSpace(link), ";")
 
-	for _, link := range strings.Split(links[0], ",") {
-		segments := strings.Split(strings.TrimSpace(link), ";")
+			if len(segments) < 2 { // link must at least have href and rel
+				continue
+			} else if !strings.HasPrefix(segments[0], "<") || !strings.HasSuffix(segments[0], ">") { // ensure href is properly formatted
+				continue
+			}
 
-		if len(segments) < 2 { // link must at least have href and rel
-			continue
-		} else if !strings.HasPrefix(segments[0], "<") || !strings.HasSuffix(segments[0], ">") { // ensure href is properly formatted
-			continue
-		}
+			// try to pull out cursor parameter
+			url, err := url.Parse(segments[0][1 : len(segments[0])-1])
+			if err != nil {
+				continue
+			}
 
-		// try to pull out cursor parameter
-		url, err := url.Parse(segments[0][1 : len(segments[0])-1])
-		if err != nil {
-			continue
-		}
+			cursor := url.Query().Get("cursor")
+			if cursor == "" {
+				continue
+			}
 
-		cursor := url.Query().Get("cursor")
-		if cursor == "" {
-			continue
-		}
-
-		for _, segment := range segments[1:] {
-			switch strings.TrimSpace(segment) {
-			case `rel="next"`:
-				r.cursor = cursor
+			for _, segment := range segments[1:] {
+				switch strings.TrimSpace(segment) {
+				case `rel="next"`:
+					r.cursor = cursor
+				}
 			}
 		}
 	}
