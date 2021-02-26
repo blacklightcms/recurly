@@ -15,18 +15,19 @@ type GiftCardsService interface {
 }
 
 type GiftCard struct {
-	XMLName           xml.Name `xml:"gift_card"`
-	ID                int64    `xml:"id"`
-	RedemptionCode    string   `xml:"redemption_code,omitempty"`
-	BalanceInCents    int      `xml:"balance_in_cents,omitempty"`
-	ProductCode       string   `xml:"product_code,omitempty"`
-	UnitAmountInCents int      `xml:"unit_amount_in_cents,omitempty"`
-	Currency          string   `xml:"currency,omitempty"`
-	CreatedAt         NullTime `xml:"created_at,omitempty"`
-	UpdatedAt         NullTime `xml:"updated_at,omitempty"`
-	DeliveredAt       NullTime `xml:"delivered_at,omitempty"`
-	RedeemedAt        NullTime `xml:"redeemed_at,omitempty"`
-	CanceledAt        NullTime `xml:"canceled_at,omitempty"`
+	XMLName           xml.Name  `xml:"gift_card"`
+	ID                int64     `xml:"id"`
+	RedemptionCode    string    `xml:"redemption_code,omitempty"`
+	BalanceInCents    int       `xml:"balance_in_cents,omitempty"`
+	ProductCode       string    `xml:"product_code,omitempty"`
+	UnitAmountInCents int       `xml:"unit_amount_in_cents,omitempty"`
+	Currency          string    `xml:"currency,omitempty"`
+	Delivery          *Delivery `xml:"delivery,omitempty"`
+	CreatedAt         NullTime  `xml:"created_at,omitempty"`
+	UpdatedAt         NullTime  `xml:"updated_at,omitempty"`
+	DeliveredAt       NullTime  `xml:"delivered_at,omitempty"`
+	RedeemedAt        NullTime  `xml:"redeemed_at,omitempty"`
+	CanceledAt        NullTime  `xml:"canceled_at,omitempty"`
 }
 
 type Delivery struct {
@@ -36,9 +37,9 @@ type Delivery struct {
 	DeliverAt       NullTime `xml:"deliver_at,omitempty"`
 	FirstName       string   `xml:"first_name,omitempty"`
 	LastName        string   `xml:"last_name,omitempty"`
-	Address         Address  `xml:"address,omitempty"`
+	Address         *Address `xml:"address,omitempty"`
 	GifterName      string   `xml:"gifter_name,omitempty"`
-	PersonalMessage string   `xml:"personal_message"`
+	PersonalMessage string   `xml:"personal_message,omitempty"`
 }
 
 type GiftCardRedemption struct {
