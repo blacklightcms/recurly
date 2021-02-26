@@ -15,19 +15,26 @@ type GiftCardsService interface {
 }
 
 type GiftCard struct {
-	XMLName           xml.Name  `xml:"gift_card"`
-	ID                int64     `xml:"id"`
-	RedemptionCode    string    `xml:"redemption_code,omitempty"`
-	BalanceInCents    int       `xml:"balance_in_cents,omitempty"`
-	ProductCode       string    `xml:"product_code,omitempty"`
-	UnitAmountInCents int       `xml:"unit_amount_in_cents,omitempty"`
-	Currency          string    `xml:"currency,omitempty"`
-	Delivery          *Delivery `xml:"delivery,omitempty"`
-	CreatedAt         NullTime  `xml:"created_at,omitempty"`
-	UpdatedAt         NullTime  `xml:"updated_at,omitempty"`
-	DeliveredAt       NullTime  `xml:"delivered_at,omitempty"`
-	RedeemedAt        NullTime  `xml:"redeemed_at,omitempty"`
-	CanceledAt        NullTime  `xml:"canceled_at,omitempty"`
+	XMLName           xml.Name       `xml:"gift_card"`
+	ID                int64          `xml:"id"`
+	RedemptionCode    string         `xml:"redemption_code,omitempty"`
+	BalanceInCents    int            `xml:"balance_in_cents,omitempty"`
+	ProductCode       string         `xml:"product_code,omitempty"`
+	UnitAmountInCents int            `xml:"unit_amount_in_cents,omitempty"`
+	Currency          string         `xml:"currency,omitempty"`
+	Delivery          *Delivery      `xml:"delivery,omitempty"`
+	GifterAccount     *GifterAccount `xml:"gifter_account,omitempty"`
+	CreatedAt         NullTime       `xml:"created_at,omitempty"`
+	UpdatedAt         NullTime       `xml:"updated_at,omitempty"`
+	DeliveredAt       NullTime       `xml:"delivered_at,omitempty"`
+	RedeemedAt        NullTime       `xml:"redeemed_at,omitempty"`
+	CanceledAt        NullTime       `xml:"canceled_at,omitempty"`
+}
+
+type GifterAccount struct {
+	XMLName xml.Name `xml:"gifter_account"`
+
+	Account
 }
 
 type Delivery struct {

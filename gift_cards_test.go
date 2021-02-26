@@ -36,7 +36,7 @@ func TestGiftCards_Encoding(t *testing.T) {
 			v: recurly.GiftCard{
 				XMLName:  xml.Name{Local: "gift_card"},
 				ID:       2003020297591186183,
-				Delivery: &recurly.Delivery{},
+				Delivery: &recurly.Delivery{XMLName: xml.Name{Local: "delivery"}},
 			},
 			expected: MustCompactString(`
 				<gift_card>
@@ -54,11 +54,15 @@ func TestGiftCards_Encoding(t *testing.T) {
 				ProductCode:       "gift_card",
 				UnitAmountInCents: 2999,
 				Currency:          "USD",
-				CreatedAt:         recurly.NewTime(moment),
-				UpdatedAt:         recurly.NewTime(moment),
-				DeliveredAt:       recurly.NewTime(moment),
-				RedeemedAt:        recurly.NewTime(moment),
-				CanceledAt:        recurly.NewTime(moment),
+				GifterAccount: &recurly.GifterAccount{
+					XMLName: xml.Name{Local: "gifter_account"},
+					Account: recurly.Account{Code: "code"},
+				},
+				CreatedAt:   recurly.NewTime(moment),
+				UpdatedAt:   recurly.NewTime(moment),
+				DeliveredAt: recurly.NewTime(moment),
+				RedeemedAt:  recurly.NewTime(moment),
+				CanceledAt:  recurly.NewTime(moment),
 			},
 			expected: MustCompactString(`
 				<gift_card>
@@ -68,6 +72,9 @@ func TestGiftCards_Encoding(t *testing.T) {
 					<product_code>gift_card</product_code>
 					<unit_amount_in_cents>2999</unit_amount_in_cents>
 					<currency>USD</currency>
+					<gifter_account>
+						<account_code>code</account_code>
+					</gifter_account>
 					<created_at>2014-01-01T07:00:00Z</created_at>
 					<updated_at>2014-01-01T07:00:00Z</updated_at>
 					<delivered_at>2014-01-01T07:00:00Z</delivered_at>
@@ -129,37 +136,75 @@ func TestGiftCards_List(t *testing.T) {
 	}
 }
 
+func TestGiftCards_Create(t *testing.T) {
+	client, s := recurly.NewTestServer()
+	defer s.Close()
+
+	requestBody := *NewTestGiftCard()
+	requestBody.GifterAccount = &recurly.GifterAccount{
+		XMLName: xml.Name{Local: "gifter_account"}, Account: *NewTestAccount(),
+	}
+	requestBody.GifterAccount.Account.XMLName = xml.Name{}
+
+	s.HandleFunc("POST", "/v2/gift_cards", func(w http.ResponseWriter, r *http.Request) {
+		var gotBody recurly.GiftCard
+		if err := xml.NewDecoder(r.Body).Decode(&gotBody); err != nil {
+			t.Fatal(err)
+		}
+
+		if diff := cmp.Diff(gotBody, requestBody); diff != "" {
+			t.Fatal(diff)
+		}
+
+		w.WriteHeader(http.StatusCreated)
+		_, _ = w.Write(MustOpenFile("gift_card.xml"))
+	}, t)
+
+	if coupon, err := client.GiftCards.Create(context.Background(), requestBody); !s.Invoked {
+		t.Fatal("expected fn invocation")
+	} else if err != nil {
+		t.Fatal(err)
+	} else if diff := cmp.Diff(coupon, NewTestGiftCard()); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
+func NewTestGiftCard() *recurly.GiftCard {
+	return &recurly.GiftCard{
+		XMLName:           xml.Name{Local: "gift_card"},
+		ID:                2003020297591186183,
+		RedemptionCode:    "518822D87268C142",
+		BalanceInCents:    500,
+		ProductCode:       "gift_card",
+		UnitAmountInCents: 1000,
+		Currency:          "USD",
+		GifterAccount:     &recurly.GifterAccount{XMLName: xml.Name{Local: "gifter_account"}},
+		Delivery: &recurly.Delivery{
+			XMLName:      xml.Name{Local: "delivery"},
+			Method:       "post",
+			EmailAddress: "john@example.com",
+			FirstName:    "John",
+			LastName:     "Smith",
+			Address: &recurly.Address{
+				XMLName: xml.Name{Local: "address"},
+				Address: "123 B St.",
+				City:    "San Francisco",
+				State:   "CA",
+				Zip:     "94110",
+				Country: "USA",
+			},
+			GifterName:      "Sally",
+			PersonalMessage: "\n                Hi John, Happy Birthday! I hope you have a great day! Love, Sally",
+		},
+		CreatedAt:  recurly.NewTime(MustParseTime("2016-07-26T15:23:46Z")),
+		UpdatedAt:  recurly.NewTime(MustParseTime("2016-07-29T04:25:39Z")),
+		RedeemedAt: recurly.NewTime(MustParseTime("2016-07-29T04:25:38Z")),
+	}
+}
+
 func NewTestGiftCards() []recurly.GiftCard {
 	return []recurly.GiftCard{
-		{
-			XMLName:           xml.Name{Local: "gift_card"},
-			ID:                2003020297591186183,
-			RedemptionCode:    "518822D87268C142",
-			BalanceInCents:    500,
-			ProductCode:       "gift_card",
-			UnitAmountInCents: 1000,
-			Currency:          "USD",
-			Delivery: &recurly.Delivery{
-				XMLName:      xml.Name{Local: "delivery"},
-				Method:       "post",
-				EmailAddress: "john@example.com",
-				FirstName:    "John",
-				LastName:     "Smith",
-				Address: &recurly.Address{
-					XMLName: xml.Name{Local: "address"},
-					Address: "123 B St.",
-					City:    "San Francisco",
-					State:   "CA",
-					Zip:     "94110",
-					Country: "USA",
-				},
-				GifterName:      "Sally",
-				PersonalMessage: "\n                Hi John, Happy Birthday! I hope you have a great day! Love, Sally",
-			},
-			CreatedAt:  recurly.NewTime(MustParseTime("2016-07-26T15:23:46Z")),
-			UpdatedAt:  recurly.NewTime(MustParseTime("2016-07-29T04:25:39Z")),
-			RedeemedAt: recurly.NewTime(MustParseTime("2016-07-29T04:25:38Z")),
-		},
+		*NewTestGiftCard(),
 		{
 			XMLName:           xml.Name{Local: "gift_card"},
 			ID:                1988596186827727838,
@@ -167,6 +212,7 @@ func NewTestGiftCards() []recurly.GiftCard {
 			ProductCode:       "gift_card",
 			UnitAmountInCents: 1000,
 			Currency:          "USD",
+			GifterAccount:     &recurly.GifterAccount{XMLName: xml.Name{Local: "gifter_account"}},
 			Delivery: &recurly.Delivery{
 				XMLName:         xml.Name{Local: "delivery"},
 				Method:          "email",
