@@ -7,10 +7,30 @@ import (
 )
 
 type GiftCardsService interface {
+	// List returns a list of all purchased gift cards on your site, across all accounts.
+	//
+	// https://developers.recurly.com/api-v2/v2.29/index.html#operation/listGiftCards
 	List(opts *PagerOptions) Pager
+
+	// Create purchases a gift card on the gifter's account.
+	//
+	// https://developers.recurly.com/api-v2/v2.29/index.html#operation/createGiftCard
 	Create(ctx context.Context, g GiftCard) (*GiftCard, error)
+
+	// Preview a gift card purchase.
+	// Allows the gifter to confirm that the delivery details provided are correct.
+	//
+	// https://developers.recurly.com/api-v2/v2.29/index.html#operation/previewGiftCard
 	Preview(ctx context.Context, g GiftCard) (*GiftCard, error)
+
+	// Lookup gift card.
+	//
+	// https://developers.recurly.com/api-v2/v2.29/index.html#operation/lookupGiftCard
 	Lookup(ctx context.Context, id int64) (*GiftCard, error)
+
+	// Redeem a gift card on a recipient's account, outside of a subscription purchase.
+	//
+	// https://developers.recurly.com/api-v2/v2.29/index.html#operation/redeemGiftCardOnAccount
 	Redeem(ctx context.Context, accountCode, redemptionCode string) (*GiftCard, error)
 }
 
