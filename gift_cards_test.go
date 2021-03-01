@@ -147,19 +147,8 @@ func TestGiftCards_Create(t *testing.T) {
 	}
 	requestBody.GifterAccount.Account.XMLName = xml.Name{}
 
-	s.HandleFunc("POST", "/v2/gift_cards", func(w http.ResponseWriter, r *http.Request) {
-		var gotBody recurly.GiftCard
-		if err := xml.NewDecoder(r.Body).Decode(&gotBody); err != nil {
-			t.Fatal(err)
-		}
-
-		if diff := cmp.Diff(gotBody, requestBody); diff != "" {
-			t.Fatal(diff)
-		}
-
-		w.WriteHeader(http.StatusCreated)
-		_, _ = w.Write(MustOpenFile("gift_card.xml"))
-	}, t)
+	handler := NewTestHandler(t, recurly.GiftCard{}, &requestBody, "gift_card.xml")
+	s.HandleFunc("POST", "/v2/gift_cards", handler, t)
 
 	if coupon, err := client.GiftCards.Create(context.Background(), requestBody); !s.Invoked {
 		t.Fatal("expected fn invocation")
