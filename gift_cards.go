@@ -14,6 +14,8 @@ type GiftCardsService interface {
 	Redeem(ctx context.Context, accountCode, redemptionCode string) (*GiftCard, error)
 }
 
+var _ GiftCardsService = &giftCardsImpl{}
+
 type GiftCard struct {
 	XMLName           xml.Name       `xml:"gift_card"`
 	ID                int64          `xml:"id"`
