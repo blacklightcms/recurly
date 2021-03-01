@@ -199,6 +199,26 @@ func TestGiftCards_Lookup(t *testing.T) {
 	}
 }
 
+func TestGiftCards_Redeem(t *testing.T) {
+	client, s := recurly.NewTestServer()
+	defer s.Close()
+
+	expectedBody := recurly.GiftCardRedemption{
+		XMLName:     xml.Name{Local: "recipient_account"},
+		AccountCode: "code",
+	}
+	handler := NewTestHandler(t, recurly.GiftCardRedemption{}, &expectedBody, "gift_card.xml")
+	s.HandleFunc("POST", "/v2/gift_cards/518822D87268C142/redeem", handler, t)
+
+	if giftCard, err := client.GiftCards.Redeem(context.Background(), "code", "518822D87268C142"); !s.Invoked {
+		t.Fatal("expected fn invocation")
+	} else if err != nil {
+		t.Fatal(err)
+	} else if diff := cmp.Diff(giftCard, NewTestGiftCard()); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
 func NewTestHandler(
 	t *testing.T, bodyType interface{}, expected interface{}, file string,
 ) func(http.ResponseWriter, *http.Request) {
