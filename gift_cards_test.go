@@ -10,7 +10,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/fubotv/go-recurly"
+	"github.com/blacklightcms/recurly"
 	"github.com/google/go-cmp/cmp"
 )
 

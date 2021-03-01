@@ -3,7 +3,7 @@ package mock
 import (
 	"context"
 
-	"github.com/fubotv/go-recurly"
+	"github.com/blacklightcms/recurly"
 )
 
 var _ recurly.GiftCardsService = &GiftCardsService{}
