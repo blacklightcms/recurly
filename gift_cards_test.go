@@ -6,6 +6,7 @@ import (
 	"encoding/xml"
 	"fmt"
 	"net/http"
+	"reflect"
 	"testing"
 	"time"
 
@@ -166,6 +167,50 @@ func TestGiftCards_Create(t *testing.T) {
 		t.Fatal(err)
 	} else if diff := cmp.Diff(coupon, NewTestGiftCard()); diff != "" {
 		t.Fatal(diff)
+	}
+}
+
+func TestGiftCardsImpl_Preview(t *testing.T) {
+	client, s := recurly.NewTestServer()
+	defer s.Close()
+
+	reqBody := *NewTestGiftCard()
+	reqBody.GifterAccount = &recurly.GifterAccount{
+		XMLName: xml.Name{Local: "gifter_account"}, Account: *NewTestAccount(),
+	}
+	reqBody.GifterAccount.Account.XMLName = xml.Name{}
+
+	handler := NewTestHandler(t, recurly.GiftCard{}, &reqBody, "gift_card.xml")
+	s.HandleFunc("POST", "/v2/gift_cards/preview", handler, t)
+
+	if coupon, err := client.GiftCards.Preview(context.Background(), reqBody); !s.Invoked {
+		t.Fatal("expected fn invocation")
+	} else if err != nil {
+		t.Fatal(err)
+	} else if diff := cmp.Diff(coupon, NewTestGiftCard()); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
+func NewTestHandler(
+	t *testing.T, bodyType interface{}, expected interface{}, file string,
+) func(http.ResponseWriter, *http.Request) {
+	t.Helper()
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		t.Helper()
+
+		gotBody := reflect.New(reflect.TypeOf(bodyType)).Interface()
+		if err := xml.NewDecoder(r.Body).Decode(&gotBody); err != nil {
+			t.Fatal(err)
+		}
+
+		if diff := cmp.Diff(gotBody, expected); diff != "" {
+			t.Fatal(diff)
+		}
+
+		w.WriteHeader(http.StatusCreated)
+		_, _ = w.Write(MustOpenFile(file))
 	}
 }
 
