@@ -172,11 +172,29 @@ func TestGiftCardsImpl_Preview(t *testing.T) {
 	handler := NewTestHandler(t, recurly.GiftCard{}, &reqBody, "gift_card.xml")
 	s.HandleFunc("POST", "/v2/gift_cards/preview", handler, t)
 
-	if coupon, err := client.GiftCards.Preview(context.Background(), reqBody); !s.Invoked {
+	if giftCard, err := client.GiftCards.Preview(context.Background(), reqBody); !s.Invoked {
 		t.Fatal("expected fn invocation")
 	} else if err != nil {
 		t.Fatal(err)
-	} else if diff := cmp.Diff(coupon, NewTestGiftCard()); diff != "" {
+	} else if diff := cmp.Diff(giftCard, NewTestGiftCard()); diff != "" {
+		t.Fatal(diff)
+	}
+}
+
+func TestGiftCards_Lookup(t *testing.T) {
+	client, s := recurly.NewTestServer()
+	defer s.Close()
+
+	s.HandleFunc("GET", "/v2/gift_cards/2003020297591186183", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(http.StatusOK)
+		_, _ = w.Write(MustOpenFile("gift_card.xml"))
+	}, t)
+
+	if giftCard, err := client.GiftCards.Lookup(context.Background(), 2003020297591186183); !s.Invoked {
+		t.Fatal("expected fn invocation")
+	} else if err != nil {
+		t.Fatal(err)
+	} else if diff := cmp.Diff(giftCard, NewTestGiftCard()); diff != "" {
 		t.Fatal(diff)
 	}
 }
