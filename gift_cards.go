@@ -38,7 +38,7 @@ var _ GiftCardsService = &giftCardsImpl{}
 
 type GiftCard struct {
 	XMLName           xml.Name       `xml:"gift_card"`
-	ID                int64          `xml:"id"`
+	ID                int64          `xml:"id,omitempty"`
 	RedemptionCode    string         `xml:"redemption_code,omitempty"`
 	BalanceInCents    int            `xml:"balance_in_cents,omitempty"`
 	ProductCode       string         `xml:"product_code,omitempty"`
