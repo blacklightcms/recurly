@@ -239,6 +239,16 @@ func (p *pager) FetchAll(ctx context.Context, dst interface{}) error {
 			all = append(all, dst...)
 		}
 		*v = all
+	case *[]GiftCard:
+		var all []GiftCard
+		for p.Next() {
+			var dst []GiftCard
+			if err := p.Fetch(ctx, &dst); err != nil {
+				return err
+			}
+			all = append(all, dst...)
+		}
+		*v = all
 	case *[]Invoice:
 		var all []Invoice
 		for p.Next() {
