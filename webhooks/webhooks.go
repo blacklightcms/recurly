@@ -53,7 +53,7 @@ func nameToNotification(name string) (interface{}, error) {
 	case BillingInfoUpdated, NewAccount, UpdatedAccount, CanceledAccount, BillingInfoUpdateFailed:
 		return &AccountNotification{Type: name}, nil
 	case NewSubscription, UpdatedSubscription, RenewedSubscription, ExpiredSubscription, CanceledSubscription, ReactivatedAccount, PausedSubscription,
-		ResumedSubscription, ScheduledPauseSubscription, ModifiedPauseSubscription, PausedRenewalSubscription, PauseCanceledSubscription:
+		ResumedSubscription, ScheduledPauseSubscription, ScheduledSubscriptionUpdate,ModifiedPauseSubscription, PausedRenewalSubscription, PauseCanceledSubscription:
 		return &SubscriptionNotification{Type: name}, nil
 	case NewChargeInvoice, ProcessingChargeInvoice, PastDueChargeInvoice, PastDueInvoice, PaidChargeInvoice, FailedChargeInvoice, ReopenedChargeInvoice, ClosedInvoiceNotification, UpdatedInvoiceNotification, UpdatedChargeInvoiceNotification, PendingInvoiceNotification:
 		return &ChargeInvoiceNotification{Type: name}, nil
