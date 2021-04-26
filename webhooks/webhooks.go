@@ -50,10 +50,10 @@ func Parse(r io.Reader) (interface{}, error) {
 // nameToNotification returns the notification interface.
 func nameToNotification(name string) (interface{}, error) {
 	switch name {
-	case BillingInfoUpdated, NewAccount, UpdatedAccount, CanceledAccount, BillingInfoUpdateFailed:
+	case BillingInfoUpdated, NewAccount, UpdatedAccount, CanceledAccount, BillingInfoUpdateFailed, NewShippingAddress:
 		return &AccountNotification{Type: name}, nil
 	case NewSubscription, UpdatedSubscription, RenewedSubscription, ExpiredSubscription, CanceledSubscription, ReactivatedAccount, PausedSubscription,
-		ResumedSubscription, ScheduledPauseSubscription, ModifiedPauseSubscription, PausedRenewalSubscription, PauseCanceledSubscription:
+		ResumedSubscription, ScheduledPauseSubscription, ScheduledSubscriptionUpdate,ModifiedPauseSubscription, PausedRenewalSubscription, PauseCanceledSubscription:
 		return &SubscriptionNotification{Type: name}, nil
 	case NewChargeInvoice, ProcessingChargeInvoice, PastDueChargeInvoice, PastDueInvoice, PaidChargeInvoice, FailedChargeInvoice, ReopenedChargeInvoice, ClosedInvoiceNotification, UpdatedInvoiceNotification, UpdatedChargeInvoiceNotification, PendingInvoiceNotification:
 		return &ChargeInvoiceNotification{Type: name}, nil
