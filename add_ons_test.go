@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/blacklightcms/recurly"
+	"github.com/autopilot3/recurly"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -81,7 +81,7 @@ func TestAddOns_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.AddOn{UnitAmountInCents: recurly.UnitAmount{USD: 200}},
+			v: recurly.AddOn{UnitAmountInCents: recurly.UnitAmount{USD: recurly.NewAmount(200)}},
 			expected: MustCompactString(`
 				<add_on>
 					<unit_amount_in_cents>
@@ -180,7 +180,7 @@ func TestUnitAmount(t *testing.T) {
 		{
 			expected: "<s></s>",
 		},
-		{v: s{Amount: recurly.UnitAmount{USD: 1000}},
+		{v: s{Amount: recurly.UnitAmount{USD: recurly.NewAmount(1000)}},
 			expected: MustCompactString(`
 				<s>
 					<amount>
@@ -189,7 +189,7 @@ func TestUnitAmount(t *testing.T) {
 				</s>
 			`),
 		},
-		{v: s{Amount: recurly.UnitAmount{USD: 800, EUR: 650}},
+		{v: s{Amount: recurly.UnitAmount{USD: recurly.NewAmount(800), EUR: recurly.NewAmount(650)}},
 			expected: MustCompactString(`
 				<s>
 					<amount>
@@ -199,7 +199,7 @@ func TestUnitAmount(t *testing.T) {
 				</s>
 			`),
 		},
-		{v: s{Amount: recurly.UnitAmount{EUR: 650}},
+		{v: s{Amount: recurly.UnitAmount{EUR: recurly.NewAmount(650)}},
 			expected: MustCompactString(`
 				<s>
 					<amount>
@@ -208,7 +208,7 @@ func TestUnitAmount(t *testing.T) {
 				</s>
 			`),
 		},
-		{v: s{Amount: recurly.UnitAmount{GBP: 3000}},
+		{v: s{Amount: recurly.UnitAmount{GBP: recurly.NewAmount(3000)}},
 			expected: MustCompactString(`
 				<s>
 					<amount>
@@ -217,7 +217,7 @@ func TestUnitAmount(t *testing.T) {
 				</s>
 			`),
 		},
-		{v: s{Amount: recurly.UnitAmount{CAD: 300}},
+		{v: s{Amount: recurly.UnitAmount{CAD: recurly.NewAmount(300)}},
 			expected: MustCompactString(`
 				<s>
 					<amount>
@@ -226,7 +226,7 @@ func TestUnitAmount(t *testing.T) {
 				</s>
 			`),
 		},
-		{v: s{Amount: recurly.UnitAmount{AUD: 400}},
+		{v: s{Amount: recurly.UnitAmount{AUD: recurly.NewAmount(400)}},
 			expected: MustCompactString(`
 				<s>
 					<amount>
@@ -235,7 +235,7 @@ func TestUnitAmount(t *testing.T) {
 				</s>
 			`),
 		},
-		{v: s{Amount: recurly.UnitAmount{USD: 1}},
+		{v: s{Amount: recurly.UnitAmount{USD: recurly.NewAmount(1)}},
 			expected: MustCompactString(`
 				<s>
 					<amount>
@@ -385,7 +385,7 @@ func NewTestAddOn() *recurly.AddOn {
 		DisplayQuantityOnHostedPage: recurly.NewBool(false),
 		TaxCode:                     "digital",
 		UnitAmountInCents: recurly.UnitAmount{
-			USD: 200,
+			USD: recurly.NewAmount(200),
 		},
 		TierType:       "volume",
 		Tiers:          &[]recurly.Tier{*NewTestTier()},
@@ -399,7 +399,7 @@ func NewTestTier() *recurly.Tier {
 		XMLName:        xml.Name{Local: "tier"},
 		EndingQuantity: 500,
 		UnitAmountInCents: recurly.UnitAmount{
-			USD: 100,
+			USD: recurly.NewAmount(100),
 		},
 	}
 }

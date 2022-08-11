@@ -3,13 +3,14 @@ package webhooks
 import (
 	"encoding/xml"
 
-	"github.com/blacklightcms/recurly"
+	"github.com/autopilot3/recurly"
 )
 
 // Credit invoice notifications.
 // https://dev.recurly.com/page/webhooks#charge-invoice-notifications
 const (
 	NewCreditInvoice        = "new_credit_invoice_notification"
+	UpdatedCreditInvoice    = "updated_credit_invoice_notification"
 	ProcessingCreditInvoice = "processing_credit_invoice_notification"
 	ClosedCreditInvoice     = "closed_credit_invoice_notification"
 	VoidedCreditInvoice     = "voided_credit_invoice_notification"

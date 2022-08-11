@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/blacklightcms/recurly"
-	"github.com/blacklightcms/recurly/webhooks"
+	"github.com/autopilot3/recurly"
+	"github.com/autopilot3/recurly/webhooks"
 	"github.com/google/go-cmp/cmp"
 )
 

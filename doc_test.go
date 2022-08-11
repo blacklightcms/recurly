@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/blacklightcms/recurly"
+	"github.com/autopilot3/recurly"
 )
 
 var client *recurly.Client

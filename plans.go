@@ -57,6 +57,7 @@ type Plan struct {
 	IntervalLength             int        `xml:"plan_interval_length,omitempty"`
 	TrialIntervalUnit          string     `xml:"trial_interval_unit,omitempty"`
 	TrialIntervalLength        int        `xml:"trial_interval_length,omitempty"`
+	TrialRequiresBillingInfo   NullBool   `xml:"trial_requires_billing_info,omitempty"`
 	TotalBillingCycles         NullInt    `xml:"total_billing_cycles,omitempty"`
 	AccountingCode             string     `xml:"accounting_code,omitempty"`
 	CreatedAt                  NullTime   `xml:"created_at,omitempty"`

@@ -2,15 +2,13 @@ package webhooks
 
 import "github.com/autopilot3/recurly"
 
-// Dunning event constants.
 const (
-	NewDunningEvent = "new_dunning_event_notification"
+	PreRenewal = "prerenewal_notification"
 )
 
 // NewDunningEventNotification is returned for new dunning events.
-type NewDunningEventNotification struct {
+type PreRenewalNotification struct {
 	Type         string `xml:"-"`
 	Account      Account
-	Invoice      ChargeInvoice
 	Subscription recurly.Subscription
 }

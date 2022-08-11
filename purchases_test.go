@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/blacklightcms/recurly"
+	"github.com/autopilot3/recurly"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -239,7 +239,7 @@ func NewTestPurchase() *recurly.Purchase {
 				FirstName: "Benjamin",
 				LastName:  "Du Monde",
 				Month:     12,
-				Number:    4111111111111111,
+				Number:    "4111111111111111",
 				State:     "CA",
 				Year:      2019,
 				Zip:       "94110",

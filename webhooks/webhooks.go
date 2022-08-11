@@ -50,14 +50,14 @@ func Parse(r io.Reader) (interface{}, error) {
 // nameToNotification returns the notification interface.
 func nameToNotification(name string) (interface{}, error) {
 	switch name {
-	case BillingInfoUpdated, NewAccount, UpdatedAccount, CanceledAccount, BillingInfoUpdateFailed:
+	case BillingInfoUpdated, NewAccount, UpdatedAccount, CanceledAccount, BillingInfoUpdateFailed, NewShippingAddress:
 		return &AccountNotification{Type: name}, nil
 	case NewSubscription, UpdatedSubscription, RenewedSubscription, ExpiredSubscription, CanceledSubscription, ReactivatedAccount, PausedSubscription,
-		ResumedSubscription, ScheduledPauseSubscription, ModifiedPauseSubscription, PausedRenewalSubscription, PauseCanceledSubscription:
+		ResumedSubscription, ScheduledPauseSubscription, ScheduledSubscriptionUpdate, ModifiedPauseSubscription, PausedRenewalSubscription, PauseCanceledSubscription:
 		return &SubscriptionNotification{Type: name}, nil
-	case NewChargeInvoice, ProcessingChargeInvoice, PastDueChargeInvoice, PaidChargeInvoice, FailedChargeInvoice, ReopenedChargeInvoice:
+	case NewChargeInvoice, ProcessingChargeInvoice, PastDueChargeInvoice, PastDueInvoice, PaidChargeInvoice, FailedChargeInvoice, ReopenedChargeInvoice, ClosedInvoiceNotification, UpdatedInvoiceNotification, UpdatedChargeInvoiceNotification, PendingInvoiceNotification:
 		return &ChargeInvoiceNotification{Type: name}, nil
-	case NewCreditInvoice, ProcessingCreditInvoice, ClosedCreditInvoice, VoidedCreditInvoice, ReopenedCreditInvoice, OpenCreditInvoice:
+	case NewCreditInvoice, UpdatedCreditInvoice, ProcessingCreditInvoice, ClosedCreditInvoice, VoidedCreditInvoice, ReopenedCreditInvoice, OpenCreditInvoice:
 		return &CreditInvoiceNotification{Type: name}, nil
 	case NewCreditPayment, VoidedCreditPayment:
 		return &CreditPaymentNotification{Type: name}, nil
@@ -65,6 +65,8 @@ func nameToNotification(name string) (interface{}, error) {
 		return &PaymentNotification{Type: name}, nil
 	case NewDunningEvent:
 		return &NewDunningEventNotification{Type: name}, nil
+	case PreRenewal:
+		return &PreRenewalNotification{Type: name}, nil
 	}
 	return nil, ErrUnknownNotification{name: name}
 }

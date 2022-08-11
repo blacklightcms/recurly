@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/blacklightcms/recurly"
+	"github.com/autopilot3/recurly"
 	"github.com/google/go-cmp/cmp"
 )
 

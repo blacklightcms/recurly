@@ -41,7 +41,7 @@ type Client struct {
 
 	// userAgent sets the User-Agent header for requests so Recurly can
 	// track usage of the client.
-	// See https://github.com/blacklightcms/recurly/issues/41
+	// See https://github.com/autopilot3/recurly/issues/41
 	userAgent string
 
 	// Client is the HTTP Client used to communicate with the API.
@@ -329,7 +329,7 @@ func (r *response) parseClientError(v interface{}) error {
 
 		// Any transaction errors return TransactionFailedError.
 		if e.Transaction != nil || e.TransactionError != nil {
-			transFailedErr := &TransactionFailedError{
+			transFailedErr := TransactionFailedError{
 				Response:    r.Response,
 				Transaction: e.Transaction,
 			}
@@ -437,7 +437,7 @@ type TransactionFailedError struct {
 	TransactionError TransactionError
 }
 
-func (e *TransactionFailedError) Error() string {
+func (e TransactionFailedError) Error() string {
 	return fmt.Sprintf("transaction failed: %s %s: %d [%s/%s/%s]",
 		e.Response.Request.Method,
 		e.Response.Request.URL.Path,

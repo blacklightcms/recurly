@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/blacklightcms/recurly"
+	"github.com/autopilot3/recurly"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -476,7 +476,8 @@ func NewTestAccountBalance() *recurly.AccountBalance {
 		XMLName: xml.Name{Local: "account_balance"},
 		PastDue: false,
 		Balance: recurly.UnitAmount{
-			USD: 3000,
+			USD: recurly.NewAmount(3000),
+			EUR: recurly.NewAmount(0),
 		},
 	}
 }

@@ -14,7 +14,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/blacklightcms/recurly"
+	"github.com/autopilot3/recurly"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -334,7 +334,7 @@ func TestClient_TransactionFailedError(t *testing.T) {
 		t.Fatal("expected invocation")
 	} else if err == nil {
 		t.Fatal(err)
-	} else if e, ok := err.(*recurly.TransactionFailedError); !ok {
+	} else if e, ok := err.(recurly.TransactionFailedError); !ok {
 		t.Fatalf("unexpected error: %T %#v", err, err)
 	} else if e.Response == nil {
 		t.Fatal("expected *http.Response")

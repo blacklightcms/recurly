@@ -64,19 +64,23 @@ type AddOn struct {
 	CreatedAt NullTime `xml:"created_at,omitempty"`
 }
 
+func NewAmount(i int) *int {
+	return &i
+}
+
 // UnitAmount can read or write amounts in various currencies.
 type UnitAmount struct {
-	USD int `xml:"USD,omitempty"`
-	EUR int `xml:"EUR,omitempty"`
-	GBP int `xml:"GBP,omitempty"`
-	CAD int `xml:"CAD,omitempty"`
-	AUD int `xml:"AUD,omitempty"`
+	USD *int `xml:"USD,omitempty"`
+	EUR *int `xml:"EUR,omitempty"`
+	GBP *int `xml:"GBP,omitempty"`
+	CAD *int `xml:"CAD,omitempty"`
+	AUD *int `xml:"AUD,omitempty"`
 }
 
 // MarshalXML ensures UnitAmount is not marshaled unless one or more currencies
 // has a value greater than zero.
 func (u UnitAmount) MarshalXML(e *xml.Encoder, start xml.StartElement) error {
-	if u.USD > 0 || u.EUR > 0 || u.CAD > 0 || u.GBP > 0 || u.AUD > 0 {
+	if u.USD != nil || u.EUR != nil || u.CAD != nil || u.GBP != nil || u.AUD != nil {
 		type uaAlias UnitAmount
 		e.EncodeElement(uaAlias(u), start)
 	}

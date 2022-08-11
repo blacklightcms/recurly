@@ -9,7 +9,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/blacklightcms/recurly"
+	"github.com/autopilot3/recurly"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -115,7 +115,7 @@ func TestBilling_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Billing{Number: 4111111111111111, Month: 5, Year: 2020, VerificationValue: 111},
+			v: recurly.Billing{Number: "4111111111111111", Month: 5, Year: 2020, VerificationValue: "111"},
 			expected: MustCompactString(`
 				<billing_info>
 					<number>4111111111111111</number>
@@ -352,7 +352,7 @@ func TestBilling_Create(t *testing.T) {
 			State:     "CA",
 			Zip:       "94105",
 			Country:   "US",
-			Number:    4111111111111111,
+			Number:    "4111111111111111",
 			Month:     10,
 			Year:      2020,
 		}); !s.Invoked {
@@ -480,7 +480,7 @@ func TestBilling_Update(t *testing.T) {
 			State:     "CA",
 			Zip:       "94105",
 			Country:   "US",
-			Number:    4111111111111111,
+			Number:    "4111111111111111",
 			Month:     10,
 			Year:      2020,
 		}); !s.Invoked {

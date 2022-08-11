@@ -177,7 +177,7 @@ type NewSubscription struct {
 	RenewalBillingCycles    NullInt              `xml:"renewal_billing_cycles"`
 	NextBillDate            NullTime             `xml:"next_bill_date,omitempty"`
 	CollectionMethod        string               `xml:"collection_method,omitempty"`
-	AutoRenew               bool                 `xml:"auto_renew,omitempty"`
+	AutoRenew               NullBool             `xml:"auto_renew,omitempty"`
 	NetTerms                NullInt              `xml:"net_terms,omitempty"`
 	PONumber                string               `xml:"po_number,omitempty"`
 	Bulk                    bool                 `xml:"bulk,omitempty"`
@@ -498,8 +498,8 @@ func (s *subscriptionsImpl) Pause(ctx context.Context, uuid string, cycles int) 
 func (s *subscriptionsImpl) Postpone(ctx context.Context, uuid string, dt time.Time, bulk bool) (*Subscription, error) {
 	path := fmt.Sprintf("/subscriptions/%s/postpone", sanitizeUUID(uuid))
 	req, err := s.client.newQueryRequest("PUT", path, query{
-		"bulk":              bulk,
-		"next_renewal_date": dt,
+		"bulk":           bulk,
+		"next_bill_date": dt,
 	}, nil)
 	if err != nil {
 		return nil, err

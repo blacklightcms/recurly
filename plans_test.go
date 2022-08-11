@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/blacklightcms/recurly"
+	"github.com/autopilot3/recurly"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -27,7 +27,7 @@ func TestPlans_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, Description: "abc"},
+			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: recurly.NewAmount(1500)}, Description: "abc"},
 			expected: MustCompactString(`
 				<plan>
 					<name>Gold plan</name>
@@ -39,7 +39,7 @@ func TestPlans_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, AccountingCode: "gold"},
+			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: recurly.NewAmount(1500)}, AccountingCode: "gold"},
 			expected: MustCompactString(`
 				<plan>
 					<name>Gold plan</name>
@@ -51,7 +51,7 @@ func TestPlans_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, IntervalUnit: "months"},
+			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: recurly.NewAmount(1500)}, IntervalUnit: "months"},
 			expected: MustCompactString(`
 				<plan>
 					<name>Gold plan</name>
@@ -63,7 +63,7 @@ func TestPlans_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, IntervalLength: 1},
+			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: recurly.NewAmount(1500)}, IntervalLength: 1},
 			expected: MustCompactString(`
 				<plan>
 					<name>Gold plan</name>
@@ -75,7 +75,7 @@ func TestPlans_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, TrialIntervalUnit: "days"},
+			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: recurly.NewAmount(1500)}, TrialIntervalUnit: "days"},
 			expected: MustCompactString(`
 				<plan>
 					<name>Gold plan</name>
@@ -87,7 +87,7 @@ func TestPlans_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Plan{Name: "Gold plan", AutoRenew: true, UnitAmountInCents: recurly.UnitAmount{USD: 1500}, TrialIntervalLength: 10},
+			v: recurly.Plan{Name: "Gold plan", AutoRenew: true, UnitAmountInCents: recurly.UnitAmount{USD: recurly.NewAmount(1500)}, TrialIntervalLength: 10},
 			expected: MustCompactString(`
 				<plan>
 					<name>Gold plan</name>
@@ -100,7 +100,7 @@ func TestPlans_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, IntervalUnit: "months"},
+			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: recurly.NewAmount(1500)}, IntervalUnit: "months"},
 			expected: MustCompactString(`
 				<plan>
 					<name>Gold plan</name>
@@ -112,7 +112,7 @@ func TestPlans_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, SetupFeeInCents: recurly.UnitAmount{USD: 1000, EUR: 800}},
+			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: recurly.NewAmount(1500)}, SetupFeeInCents: recurly.UnitAmount{USD: recurly.NewAmount(1000), EUR: recurly.NewAmount(800)}},
 			expected: MustCompactString(`
 				<plan>
 					<name>Gold plan</name>
@@ -127,7 +127,7 @@ func TestPlans_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, TotalBillingCycles: recurly.NewInt(24)},
+			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: recurly.NewAmount(1500)}, TotalBillingCycles: recurly.NewInt(24)},
 			expected: MustCompactString(`
 				<plan>
 					<name>Gold plan</name>
@@ -139,7 +139,7 @@ func TestPlans_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, UnitName: "unit"},
+			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: recurly.NewAmount(1500)}, UnitName: "unit"},
 			expected: MustCompactString(`
 				<plan>
 					<name>Gold plan</name>
@@ -151,7 +151,7 @@ func TestPlans_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, DisplayQuantity: recurly.NewBool(true)},
+			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: recurly.NewAmount(1500)}, DisplayQuantity: recurly.NewBool(true)},
 			expected: MustCompactString(`
 				<plan>
 					<name>Gold plan</name>
@@ -163,7 +163,7 @@ func TestPlans_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, DisplayQuantity: recurly.NewBool(false)},
+			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: recurly.NewAmount(1500)}, DisplayQuantity: recurly.NewBool(false)},
 			expected: MustCompactString(`
 				<plan>
 					<name>Gold plan</name>
@@ -175,7 +175,7 @@ func TestPlans_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, SuccessURL: "https://example.com/success"},
+			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: recurly.NewAmount(1500)}, SuccessURL: "https://example.com/success"},
 			expected: MustCompactString(`
 				<plan>
 					<name>Gold plan</name>
@@ -187,7 +187,7 @@ func TestPlans_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, CancelURL: "https://example.com/cancel"},
+			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: recurly.NewAmount(1500)}, CancelURL: "https://example.com/cancel"},
 			expected: MustCompactString(`
 				<plan>
 					<name>Gold plan</name>
@@ -199,7 +199,7 @@ func TestPlans_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, TaxExempt: recurly.NewBool(true)},
+			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: recurly.NewAmount(1500)}, TaxExempt: recurly.NewBool(true)},
 			expected: MustCompactString(`
 				<plan>
 					<name>Gold plan</name>
@@ -211,7 +211,7 @@ func TestPlans_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, TaxExempt: recurly.NewBool(false)},
+			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: recurly.NewAmount(1500)}, TaxExempt: recurly.NewBool(false)},
 			expected: MustCompactString(`
 				<plan>
 					<name>Gold plan</name>
@@ -223,7 +223,7 @@ func TestPlans_Encoding(t *testing.T) {
 			`),
 		},
 		{
-			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: 1500}, TaxCode: "physical"},
+			v: recurly.Plan{Name: "Gold plan", UnitAmountInCents: recurly.UnitAmount{USD: recurly.NewAmount(1500)}, TaxCode: "physical"},
 			expected: MustCompactString(`
 				<plan>
 					<name>Gold plan</name>
@@ -398,12 +398,12 @@ func NewTestPlan() *recurly.Plan {
 		TrialIntervalUnit:        "days",
 		TaxExempt:                recurly.NewBool(false),
 		UnitAmountInCents: recurly.UnitAmount{
-			USD: 6000,
-			EUR: 4500,
+			USD: recurly.NewAmount(6000),
+			EUR: recurly.NewAmount(4500),
 		},
 		SetupFeeInCents: recurly.UnitAmount{
-			USD: 1000,
-			EUR: 800,
+			USD: recurly.NewAmount(1000),
+			EUR: recurly.NewAmount(800),
 		},
 		CreatedAt: recurly.NewTime(MustParseTime("2015-05-29T17:38:15Z")),
 	}

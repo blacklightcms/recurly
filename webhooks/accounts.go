@@ -10,6 +10,7 @@ const (
 	CanceledAccount         = "canceled_account_notification"
 	BillingInfoUpdated      = "billing_info_updated_notification"
 	BillingInfoUpdateFailed = "billing_info_update_failed_notification"
+	NewShippingAddress      = "new_shipping_address_notification"
 )
 
 // AccountNotification is returned for all account notifications.
